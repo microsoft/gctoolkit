@@ -1,0 +1,62 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+package com.microsoft.censum.aggregator;
+
+import com.microsoft.censum.event.jvm.JVMEvent;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Consumer;
+
+public class JVMEventDispatcher {
+    private final Map<Class<? extends JVMEvent>, Consumer<JVMEvent>> eventConsumers = new HashMap<>();
+
+    private final Consumer<JVMEvent> nopConsumer = (evt) -> {
+    };
+
+    private <R extends JVMEvent> Consumer<JVMEvent> getConsumerForClass(Class<R> eventClass) {
+        Class<? extends JVMEvent> clazz = eventClass;
+
+        //Fast path that should hit after the event has been seen for the first time
+        Consumer<JVMEvent> eventConsumer = eventConsumers.get(clazz);
+        if (eventConsumer != null) {
+            return eventConsumer;
+        }
+
+        do {
+            eventConsumer = eventConsumers.get(clazz);
+
+            if (eventConsumer != null) {
+
+                if (eventClass != clazz) {
+                    //optimisation to avoid walking up the class tree every time, if we get a hit on
+                    //R maps to eventConsumer, just put it in the map and it will fetch first time in the future
+                    eventConsumers.put(eventClass, eventConsumer);
+                }
+
+                //visit the most specific ONLY
+                return eventConsumer;
+            }
+
+            if (clazz == JVMEvent.class) {
+                // Hit the top of the hierachy
+                break;
+            } else {
+                //Unfortunate cast but assuming register has done its job it is impossible for this cast to fail
+                clazz = (Class<? extends JVMEvent>) clazz.getSuperclass();
+            }
+        } while (clazz != null);
+
+        //no handler for eventClass so lets put in a stub so we dont have to figure this out on every event
+        eventConsumers.put(eventClass, nopConsumer);
+        return nopConsumer;
+    }
+
+    public <R extends JVMEvent> void register(Class<R> eventClass, Consumer<? super R> process) {
+        eventConsumers.put(eventClass, (Consumer<JVMEvent>)process);
+    }
+
+    public <R extends JVMEvent> void dispatch(R event) {
+        getConsumerForClass(event.getClass()).accept(event);
+    }
+}
