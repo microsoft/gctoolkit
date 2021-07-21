@@ -19,6 +19,7 @@ module censum.vertx {
             censum.vertx.test;
 
     exports com.microsoft.censum.vertx.jvm to
+            censum.api,
             censum.vertx.test;
 
     provides JavaVirtualMachine with DefaultJavaVirtualMachine;

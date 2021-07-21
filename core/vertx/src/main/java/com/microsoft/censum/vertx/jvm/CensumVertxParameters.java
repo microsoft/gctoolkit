@@ -39,7 +39,7 @@ import java.util.logging.Logger;
                     if (found = (value == eventSource)) break;
                 }
             }
-            clazz = (Class<Aggregator<?>>) clazz.getSuperclass();
+            //clazz = (Class<Aggregator<?>>) clazz.getSuperclass();
         } while (!found && (clazz = (Class<Aggregator<?>>) clazz.getSuperclass()) != null);
 
         return found;
