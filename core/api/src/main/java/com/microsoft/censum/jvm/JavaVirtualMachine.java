@@ -36,5 +36,5 @@ public interface JavaVirtualMachine {
 
     JvmConfiguration getJvmConfiguration();
 
-    <T extends Aggregation> Aggregation getAggregations(Class<T> aggregationClass);
+    <T extends Aggregation> T getAggregation(Class<T> aggregationClass);
 }
