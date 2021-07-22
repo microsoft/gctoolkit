@@ -93,8 +93,9 @@ public class DefaultJavaVirtualMachine implements JavaVirtualMachine {
         return getTimeOfLastEvent().getTimeStamp();        }
 
     @Override
-    public <T extends Aggregation> Aggregation getAggregation(Class<T> aggregationClass) {
-        return aggregatedData != null ? aggregatedData.get(aggregationClass) : null;
+    @SuppressWarnings("unchecked")
+    public <T extends Aggregation> T getAggregation(Class<T> aggregationClass) {
+        return aggregatedData != null ? (T)aggregatedData.get(aggregationClass) : null;
     }
 
     @Override

@@ -119,11 +119,11 @@ import java.util.Set;
         }
 
         if (diary.isZGC()) {
-            throw new UnsupportedOperationException("Internal Censum Error: " + getClass().getName() + " cannot process ZGC");
+            throw new IllegalStateException("Internal Censum Error: " + getClass().getName() + " cannot process ZGC");
         }
 
         if (diary.isShenandoah()) {
-            throw new UnsupportedOperationException("Internal Censum Error: " + getClass().getName() + " cannot process Shenandoah");
+            throw new IllegalStateException("Internal Censum Error: " + getClass().getName() + " cannot process Shenandoah");
         }
 
         if (diary.isTenuringDistribution()) {

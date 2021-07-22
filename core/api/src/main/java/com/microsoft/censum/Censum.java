@@ -96,7 +96,7 @@ public class Censum {
         JavaVirtualMachine javaVirtualMachine = loadJavaVirtualMachine();
         try {
             Method analyze = javaVirtualMachine.getClass().getMethod("analyze", Set.class, DataSource.class);
-            analyze.invoke(javaVirtualMachine, this, dataSource);
+            analyze.invoke(javaVirtualMachine, this.registeredAggregations, dataSource);
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
             LOGGER.log(Level.SEVERE, "Cannot invoke analyze method",e);
         }

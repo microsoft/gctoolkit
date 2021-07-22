@@ -95,5 +95,5 @@ public interface JavaVirtualMachine {
      * @param <T> type cast for the Aggregation class type.
      * @return an {@code Aggregation} whose {@code getClass() == aggregationClass}, or {@code null}
      */
-    <T extends Aggregation> Aggregation getAggregation(Class<T> aggregationClass);
+    <T extends Aggregation> T getAggregation(Class<T> aggregationClass);
 }

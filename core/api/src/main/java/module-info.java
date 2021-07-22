@@ -41,5 +41,5 @@ module censum.api {
     requires java.logging;
 
     uses com.microsoft.censum.jvm.JavaVirtualMachine;
-    uses com.microsoft.censum.aggregator.Aggregator;
+    uses com.microsoft.censum.aggregator.Aggregation;
 }
