@@ -7,6 +7,7 @@
 module censum.sample {
 
     provides com.microsoft.censum.aggregator.Aggregation with com.microsoft.censum.sample.aggregation.HeapOccupancyAfterCollectionSummary;
+    exports com.microsoft.censum.sample.aggregation to censum.vertx;
 
     requires censum.api;
     requires censum.vertx;
