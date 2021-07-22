@@ -10,24 +10,24 @@ import java.util.function.Consumer;
 /**
  * An Aggregator consumes a JVMEvent, extracts data from the event, and calls on an
  * Aggregation which collates the data.
- * An Aggregators uses the {@code {@literal @}Aggregates} annotation to declare the
+ * An Aggregators uses the <code>{@literal @}Aggregates</code> annotation to declare the
  * EventSource(s) of the JVMEvents it handles.
  * The constructor of an Aggregator must call {@link #register(Class, Consumer)}
  * to register the consumer methods of JVMEvents the Aggregator consumes.
- *
+ * <p>
  * This example Aggregator aggregates events from the G1GC event source. It consumes
  * and processes four different events. The {@code Consumer} method for each event extracts
  * the cause of the collection and calls the GCCauseAggregation {@code record} method.
- * The implementation of
- * <pre>{@code
  *
- * \@Collates(GCCauseAggregator)
+ * <pre><code>
+ *
+ * {@literal @}Collates(GCCauseAggregator)
  * public interface GCCauseAggregation extends Aggregation {
  *     record(GarbageCollectionType type, GCCause cause);
  * }
  *
- * \@Aggregates(EventSource.G1GC)
- * public class GCCauseAggregator extends Aggregator<GCCauseAggregation> {
+ * {@literal @}Aggregates(EventSource.G1GC)
+ * public class GCCauseAggregator extends Aggregator{@literal <}GCCauseAggregation{@literal >} {
  *
  *     public GCCauseAggregator(GCCauseAggregation aggregation) {
  *         super(aggregation);
@@ -53,7 +53,7 @@ import java.util.function.Consumer;
  *         aggregation().record(GarbageCollectionTypes.FullGC, collection.getGCCause());
  *     }
  * }
- * }</pre>
+ * </code></pre>
  * @param <A> The type of Aggregation
  */
 public abstract class Aggregator<A extends Aggregation> {
@@ -66,7 +66,7 @@ public abstract class Aggregator<A extends Aggregation> {
 
     /**
      * Subclass only.
-     * @param aggregation The Aggregation that {@code @Collates} this Aggregator
+     * @param aggregation The Aggregation that {@literal @}Collates this Aggregator
      * @see Collates
      * @see Aggregation
      */

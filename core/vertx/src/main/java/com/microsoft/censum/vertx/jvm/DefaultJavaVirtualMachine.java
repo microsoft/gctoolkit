@@ -63,7 +63,7 @@ public class DefaultJavaVirtualMachine implements JavaVirtualMachine {
     }
 
     @Override
-    public boolean isConcurrent() {
+    public boolean isCMS() {
         return jvmConfigurationFromParser.getDiary().isCMS();
     }
 
@@ -93,7 +93,7 @@ public class DefaultJavaVirtualMachine implements JavaVirtualMachine {
         return getTimeOfLastEvent().getTimeStamp();        }
 
     @Override
-    public <T extends Aggregation> Aggregation getAggregations(Class<T> aggregationClass) {
+    public <T extends Aggregation> Aggregation getAggregation(Class<T> aggregationClass) {
         return aggregatedData != null ? aggregatedData.get(aggregationClass) : null;
     }
 

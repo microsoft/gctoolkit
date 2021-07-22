@@ -30,7 +30,7 @@
                 <version>3.3.0</version>
                 <configuration>
                     <excludePackageNames>
-                        com.microsoft.censum.parser,com.microsoft.censum.vertx
+                        com.microsoft.censum.parser.**,com.microsoft.censum.vertx.**,com.microsoft.censum.sample.**
                     </excludePackageNames>
                 </configuration>
             </plugin>

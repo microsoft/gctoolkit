@@ -16,10 +16,8 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 /**
- * SingleGCLogFile is a file containing a single GC log. If the file is a zip or gzip file,
+ * A single GC log file. If the file is a zip or gzip file,
  * then the first entry is the file of interest.
- * zip or gzip assumed that the first file in the zip is the file of interest
- * todo: URI to a single file (on the web???)
  */
 public class SingleGCLogFile extends GCLogFile {
 
@@ -49,6 +47,7 @@ public class SingleGCLogFile extends GCLogFile {
 
     }
 
+    @Override
     public Stream<String> stream() throws IOException {
         return stream(path, getMetaData());
     }

@@ -1,5 +1,8 @@
 package com.microsoft.censum.jvm;
 
+/**
+ * The configuration of the Java Virtual Machine, calculated from the GC log analysis.
+ */
 public interface JvmConfiguration {
     /**
      * Was the JVM configured with {@code -XX:+PrintGCDetails}, or with {@code -Xlog:gc*}?
@@ -35,6 +38,12 @@ public interface JvmConfiguration {
      */
     int getMaxTenuringThreshold();
 
+    /**
+     * Return {@code true} if the JDK version has been determined from parsing the log file. This method
+     * should be used in conjunction with {@link #isJDK70()}, {@link #isJDK80()}}, and {@link #isPreJDK17040()}
+     * to determine whether these methods return {@code false} because the parser could not determine the JDK version.
+     * @return {@code} true if the JDK version is known.
+     */
     boolean isJDKVersionKnown();
 
     /**
