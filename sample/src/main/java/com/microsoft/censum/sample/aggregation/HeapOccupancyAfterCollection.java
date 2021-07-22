@@ -20,8 +20,8 @@ public class HeapOccupancyAfterCollection extends Aggregator<HeapOccupancyAfterC
         register(ShenandoahCycle.class,this::extractHeapOccupancy);
     }
 
-    //@Override
-    public HeapOccupancyAfterCollectionAggregation aggregation(JavaVirtualMachine javaVirtualMachine) {
+    @Override
+    public HeapOccupancyAfterCollectionAggregation aggregation() {
         return aggregation();
     }
 
