@@ -18,13 +18,12 @@ import java.lang.annotation.Target;
  * that makes sense for how the data is to be viewed. For example: one may want to
  * summarize the data as a histogram, or one may want to collect a series of data
  * for plotting.
- * <pre>
- * {@code
- * @Aggregates({EventSource.G1GC. EventSource.Generational, EventSource.ZGC, EventSource.Shenandoah})
+ * <pre>{@code
+ * \@Aggregates({EventSource.G1GC. EventSource.Generational, EventSource.ZGC, EventSource.Shenandoah})
  * public class PauseTimeAggregator extends Aggregator<PauseTimeAggregation> {
- * ...
+ *     ...
  * }
- * @Collates(PauseTimeAggregator.class)
+ * \@Collates(PauseTimeAggregator.class)
  * public interface PauseTimeAggregation extends Aggregation {
  *     ...
  * }
@@ -36,7 +35,7 @@ import java.lang.annotation.Target;
  * public class PauseTimeGraph implements PauseTimeAggregation {
  *     ...
  * }
- * </pre>
+ * }</pre>
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)

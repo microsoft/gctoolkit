@@ -8,15 +8,29 @@ import com.microsoft.censum.event.jvm.JVMTermination;
 import java.util.function.Consumer;
 
 /**
- * An Aggregator consumes a JVMEvent and accumulates counts and stats about that JVMEvent.
- * JVMEvents are {@link #consume(JVMEvent) consumed} and dispatched to methods written to
- * handle a particular kind of event. Aggregators should {@link #register(Class, Consumer)}
- * the event handlers in their constructor.
- * <code>
- *     <pre>
- *public class G1GCCauseAggregator extends GCCauseAggregator {
+ * An Aggregator consumes a JVMEvent, extracts data from the event, and calls on an
+ * Aggregation which collates the data.
+ * An Aggregators uses the {@code {@literal @}Aggregates} annotation to declare the
+ * EventSource(s) of the JVMEvents it handles.
+ * The constructor of an Aggregator must call {@link #register(Class, Consumer)}
+ * to register the consumer methods of JVMEvents the Aggregator consumes.
  *
- *     public G1GCCauseAggregator() {
+ * This example Aggregator aggregates events from the G1GC event source. It consumes
+ * and processes four different events. The {@code Consumer} method for each event extracts
+ * the cause of the collection and calls the GCCauseAggregation {@code record} method.
+ * The implementation of
+ * <pre>{@code
+ *
+ * \@Collates(GCCauseAggregator)
+ * public interface GCCauseAggregation extends Aggregation {
+ *     record(GarbageCollectionType type, GCCause cause);
+ * }
+ *
+ * \@Aggregates(EventSource.G1GC)
+ * public class GCCauseAggregator extends Aggregator<GCCauseAggregation> {
+ *
+ *     public GCCauseAggregator(GCCauseAggregation aggregation) {
+ *         super(aggregation);
  *         register(G1Young.class, this::process);
  *         register(G1Mixed.class, this::process);
  *         register(G1YoungInitialMark.class, this::process);
@@ -24,23 +38,23 @@ import java.util.function.Consumer;
  *     }
  *
  *     private void process(G1Young collection) {
- *         record(GarbageCollectionTypes.Young, collection.getGCCause());
+ *         aggregation().record(GarbageCollectionTypes.Young, collection.getGCCause());
  *     }
  *
  *     private void process(G1Mixed collection) {
- *         record(GarbageCollectionTypes.Mixed, collection.getGCCause());
+ *         aggregation().record(GarbageCollectionTypes.Mixed, collection.getGCCause());
  *     }
  *
  *     private void process(G1YoungInitialMark collection) {
- *         record(GarbageCollectionTypes.G1GCYoungInitialMark, collection.getGCCause());
+ *         aggregation().record(GarbageCollectionTypes.G1GCYoungInitialMark, collection.getGCCause());
  *     }
  *
  *     private void process(G1FullGC collection) {
- *         record(GarbageCollectionTypes.FullGC, collection.getGCCause());
+ *         aggregation().record(GarbageCollectionTypes.FullGC, collection.getGCCause());
  *     }
  * }
- *     </pre>
- * </code>
+ * }</pre>
+ * @param <A> The type of Aggregation
  */
 public abstract class Aggregator<A extends Aggregation> {
 
@@ -52,6 +66,9 @@ public abstract class Aggregator<A extends Aggregation> {
 
     /**
      * Subclass only.
+     * @param aggregation The Aggregation that {@code @Collates} this Aggregator
+     * @see Collates
+     * @see Aggregation
      */
     protected Aggregator(A aggregation) {
         this.aggregation = aggregation;
@@ -74,16 +91,18 @@ public abstract class Aggregator<A extends Aggregation> {
      * is registered.
      * <p>
      * The typical pattern is to call this method from the constructor of the Aggregator sub-class.
-     * <code><pre>
+     * <pre>{@code
      *     register(G1Young.class, this::process);
-     * </pre></code>
+     * }</pre>
      * The {@code Consumer} for this example would be coded as:
-     * <code><pre>
+     * <pre>{@code
      *     private void process(G1Young collection) {...}
-     * </pre></code>
-     * Where the body of the method would pull out and aggregate the relevant data from the event.
+     * }</pre>
+     * Where the body of the method would pull the relevant data from the event
+     * and pass the data on to the Aggregation.
      * @param eventClass the Class of the JVMEvent type to register.
      * @param process the handler which processes the event
+     * @param <E> the type of JVMEvent
      */
     protected <E extends JVMEvent> void register(Class<E> eventClass, Consumer<? super E> process) {
         jvmEventDispatcher.register(eventClass, process);
@@ -93,8 +112,9 @@ public abstract class Aggregator<A extends Aggregation> {
      * This method consumes a JVMEvent and dispatches it to the
      * {@link #register(Class, Consumer) registered consumer}.
      * @param event an event to be processed
+     * @param <E> the type of JVMEvent
      */
-    public <R extends JVMEvent> void consume(R event) {
+    public <E extends JVMEvent> void consume(E event) {
         jvmEventDispatcher.dispatch(event);
     }
 
