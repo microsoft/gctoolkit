@@ -5,10 +5,9 @@ package com.microsoft.censum.vertx.test.io;
 import com.microsoft.censum.io.GCLogFile;
 import com.microsoft.censum.io.RotatingGCLogFile;
 import com.microsoft.censum.io.SingleGCLogFile;
-import com.microsoft.censum.vertx.jvm.JVMEventSource;
+import com.microsoft.censum.vertx.JVMEventSource;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Vertx;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;

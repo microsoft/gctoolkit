@@ -1,6 +1,6 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
-package com.microsoft.censum.vertx.jvm;
+package com.microsoft.censum.vertx;
 
 import com.microsoft.censum.io.DataSource;
 import io.vertx.core.AbstractVerticle;

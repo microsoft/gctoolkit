@@ -8,7 +8,6 @@ import com.microsoft.censum.io.DataSource;
 import com.microsoft.censum.time.DateTimeStamp;
 import com.microsoft.censum.vertx.aggregator.AggregatorVerticle;
 import com.microsoft.censum.vertx.io.JVMEventCodec;
-import com.microsoft.censum.vertx.jvm.JVMEventSource;
 import com.microsoft.censum.vertx.jvm.LogFileParser;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.DeploymentOptions;

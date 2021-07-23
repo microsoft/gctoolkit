@@ -35,6 +35,7 @@ public class HeapOccupancyAfterCollectionSummary implements HeapOccupancyAfterCo
         return aggregations.isEmpty();
     }
 
+    @Override
     public String toString() {
         return "Collected " + aggregations.size() + " elements";
     }

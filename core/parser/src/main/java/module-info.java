@@ -33,5 +33,4 @@ module censum.parser {
     requires censum.api;
     requires java.logging;
 
-
 }
