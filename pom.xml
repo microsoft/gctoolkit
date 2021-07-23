@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.microsoft.censum</groupId>
-    <artifactId>censum-parent</artifactId>
+    <artifactId>gctoolkit</artifactId>
     <packaging>pom</packaging>
     <version>2.0.1-SNAPSHOT</version>
 
@@ -28,7 +28,7 @@
         <connection>scm:git:git@github.com:microsoft/gctoolkit.git</connection>
         <developerConnection>scm:git:git@github.com:microsoft/gctoolkit.git</developerConnection>
         <url>https://github.com/microsoft/gctoolkit</url>
-        <tag>censum-parent-2.0.0</tag>
+        <tag>gctoolkit-2.0.0</tag>
     </scm>
 
     <developers>
