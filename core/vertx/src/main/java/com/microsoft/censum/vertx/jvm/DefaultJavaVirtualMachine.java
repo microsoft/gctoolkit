@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
 package com.microsoft.censum.vertx.jvm;
 
 import com.microsoft.censum.aggregator.Aggregation;
@@ -63,7 +65,7 @@ public class DefaultJavaVirtualMachine implements JavaVirtualMachine {
     }
 
     @Override
-    public boolean isConcurrent() {
+    public boolean isCMS() {
         return jvmConfigurationFromParser.getDiary().isCMS();
     }
 

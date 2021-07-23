@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
 package com.microsoft.censum.aggregator;
 
 import java.lang.annotation.ElementType;
@@ -6,15 +8,15 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * This annotation is used by implementations of Aggregator to indicate
- * to the AggregationRegistry the source of the events being aggregated.
+ * This annotation is used by implementations of {@link Aggregator} to indicate
+ * the source of the events being aggregated. An {@code Aggregator} must include
+ * this annotation in order to receive JVM events from the parser.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 /**
  * This annotation is used by implementations of Aggregator to indicate
- * to the AggregatorRegistry the source of the events being aggregated.
- * @see AggregatorRegistry#getAggregators(EventSource)
+ * the source of the events being aggregated.
  */
 public @interface Aggregates {
     /**
