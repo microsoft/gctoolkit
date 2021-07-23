@@ -65,7 +65,7 @@ public class DefaultJavaVirtualMachine implements JavaVirtualMachine {
     }
 
     @Override
-    public boolean isConcurrent() {
+    public boolean isCMS() {
         return jvmConfigurationFromParser.getDiary().isCMS();
     }
 

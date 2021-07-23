@@ -28,6 +28,10 @@ import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+/**
+ * A collection of rotating GC log files. The collection will contain only those files that can be
+ * considered contiguous. The log file segments are ordered, with the current or newest file first.
+ */
 public class RotatingGCLogFile extends GCLogFile {
 
     private final static Logger LOGGER = Logger.getLogger(RotatingGCLogFile.class.getName());
@@ -67,8 +71,9 @@ public class RotatingGCLogFile extends GCLogFile {
     }
 
     /**
-     * Use the given path to find rotating log files.
-     * @param path the path to the file
+     * Use the given path to find rotating log files. If the path is a file, the file name is used to match
+     * other files in the directory. If the path is a directory, all files in the directory are considered.
+     * @param path the path to a rotating log file, or to a directory containing rotating log files.
      */
     public RotatingGCLogFile(Path path) {
         super(path, isUnifiedLogging(path));
@@ -89,15 +94,26 @@ public class RotatingGCLogFile extends GCLogFile {
         }
     }
 
+    /**
+     * Create a RotatingGCLogFile with the given log file segments.
+     * @param parentDirectory The directory that contains the log file segments.
+     * @param segments The log file segments.
+     */
     public RotatingGCLogFile(Path parentDirectory, List<GarbageCollectionLogFileSegment> segments) {
         super(parentDirectory, isUnifiedLogging(parentDirectory, segments));
         this.orderedGarbageCollectionLogFiles = orderSegments(segments);
     }
 
-    // suffix is like '.0' or '.5.current'
+    /**
+     * A regular expression for matching a file name suffix such as '.0' or '.5.current'
+     */
     private static final String ROTATING_LOG_SUFFIX = ".*(\\.\\d+(?:\\.current)?)$";
 
-    // given Path.getFileName().toString(), group(1) is the suffix of the rotating log.
+    /**
+     * A pattern for matching the suffix of a rotating log file, such as '.0' or '.5.current'. Given
+     * Path.getFileName().toString(), group(1) is the suffix of the rotating log. The dot is not
+     * captured in the first group.
+     */
     public static final Pattern ROTATING_LOG_PATTERN = Pattern.compile(ROTATING_LOG_SUFFIX);
 
     private final LinkedList<GarbageCollectionLogFileSegment> orderedGarbageCollectionLogFiles;
@@ -159,6 +175,12 @@ public class RotatingGCLogFile extends GCLogFile {
         return new BufferedReader(new InputStreamReader(sequenceInputStream)).lines();
     }
 
+    /**
+     * The {@link GarbageCollectionLogFileSegment}s in rotating order. Note that only the contiguous
+     * log file segments are included. Therefore, the number of log file segments may be less than
+     * the files that match the rotating pattern.
+     * @return The log file segments in rotating order.
+     */
     public List<GarbageCollectionLogFileSegment> getOrderedGarbageCollectionLogFiles() {
         return Collections.unmodifiableList(orderedGarbageCollectionLogFiles);
     }

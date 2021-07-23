@@ -10,6 +10,9 @@ import java.util.ArrayList;
 import java.util.logging.Logger;
 import java.util.zip.ZipFile;
 
+/**
+ * Meta-data about a {@link FileDataSource}.
+ */
 public class FileDataSourceMetaData {
 
     private final static Logger LOG = Logger.getLogger(FileDataSourceMetaData.class.getName());
@@ -77,22 +80,43 @@ public class FileDataSourceMetaData {
     }
 
 
+    /**
+     * Return the number of files. Useful if the file is a compressed file which may
+     * contain multiple entries.
+     * @return The number of files in the file.
+     */
     public int getNumberOfFiles() {
         return this.numberOfFiles;
     }
 
+    /**
+     * {@code true} if the file is a Zip compressed file. 
+     * @return {@code true} if the file is a Zip compressed file.
+     */
     public boolean isZip() {
         return this.zip;
     }
 
+    /**
+     * {@code true} if the file is a GZip compressed file. 
+     * @return {@code true} if the file is a GZip compressed file.
+     */
     public boolean isGZip() {
         return this.gzip;
     }
 
+    /**
+     * {@code true} if the file is a regular file. 
+     * @return {@code true} if the file is a regular file.
+     */
     public boolean isFile() {
         return !(isGZip() || isZip() || isDirectory());
     }
 
+    /**
+     * {@code true} if the file is a directory. 
+     * @return {@code true} if the file is a directory.
+     */
     public boolean isDirectory() {
         return path.toFile().isDirectory();
     }

@@ -11,10 +11,18 @@ import java.nio.file.Path;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
+/**
+ * A {@link RotatingGCLogFile} is made up of {@code GarbageCollectionLogFileSegment}s. Creating
+ * a {@code GarbageCollectionLogFileSegment} is not necessary when the
+ * {@link RotatingGCLogFile#RotatingGCLogFile(Path)} constructor is used.
+ * The {@link RotatingGCLogFile#RotatingGCLogFile(Path, List)} constructor allows the user to
+ * provide a list of discrete {@code GarbageCollectionLogFileSegement}s for a {@code RotatingGCLogFile}.
+ */
 public class GarbageCollectionLogFileSegment {
 
     private static final String ROTATING_LOG_SUFFIX = ".*\\.(\\d+)(\\.current)?$";
@@ -47,6 +55,11 @@ public class GarbageCollectionLogFileSegment {
     private DateTimeStamp endTime = null;
     private DateTimeStamp startTime = null;
 
+    /**
+     * The constructor attempts to extract the segment index from the file name.
+     * @param path The path to the file.
+     * @see #segmentIndex
+     */
     public GarbageCollectionLogFileSegment(Path path) {
         this.path = path;
 
@@ -62,14 +75,27 @@ public class GarbageCollectionLogFileSegment {
         }
     }
 
+    /**
+     * Return the path to the file.
+     * @return The path to the file.
+     */
     public Path getPath() {
         return path;
     }
 
+    /**
+     * The segment index is the integer appended to the file name. If the file name does not
+     * have a segment index, then {@code Integer.MAX_VALUE} is returned.
+     * @return The segment index, or {@code Integer.MAX_VALUE} if the file does not have a segment index.
+     */
     public int getSegmentIndex() {
         return segmentIndex;
     }
 
+    /**
+     * Stream the file, one line at a time.
+     * @return A stream of lines from the file.
+     */
     public Stream<String> stream() {
         try {
             return Files.lines(path);
@@ -79,17 +105,21 @@ public class GarbageCollectionLogFileSegment {
         return null;
     }
 
+    /**
+     * Return {@code true} if the log file segment was the file being written to.
+     * @return {@code true} if the log file segment was the current file.
+     */
     public boolean isCurrent() {
         return current;
     }
 
-    public DateTimeStamp ageOfJVMAtLogStart() throws IOException {
+    private DateTimeStamp ageOfJVMAtLogStart() throws IOException {
         if (startTime == null)
             startTime = scanForTimeOfLogStart(path);
         return startTime;
     }
 
-    public DateTimeStamp ageOfJVMAtLogEnd() throws IOException {
+    private DateTimeStamp ageOfJVMAtLogEnd() throws IOException {
         if (endTime == null)
             endTime = scanForTimeOfLogEnd(path);
         return endTime;
@@ -100,6 +130,14 @@ public class GarbageCollectionLogFileSegment {
 
     // does this log begin after otherSegment ends
     // log roll over has no JVM age.. can we estimate this...
+
+    /**
+     * Return true if this segment is a rollover from the other segment. If this segment starts
+     * after the other segment ends, and the time difference between them is small, the segments are
+     * considered contiguous.
+     * @param otherSegment The log file segment being compared to this.
+     * @return {@code true} if this segment is a rollover from the other segment.
+     */
     public boolean isContiguousWith(GarbageCollectionLogFileSegment otherSegment) {
         // Compare by calendar date, if possible.
         double delta = rolloverDelta(this, otherSegment);
@@ -111,7 +149,7 @@ public class GarbageCollectionLogFileSegment {
     }
 
     // calculate the delta between the start of newSegment and the end of oldSegment.
-    static double rolloverDelta(GarbageCollectionLogFileSegment newSegment, GarbageCollectionLogFileSegment oldSegment) {
+    /* package scope for testing */ static double rolloverDelta(GarbageCollectionLogFileSegment newSegment, GarbageCollectionLogFileSegment oldSegment) {
         DateTimeStamp startAge = null;
         DateTimeStamp endAge = null;
         try {
@@ -143,8 +181,13 @@ public class GarbageCollectionLogFileSegment {
         return startTime - endTime;
     }
 
+    /**
+     * {@inheritDoc}
+     * @return Returns {@code this.getPath().toString(); }
+     */
+    @Override
     public String toString() {
-        return path.toFile().toString();
+        return path.toString();
     }
 
     private static Matcher matcher(String line) {
@@ -203,16 +246,11 @@ public class GarbageCollectionLogFileSegment {
                 .orElse(null);
     }
 
-    /**
-     * todo: implementation may be a bit ugly...
-     * https://codereview.stackexchange.com/questions/79039/get-the-tail-of-a-file-the-last-10-lines
-     * Tail is not a class, it's a method so the solution in stackoverflow isn't correct but the core
-     * could be used here as it's cleaner
-     *
-     * @param numberOfLines
-     * @return
-     * @throws IOException
-     */
+
+     // todo: implementation may be a bit ugly...
+     // https://codereview.stackexchange.com/questions/79039/get-the-tail-of-a-file-the-last-10-lines
+     // Tail is not a class, it's a method so the solution in stackoverflow isn't correct but the core
+     // could be used here as it's cleaner
     private static ArrayList<String> tail(Path path, int numberOfLines) throws IOException {
 
         char LF = '\n';

@@ -8,11 +8,32 @@ package com.microsoft.censum.aggregator;
  * @see Aggregates
  */
 public enum EventSource {
+    /**
+     * Event come from CMS, Parallel or Serial collectors.
+     */
     GENERATIONAL,
+    /**
+     * Events come from the G1 collector.
+     */
     G1GC,
+    /**
+     * Events come from the Shenandoah collector.
+     */
     SHENANDOAH,
+    /**
+     * Events come from the ZGC collector.
+     */
     ZGC,
+    /**
+     * Events come from the safe points in the GC log, or from a separate safepoint log.
+     */
     SAFEPOINT,
+    /**
+     * Events come from the survivor space.
+     */
     SURVIVOR,
+    /**
+     * Events come from the tenured space.
+     */
     TENURED;
 }
