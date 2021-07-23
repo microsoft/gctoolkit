@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
 package com.microsoft.censum.parser.jvm;
 
 public enum GarbageCollectorAlgorithm {

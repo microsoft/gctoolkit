@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
 open module censum.api.test {
     requires censum.api;
     requires java.logging;

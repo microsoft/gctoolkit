@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
 package com.microsoft.censum;
 
 import com.microsoft.censum.aggregator.Aggregation;

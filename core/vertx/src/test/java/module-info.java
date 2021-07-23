@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
 open module censum.vertx.test {
     requires censum.api;
     requires censum.parser;
