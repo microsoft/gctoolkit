@@ -7,7 +7,6 @@ import com.microsoft.censum.event.g1gc.G1GCPauseEvent;
 import com.microsoft.censum.event.generational.GenerationalGCPauseEvent;
 import com.microsoft.censum.event.shenandoah.ShenandoahCycle;
 import com.microsoft.censum.event.zgc.ZGCCycle;
-import com.microsoft.censum.jvm.JavaVirtualMachine;
 
 @Aggregates({EventSource.G1GC,EventSource.GENERATIONAL,EventSource.ZGC,EventSource.SHENANDOAH})
 public class HeapOccupancyAfterCollection extends Aggregator<HeapOccupancyAfterCollectionAggregation> {
