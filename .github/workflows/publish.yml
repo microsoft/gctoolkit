@@ -32,13 +32,9 @@ jobs:
           git config user.name "GitHub Actions"
       - name: Prepare the release
         run: mvn -B release:prepare -DpushChanges=false
-        env:
-          GITHUB_TOKEN: ${{ secrets.TEMP_PAT }}
 
       - name: Perform the release
         run: mvn -B release:perform -DlocalCheckout=true -Darguments="-DskipTests -Dmaven.javadoc.skip=true"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Bump pom version
         run : git push
