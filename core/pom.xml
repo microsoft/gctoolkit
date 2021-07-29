@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>censum-parent</artifactId>
-        <groupId>com.microsoft.censum</groupId>
+        <artifactId>gctoolkit</artifactId>
+        <groupId>com.microsoft.gctoolkit</groupId>
         <version>2.0.1-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
@@ -20,5 +20,20 @@
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
     </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.3.0</version>
+                <configuration>
+                    <excludePackageNames>
+                        com.microsoft.gctoolkit.parser.**,com.microsoft.gctoolkit.vertx.**,com.microsoft.gctoollkit.sample.**
+                    </excludePackageNames>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

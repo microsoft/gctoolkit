@@ -1,7 +1,9 @@
-open module censum.parser.test {
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+open module gctoolkit.parser.test {
 
-    requires censum.api;
-    requires censum.parser;
+    requires gctoolkit.api;
+    requires gctoolkit.parser;
     requires java.logging;
 
     requires org.junit.jupiter.engine;

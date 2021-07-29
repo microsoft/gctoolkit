@@ -1,0 +1,47 @@
+name: Publish package to GitHub Packages
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  publish:
+
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+      packages: write
+
+    steps:
+      - name: Checkout project
+        uses: actions/checkout@v2
+        with:
+          ref: main
+
+      - name: Setup Java JDK
+        uses: actions/setup-java@v2
+        with:
+          java-version: '11'
+          distribution: 'adopt'
+          server-id: github
+
+      - name: Configure Git user
+        run: |
+          git config user.email "actions@github.com"
+          git config user.name "GitHub Actions"
+      - name: Prepare the release
+        run: mvn -B release:prepare -DpushChanges=false
+        env:
+          GITHUB_TOKEN: ${{ secrets.TEMP_PAT }}
+
+      - name: Perform the release
+        run: mvn -B release:perform -DlocalCheckout=true -Darguments="-DskipTests -Dmaven.javadoc.skip=true"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Bump pom version
+        run : git push
+
+      - name: Push tags
+        run: git push --tags

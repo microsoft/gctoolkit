@@ -4,7 +4,7 @@
 
     <parent>
         <artifactId>core</artifactId>
-        <groupId>com.microsoft.censum</groupId>
+        <groupId>com.microsoft.gctoolkit</groupId>
         <version>2.0.1-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
@@ -13,12 +13,12 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.microsoft.censum</groupId>
+            <groupId>com.microsoft.gctoolkit</groupId>
             <artifactId>api</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.microsoft.censum</groupId>
+            <groupId>com.microsoft.gctoolkit</groupId>
             <artifactId>parser</artifactId>
             <version>${project.parent.version}</version>
         </dependency>

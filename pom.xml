@@ -2,8 +2,8 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.microsoft.censum</groupId>
-    <artifactId>censum-parent</artifactId>
+    <groupId>com.microsoft.gctoolkit</groupId>
+    <artifactId>gctoolkit</artifactId>
     <packaging>pom</packaging>
     <version>2.0.1-SNAPSHOT</version>
 
@@ -28,7 +28,7 @@
         <connection>scm:git:git@github.com:microsoft/gctoolkit.git</connection>
         <developerConnection>scm:git:git@github.com:microsoft/gctoolkit.git</developerConnection>
         <url>https://github.com/microsoft/gctoolkit</url>
-        <tag>censum-parent-2.0.0</tag>
+        <tag>gctoolkit-2.0.0</tag>
     </scm>
 
     <developers>
@@ -79,7 +79,7 @@
         <dependencies>
             <dependency>
                 <groupId>com.microsoft.gctoolkit</groupId>
-                <artifactId>censum-testdata</artifactId>
+                <artifactId>gctoolkit-testdata</artifactId>
                 <version>1.0.0</version>
                 <type>zip</type>
                 <scope>test</scope>
@@ -140,26 +140,26 @@
                             <skip>${skipUnpack}</skip>
                             <artifactItems>
                                 <artifactItem>
-                                    <groupId>com.microsoft.censum</groupId>
-                                    <artifactId>censum-gclogs</artifactId>
+                                    <groupId>com.microsoft.gctoolkit</groupId>
+                                    <artifactId>gctoolkit-gclogs</artifactId>
                                     <version>1.0.0</version>
                                     <type>zip</type>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>com.microsoft.censum</groupId>
-                                    <artifactId>censum-gclogs-rolling</artifactId>
+                                    <groupId>com.microsoft.gctoolkit</groupId>
+                                    <artifactId>gctoolkit-gclogs-rolling</artifactId>
                                     <version>1.0.0</version>
                                     <type>zip</type>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>com.microsoft.censum</groupId>
-                                    <artifactId>censum-shenandoah-logs</artifactId>
+                                    <groupId>com.microsoft.gctoolkit</groupId>
+                                    <artifactId>gctoolkit-shenandoah-logs</artifactId>
                                     <version>1.0.0</version>
                                     <type>zip</type>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>com.microsoft.censum</groupId>
-                                    <artifactId>censum-zgc-logs</artifactId>
+                                    <groupId>com.microsoft.gctoolkit</groupId>
+                                    <artifactId>gctoolkit-zgc-logs</artifactId>
                                     <version>1.0.0</version>
                                     <type>zip</type>
                                 </artifactItem>

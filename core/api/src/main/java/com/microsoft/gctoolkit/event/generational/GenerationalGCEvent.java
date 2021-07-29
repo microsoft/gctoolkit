@@ -1,0 +1,15 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+package com.microsoft.gctoolkit.event.generational;
+
+import com.microsoft.gctoolkit.event.GCCause;
+import com.microsoft.gctoolkit.event.GCEvent;
+import com.microsoft.gctoolkit.event.GarbageCollectionTypes;
+import com.microsoft.gctoolkit.time.DateTimeStamp;
+
+public abstract class GenerationalGCEvent extends GCEvent {
+
+    protected GenerationalGCEvent(DateTimeStamp timeStamp, GarbageCollectionTypes type, GCCause cause, double duration) {
+        super(timeStamp, type, cause, duration);
+    }
+}

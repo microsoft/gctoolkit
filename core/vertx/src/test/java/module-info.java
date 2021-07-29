@@ -1,7 +1,9 @@
-open module censum.vertx.test {
-    requires censum.api;
-    requires censum.parser;
-    requires censum.vertx;
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+open module gctoolkit.vertx.test {
+    requires gctoolkit.api;
+    requires gctoolkit.parser;
+    requires gctoolkit.vertx;
     requires java.logging;
     requires io.vertx.core;
 
