@@ -65,18 +65,7 @@ import java.util.logging.Logger;
             Class<? extends Aggregator<?>> aggregatorClass,
             Class<? extends Aggregation> aggregationClass) {
         try {
-<<<<<<< HEAD
             return (Aggregator<?>) aggregatorClass.getConstructors()[0].newInstance(aggregationClass.getConstructors()[0].newInstance());
-=======
-            Constructor<?>[] constructors = aggregatorClass.getConstructors();
-            Aggregation aggregation = aggregationClass.getConstructor().newInstance();
-                return (Aggregator<?>) constructors[0].newInstance(aggregation);
-//            Constructor<? extends Aggregator<?>> ctor = aggregatorClass.getConstructor(aggregationClass);
-//            return ctor.newInstance(aggregationClass);
-        } catch (NoSuchMethodException | SecurityException e) {
-            LOGGER.log(Level.WARNING, aggregatorClass +
-                    " must have a public constructor that takes a single, Class<? extends Aggregation> parameter");
->>>>>>> main
         } catch (InstantiationException | IllegalAccessException |
                 IllegalArgumentException | InvocationTargetException e) {
             LOGGER.log(Level.WARNING, "Cannot construct instance of " + aggregatorClass + ": " + e);
