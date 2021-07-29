@@ -23,5 +23,3 @@ jobs:
         distribution: 'adopt'
     - name: Build with Maven
       run: mvn -B package --file pom.xml
-      env:
-        GITHUB_TOKEN: ${{ secrets.TEMP_PAT }}
