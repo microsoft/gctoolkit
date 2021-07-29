@@ -25,11 +25,13 @@ jobs:
           java-version: '11'
           distribution: 'adopt'
           server-id: github
+          settings-path: ${{ github.workspace }} # location for the settings.xml file
 
       - name: Configure Git user
         run: |
           git config user.email "actions@github.com"
           git config user.name "GitHub Actions"
+          
       - name: Prepare the release
         run: mvn -B release:prepare -DpushChanges=false --settings $GITHUB_WORKSPACE/settings.xml
         env:
