@@ -2,7 +2,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>gctoolkit</artifactId>
-        <groupId>com.microsoft.censum</groupId>
+        <groupId>com.microsoft.gctoolkit</groupId>
         <version>2.0.1-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
@@ -29,7 +29,7 @@
                 <version>3.3.0</version>
                 <configuration>
                     <excludePackageNames>
-                        com.microsoft.censum.parser.**,com.microsoft.censum.vertx.**,com.microsoft.censum.sample.**
+                        com.microsoft.gctoolkit.parser.**,com.microsoft.censum.vertx.**,com.microsoft.censum.sample.**
                     </excludePackageNames>
                 </configuration>
             </plugin>
