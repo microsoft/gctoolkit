@@ -12,7 +12,7 @@ public class LogLineFilter {
     private static final Logger LOGGER = Logger.getLogger(LogLineFilter.class.getName());
 
     //Define a regex prefix to remove from the logging statement
-    //Example, -Dcom.microsoft.censum.filter="^\d{8}\.\d{6} strips off an 8 digit dot 6 digit number off of the front of the line.
+    //Example, -Dcom.microsoft.gctoolkit.filter="^\d{8}\.\d{6} strips off an 8 digit dot 6 digit number off of the front of the line.
     private static final String PREFIX_FILTER_PROPERTY = "com.microsoft.gctoolkit.filter"; //Define a prefix to remove from the logging statement
 
     private static final String VERBOSE_PROPERTY = "com.microsoft.gctoolkit.verbose.log";
