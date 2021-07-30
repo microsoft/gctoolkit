@@ -73,6 +73,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <jdk.version>11</jdk.version>
+        <skipUnpack>false</skipUnpack>
     </properties>
 
     <dependencyManagement>
