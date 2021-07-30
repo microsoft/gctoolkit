@@ -8,7 +8,7 @@ import com.microsoft.gctoolkit.io.GCLogFile;
 import com.microsoft.gctoolkit.jvm.JavaVirtualMachine;
 import com.microsoft.gctoolkit.jvm.JvmConfiguration;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
-import com.microsoft.gctoolkit.vertx.CensumVertx;
+import com.microsoft.gctoolkit.vertx.GCToolkitVertx;
 import com.microsoft.gctoolkit.parser.jvm.JVMConfiguration;
 import com.microsoft.gctoolkit.parser.jvm.PreUnifiedJVMConfiguration;
 import com.microsoft.gctoolkit.parser.jvm.UnifiedJVMConfiguration;
@@ -128,18 +128,18 @@ public class DefaultJavaVirtualMachine implements JavaVirtualMachine {
 
             this.jvmConfigurationFromParser.fillInKnowns();
 
-            CensumVertxParameters censumVertxParameters = gcLogFile.isUnifiedFormat()
-                    ? new CensumVertxParametersForUnifiedLogs(registeredAggregations, this.jvmConfigurationFromParser)
-                    : new CensumVertxParametersForPreUnifiedLogs(registeredAggregations, this.jvmConfigurationFromParser);
+            GCToolkitVertxParameters GCToolkitVertxParameters = gcLogFile.isUnifiedFormat()
+                    ? new GCToolkitVertxParametersForUnifiedLogs(registeredAggregations, this.jvmConfigurationFromParser)
+                    : new GCToolkitVertxParametersForPreUnifiedLogs(registeredAggregations, this.jvmConfigurationFromParser);
 
-            this.timeOfLastEvent = CensumVertx.aggregateDataSource(
+            this.timeOfLastEvent = GCToolkitVertx.aggregateDataSource(
                     dataSource,
-                    censumVertxParameters.logFileParsers(),
-                    censumVertxParameters.aggregatorVerticles(),
-                    censumVertxParameters.mailBox()
+                    GCToolkitVertxParameters.logFileParsers(),
+                    GCToolkitVertxParameters.aggregatorVerticles(),
+                    GCToolkitVertxParameters.mailBox()
             );
 
-            censumVertxParameters.aggregatorVerticles().stream()
+            GCToolkitVertxParameters.aggregatorVerticles().stream()
                     .flatMap(aggregatorVerticle -> aggregatorVerticle.aggregators().stream())
                     .forEach(aggregator -> {
                         Aggregation aggregation = aggregator.aggregation();

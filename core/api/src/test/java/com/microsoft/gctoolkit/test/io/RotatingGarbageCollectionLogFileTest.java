@@ -70,7 +70,7 @@ class RotatingGarbageCollectionLogFileTest {
     }
 
     @Test
-    void testCensumDesktopUsage() {
+    void testRollingLogOrderUsage() {
         Path path = getPath( "rolling/jdk14/rollinglogs/rollover.log");
         List<String> expected = Arrays.asList(
                 "rollover.log.3", "rollover.log.4", "rollover.log.0", "rollover.log.1", "rollover.log.2", "rollover.log"

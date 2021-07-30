@@ -25,3 +25,6 @@ out/
 
 # vi
 **/*.swp
+
+# jenv version
+.java-version
