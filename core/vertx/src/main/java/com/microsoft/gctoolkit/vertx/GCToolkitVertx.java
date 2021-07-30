@@ -19,9 +19,9 @@ import java.io.IOException;
 import java.util.Set;
 import java.util.logging.Logger;
 
-public class CensumVertx extends AbstractVerticle {
+public class GCToolkitVertx extends AbstractVerticle {
 
-    private static final Logger LOGGER = Logger.getLogger(CensumVertx.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(GCToolkitVertx.class.getName());
 
     public static final String PARSER_INBOX = "PARSER";
     public static final String JVM_EVENT_PARSER_OUTBOX = "JVMEventParser";
@@ -45,7 +45,7 @@ public class CensumVertx extends AbstractVerticle {
     private final Vertx vertx;
     private DateTimeStamp timeOfLastEvent = new DateTimeStamp(0.0d);
 
-    private CensumVertx(String mailBox) {
+    private GCToolkitVertx(String mailBox) {
         disableCaching();
         this.mailBox = mailBox;
         this.vertx = Vertx.vertx();
@@ -68,27 +68,27 @@ public class CensumVertx extends AbstractVerticle {
             Set<AggregatorVerticle> aggregatorVerticles,
             String mailBox) throws IOException {
 
-        CensumVertx censumVertx = new CensumVertx(mailBox);
+        GCToolkitVertx GCToolkitVertx = new GCToolkitVertx(mailBox);
         JVMEventSource jvmEventSource = new JVMEventSource(PARSER_INBOX);
-        censumVertx.deployVerticle(jvmEventSource);
+        GCToolkitVertx.deployVerticle(jvmEventSource);
         jvmEventSource.awaitDeployment();
 
-        censumVertx.deployVerticle(censumVertx);
+        GCToolkitVertx.deployVerticle(GCToolkitVertx);
 
         logFileParsers.forEach(logFileParser -> {
-            censumVertx.deployVerticle(logFileParser, new DeploymentOptions().setWorker(true));
+            GCToolkitVertx.deployVerticle(logFileParser, new DeploymentOptions().setWorker(true));
         });
         logFileParsers.forEach(LogFileParser::awaitDeployment);
 
-        aggregatorVerticles.forEach(censumVertx::deployVerticle);
+        aggregatorVerticles.forEach(GCToolkitVertx::deployVerticle);
         aggregatorVerticles.forEach(AggregatorVerticle::awaitDeployment);
 
         jvmEventSource.publishGCDataSource(dataSource);
         aggregatorVerticles.forEach(AggregatorVerticle::awaitCompletion);
 
-        censumVertx.shutdown();
+        GCToolkitVertx.shutdown();
 
-        return censumVertx.timeOfLastEvent;
+        return GCToolkitVertx.timeOfLastEvent;
     }
 
     private Future<String> deployVerticle(Verticle verticle) {

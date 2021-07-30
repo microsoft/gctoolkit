@@ -200,7 +200,7 @@ public class ParallelJVMConfigurationTest extends LogDiaryTest {
     };
 
     private static String[] detailsTenuring80 = {
-            "censum-kabutz-1398331617.vgc"
+            "1398331617.vgc"
     };
 
     private static boolean[][] detailsTenuring80Diary = {
@@ -223,7 +223,6 @@ public class ParallelJVMConfigurationTest extends LogDiaryTest {
             testWith(name, detailsTenuringAdaptiveSizingDiary[i], detailsTenuringAdaptiveSizingDiaryUnknown[i], detailsTenuringAdaptiveSizingDiaryKnown[i++]);
         }
     }
-
 
     private static String[] detailsTenuringAdpativeSizing = {
             "ps/details/tenuring/adaptive_sizing/icap.log"

@@ -9,16 +9,15 @@ import com.microsoft.gctoolkit.aggregator.Collates;
 import com.microsoft.gctoolkit.aggregator.EventSource;
 import com.microsoft.gctoolkit.vertx.aggregator.AggregatorVerticle;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/* package-scope */ abstract class CensumVertxParameters {
+/* package-scope */ abstract class GCToolkitVertxParameters {
 
-    private static final Logger LOGGER = Logger.getLogger(CensumVertxParameters.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(GCToolkitVertxParameters.class.getName());
 
     abstract Set<LogFileParser> logFileParsers();
     abstract Set<AggregatorVerticle> aggregatorVerticles();

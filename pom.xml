@@ -73,6 +73,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <jdk.version>11</jdk.version>
+        <skipUnpack>false</skipUnpack>
     </properties>
 
     <dependencyManagement>
@@ -80,7 +81,7 @@
             <dependency>
                 <groupId>com.microsoft.gctoolkit</groupId>
                 <artifactId>gctoolkit-testdata</artifactId>
-                <version>1.0.0</version>
+                <version>1.0.1</version>
                 <type>zip</type>
                 <scope>test</scope>
             </dependency>
