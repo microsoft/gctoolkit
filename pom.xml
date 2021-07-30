@@ -81,7 +81,7 @@
             <dependency>
                 <groupId>com.microsoft.gctoolkit</groupId>
                 <artifactId>gctoolkit-testdata</artifactId>
-                <version>1.0.0</version>
+                <version>1.0.1</version>
                 <type>zip</type>
                 <scope>test</scope>
             </dependency>
