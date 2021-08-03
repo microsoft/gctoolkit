@@ -9,7 +9,9 @@ import com.microsoft.gctoolkit.aggregator.Collates;
 import com.microsoft.gctoolkit.aggregator.EventSource;
 import com.microsoft.gctoolkit.vertx.aggregator.AggregatorVerticle;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Level;
@@ -23,51 +25,66 @@ import java.util.logging.Logger;
     abstract Set<AggregatorVerticle> aggregatorVerticles();
     abstract String mailBox();
 
-    // routine to find if this Aggregator Aggregates eventSource.
+    // routine to find what this Aggregator Aggregates.
     @SuppressWarnings("unchecked")
-    private static boolean aggregatorClassAggregates(Class<? extends Aggregator<?>> clazz, EventSource eventSource) {
+    private static void aggregatorAggregates(Class<?> clazz, Set<EventSource> eventSources) {
 
-        if (clazz == null) return false;
+        if (clazz == null || clazz == Aggregator.class) {
+            return;
+        }
 
-        boolean found = false;
-        do {
-            if (clazz.isAnnotationPresent(Aggregates.class)) {
-                Aggregates aggregates = clazz.getAnnotation(Aggregates.class);
-                EventSource[] aggregatesValue = aggregates.value();
-                for (EventSource value : aggregatesValue) {
-                    if (found = (value == eventSource)) break;
-                }
+        if (clazz.isAnnotationPresent(Aggregates.class)) {
+            Aggregates aggregates = clazz.getAnnotation(Aggregates.class);
+            if (aggregates != null) {
+                Collections.addAll(eventSources, aggregates.value());
             }
-            //clazz = (Class<Aggregator<?>>) clazz.getSuperclass();
-        } while (!found && (clazz = (Class<Aggregator<?>>) clazz.getSuperclass()) != null);
+        }
 
-        return found;
+        aggregatorAggregates((Class<?>) clazz.getSuperclass(), eventSources);
+
+        Class<?>[] interfaces = clazz.getInterfaces();
+        for(Class<?> iface : interfaces) {
+            aggregatorAggregates(iface, eventSources);
+        }
+
     }
 
     @SuppressWarnings("unchecked")
-    private static Class<? extends Aggregator<?>> getAggregatorClassFromCollatesAnnotation(Class<? extends Aggregation> clazz) {
+    private static Class<? extends Aggregator<?>> getAggregatorClassFromCollatesAnnotation(Class<?> clazz) {
 
-        if (clazz == null) return null;
+        if (clazz == null) {
+            return null;
+        } else if (clazz.isAnnotationPresent(Collates.class)) {
+            Collates collates = clazz.getAnnotation(Collates.class);
+            return collates.value();
+        } else {
+            Class<? extends Aggregator<?>> aggregatorClass = getAggregatorClassFromCollatesAnnotation(clazz.getSuperclass());
 
-        Class<? extends Aggregator<?>> aggregatorClass = null;
-        do {
-            if (clazz.isAnnotationPresent(Collates.class)) {
-                Collates collates = clazz.getAnnotation(Collates.class);
-                aggregatorClass = collates.value();
+            if (aggregatorClass == null) {
+                Class<?>[] interfaces = clazz.getInterfaces();
+                for (Class<?> iface : interfaces) {
+                    aggregatorClass = getAggregatorClassFromCollatesAnnotation(iface);
+                    if (aggregatorClass != null) break;
+                }
             }
-        } while (aggregatorClass == null && (clazz = (Class<Aggregation>)clazz.getSuperclass()) != null);
 
-        return aggregatorClass;
+            return aggregatorClass;
+        }
     }
 
     private static Aggregator<?> createAggregator(
             Class<? extends Aggregator<?>> aggregatorClass,
             Class<? extends Aggregation> aggregationClass) {
         try {
+            Constructor<?>[] constructors = aggregatorClass.getConstructors();
+            if (constructors.length == 0) {
+                LOGGER.log(Level.WARNING, aggregatorClass + " must have a public constructor which takes a " +  Aggregation.class);
+                return null;
+            }
             return (Aggregator<?>) aggregatorClass.getConstructors()[0].newInstance(aggregationClass.getConstructors()[0].newInstance());
         } catch (InstantiationException | IllegalAccessException |
                 IllegalArgumentException | InvocationTargetException e) {
-            LOGGER.log(Level.WARNING, "Cannot construct instance of " + aggregatorClass + ": " + e);
+            LOGGER.log(Level.WARNING, e + ": Cannot construct instance of " + aggregatorClass);
         }
         return null;
     }
@@ -76,11 +93,14 @@ import java.util.logging.Logger;
             EventSource eventSource,
             Set<Class<? extends Aggregation>> registeredAggregations)
     {
-        Set<Aggregator<?>> aggregators = new HashSet<>();
+        final Set<Aggregator<?>> aggregators = new HashSet<>();
+        final Set<EventSource> eventSources = new HashSet<>();
 
         registeredAggregations.forEach(aggregationClass -> {
             Class<? extends Aggregator<?>> aggregatorClass = getAggregatorClassFromCollatesAnnotation(aggregationClass);
-            if (aggregatorClassAggregates(aggregatorClass, eventSource)) {
+            eventSources.clear(); // reusing the Set...
+            aggregatorAggregates(aggregatorClass, eventSources);
+            if (eventSources.contains(eventSource)) {
                 Aggregator<?> aggregator = createAggregator(aggregatorClass, aggregationClass);
                 if (aggregator != null) aggregators.add(aggregator);
             }
