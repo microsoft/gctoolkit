@@ -1,5 +1,7 @@
 # Microsoft GCToolKit
 
+[![GCToolKit build with Maven](https://github.com/microsoft/gctoolkit/actions/workflows/maven.yml/badge.svg)](https://github.com/microsoft/gctoolkit/actions/workflows/maven.yml)
+
 ## Getting Started
 
 ### Maven Coordinates
