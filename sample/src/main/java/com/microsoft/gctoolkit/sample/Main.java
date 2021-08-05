@@ -17,7 +17,7 @@ public class Main {
     }
 
     public void execute() {
-        GCLogFile logFile = new SingleGCLogFile(Path.of("./gclogs/preunified/cms/defnew/details/defnew.log"));
+        GCLogFile logFile = new SingleGCLogFile(Path.of("../gclogs/preunified/cms/defnew/details/defnew.log"));
         GCToolKit gcToolKit = new GCToolKit();
         JavaVirtualMachine machine = gcToolKit.analyze(logFile);
         HeapOccupancyAfterCollectionAggregation results = machine.getAggregation(HeapOccupancyAfterCollectionSummary.class);

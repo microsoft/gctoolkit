@@ -19,11 +19,6 @@ public class HeapOccupancyAfterCollection extends Aggregator<HeapOccupancyAfterC
         register(ShenandoahCycle.class,this::extractHeapOccupancy);
     }
 
-    //@Override
-    public HeapOccupancyAfterCollectionAggregation aggregation() {
-        return aggregation();
-    }
-
     private void extractHeapOccupancy(GenerationalGCPauseEvent event) {
         aggregation().addDataPoint(event.getGarbageCollectionType(), event.getDateTimeStamp(), event.getHeap().getOccupancyAfterCollection());
     }
