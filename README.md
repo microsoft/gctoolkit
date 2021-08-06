@@ -4,10 +4,53 @@ GCToolKit is a set of libraries for analyzing Java garbage collection (GC) log f
 
 [![GCToolKit build with Maven](https://github.com/microsoft/gctoolkit/actions/workflows/maven.yml/badge.svg)](https://github.com/microsoft/gctoolkit/actions/workflows/maven.yml)
 
+---
+**NOTE**
+
+The gctoolkit build relies on test data which is archived in [GitHub Packages](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-apache-maven-registry). This requires you to [authenticate to GitHub packages with a personal access token (PAT)](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-apache-maven-registry#authenticating-with-a-personal-access-token) 
+to build and test. 
+
+If your organization uses Single Sign-On (SSO), also follow the directions under [Authorizing a personal access token for use with SAML single sign-on](https://docs.github.com/en/github/authenticating-to-github/authenticating-with-saml-single-sign-on/authorizing-a-personal-access-token-for-use-with-saml-single-sign-on).
+
+You must also add github as a server in your `~/.m2/settings.xml` file. Replace USERNAME with your GitHub user name and TOKEN with your PAT.
+```xml
+    <server>
+      <id>github</id>
+      <username>USERNAME</username>
+      <password>TOKEN</password>
+    </server>
+```
+---
 ## Getting Started
 
 ### Maven Coordinates
+```xml
+<repository>
+    <id>github</id>
+    <name>GCToolKit packages</name>
+    <url>https://maven.pkg.github.com/microsoft/*</url>
+</repository>
+```
 
+```xml
+<dependency>
+    <groupId>com.microsoft.gctoolkit</groupId>
+    <artifactId>api</artifactId>
+    <version>2.0.1-SNAPSHOT</version>
+</dependency>
+
+<dependency>
+    <groupId>com.microsoft.gctoolkit</groupId>
+    <artifactId>parser</artifactId>
+    <version>2.0.1-SNAPSHOT</version>
+</dependency>
+
+<dependency>
+    <groupId>com.microsoft.gctoolkit</groupId>
+    <artifactId>vertx</artifactId>
+    <version>2.0.1-SNAPSHOT</version>
+</dependency>
+```
 ### Example
 
 ## Build and Test
