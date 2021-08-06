@@ -74,6 +74,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>11</maven.compiler.release>
         <skipUnpack>false</skipUnpack>
+        <gctoolkit-testdata-version>1.0.2</gctoolkit-testdata-version>
     </properties>
 
     <dependencyManagement>
@@ -81,7 +82,7 @@
             <dependency>
                 <groupId>com.microsoft.gctoolkit</groupId>
                 <artifactId>gctoolkit-testdata</artifactId>
-                <version>1.0.1</version>
+                <version>${gctoolkit-testdata-version}</version>
                 <type>zip</type>
                 <scope>test</scope>
             </dependency>
@@ -144,25 +145,25 @@
                                 <artifactItem>
                                     <groupId>com.microsoft.gctoolkit</groupId>
                                     <artifactId>gctoolkit-gclogs</artifactId>
-                                    <version>1.0.1</version>
+                                    <version>${gctoolkit-testdata-version}</version>
                                     <type>zip</type>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>com.microsoft.gctoolkit</groupId>
                                     <artifactId>gctoolkit-gclogs-rolling</artifactId>
-                                    <version>1.0.1</version>
+                                    <version>${gctoolkit-testdata-version}</version>
                                     <type>zip</type>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>com.microsoft.gctoolkit</groupId>
                                     <artifactId>gctoolkit-shenandoah-logs</artifactId>
-                                    <version>1.0.1</version>
+                                    <version>${gctoolkit-testdata-version}</version>
                                     <type>zip</type>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>com.microsoft.gctoolkit</groupId>
                                     <artifactId>gctoolkit-zgc-logs</artifactId>
-                                    <version>1.0.1</version>
+                                    <version>${gctoolkit-testdata-version}</version>
                                     <type>zip</type>
                                 </artifactItem>
                             </artifactItems>
