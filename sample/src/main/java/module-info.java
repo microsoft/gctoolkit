@@ -9,11 +9,11 @@ import com.microsoft.gctoolkit.sample.aggregation.HeapOccupancyAfterCollectionSu
  */
 module gctoolkit.sample {
 
-    requires gctoolkit.api;
-    requires gctoolkit.vertx;
+    requires com.microsoft.gctoolkit.api;
+    requires com.microsoft.gctoolkit.vertx;
     requires java.logging;
 
-    exports com.microsoft.gctoolkit.sample.aggregation to gctoolkit.vertx;
+    exports com.microsoft.gctoolkit.sample.aggregation to com.microsoft.gctoolkit.vertx;
 
     provides Aggregation with HeapOccupancyAfterCollectionSummary;
 }
