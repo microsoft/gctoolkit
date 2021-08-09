@@ -566,7 +566,7 @@ public class GenerationalHeapParser extends PreUnifiedGCLogParser implements Sim
         record(collection);
     }
 
-    //Very rare occurance where ParNew suffers from a promotion failure during the reset. This is, and isn't a CMF but will be treated as one.
+    //Very rare occurence where ParNew suffers from a promotion failure during the reset. This is, and isn't a CMF but will be treated as one.
     public void parNewToPsudoConcurrentModeFailure(GCLogTrace trace, String line) {
         ConcurrentModeFailure collection = new ConcurrentModeFailure(scavengeTimeStamp, GCCause.PROMOTION_FAILED, trace.getDoubleGroup(trace.groupCount()));
         MemoryPoolSummary tenured = trace.getOccupancyBeforeAfterWithMemoryPoolSizeSummary(1);
