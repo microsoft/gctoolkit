@@ -42,7 +42,7 @@ public class JVMEventDispatcher {
             }
 
             if (clazz == JVMEvent.class) {
-                // Hit the top of the hierachy
+                // Hit the top of the hierarchy
                 break;
             } else {
                 //Unfortunate cast but assuming register has done its job it is impossible for this cast to fail
