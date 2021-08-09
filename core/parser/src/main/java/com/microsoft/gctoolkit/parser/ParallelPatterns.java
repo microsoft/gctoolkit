@@ -28,7 +28,7 @@ public interface ParallelPatterns extends SharedPatterns {
     GCParseRule SERIAL_FULL_REFERENCE = new GCParseRule("SERIAL_FULL_REFERENCE", FULL_GC_PREFIX + DATE_TIMESTAMP + "\\[Tenured" + REFERENCE_RECORDS + ": " + BEFORE_AFTER_CONFIGURED_PAUSE + "\\] " + BEFORE_AFTER_CONFIGURED + "\\, " + PERM_RECORD + ", " + PAUSE_TIME);
     GCParseRule PS_FULL_REFERENCE = new GCParseRule("PS_FULL_REFERENCE", FULL_GC_PREFIX + REFERENCE_RECORDS + "\\s*" + PS_BLOCK + " \\[(?:PSFull|PSOldGen|ParOldGen): " + BEFORE_AFTER_CONFIGURED + "\\] " + BEFORE_AFTER_CONFIGURED + "(?:,)? " + PERM_RECORD + ", " + PAUSE_TIME);
 
-    //Moronic HotSpot/GC developers decided on yet another arbitrary format change... Why we need the comma... beyound me!
+    //Moronic HotSpot/GC developers decided on yet another arbitrary format change... Why we need the comma... beyond me!
     //22.014: [Full GC (Metadata GC Threshold) [PSYoungGen: 16865K->0K(107008K)] [ParOldGen: 108907K->103881K(124416K)] 125773K->103881K(231424K), [Metaspace: 21089K->21089K(1067008K)], 0.2715010 secs]
     //0.221: [Full GC (Ergonomics) [PSYoungGen: 10736K->0K(76288K)] [ParOldGen: 120258K->115108K(175104K)] 130995K->115108K(251392K), [Metaspace: 4209K->4207K(1056768K)], 0.0235254 secs]
     //42384.024: [Full GC [PSYoungGen: 1696K->0K(70464K)] [PSFull: 928442K->125867K(932096K)] 930139K->125867K(1002560K) [PSPermGen: 37030K->37030K(65536K)], 117.0312620 secs]
