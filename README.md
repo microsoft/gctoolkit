@@ -24,7 +24,7 @@ The gctoolkit build relies on test data which is archived in [GitHub Packages](h
 
 If your organization uses Single Sign-On (SSO), also follow the directions under [Authorizing a personal access token for use with SAML single sign-on](https://docs.github.com/en/github/authenticating-to-github/authenticating-with-saml-single-sign-on/authorizing-a-personal-access-token-for-use-with-saml-single-sign-on).
 
-You must also add github as a server in your `~/.m2/settings.xml` file. Replace USERNAME with your GitHub user name and TOKEN with your PAT.
+You must also add `github` as a server in your `~/.m2/settings.xml` file. Replace `USERNAME` with your GitHub user name and `TOKEN` with your PAT.
 
 ```xml
     <server>
@@ -40,7 +40,7 @@ You must also add github as a server in your `~/.m2/settings.xml` file. Replace 
 
 ### Maven Coordinates
 
-TODO Add some context as to why we need this and where it should go.
+The GCToolKit artifacts are in GitHub packages. To use the GCToolKit artifacts as dependencies in your project, `github` must be added as a repository in your POM file.
 
 ```xml
 <repository>
@@ -54,31 +54,26 @@ TODO Add some context as to why we need this and where it should go.
 <dependency>
     <groupId>com.microsoft.gctoolkit</groupId>
     <artifactId>api</artifactId>
-    <version>2.0.1-SNAPSHOT</version>
+    <version>2.0.1</version>
 </dependency>
 
 <dependency>
     <groupId>com.microsoft.gctoolkit</groupId>
     <artifactId>parser</artifactId>
-    <version>2.0.1-SNAPSHOT</version>
+    <version>2.0.1</version>
 </dependency>
 
 <dependency>
     <groupId>com.microsoft.gctoolkit</groupId>
     <artifactId>vertx</artifactId>
-    <version>2.0.1-SNAPSHOT</version>
+    <version>2.0.1</version>
 </dependency>
 
 ```
 
 ### Example
 
-TODO Shell script needs to be added.
-
-```shell
-cd sample
-./sample.sh
-```
+See [sample/README](./sample/README.md)
 
 ## Build and Test
 
@@ -87,11 +82,11 @@ The build is vanilla Maven.
 * `mvn clean` - remove build artifacts
 * `mvn compile` - compile the source code
 * `mvn test` - run unit tests (this project uses TestNG)
-* `mvn package` - build the .jar file
+* `mvn package` - build the .jar files
 
 ## Contributing
 
-See [CONTRIBUTING.md] for full details.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for full details.
 
 ## License
 

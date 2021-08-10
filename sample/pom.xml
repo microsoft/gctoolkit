@@ -11,6 +11,10 @@
 
     <artifactId>sample</artifactId>
 
+    <properties>
+        <gcLogFile>../gclogs/preunified/cms/defnew/details/defnew.log</gcLogFile>
+    </properties>    
+
     <dependencies>
         <dependency>
             <groupId>com.microsoft.gctoolkit</groupId>
@@ -23,5 +27,32 @@
             <version>${project.parent.version}</version>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <configuration>
+                    <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.0.0</version>
+                <configuration>
+                    <executable>java</executable>
+                    <arguments>
+                        <argument>--module-path</argument>
+                        <!-- Create the modulepath using all project dependencies and project build directory -->
+                        <modulepath/>
+                        <argument>--module</argument>
+                        <argument>gctoolkit.sample/com.microsoft.gctoolkit.sample.Main</argument>
+                        <argument>${gcLogFile}</argument>
+                    </arguments>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>
