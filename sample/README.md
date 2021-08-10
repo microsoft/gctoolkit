@@ -1,4 +1,4 @@
-# GCToolKit Sample
+ # GCToolKit introductory sample
 
 This sample shows how to use [GCToolKit](../README.md) to analyze a GC log file and report on total heap occupancy after a GC cycle has been completed. For more details on how GCToolKit and this sample work, visit [Introducing Microsoft GCToolKit](https://devblogs.microsoft.com/java/introducing-microsoft-gctoolkit/).
 
