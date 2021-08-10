@@ -7,7 +7,6 @@ import com.microsoft.gctoolkit.jvm.JavaVirtualMachine;
 import com.microsoft.gctoolkit.sample.aggregation.HeapOccupancyAfterCollectionAggregation;
 import com.microsoft.gctoolkit.sample.aggregation.HeapOccupancyAfterCollectionSummary;
 
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class Main {
