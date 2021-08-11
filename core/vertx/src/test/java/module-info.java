@@ -1,9 +1,9 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 open module gctoolkit.vertx.test {
-    requires gctoolkit.api;
-    requires gctoolkit.parser;
-    requires gctoolkit.vertx;
+    requires com.microsoft.gctoolkit.api;
+    requires com.microsoft.gctoolkit.parser;
+    requires com.microsoft.gctoolkit.vertx;
     requires java.logging;
     requires io.vertx.core;
 

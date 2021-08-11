@@ -722,7 +722,7 @@ public class PreUnifiedJVMConfiguration implements SimplePatterns, CMSPatterns, 
      *
      * The following table bit encodes all of the Collector flags. The flags cannot be acted upon until all of the
      * flags have been seen as not all combinations of flags are valid and certain combinations will yield unexpected
-     * configurations. The method evaluateGCLogFlags() will examine the flags and set the corrisponding values in the
+     * configurations. The method evaluateGCLogFlags() will examine the flags and set the corresponding values in the
      * deriveConfiguration.
      *
      * GC Flag                  Bit Value

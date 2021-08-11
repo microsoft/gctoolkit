@@ -8,7 +8,7 @@ import com.microsoft.gctoolkit.vertx.jvm.DefaultJavaVirtualMachine;
  * Contains a vertx based implementation of GCToolKit. The vertx implementation is an internal module.
  * @provides com.microsoft.gctoolkit.jvm.JavaVirtualMachine
  */
-module gctoolkit.vertx {
+module com.microsoft.gctoolkit.vertx {
     exports com.microsoft.gctoolkit.vertx to
             gctoolkit.vertx.test;
 
@@ -19,13 +19,13 @@ module gctoolkit.vertx {
             gctoolkit.vertx.test;
 
     exports com.microsoft.gctoolkit.vertx.jvm to
-            gctoolkit.api,
+            com.microsoft.gctoolkit.api,
             gctoolkit.vertx.test;
 
     provides JavaVirtualMachine with DefaultJavaVirtualMachine;
 
-    requires gctoolkit.api;
-    requires gctoolkit.parser;
+    requires com.microsoft.gctoolkit.api;
+    requires com.microsoft.gctoolkit.parser;
     requires java.logging;
     requires io.vertx.core;
 }

@@ -28,3 +28,9 @@ out/
 
 # jenv version
 .java-version
+
+# VSCode / Eclipse IDE
+**/*.classpath
+**/*.project
+**/*.settings/
+.vscode/
