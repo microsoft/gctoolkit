@@ -75,7 +75,6 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>11</maven.compiler.release>
         <skipUnpack>false</skipUnpack>
-
         <junit.version>5.7.2</junit.version>
 
         <maven.plugin.jacoco.version>0.8.7</maven.plugin.jacoco.version>
