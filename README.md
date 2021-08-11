@@ -8,6 +8,13 @@ For more detail you can read our [Launch Blog Post](https://devblogs.microsoft.c
 
 ---
 
+Test Coverage Report:
+
+![Coverage::Core::API](.github/badges/jacoco1.svg)
+![Coverage::Core::Parser](.github/badges/jacoco2.svg)
+
+
+
 ## Introduction
 
 Managed memory in the Java Virtual Machine (JVM) is comprised of 3 main pieces:
