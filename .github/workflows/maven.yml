@@ -28,7 +28,6 @@ jobs:
       run: mvn -B package --file pom.xml --settings $GITHUB_WORKSPACE/settings.xml
       env:
         GITHUB_TOKEN: ${{ github.token }}
-
     - name: Generate JaCoCo Badges for core/api
       id: coreApi
       uses: cicirello/jacoco-badge-generator@v2
@@ -37,7 +36,6 @@ jobs:
         jacoco-csv-file: core/api/target/site/jacoco/jacoco.csv
         coverage-badge-filename: jacoco1.svg
         branches-badge-filename: branches1.svg
-
     - name: Generate JaCoCo Badges for core/parser
       id: coreParser
       uses: cicirello/jacoco-badge-generator@v2
@@ -46,7 +44,6 @@ jobs:
         jacoco-csv-file: core/parser/target/site/jacoco/jacoco.csv
         coverage-badge-filename: jacoco2.svg
         branches-badge-filename: branches2.svg
-
     - name: Generate JaCoCo Badges for core/vertx
       id: coreVertx
       uses: cicirello/jacoco-badge-generator@v2
