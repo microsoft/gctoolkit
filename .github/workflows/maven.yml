@@ -47,6 +47,15 @@ jobs:
         coverage-badge-filename: jacoco2.svg
         branches-badge-filename: branches2.svg
 
+    - name: Generate JaCoCo Badges for core/vertx
+      id: coreVertx
+      uses: cicirello/jacoco-badge-generator@v2
+      with:
+        generate-branches-badge: true
+        jacoco-csv-file: core/vertx/target/site/jacoco/jacoco.csv
+        coverage-badge-filename: jacoco3.svg
+        branches-badge-filename: branches3.svg
+
     - name: Commit the badge (if it changed)
       run: |
         if [[ `git status --porcelain` ]]; then

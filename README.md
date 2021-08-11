@@ -8,12 +8,12 @@ For more detail you can read our [Launch Blog Post](https://devblogs.microsoft.c
 
 ---
 
-Test Coverage Report:
+## Test Coverage Report
+**Core API Covergage** </br>![Coverage](.github/badges/jacoco1.svg)
 
-![Coverage::Core::API](.github/badges/jacoco1.svg)
-![Coverage::Core::Parser](.github/badges/jacoco2.svg)
+**Core :: Parser</br>**![Coverage::Core::Parser](.github/badges/jacoco2.svg)
 
-
+**Core :: Vertx**</br>![Coverage::Core::Parser](.github/badges/jacoco3.svg)
 
 ## Introduction
 
