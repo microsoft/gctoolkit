@@ -74,6 +74,11 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <jdk.version>11</jdk.version>
         <skipUnpack>false</skipUnpack>
+
+        <junit.version>5.7.2</junit.version>
+
+        <maven.plugin.jacoco.version>0.8.7</maven.plugin.jacoco.version>
+
     </properties>
 
     <dependencyManagement>
@@ -103,6 +108,13 @@
     <build>
         <pluginManagement>
             <plugins>
+
+                <plugin>
+                    <groupId>org.jacoco</groupId>
+                    <artifactId>jacoco-maven-plugin</artifactId>
+                    <version>${maven.plugin.jacoco.version}</version>
+                </plugin>
+
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
