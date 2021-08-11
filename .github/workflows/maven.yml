@@ -39,7 +39,7 @@ jobs:
         branches-badge-filename: branches1.svg
 
     - name: Generate JaCoCo Badges for core/parser
-      id: coreApi
+      id: coreParser
       uses: cicirello/jacoco-badge-generator@v2
       with:
         generate-branches-badge: true
