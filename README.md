@@ -41,8 +41,6 @@ You must also add `github` as a server in your `~/.m2/settings.xml` file. Replac
     </server>
 ```
 
----
-
 ## Getting Started
 
 ### Maven Coordinates
@@ -90,6 +88,11 @@ The build is vanilla Maven.
 * `mvn compile` - compile the source code
 * `mvn test` - run unit tests (this project uses TestNG)
 * `mvn package` - build the .jar files
+
+### Additional build properties
+* `skipUnpack` - boolean. Defaults to `false`. This tells the build to skip unpacking the gctoolkit-testdata logs. 
+If the test data has already be extracted to the gclogs directory, setting this property to `true` can save 
+a minute or so of build time.
 
 ## Contributing
 
