@@ -5,7 +5,10 @@ package com.microsoft.gctoolkit.time;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
+import java.util.Comparator;
 import java.util.Objects;
+
+import static java.util.Comparator.*;
 
 /**
  * A date and time. Both date and time come from reading the GC log. In cases where
@@ -15,7 +18,7 @@ import java.util.Objects;
  * Instance of DateTimeStamp are created by the parser. The constructors match what might be
  * found for dates and time stamps in a GC log file.
  */
-public class DateTimeStamp {
+public class DateTimeStamp implements Comparable<DateTimeStamp> {
     // Represents the time from Epoch
     // In the case where we have timestamps, the epoch is start of JVM
     // In the case where we only have date stamps, the epoch is 1970:01:01:00:00:00.000::UTC+0
@@ -27,11 +30,12 @@ public class DateTimeStamp {
     // Requirements
     // Timestamp can never be less than 0
     //      - use NaN to say it's not set
-    final private ZonedDateTime dateTime;
-    final private double timeStamp;
+    private final ZonedDateTime dateTime;
+    private final double timeStamp;
+    public static final Comparator<DateTimeStamp> comparator = getComparator();
 
     // For some reason, ISO_DATE_TIME doesn't like that time-zone is -0100. It wants -01:00.
-    private final static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 
     private static ZonedDateTime fromString(String iso8601DateTime) {
         if (iso8601DateTime != null) {
@@ -252,4 +256,11 @@ public class DateTimeStamp {
         return this.minus(dateTimeStamp) / 60.0d;
     }
 
+    @Override
+    public int compareTo(DateTimeStamp dateTimeStamp) {
+        return  comparator.compare(this,dateTimeStamp);
+    }
+    private static  Comparator<DateTimeStamp> getComparator(){
+        return nullsLast(comparing(DateTimeStamp::getDateTime));
+    }
 }

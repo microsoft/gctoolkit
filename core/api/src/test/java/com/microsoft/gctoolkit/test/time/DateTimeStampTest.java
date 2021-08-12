@@ -7,6 +7,10 @@ import org.junit.jupiter.api.Test;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -352,6 +356,21 @@ class DateTimeStampTest {
         b = new DateTimeStamp("2018-04-04T09:10:00.587-0100", .19);
         diff = a.timeSpanInMinutes(b);
         assertEquals((.18 - .19)/60d, diff, .001);
+    }
+    @Test
+    void testCompare(){
+        DateTimeStamp older = new DateTimeStamp("2018-04-04T09:10:00.586-0100");
+        DateTimeStamp newer = new DateTimeStamp("2018-04-04T10:10:00.587-0100");
+        List<DateTimeStamp> dateTimeStampList = new ArrayList<>();
+        dateTimeStampList.add(newer);
+        dateTimeStampList.add(older);
+        dateTimeStampList.sort(null);
+        List<DateTimeStamp> sorted = dateTimeStampList.stream().sorted().collect(Collectors.toList());
+        assertEquals(older,sorted.get(0));
+        assertEquals(newer,sorted.get(1));
+        dateTimeStampList.add(0,null);
+        dateTimeStampList.sort(DateTimeStamp.comparator);
+        assertNull(dateTimeStampList.get(2));
     }
 
 }
