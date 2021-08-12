@@ -31,7 +31,7 @@ import com.microsoft.gctoolkit.jvm.JavaVirtualMachine;
  * @uses JavaVirtualMachine
  * @uses Aggregator
  */
-module gctoolkit.api {
+module com.microsoft.gctoolkit.api {
 
     exports com.microsoft.gctoolkit;
     exports com.microsoft.gctoolkit.aggregator;
