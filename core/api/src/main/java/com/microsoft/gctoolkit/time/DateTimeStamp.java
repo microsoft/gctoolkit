@@ -8,7 +8,9 @@ import java.time.temporal.TemporalAccessor;
 import java.util.Comparator;
 import java.util.Objects;
 
-import static java.util.Comparator.*;
+import static java.util.Comparator.comparing;
+import static java.util.Comparator.nullsLast;
+
 
 /**
  * A date and time. Both date and time come from reading the GC log. In cases where
@@ -92,7 +94,7 @@ public class DateTimeStamp implements Comparable<DateTimeStamp> {
         this.dateTime = dateTime;
         //NaN is our agreed upon not set but less than 0 makes no sense either.
         if ( dateTime != null && (Double.isNaN(timeStamp) || timeStamp < 0.0d))
-            this.timeStamp = (double)dateTime.toEpochSecond() + (double) dateTime.getNano() / 1_000_000_000d;
+            this.timeStamp = dateTime.toEpochSecond() +  dateTime.getNano() / 1_000_000_000d;
         else
             this.timeStamp = timeStamp;
     }
@@ -256,11 +258,23 @@ public class DateTimeStamp implements Comparable<DateTimeStamp> {
         return this.minus(dateTimeStamp) / 60.0d;
     }
 
+    /**
+     * It will compare date time first, if both are equals then compare timestamp value,
+     * For Null date time  considered to be last entry.
+     * @param dateTimeStamp - other object to compared
+     * @return  a negative integer, zero, or a positive integer as this object is less than, equal to, or greater than the specified object
+     */
     @Override
     public int compareTo(DateTimeStamp dateTimeStamp) {
         return  comparator.compare(this,dateTimeStamp);
     }
+
     private static  Comparator<DateTimeStamp> getComparator(){
-        return nullsLast(comparing(DateTimeStamp::getDateTime));
+        // compare withs dateTime if null, then it will go to last
+        Comparator<DateTimeStamp> dateTimeComparing = comparing(DateTimeStamp::getDateTime, nullsLast(ZonedDateTime::compareTo));
+        Comparator<DateTimeStamp> comparing = nullsLast(dateTimeComparing);
+        //add timestamp comparing.
+        return comparing.thenComparingDouble(DateTimeStamp::getTimeStamp);
     }
+
 }
