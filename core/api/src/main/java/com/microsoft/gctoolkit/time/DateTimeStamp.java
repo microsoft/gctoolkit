@@ -268,15 +268,25 @@ public class DateTimeStamp implements Comparable<DateTimeStamp> {
      */
     @Override
     public int compareTo(DateTimeStamp dateTimeStamp) {
+
         return  comparator.compare(this,dateTimeStamp);
     }
 
     private static  Comparator<DateTimeStamp> getComparator(){
         // compare with dateTime field, if null then it will go to last
-        Comparator<DateTimeStamp> dateTimeComparing = comparing(DateTimeStamp::getDateTime, nullsLast(ZonedDateTime::compareTo));
-        Comparator<DateTimeStamp> comparing = nullsLast(dateTimeComparing);
-        //add timestamp comparing.
-        return comparing.thenComparingDouble(DateTimeStamp::getTimeStamp);
+        return nullsLast((o1, o2) -> {
+            Comparator<DateTimeStamp> dateTimeStampComparator = compareDateTimeStamp(o1, o2);
+            return dateTimeStampComparator.compare(o1,o2);
+        });
     }
 
+    private static Comparator<DateTimeStamp> compareDateTimeStamp(DateTimeStamp o1, DateTimeStamp o2) {
+        if (o1.getDateTime() == null || o2.getDateTime() == null) {
+            //if any of value is null then check timestamp
+            return comparing(DateTimeStamp::getTimeStamp);
+        } else {
+            // means both values for date time are present, then compare datetime and timestamp.
+            return comparing(DateTimeStamp::getDateTime).thenComparing(DateTimeStamp::getTimeStamp);
+        }
+    }
 }

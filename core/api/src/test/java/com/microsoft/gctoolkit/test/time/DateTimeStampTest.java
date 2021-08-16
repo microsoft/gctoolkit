@@ -366,16 +366,16 @@ class DateTimeStampTest {
 
     @Test
     void testCompareEquals() {
-        DateTimeStamp smaller = new DateTimeStamp("2018-04-04T10:10:00.586-0100");
-        DateTimeStamp greater = new DateTimeStamp("2018-04-04T10:10:00.586-0100");
-        assertEquals(0, greater.compareTo(smaller));
+        DateTimeStamp object1 = new DateTimeStamp("2018-04-04T10:10:00.586-0100");
+        DateTimeStamp object2 = new DateTimeStamp("2018-04-04T10:10:00.586-0100");
+        assertEquals(0, object1.compareTo(object2));
     }
 
     @Test
     void testCompareEqualsTimeStamp() {
-        DateTimeStamp smaller = new DateTimeStamp("2018-04-04T10:10:00.586-0100", 123);
-        DateTimeStamp greater = new DateTimeStamp("2018-04-04T10:10:00.586-0100", 123);
-        assertEquals(0, greater.compareTo(smaller));
+        DateTimeStamp object1 = new DateTimeStamp("2018-04-04T10:10:00.586-0100", 123);
+        DateTimeStamp object2 = new DateTimeStamp("2018-04-04T10:10:00.586-0100", 123);
+        assertEquals(0, object2.compareTo(object1));
     }
 
     @Test
@@ -396,6 +396,48 @@ class DateTimeStampTest {
     void testCompareNullValue() {
         DateTimeStamp smaller = new DateTimeStamp("2018-04-04T09:10:00.586-0100");
         assertEquals(-1, smaller.compareTo(null));
+    }
+
+    @Test
+    void testCompareEqualsTimeStampWithoutDateTime() {
+        DateTimeStamp object1 = new DateTimeStamp(123);
+        DateTimeStamp object2 = new DateTimeStamp(123);
+        assertEquals(0, object2.compareTo(object1));
+    }
+
+    @Test
+    void testCompareGreaterTimeStampWithoutDateTime() {
+        DateTimeStamp smaller = new DateTimeStamp(122);
+        DateTimeStamp greater = new DateTimeStamp(124);
+        assertEquals(1, greater.compareTo(smaller));
+    }
+
+    @Test
+    void testCompareSmallerTimeStampWithoutDateTime() {
+        DateTimeStamp smaller = new DateTimeStamp(123);
+        DateTimeStamp greater = new DateTimeStamp(124);
+        assertEquals(-1, smaller.compareTo(greater));
+    }
+
+    @Test
+    void testCompareEqualsTimeStampMixed() {
+        DateTimeStamp object1 = new DateTimeStamp(1.522840200586E9);
+        DateTimeStamp object2 = new DateTimeStamp("2018-04-04T10:10:00.586-0100");
+        assertEquals(0, object2.compareTo(object1));
+    }
+
+    @Test
+    void testCompareGreaterTimeStampMixed() {
+        DateTimeStamp smaller = new DateTimeStamp(122);
+        DateTimeStamp greater = new DateTimeStamp("2018-04-04T10:10:00.586-0100");
+        assertEquals(1, greater.compareTo(smaller));
+    }
+
+    @Test
+    void testCompareSmallerTimeStampMixed() {
+        DateTimeStamp smaller = new DateTimeStamp(123);
+        DateTimeStamp greater = new DateTimeStamp("2018-04-04T10:10:00.586-0100");
+        assertEquals(-1, smaller.compareTo(greater));
     }
 
 }
