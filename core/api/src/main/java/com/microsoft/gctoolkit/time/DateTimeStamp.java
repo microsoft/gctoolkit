@@ -93,8 +93,10 @@ public class DateTimeStamp implements Comparable<DateTimeStamp> {
     public DateTimeStamp(ZonedDateTime dateTime, double timeStamp) {
         this.dateTime = dateTime;
         //NaN is our agreed upon not set but less than 0 makes no sense either.
-        if ( dateTime != null && (Double.isNaN(timeStamp) || timeStamp < 0.0d))
-            this.timeStamp = dateTime.toEpochSecond() +  dateTime.getNano() / 1_000_000_000d;
+        if ( dateTime != null && (Double.isNaN(timeStamp) || timeStamp < 0.0d)) {
+            //Converts the long nano value to a decimal nano value. The timeStamp value is in decimal seconds - <seconds>.<millis>
+            this.timeStamp = dateTime.toEpochSecond() + dateTime.getNano() / 1_000_000_000d;
+        }
         else
             this.timeStamp = timeStamp;
     }
@@ -270,7 +272,7 @@ public class DateTimeStamp implements Comparable<DateTimeStamp> {
     }
 
     private static  Comparator<DateTimeStamp> getComparator(){
-        // compare withs dateTime if null, then it will go to last
+        // compare with dateTime field, if null then it will go to last
         Comparator<DateTimeStamp> dateTimeComparing = comparing(DateTimeStamp::getDateTime, nullsLast(ZonedDateTime::compareTo));
         Comparator<DateTimeStamp> comparing = nullsLast(dateTimeComparing);
         //add timestamp comparing.
