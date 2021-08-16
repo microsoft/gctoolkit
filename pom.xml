@@ -74,7 +74,9 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>11</maven.compiler.release>
-        <skipUnpack>false</skipUnpack>
+        <skipUnpack>true</skipUnpack>
+        <skipTests>true</skipTests>
+        <maven.test.skip>true</maven.test.skip>
         <gctoolkit-testdata-version>1.0.2</gctoolkit-testdata-version>
         <spotbugs.version>4.3.0</spotbugs.version>
         <maven-checkstyle-plugin.version>3.1.2</maven-checkstyle-plugin.version>
@@ -229,5 +231,25 @@
             </plugin>
         </plugins>
     </reporting>
-
+    <profiles>
+        <profile>
+            <id>contributor</id>
+            <properties>
+                <skipUnpack>false</skipUnpack>
+                <skipTests>false</skipTests>
+                <maven.test.skip>false</maven.test.skip>
+            </properties>
+        </profile>
+        <profile>
+            <id>default</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <skipUnpack>true</skipUnpack>
+                <skipTests>true</skipTests>
+                <maven.test.skip>true</maven.test.skip>
+            </properties>
+        </profile>
+    </profiles>
 </project>
