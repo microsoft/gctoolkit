@@ -9,11 +9,11 @@ For more detail you can read our [Launch Blog Post](https://devblogs.microsoft.c
 ---
 
 ## Test Coverage Report
-**Core API Covergage** </br>![Coverage](.github/badges/jacoco1.svg)
+**Core API Covergage** </br>![Coverage](.github/badges/jacoco-api-coverage.svg)
 
-**Core :: Parser</br>**![Coverage::Core::Parser](.github/badges/jacoco2.svg)
+**Core :: Parser</br>**![Coverage::Core::Parser](.github/badges/jacoco-parser-coverage.svg)
 
-**Core :: Vertx**</br>![Coverage::Core::Parser](.github/badges/jacoco3.svg)
+**Core :: Vertx**</br>![Coverage::Core::Parser](.github/badges/jacoco-vertx-coverage.svg)
 
 ---
 ## Introduction

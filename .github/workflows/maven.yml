@@ -45,7 +45,7 @@ jobs:
         generate-branches-badge: true
         jacoco-csv-file: core/parser/target/site/jacoco/jacoco.csv
         coverage-badge-filename: jacoco-parser-coverage.svg
-        branches-badge-filename: jacoco-parser-coverage.svg
+        branches-badge-filename: jacoco-parser-branches.svg
 
     - name: Generate JaCoCo Badges for core/vertx
       id: coreVertx
@@ -57,6 +57,8 @@ jobs:
         branches-badge-filename: jacoco-vertx-branches.svg
 
     - name: Commit the badge (if it changed)
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
       run: |
         if [[ `git status --porcelain` ]]; then
           git add -A
