@@ -79,6 +79,7 @@
         <spotbugs.version>4.3.0</spotbugs.version>
         <maven-checkstyle-plugin.version>3.1.2</maven-checkstyle-plugin.version>
         <checkstyleVersion>8.45.1</checkstyleVersion>
+        <maven.jacoco-plugin.version>0.8.7</maven.jacoco-plugin.version>
     </properties>
 
     <dependencyManagement>
@@ -154,6 +155,25 @@
                             <version>${checkstyleVersion}</version>
                         </dependency>
                     </dependencies>
+                </plugin>
+                <plugin>
+                    <groupId>org.jacoco</groupId>
+                    <artifactId>jacoco-maven-plugin</artifactId>
+                    <version>${maven.jacoco-plugin.version}</version>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>prepare-agent</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>report</id>
+                            <phase>prepare-package</phase>
+                            <goals>
+                                <goal>report</goal>
+                            </goals>
+                        </execution>
+                    </executions>
                 </plugin>
             </plugins>
         </pluginManagement>
