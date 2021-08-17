@@ -5,7 +5,12 @@ package com.microsoft.gctoolkit.time;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
+import java.util.Comparator;
 import java.util.Objects;
+
+import static java.util.Comparator.comparing;
+import static java.util.Comparator.nullsLast;
+
 
 /**
  * A date and time. Both date and time come from reading the GC log. In cases where
@@ -15,7 +20,7 @@ import java.util.Objects;
  * Instance of DateTimeStamp are created by the parser. The constructors match what might be
  * found for dates and time stamps in a GC log file.
  */
-public class DateTimeStamp {
+public class DateTimeStamp implements Comparable<DateTimeStamp> {
     // Represents the time from Epoch
     // In the case where we have timestamps, the epoch is start of JVM
     // In the case where we only have date stamps, the epoch is 1970:01:01:00:00:00.000::UTC+0
@@ -27,11 +32,12 @@ public class DateTimeStamp {
     // Requirements
     // Timestamp can never be less than 0
     //      - use NaN to say it's not set
-    final private ZonedDateTime dateTime;
-    final private double timeStamp;
+    private final ZonedDateTime dateTime;
+    private final double timeStamp;
+    public static final Comparator<DateTimeStamp> comparator = getComparator();
 
     // For some reason, ISO_DATE_TIME doesn't like that time-zone is -0100. It wants -01:00.
-    private final static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 
     private static ZonedDateTime fromString(String iso8601DateTime) {
         if (iso8601DateTime != null) {
@@ -87,8 +93,10 @@ public class DateTimeStamp {
     public DateTimeStamp(ZonedDateTime dateTime, double timeStamp) {
         this.dateTime = dateTime;
         //NaN is our agreed upon not set but less than 0 makes no sense either.
-        if ( dateTime != null && (Double.isNaN(timeStamp) || timeStamp < 0.0d))
-            this.timeStamp = (double)dateTime.toEpochSecond() + (double) dateTime.getNano() / 1_000_000_000d;
+        if ( dateTime != null && (Double.isNaN(timeStamp) || timeStamp < 0.0d)) {
+            //Converts the long nano value to a decimal nano value. The timeStamp value is in decimal seconds - <seconds>.<millis>
+            this.timeStamp = dateTime.toEpochSecond() + dateTime.getNano() / 1_000_000_000d;
+        }
         else
             this.timeStamp = timeStamp;
     }
@@ -252,4 +260,33 @@ public class DateTimeStamp {
         return this.minus(dateTimeStamp) / 60.0d;
     }
 
+    /**
+     * It will compare date time first, if both are equals then compare timestamp value,
+     * For Null date time  considered to be last entry.
+     * @param dateTimeStamp - other object to compared
+     * @return  a negative integer, zero, or a positive integer as this object is less than, equal to, or greater than the specified object
+     */
+    @Override
+    public int compareTo(DateTimeStamp dateTimeStamp) {
+
+        return  comparator.compare(this,dateTimeStamp);
+    }
+
+    private static  Comparator<DateTimeStamp> getComparator(){
+        // compare with dateTime field, if null then it will go to last
+        return nullsLast((o1, o2) -> {
+            Comparator<DateTimeStamp> dateTimeStampComparator = compareDateTimeStamp(o1, o2);
+            return dateTimeStampComparator.compare(o1,o2);
+        });
+    }
+
+    private static Comparator<DateTimeStamp> compareDateTimeStamp(DateTimeStamp o1, DateTimeStamp o2) {
+        if (o1.getDateTime() == null || o2.getDateTime() == null) {
+            //if any of value is null then check timestamp
+            return comparing(DateTimeStamp::getTimeStamp);
+        } else {
+            // means both values for date time are present, then compare datetime and timestamp.
+            return comparing(DateTimeStamp::getDateTime).thenComparing(DateTimeStamp::getTimeStamp);
+        }
+    }
 }
