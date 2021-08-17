@@ -72,13 +72,15 @@
     </modules>
 
     <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.release>11</maven.compiler.release>
-        <skipUnpack>false</skipUnpack>
-        <gctoolkit-testdata-version>1.0.2</gctoolkit-testdata-version>
-        <spotbugs.version>4.3.0</spotbugs.version>
-        <maven-checkstyle-plugin.version>3.1.2</maven-checkstyle-plugin.version>
         <checkstyleVersion>8.45.1</checkstyleVersion>
+        <gctoolkit-testdata-version>1.0.2</gctoolkit-testdata-version>
+        <maven-checkstyle-plugin.version>3.1.2</maven-checkstyle-plugin.version>
+        <maven.compiler.release>11</maven.compiler.release>
+        <maven.test.skip>true</maven.test.skip>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <skipTests>true</skipTests>
+        <skipUnpack>true</skipUnpack>
+        <spotbugs.version>4.3.0</spotbugs.version>
     </properties>
 
     <dependencyManagement>
@@ -229,5 +231,15 @@
             </plugin>
         </plugins>
     </reporting>
-
+    <profiles>
+        <!-- profile for downloading test log data,checks and running test-->
+        <profile>
+            <id>contributor</id>
+            <properties>
+                <maven.test.skip>false</maven.test.skip>
+                <skipTests>false</skipTests>
+                <skipUnpack>false</skipUnpack>
+            </properties>
+        </profile>
+    </profiles>
 </project>
