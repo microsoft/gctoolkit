@@ -219,6 +219,8 @@ public class DateTimeStamp implements Comparable<DateTimeStamp> {
      */
     public DateTimeStamp add(double offsetInDecimalSeconds) {
         DateTimeStamp now;
+        // if passed value is NAN then consider offset seconds as 0.0d
+        offsetInDecimalSeconds = Double.isNaN(offsetInDecimalSeconds)? 0.0d:offsetInDecimalSeconds;
         if (dateTime != null) {
             int seconds = (int) offsetInDecimalSeconds;
             long nanos = (long) ((offsetInDecimalSeconds % 1) * 1_000_000_000L);

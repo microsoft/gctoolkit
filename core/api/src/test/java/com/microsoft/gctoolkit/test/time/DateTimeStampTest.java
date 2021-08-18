@@ -440,4 +440,25 @@ class DateTimeStampTest {
         assertEquals(-1, smaller.compareTo(greater));
     }
 
+    @Test
+    void testNanWithZero() {
+        DateTimeStamp dateTimeStamp = new DateTimeStamp(0.0);
+        DateTimeStamp forComparing = new DateTimeStamp(0.0).add(Double.NaN);
+        assertEquals(dateTimeStamp, forComparing);
+    }
+
+    @Test
+    void testNanWithNonZero() {
+        DateTimeStamp dateTimeStamp = new DateTimeStamp("2018-04-04T10:10:00.586-0100");
+        DateTimeStamp forComparing = new DateTimeStamp("2018-04-04T10:10:00.586-0100").add(Double.NaN);
+        assertEquals(dateTimeStamp, forComparing);
+    }
+
+    @Test
+    void testNanWithNegativeAdd() {
+        DateTimeStamp dateTimeStamp = new DateTimeStamp("2018-04-04T10:09:59.586-0100");
+        DateTimeStamp forComparing = new DateTimeStamp("2018-04-04T10:10:00.586-0100").add(-1);
+        assertEquals(dateTimeStamp, forComparing);
+    }
+
 }
