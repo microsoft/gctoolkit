@@ -42,5 +42,5 @@ Once above steps are configured you can execute testcases with following command
   a minute or so of build time.
 
 ### Contributor maven profile
-* `-Pcontributor` maven profile will  enable downloading test data,checks that are required for build and running unit tests .
+* `-Pcontributor` maven profile will enable downloading test data, checks that are required for the build, and running unit tests.
   

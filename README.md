@@ -8,6 +8,14 @@ For more detail you can read our [Launch Blog Post](https://devblogs.microsoft.c
 
 ---
 
+## Test Coverage Report
+**Core API Covergage** </br>![Coverage](.github/badges/jacoco-api-coverage.svg)
+
+**Core :: Parser</br>**![Coverage::Core::Parser](.github/badges/jacoco-parser-coverage.svg)
+
+**Core :: Vertx**</br>![Coverage::Core::Parser](.github/badges/jacoco-vertx-coverage.svg)
+
+---
 ## Introduction
 
 Managed memory in the Java Virtual Machine (JVM) is comprised of 3 main pieces:
@@ -63,6 +71,7 @@ The build is vanilla Maven.
 
 * `mvn clean` - remove build artifacts
 * `mvn compile` - compile the source code
+* `mvn test` - unit tests are skipped for the default profile. Use the `contributor` profile to run tests. See [CONTRIBUTING](CONTRIBUTING.md) for details.
 * `mvn package` - build the .jar files
 
 ## Contributing

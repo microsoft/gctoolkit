@@ -72,10 +72,20 @@
     </modules>
 
     <properties>
-        <checkstyleVersion>8.45.1</checkstyleVersion>
+        <checkstyle.version>8.45.1</checkstyle.version>
         <gctoolkit-testdata-version>1.0.2</gctoolkit-testdata-version>
-        <maven-checkstyle-plugin.version>3.1.2</maven-checkstyle-plugin.version>
+        <junit5.version>5.7.2</junit5.version>
+        <maven.checkstyle-plugin.version>3.1.2</maven.checkstyle-plugin.version>
+        <maven.compiler-plugin.version>3.8.1</maven.compiler-plugin.version>
         <maven.compiler.release>11</maven.compiler.release>
+        <maven.dependency-plugin.version>3.1.1</maven.dependency-plugin.version>
+        <maven.jacoco-plugin.version>0.8.7</maven.jacoco-plugin.version>
+        <maven.jar-plugin.version>3.2.0</maven.jar-plugin.version>
+        <maven.javadoc-plugin.version>3.3.0</maven.javadoc-plugin.version>
+        <maven.project-info-reports-plugin.version>3.0.0</maven.project-info-reports-plugin.version>
+        <maven.site-plugin.version>3.7.1</maven.site-plugin.version>
+        <maven.spotbugs-plugin.version>4.3.0</maven.spotbugs-plugin.version>
+        <maven.surefire-plugin.version>3.0.0-M5</maven.surefire-plugin.version>
         <maven.test.skip>true</maven.test.skip>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <skipTests>true</skipTests>
@@ -88,13 +98,13 @@
             <dependency>
                 <groupId>org.junit.jupiter</groupId>
                 <artifactId>junit-jupiter-engine</artifactId>
-                <version>5.7.2</version>
+                <version>${junit5.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.junit.jupiter</groupId>
                 <artifactId>junit-jupiter-api</artifactId>
-                <version>5.7.2</version>
+                <version>${junit5.version}</version>
                 <scope>test</scope>
             </dependency>
         </dependencies>
@@ -106,7 +116,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.8.1</version>
+                    <version>${maven.compiler-plugin.version}</version>
                     <configuration>
                         <compilerArgs>
                             <arg>--module-version=${project.version}</arg>
@@ -116,27 +126,27 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
-                    <version>3.2.0</version>
+                    <version>${maven.jar-plugin.version}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>3.0.0-M5</version>
+                    <version>${maven.surefire-plugin.version}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-site-plugin</artifactId>
-                    <version>3.7.1</version>
+                    <version>${maven.site-plugin.version}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-project-info-reports-plugin</artifactId>
-                    <version>3.0.0</version>
+                    <version>${maven.project-info-reports-plugin.version}</version>
                 </plugin>
                 <plugin>
                     <groupId>com.github.spotbugs</groupId>
                     <artifactId>spotbugs-maven-plugin</artifactId>
-                    <version>${spotbugs.version}</version>
+                    <version>${maven.spotbugs-plugin.version}</version>
                     <dependencies>
                         <dependency>
                             <groupId>com.github.spotbugs</groupId>
@@ -148,14 +158,33 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-checkstyle-plugin</artifactId>
-                    <version>${maven-checkstyle-plugin.version}</version>
+                    <version>${maven.checkstyle-plugin.version}</version>
                     <dependencies>
                         <dependency>
                             <groupId>com.puppycrawl.tools</groupId>
                             <artifactId>checkstyle</artifactId>
-                            <version>${checkstyleVersion}</version>
+                            <version>${checkstyle.version}</version>
                         </dependency>
                     </dependencies>
+                </plugin>
+                <plugin>
+                    <groupId>org.jacoco</groupId>
+                    <artifactId>jacoco-maven-plugin</artifactId>
+                    <version>${maven.jacoco-plugin.version}</version>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>prepare-agent</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>report</id>
+                            <phase>prepare-package</phase>
+                            <goals>
+                                <goal>report</goal>
+                            </goals>
+                        </execution>
+                    </executions>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -163,7 +192,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
-                <version>3.1.1</version>
+                <version>${maven.dependency-plugin.version}</version>
                 <inherited>false</inherited>
                 <executions>
                     <execution>
