@@ -25,7 +25,7 @@ jobs:
         settings-path: ${{ github.workspace }} # location for the settings.xml file
         
     - name: Build with Maven
-      run: mvn -B package --file pom.xml --settings $GITHUB_WORKSPACE/settings.xml
+      run: mvn -B package -Pcontributor --file pom.xml --settings $GITHUB_WORKSPACE/settings.xml
       env:
         GITHUB_TOKEN: ${{ github.token }}
 

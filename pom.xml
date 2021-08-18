@@ -86,7 +86,10 @@
         <maven.site-plugin.version>3.7.1</maven.site-plugin.version>
         <maven.spotbugs-plugin.version>4.3.0</maven.spotbugs-plugin.version>
         <maven.surefire-plugin.version>3.0.0-M5</maven.surefire-plugin.version>
-        <skipUnpack>false</skipUnpack>
+        <maven.test.skip>true</maven.test.skip>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <skipTests>true</skipTests>
+        <skipUnpack>true</skipUnpack>
         <spotbugs.version>4.3.0</spotbugs.version>
     </properties>
 
@@ -257,5 +260,15 @@
             </plugin>
         </plugins>
     </reporting>
-
+    <profiles>
+        <!-- profile for downloading test log data,checks and running test-->
+        <profile>
+            <id>contributor</id>
+            <properties>
+                <maven.test.skip>false</maven.test.skip>
+                <skipTests>false</skipTests>
+                <skipUnpack>false</skipUnpack>
+            </properties>
+        </profile>
+    </profiles>
 </project>
