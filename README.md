@@ -71,6 +71,7 @@ The build is vanilla Maven.
 
 * `mvn clean` - remove build artifacts
 * `mvn compile` - compile the source code
+* `mvn test` - unit tests are skipped for the default profile. Use the `contributor` profile to run tests. See [CONTRIBUTING](CONTRIBUTING.md) for details.
 * `mvn package` - build the .jar files
 
 ## Contributing
