@@ -47,7 +47,7 @@
                         <!-- Create the modulepath using all project dependencies and project build directory -->
                         <modulepath/>
                         <argument>--module</argument>
-                        <argument>gctoolkit.sample/com.microsoft.gctoolkit.sample.Main</argument>
+                        <argument>com.microsoft.gctoolkit.sample/com.microsoft.gctoolkit.sample.Main</argument>
                         <argument>${gcLogFile}</argument>
                     </arguments>
                 </configuration>
