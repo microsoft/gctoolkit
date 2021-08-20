@@ -26,7 +26,7 @@ then run `java` with `--module-path` and give it the path to a GC log file as an
 
 ```shell
 $ mvn clean compile dependency:copy-dependencies
-$ java java --module-path target/classes:target/lib --module gctoolkit.sample/com.microsoft.gctoolkit.sample.Main ../gclogs/preunified/cms/defnew/details/defnew.log
+$ java java --module-path target/classes:target/lib --module com.microsoft.gctoolkit.sample/com.microsoft.gctoolkit.sample.Main ../gclogs/preunified/cms/defnew/details/defnew.log
 ```
 
 ## Troubleshooting
