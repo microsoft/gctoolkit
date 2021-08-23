@@ -7,7 +7,7 @@ import com.microsoft.gctoolkit.sample.aggregation.HeapOccupancyAfterCollectionSu
 /**
  * Contains an Aggregator and an Aggregation
  */
-module gctoolkit.sample {
+module com.microsoft.gctoolkit.sample {
 
     requires com.microsoft.gctoolkit.api;
     requires com.microsoft.gctoolkit.vertx;
