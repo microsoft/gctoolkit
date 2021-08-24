@@ -98,7 +98,7 @@ public class DateTimeStamp implements Comparable<DateTimeStamp> {
             this.timeStamp = dateTime.toEpochSecond() + dateTime.getNano() / 1_000_000_000d;
         }
         else
-            this.timeStamp = timeStamp;
+            this.timeStamp = getTimestampValue(timeStamp);
     }
 
     /**
@@ -154,7 +154,7 @@ public class DateTimeStamp implements Comparable<DateTimeStamp> {
      * @return {@code true} if this time stamp is less than the other.
      */
     public boolean before(double other) {
-        return getTimeStamp() < other;
+        return getTimeStamp() < getTimestampValue(other);
     }
 
     /**
@@ -163,7 +163,7 @@ public class DateTimeStamp implements Comparable<DateTimeStamp> {
      * @return {@code true} if this time stamp is greater than the other.
      */
     public boolean after(double other) {
-        return getTimeStamp() > other;
+        return getTimeStamp() > getTimestampValue(other);
     }
 
     /**
@@ -219,6 +219,8 @@ public class DateTimeStamp implements Comparable<DateTimeStamp> {
      */
     public DateTimeStamp add(double offsetInDecimalSeconds) {
         DateTimeStamp now;
+        // if passed value is NAN then consider offset seconds as 0.0d
+        offsetInDecimalSeconds = getTimestampValue(offsetInDecimalSeconds);
         if (dateTime != null) {
             int seconds = (int) offsetInDecimalSeconds;
             long nanos = (long) ((offsetInDecimalSeconds % 1) * 1_000_000_000L);
@@ -227,6 +229,10 @@ public class DateTimeStamp implements Comparable<DateTimeStamp> {
             now = new DateTimeStamp(getTimeStamp() + offsetInDecimalSeconds);
 
         return now;
+    }
+
+    private double getTimestampValue(double timestamp) {
+        return Double.isNaN(timestamp)? 0.0d: timestamp;
     }
 
     /**
