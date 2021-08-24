@@ -46,6 +46,7 @@ public abstract class JVMEvent {
             string.append(timeStamp.toString());
         else
             string.append("unknown");
+        string.append(':').append(getDuration());
         return string.toString();
     }
 
