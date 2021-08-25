@@ -13,7 +13,6 @@ This project has adopted the [Microsoft Open Source Code of Conduct](https://ope
 For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/)
 or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
 
-
 ## Prerequisite for Contributing on  GCTooKit
 
 The gctoolkit build relies on test data which is archived in [GitHub Packages](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-apache-maven-registry). This requires you to [authenticate to GitHub packages with a personal access token (PAT)](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-apache-maven-registry#authenticating-with-a-personal-access-token) to build and test.
@@ -30,17 +29,31 @@ You must also add `github` as a server in your `~/.m2/settings.xml` file. Replac
     </server>
 ```
 
-### To Test
+## Build
 
-Once above steps are configured you can execute testcases with following command.
+The build is vanilla Maven.
 
-* `mvn test -Pcontributor` - run unit tests (this project uses TestNG)
+* `mvn clean` - remove build artifacts
+* `mvn compile` - compile the source code
 
 ### Additional build properties
+
 * `skipUnpack` - boolean. Defaults to `false`. This tells the build to skip unpacking the gctoolkit-testdata logs.
   If the test data has already be extracted to the gclogs directory, setting this property to `true` can save
   a minute or so of build time.
 
+## Test
+
+Once above steps are configured you can execute test cases with following command.
+
+* `mvn test -Pcontributor` - run unit tests (this project uses JUnit 5)
+
 ### Contributor maven profile
+
 * `-Pcontributor` maven profile will enable downloading test data, checks that are required for the build, and running unit tests.
-  
+
+## Package
+
+The packaging is vanilla Maven.
+
+* `mvn package` - create the binaries.
