@@ -3,12 +3,12 @@
 package com.microsoft.gctoolkit.vertx;
 
 import com.microsoft.gctoolkit.io.DataSource;
-import io.vertx.core.AbstractVerticle;
 import com.microsoft.gctoolkit.parser.io.SafepointLogFile;
+import com.microsoft.gctoolkit.util.concurrent.StartingGun;
+import io.vertx.core.AbstractVerticle;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.concurrent.CountDownLatch;
 import java.util.logging.Logger;
 
 public class JVMEventSource extends AbstractVerticle {
@@ -32,17 +32,13 @@ public class JVMEventSource extends AbstractVerticle {
         vertx.eventBus().publish(publicationChannel, safepointLogFile.endOfData());
     }
 
-    CountDownLatch latch = new CountDownLatch(1);
+    private final StartingGun latch = new StartingGun();
 
     public void awaitDeployment() {
-        try {
-            latch.await();
-        } catch (InterruptedException e) {
-            LOGGER.throwing("JVMEventSource", "awaitDeployment", e);
-        }
+        latch.awaitUninterruptibly();
     }
 
     public void start() {
-        latch.countDown();
+        latch.ready();
     }
 }

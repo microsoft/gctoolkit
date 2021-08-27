@@ -6,11 +6,11 @@ import com.microsoft.gctoolkit.aggregator.Aggregation;
 import com.microsoft.gctoolkit.aggregator.Aggregator;
 import com.microsoft.gctoolkit.event.jvm.JVMEvent;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
+import com.microsoft.gctoolkit.util.concurrent.StartingGun;
 import io.vertx.core.AbstractVerticle;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -57,8 +57,8 @@ public class AggregatorVerticle extends AbstractVerticle {
     private static final Logger LOGGER = Logger.getLogger(AggregatorVerticle.class.getName());
 
     private Set<Aggregator<?>> aggregators = new HashSet<>();
-    private CountDownLatch deployed = new CountDownLatch(1);
-    private CountDownLatch completion = new CountDownLatch(1);
+    private StartingGun deployed = new StartingGun();
+    private StartingGun completion = new StartingGun();
 
     private DateTimeStamp timeOfTerminationEvent;
 
@@ -105,20 +105,11 @@ public class AggregatorVerticle extends AbstractVerticle {
     }
 
     public void awaitDeployment() {
-        try {
-            deployed.await();
-        } catch (InterruptedException ie) {
-            LOGGER.throwing(this.getClass().getName(), "start", ie);
-        }
+        deployed.awaitUninterruptibly();
     }
 
     public DateTimeStamp awaitCompletion() {
-        try {
-            completion.await();
-        } catch (InterruptedException ie) {
-            LOGGER.throwing(this.getClass().getName(), "awaitCompletion", ie);
-        }
-
+        completion.awaitUninterruptibly();
         return timeOfTerminationEvent;
     }
 
@@ -126,7 +117,7 @@ public class AggregatorVerticle extends AbstractVerticle {
         AtomicInteger counter = new AtomicInteger(aggregators.size());
         aggregators.forEach(aggregator -> ((AggregatorWrapper)aggregator).onCompletion(() -> {
             if ( counter.decrementAndGet() == 0) {
-                completion.countDown();
+                completion.ready();
             }
         }));
     }
@@ -145,7 +136,7 @@ public class AggregatorVerticle extends AbstractVerticle {
                             LOGGER.throwing(this.getClass().getName(), "start", t);
                         }
                     });
-            deployed.countDown();
+            deployed.ready();
         } catch (Throwable t) {
             LOGGER.throwing(this.getClass().getName(), "start", t);
         }
