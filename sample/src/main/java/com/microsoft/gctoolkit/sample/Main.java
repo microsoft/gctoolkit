@@ -10,7 +10,7 @@ import java.nio.file.Path;
 
 public class Main {
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         if (args.length == 0) {
             throw new IllegalArgumentException("This sample requires a path to a GC log file as an argument.");
         }
