@@ -38,7 +38,7 @@ public class TestLogFile {
                         }
                 )).
                         map(path -> new File(path + File.separator + fileName)).
-                        filter(file -> file.exists())
+                        filter(File::exists)
                 .findFirst();
 
         if (!fileOptional.isPresent()) {
