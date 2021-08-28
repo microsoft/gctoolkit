@@ -28,15 +28,6 @@ public class ParallelParserRulesTest implements ParallelPatterns {
             }
     }
 
-    private int captureTest(GCParseRule rule, String[] lines) {
-        int captureCount = 0;
-        for (String line : lines)
-            if (rule.parse(line) != null)
-                captureCount++;
-        return captureCount;
-    }
-
-
     /* Code that is useful when testing individual records */
 
     private boolean debugging = ("true".equals(System.getProperty("microsoft.debug", "true").toLowerCase()));

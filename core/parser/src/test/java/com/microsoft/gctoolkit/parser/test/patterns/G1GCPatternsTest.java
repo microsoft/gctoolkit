@@ -4,10 +4,12 @@ package com.microsoft.gctoolkit.parser.test.patterns;
 
 import com.microsoft.gctoolkit.parser.G1GCPatterns;
 import com.microsoft.gctoolkit.parser.GCParseRule;
+import com.microsoft.gctoolkit.parser.test.CommonTestHelper;
 import org.junit.jupiter.api.Test;
 
 import java.util.logging.Logger;
 
+import static com.microsoft.gctoolkit.parser.test.CommonTestHelper.captureTest;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -27,15 +29,6 @@ public class G1GCPatternsTest implements G1GCPatterns {
                 }
             }
     }
-
-    private int captureTest(GCParseRule rule, String[] lines) {
-        int captureCount = 0;
-        for (String line : lines)
-            if (rule.parse(line) != null)
-                captureCount++;
-        return captureCount;
-    }
-
 
     /* Code that is useful when testing individual records */
 
@@ -62,7 +55,7 @@ public class G1GCPatternsTest implements G1GCPatterns {
             FULL_WITH_CONCURRENT_PHASE_START,
             DELAY_MIXED_GC,
             START_MIXED_GC
-};
+    };
 
     String[][] lines = {
             { // G1_CONCURRENT_START

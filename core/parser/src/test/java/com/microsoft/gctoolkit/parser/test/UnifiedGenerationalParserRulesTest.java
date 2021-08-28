@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.logging.Logger;
 
+import static com.microsoft.gctoolkit.parser.test.CommonTestHelper.captureTest;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class UnifiedGenerationalParserRulesTest implements UnifiedGenerationalPatterns {
@@ -37,15 +38,6 @@ public class UnifiedGenerationalParserRulesTest implements UnifiedGenerationalPa
             Decorators decorators = new Decorators(decoratorLine);
             assertTrue(decorators.getNumberOfDecorators() != 0);
         }
-    }
-
-    private int captureTest(GCParseRule rule, String[] lines) {
-        int captureCount = 0;
-        for (String line : lines)
-            if (rule.parse(line) != null) {
-                captureCount++;
-            }
-        return captureCount;
     }
 
     // Convenience test for debugging single rules

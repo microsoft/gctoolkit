@@ -7,6 +7,8 @@ import com.microsoft.gctoolkit.parser.GCLogTrace;
 import com.microsoft.gctoolkit.parser.GCParseRule;
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
+import java.util.Objects;
 import java.util.logging.Logger;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -19,7 +21,7 @@ public class G1GCParserRulesTest implements G1GCPatterns {
     public void testG1GCParseRules() {
         for (int i = 0; i < rules.length; i++)
             for (int j = 0; j < lines.length; j++) {
-                int captured = captureTest(rules[i], lines[j]);
+                int captured = CommonTestHelper.captureTest(rules[i], lines[j]);
                 if (i == j) {
                     assertTrue(captured == lines[j].length, i + " failed to captured it's lines");
                 } else {
@@ -30,18 +32,10 @@ public class G1GCParserRulesTest implements G1GCPatterns {
         assertTrue(true);
     }
 
-    private int captureTest(GCParseRule rule, String[] lines) {
-        int captureCount = 0;
-        for (String line : lines)
-            if (rule.parse(line) != null)
-                captureCount++;
-        return captureCount;
-    }
-
     //@Test
     public void testSingeRule() {
         int index = 35;
-        assertTrue(captureTest(rules[index], lines[index]) == 1);
+        assertTrue(CommonTestHelper.captureTest(rules[index], lines[index]) == 1);
     }
 
 
