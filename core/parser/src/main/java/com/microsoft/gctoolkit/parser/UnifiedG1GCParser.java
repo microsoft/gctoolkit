@@ -8,17 +8,18 @@ import com.microsoft.gctoolkit.event.RegionSummary;
 import com.microsoft.gctoolkit.event.g1gc.G1GCConcurrentEvent;
 import com.microsoft.gctoolkit.event.g1gc.G1GCPauseEvent;
 import com.microsoft.gctoolkit.event.jvm.JVMTermination;
-import com.microsoft.gctoolkit.time.DateTimeStamp;
 import com.microsoft.gctoolkit.parser.collection.RuleSet;
 import com.microsoft.gctoolkit.parser.jvm.Decorators;
 import com.microsoft.gctoolkit.parser.jvm.LoggingDiary;
 import com.microsoft.gctoolkit.parser.unified.UnifiedG1GCPatterns;
+import com.microsoft.gctoolkit.time.DateTimeStamp;
 
 import java.util.AbstractMap;
-import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -39,7 +40,7 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
     private static final Logger LOGGER = Logger.getLogger(UnifiedG1GCParser.class.getName());
     boolean debugging = "true".equalsIgnoreCase(System.getProperty("microsoft.debug", "false"));
 
-    private HashMap<Integer, G1GCForwardReference> collectionsUnderway = new HashMap<>();
+    private final Map<Integer, G1GCForwardReference> collectionsUnderway = new ConcurrentHashMap<>();
 
     // state variables
     private boolean before = false; //todo what happens if this gets out of sync. #IHateState

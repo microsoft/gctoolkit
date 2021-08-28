@@ -20,7 +20,6 @@ import com.microsoft.gctoolkit.parser.jvm.UnifiedJVMConfiguration;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -34,37 +33,32 @@ public abstract class ParserTest {
 
     private static final Logger LOGGER = Logger.getLogger(ParserTest.class.getName());
 
-    private HashMap<GarbageCollectionTypes, Integer> collectorNameMapping;
+    private final Map<GarbageCollectionTypes, Integer> collectorNameMapping = Map.ofEntries(
+            Map.entry(GarbageCollectionTypes.Young, 0),
+            Map.entry(GarbageCollectionTypes.DefNew, 1),
+            Map.entry(GarbageCollectionTypes.ParNew, 2),
+            Map.entry(GarbageCollectionTypes.ParNewPromotionFailed, 3),
+            Map.entry(GarbageCollectionTypes.ConcurrentModeFailure, 5),
+            Map.entry(GarbageCollectionTypes.ConcurrentModeInterrupted, 6),
+            Map.entry(GarbageCollectionTypes.PSYoungGen, 7),
+            Map.entry(GarbageCollectionTypes.FullGC, 8),
+            Map.entry(GarbageCollectionTypes.SystemGC, 10),
+            Map.entry(GarbageCollectionTypes.InitialMark, 11),
+            Map.entry(GarbageCollectionTypes.Remark, 12),
+            Map.entry(GarbageCollectionTypes.PSFull, 8),  // bit of a hack to account that the parser is now differentiating between Full and PSFull. (kcp 11/8/15)
+            Map.entry(GarbageCollectionTypes.Mixed, 1),
+            Map.entry(GarbageCollectionTypes.G1GCYoungInitialMark, 2),
+            Map.entry(GarbageCollectionTypes.G1GCMixedInitialMark, 3),
+            Map.entry(GarbageCollectionTypes.Full, 4),
+            Map.entry(GarbageCollectionTypes.ConcurrentMark, 5),
+            Map.entry(GarbageCollectionTypes.G1GCConcurrentMark, 5),
+            Map.entry(GarbageCollectionTypes.G1GCRemark, 7),
 
-    {
-        collectorNameMapping = new HashMap<>();
-        collectorNameMapping.put(GarbageCollectionTypes.Young, 0);
-        collectorNameMapping.put(GarbageCollectionTypes.DefNew, 1);
-        collectorNameMapping.put(GarbageCollectionTypes.ParNew, 2);
-        collectorNameMapping.put(GarbageCollectionTypes.ParNewPromotionFailed, 3);
-        collectorNameMapping.put(GarbageCollectionTypes.ConcurrentModeFailure, 4);   // delete this line  todo:
-        collectorNameMapping.put(GarbageCollectionTypes.ConcurrentModeFailure, 5);
-        collectorNameMapping.put(GarbageCollectionTypes.ConcurrentModeInterrupted, 6);
-        collectorNameMapping.put(GarbageCollectionTypes.PSYoungGen, 7);
-        collectorNameMapping.put(GarbageCollectionTypes.FullGC, 8);
-        collectorNameMapping.put(GarbageCollectionTypes.SystemGC, 10);
-        collectorNameMapping.put(GarbageCollectionTypes.InitialMark, 11);
-        collectorNameMapping.put(GarbageCollectionTypes.Remark, 12);
-        collectorNameMapping.put(GarbageCollectionTypes.PSFull, 8);  // bit of a hack to account that the parser is now differentiating between Full and PSFull. (kcp 11/8/15)
-        collectorNameMapping.put(GarbageCollectionTypes.Young, 0);                  // delete this line todo:
-        collectorNameMapping.put(GarbageCollectionTypes.Mixed, 1);
-        collectorNameMapping.put(GarbageCollectionTypes.G1GCYoungInitialMark, 2);
-        collectorNameMapping.put(GarbageCollectionTypes.G1GCMixedInitialMark, 3);
-        collectorNameMapping.put(GarbageCollectionTypes.Full, 4);
-        collectorNameMapping.put(GarbageCollectionTypes.ConcurrentMark, 5);
-        collectorNameMapping.put(GarbageCollectionTypes.G1GCConcurrentMark, 5);
-        collectorNameMapping.put(GarbageCollectionTypes.G1GCRemark, 7);
-
-        collectorNameMapping.put(GarbageCollectionTypes.G1GCConcurrentCleanup, 8);
-        collectorNameMapping.put(GarbageCollectionTypes.G1GCCleanup, 9);
-        collectorNameMapping.put(GarbageCollectionTypes.G1ConcurrentMarkResetForOverflow, 11);
-        collectorNameMapping.put(GarbageCollectionTypes.ConcurrentRootRegionScan, 12);
-    }
+            Map.entry(GarbageCollectionTypes.G1GCConcurrentCleanup, 8),
+            Map.entry(GarbageCollectionTypes.G1GCCleanup, 9),
+            Map.entry(GarbageCollectionTypes.G1ConcurrentMarkResetForOverflow, 11),
+            Map.entry(GarbageCollectionTypes.ConcurrentRootRegionScan, 12)
+    );
 
     private List<GarbageCollectionTypes> findGarbageCollector(final int index) {
         return collectorNameMapping

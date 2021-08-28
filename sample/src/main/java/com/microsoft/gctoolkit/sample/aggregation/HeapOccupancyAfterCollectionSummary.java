@@ -5,12 +5,13 @@ import com.microsoft.gctoolkit.collections.XYDataSet;
 import com.microsoft.gctoolkit.event.GarbageCollectionTypes;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
 
-import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Collates(HeapOccupancyAfterCollection.class)
 public class HeapOccupancyAfterCollectionSummary implements HeapOccupancyAfterCollectionAggregation {
 
-    private HashMap<GarbageCollectionTypes, XYDataSet> aggregations = new HashMap();
+    private final Map<GarbageCollectionTypes, XYDataSet> aggregations = new ConcurrentHashMap();
 
     public void addDataPoint(GarbageCollectionTypes gcType, DateTimeStamp timeStamp, long heapOccupancy) {
         XYDataSet dataSet = aggregations.get(gcType);
@@ -21,7 +22,7 @@ public class HeapOccupancyAfterCollectionSummary implements HeapOccupancyAfterCo
         dataSet.add(timeStamp.getTimeStamp(),heapOccupancy);
     }
 
-    public HashMap<GarbageCollectionTypes, XYDataSet> get() {
+    public Map<GarbageCollectionTypes, XYDataSet> get() {
         return aggregations;
     }
 
