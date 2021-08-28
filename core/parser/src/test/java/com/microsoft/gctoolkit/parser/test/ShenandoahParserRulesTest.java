@@ -32,9 +32,9 @@ public class ShenandoahParserRulesTest implements ShenandoahPatterns {
 
     private int captureTest(GCParseRule rule, String[] lines) {
         int captureCount = 0;
-        for (int i = 0; i < lines.length; i++) {
-            GCLogTrace trace = rule.parse(lines[i]);
-            if (rule.parse(lines[i]) != null) {
+        for (String line : lines) {
+            GCLogTrace trace = rule.parse(line);
+            if (rule.parse(line) != null) {
                 captureCount++;
             }
         }

@@ -159,8 +159,8 @@ public abstract class ParserTest {
 
         public int numberOfDifferentPhases() {
             int count = 0;
-            for (int i = 0; i < counts.length; i++)
-                if (counts[i] > 0)
+            for (int j : counts)
+                if (j > 0)
                     count++;
             return count;
         }
