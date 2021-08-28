@@ -22,7 +22,7 @@ public class AggregatorVerticle extends AbstractVerticle {
         private final Aggregator<?> proxy;
         private Runnable completionHandler;
 
-        private AggregatorWrapper(Aggregator proxy) {
+        private AggregatorWrapper(Aggregator<?> proxy) {
             super(null);
             this.proxy = proxy;
         }

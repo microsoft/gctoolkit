@@ -11,7 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Collates(HeapOccupancyAfterCollection.class)
 public class HeapOccupancyAfterCollectionSummary implements HeapOccupancyAfterCollectionAggregation {
 
-    private final Map<GarbageCollectionTypes, XYDataSet> aggregations = new ConcurrentHashMap();
+    private final Map<GarbageCollectionTypes, XYDataSet> aggregations = new ConcurrentHashMap<>();
 
     public void addDataPoint(GarbageCollectionTypes gcType, DateTimeStamp timeStamp, long heapOccupancy) {
         XYDataSet dataSet = aggregations.get(gcType);
