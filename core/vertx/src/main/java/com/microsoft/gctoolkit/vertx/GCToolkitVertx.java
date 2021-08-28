@@ -75,9 +75,7 @@ public class GCToolkitVertx extends AbstractVerticle {
 
         GCToolkitVertx.deployVerticle(GCToolkitVertx);
 
-        logFileParsers.forEach(logFileParser -> {
-            GCToolkitVertx.deployVerticle(logFileParser, new DeploymentOptions().setWorker(true));
-        });
+        logFileParsers.forEach(logFileParser -> GCToolkitVertx.deployVerticle(logFileParser, new DeploymentOptions().setWorker(true)));
         logFileParsers.forEach(LogFileParser::awaitDeployment);
 
         aggregatorVerticles.forEach(GCToolkitVertx::deployVerticle);
