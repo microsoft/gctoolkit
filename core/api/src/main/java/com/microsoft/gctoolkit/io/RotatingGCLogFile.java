@@ -43,7 +43,7 @@ public class RotatingGCLogFile extends GCLogFile {
             final List<GarbageCollectionLogFileSegment> segments;
             if (metadata.isZip() || metadata.isGZip()) {
                 //TODO: add code to ensure correct order to stream files in zip and gzip files
-                segments = Collections.EMPTY_LIST;
+                segments = List.of();
             } else {
                 segments = findGCLogSegments(path);
             }
