@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.logging.Logger;
 
+import static com.microsoft.gctoolkit.parser.test.CommonTestHelper.captureTest;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ParallelParserRulesTest implements ParallelPatterns {

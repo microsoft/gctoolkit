@@ -2,7 +2,10 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.event.zgc;
 
-public enum ZGCConcurrentPhases {
+import com.microsoft.gctoolkit.event.GarbageCollectionTypes;
+import com.microsoft.gctoolkit.event.LabelledGCEventType;
+
+public enum ZGCConcurrentPhases implements LabelledGCEventType {
 
     MARK("Concurrent Mark"),
     REFERENCE_PROCESSING( "Reference Processing"),
@@ -16,11 +19,7 @@ public enum ZGCConcurrentPhases {
     }
 
     public static ZGCConcurrentPhases fromLabel(String label) {
-        for (ZGCConcurrentPhases gcType : ZGCConcurrentPhases.values()) {
-            if (gcType.label.equals(label))
-                return gcType;
-        }
-        return null;
+        return LabelledGCEventType.fromLabel(ZGCConcurrentPhases.class, label);
     }
 
     public String getLabel() {
