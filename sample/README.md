@@ -1,4 +1,4 @@
- # GCToolKit introductory sample
+# GCToolKit introductory sample
 
 This sample shows how to use [GCToolKit](../README.md) to analyze a GC log file and report on total heap occupancy after a GC cycle has been completed. For more details on how GCToolKit and this sample work, visit [Introducing Microsoft GCToolKit](https://devblogs.microsoft.com/java/introducing-microsoft-gctoolkit/).
 
@@ -9,8 +9,8 @@ This sample shows how to use [GCToolKit](../README.md) to analyze a GC log file 
 Compile the sample with `mvn compile`, then use `mvn exec:exec` to run the sample.
 
 ```shell
-$ mvn clean compile
-$ mvn exec:exec
+mvn clean compile
+mvn exec:exec
 ```
 
 By default, the sample analyzes `../gclogs/preunified/cms/defnew/details/defnew.log`. Set the parameter `gcLogPath` to analyze a different GC log file.
@@ -25,8 +25,8 @@ The sample can also be run from the command line with Java 11 or higher. Compile
 then run `java` with `--module-path` and give it the path to a GC log file as an argument.
 
 ```shell
-$ mvn clean compile dependency:copy-dependencies
-$ java java --module-path target/classes:target/lib --module com.microsoft.gctoolkit.sample/com.microsoft.gctoolkit.sample.Main ../gclogs/preunified/cms/defnew/details/defnew.log
+mvn clean compile dependency:copy-dependencies
+java java --module-path target/classes:target/lib --module com.microsoft.gctoolkit.sample/com.microsoft.gctoolkit.sample.Main ../gclogs/preunified/cms/defnew/details/defnew.log
 ```
 
 ## Troubleshooting

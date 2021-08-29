@@ -440,4 +440,63 @@ class DateTimeStampTest {
         assertEquals(-1, smaller.compareTo(greater));
     }
 
+    @Test
+    void testNanWithZero() {
+        DateTimeStamp dateTimeStamp = new DateTimeStamp(0.0);
+        DateTimeStamp forComparing = new DateTimeStamp(0.0).add(Double.NaN);
+        assertEquals(dateTimeStamp, forComparing);
+    }
+
+    @Test
+    void testNanWithNonZero() {
+        DateTimeStamp dateTimeStamp = new DateTimeStamp("2018-04-04T10:10:00.586-0100");
+        DateTimeStamp forComparing = new DateTimeStamp("2018-04-04T10:10:00.586-0100").add(Double.NaN);
+        assertEquals(dateTimeStamp, forComparing);
+    }
+
+    @Test
+    void testNanWithMinusNonZero() {
+        DateTimeStamp dateTimeStamp = new DateTimeStamp("2018-04-04T10:10:00.586-0100");
+        DateTimeStamp forComparing = new DateTimeStamp("2018-04-04T10:10:00.586-0100").minus(Double.NaN);
+        assertEquals(dateTimeStamp, forComparing);
+    }
+
+    @Test
+    void testNanWithMinus() {
+        DateTimeStamp dateTimeStamp = new DateTimeStamp("2018-04-04T10:09:59.586-0100");
+        DateTimeStamp forComparing = new DateTimeStamp("2018-04-04T10:10:00.586-0100").minus(1);
+        assertEquals(dateTimeStamp, forComparing);
+    }
+
+    @Test
+    void testNanWithConstructor() {
+        DateTimeStamp dateTimeStamp = new DateTimeStamp((String) null,Double.NaN);
+        DateTimeStamp forComparing = new DateTimeStamp(0.0);
+        assertEquals(dateTimeStamp, forComparing);
+    }
+
+    @Test
+    void testBeforeForNAN(){
+        DateTimeStamp dateTimeStamp = new DateTimeStamp(-1);
+        boolean before = dateTimeStamp.before(Double.NaN);
+        assertTrue(before);
+    }
+
+    @Test
+    void testAfterForNAN(){
+        DateTimeStamp dateTimeStamp = new DateTimeStamp(1);
+        boolean after = dateTimeStamp.after(Double.NaN);
+        assertTrue(after);
+    }
+
+    @Test
+    void compareWithNANValue(){
+        DateTimeStamp dateTimeStamp = new DateTimeStamp(12d);
+        DateTimeStamp dateTimeStampCompare = new DateTimeStamp(Double.NaN);
+        int compare = dateTimeStamp.compareTo(dateTimeStampCompare);
+        assertEquals(1,compare);
+
+    }
+
+
 }
