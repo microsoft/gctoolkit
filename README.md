@@ -20,7 +20,7 @@ For more detail you can read our [Launch Blog Post](https://devblogs.microsoft.c
 
 ## Introduction
 
-Managed memory in the Java Virtual Machine (JVM) is comprised of 3 main pieces:
+Managed memory in the Java Virtual Machine (JVM) is composed of 3 main pieces:
 
 1. Memory buffers known as Java heap
 1. Allocators which perform the work of getting data into Java heap
@@ -47,25 +47,29 @@ The GCToolKit artifacts are in GitHub packages. To use the GCToolKit artifacts a
 You'll then want to add the `api`, `parser` and `vertx` modules to your project in the `dependencyManagement` and/or `dependencies` section as you see fit.
 
 ```xml
+<dependencies>
+    ...
+    
+    <dependency>
+        <groupId>com.microsoft.gctoolkit</groupId>
+        <artifactId>api</artifactId>
+        <version>2.0.1</version>
+    </dependency>
+    
+    <dependency>
+        <groupId>com.microsoft.gctoolkit</groupId>
+        <artifactId>parser</artifactId>
+        <version>2.0.1</version>
+    </dependency>
+    
+    <dependency>
+        <groupId>com.microsoft.gctoolkit</groupId>
+        <artifactId>vertx</artifactId>
+        <version>2.0.1</version>
+    </dependency>
 
-<dependency>
-    <groupId>com.microsoft.gctoolkit</groupId>
-    <artifactId>api</artifactId>
-    <version>2.0.1</version>
-</dependency>
-
-<dependency>
-    <groupId>com.microsoft.gctoolkit</groupId>
-    <artifactId>parser</artifactId>
-    <version>2.0.1</version>
-</dependency>
-
-<dependency>
-    <groupId>com.microsoft.gctoolkit</groupId>
-    <artifactId>vertx</artifactId>
-    <version>2.0.1</version>
-</dependency>
-
+    ...
+</dependencies>
 ```
 
 ### Example
