@@ -28,24 +28,13 @@ public class StartingGun {
             setState(count);
         }
 
-        int getCount() {
-            return getState();
-        }
-
         protected int tryAcquireShared(int unused) {
             return (getState() == 0) ? 1 : -1;
         }
 
         protected boolean tryReleaseShared(int unused) {
-            // Decrement count; signal when transition to zero
-            for (; ; ) {
-                int c = getState();
-                if (c == 0)
-                    return false;
-                int nextc = c - 1;
-                if (compareAndSetState(c, nextc))
-                    return nextc == 0;
-            }
+            setState(1);
+            return true;
         }
     }
 
