@@ -9,12 +9,15 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class StartingGunTest {
+
+  private static final int PAUSE = 300;
+
   @Test
   public void testStartingGunNoInterruptions() throws InterruptedException {
     StartingGun sg = new StartingGun();
     Thread[] threads = startWaitingThreads(sg);
 
-    Thread.sleep(30);
+    Thread.sleep(PAUSE);
 
     allThreadsAlive(threads);
 
@@ -50,10 +53,10 @@ public class StartingGunTest {
         Thread.yield();
       }
       // just in case the state was set early
-      LockSupport.parkNanos(10_000_000);
+      LockSupport.parkNanos(PAUSE * 1_000_000);
       testingThread.interrupt();
 
-      LockSupport.parkNanos(10_000_000);
+      LockSupport.parkNanos(PAUSE * 1_000_000);
       sg.ready();
     });
     thread.start();
@@ -68,7 +71,7 @@ public class StartingGunTest {
     StartingGun sg = new StartingGun();
     Thread[] threads = startWaitingThreads(sg);
 
-    Thread.sleep(30);
+    Thread.sleep(PAUSE);
 
     allThreadsAlive(threads);
 
@@ -81,7 +84,7 @@ public class StartingGunTest {
       threads[i] = new Thread(sg::awaitUninterruptibly);
       threads[i].start();
     }
-    Thread.sleep(30);
+    Thread.sleep(PAUSE);
     allThreadsDead(threads);
   }
 
@@ -90,13 +93,13 @@ public class StartingGunTest {
     StartingGun sg = new StartingGun();
     Thread[] threads = startWaitingThreads(sg);
 
-    Thread.sleep(30);
+    Thread.sleep(PAUSE);
 
     allThreadsAlive(threads);
 
     for (Thread thread : threads) thread.interrupt();
 
-    Thread.sleep(30);
+    Thread.sleep(PAUSE);
 
     sg.ready();
 
@@ -106,7 +109,7 @@ public class StartingGunTest {
   private void allThreadsDead(Thread[] threads)
       throws InterruptedException {
     for (Thread thread : threads) {
-      thread.join(100);
+      thread.join(PAUSE);
       assertFalse(thread.isAlive());
     }
   }
