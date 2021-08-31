@@ -32,13 +32,13 @@ public class JVMEventSource extends AbstractVerticle {
         vertx.eventBus().publish(publicationChannel, safepointLogFile.endOfData());
     }
 
-    private final StartingGun latch = new StartingGun();
+    private final StartingGun deployed = new StartingGun();
 
     public void awaitDeployment() {
-        latch.awaitUninterruptibly();
+        deployed.awaitUninterruptibly();
     }
 
     public void start() {
-        latch.ready();
+        deployed.ready();
     }
 }
