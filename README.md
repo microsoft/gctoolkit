@@ -37,11 +37,17 @@ In order to use this library you'll need to add its dependencies to your project
 The GCToolKit artifacts are in GitHub packages. To use the GCToolKit artifacts as dependencies in your project, `github` must be added as a repository in your POM file.
 
 ```xml
-<repository>
-    <id>github</id>
-    <name>GCToolKit packages</name>
-    <url>https://maven.pkg.github.com/microsoft/*</url>
-</repository>
+<repositories>
+    ...
+    
+    <repository>
+        <id>github</id>
+        <name>GCToolKit packages</name>
+        <url>https://maven.pkg.github.com/microsoft/*</url>
+    </repository>
+    
+    ...
+</repositories>
 ```
 
 You'll then want to add the `api`, `parser` and `vertx` modules to your project in the `dependencyManagement` and/or `dependencies` section as you see fit.
