@@ -14,13 +14,13 @@
 
     <organization>
         <name>Microsoft Corporation</name>
-        <url>http://microsoft.com</url>
+        <url>https://microsoft.com</url>
     </organization>
 
     <licenses>
         <license>
             <name>MIT License</name>
-            <url>http://opensource.org/licenses/MIT</url>
+            <url>https://opensource.org/licenses/MIT</url>
             <distribution>repo</distribution>
         </license>
     </licenses>
@@ -120,6 +120,7 @@
                     <configuration>
                         <compilerArgs>
                             <arg>--module-version=${project.version}</arg>
+                            <arg>-Xlint:unchecked</arg>
                         </compilerArgs>
                     </configuration>
                 </plugin>
