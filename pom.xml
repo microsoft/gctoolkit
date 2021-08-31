@@ -32,11 +32,6 @@
         <tag>gctoolkit-2.0.0</tag>
     </scm>
 
-    <!-- This throws a warning, but the versions plugin does actually require it if you're checking plugin versions -->
-    <prerequisites>
-        <maven>3.8.2</maven>
-    </prerequisites>
-
     <developers>
         <developer>
             <id>microsoft</id>
@@ -88,15 +83,17 @@
         <maven.dependency-plugin.version>3.2.0</maven.dependency-plugin.version>
         <maven.deploy-plugin.version>3.0.0-M1</maven.deploy-plugin.version>
         <maven.enforcer-plugin.version>3.0.0</maven.enforcer-plugin.version>
+        <maven.install-plugin.version>3.0.0-M1</maven.install-plugin.version>
         <maven.jacoco-plugin.version>0.8.7</maven.jacoco-plugin.version>
         <maven.jar-plugin.version>3.2.0</maven.jar-plugin.version>
         <maven.javadoc-plugin.version>3.3.0</maven.javadoc-plugin.version>
-        <maven.jxr-plugin.version>3.0.0</maven.jxr-plugin.version>
+        <maven.jxr-plugin.version>3.1.1</maven.jxr-plugin.version>
+        <maven.license-plugin.version>2.0.0</maven.license-plugin.version>
         <maven.pmd-plugin.version>3.14.0</maven.pmd-plugin.version>
-        <maven.project-info-reports-plugin.version>3.0.0</maven.project-info-reports-plugin.version>
-        <maven.install-plugin.version>3.0.0-M1</maven.install-plugin.version>
-        <maven.resources-plugin.version>3.1.0</maven.resources-plugin.version>
-        <maven.site-plugin.version>3.7.1</maven.site-plugin.version>
+        <maven.project-info-reports-plugin.version>3.1.2</maven.project-info-reports-plugin.version>
+        <maven.rat-plugin.version>0.13</maven.rat-plugin.version>
+        <maven.resources-plugin.version>3.2.0</maven.resources-plugin.version>
+        <maven.site-plugin.version>3.9.1</maven.site-plugin.version>
         <maven.spotbugs-plugin.version>4.3.0</maven.spotbugs-plugin.version>
         <maven.surefire-plugin.version>3.0.0-M5</maven.surefire-plugin.version>
         <maven.versions-plugin.version>2.8.1</maven.versions-plugin.version>
@@ -126,6 +123,7 @@
 
     <build>
         <!-- NOTE: Some plugin configuration is set in the reporting section below as opposed to here by design -->
+        <!-- antrun and assembly are the other two plugins that we could define versions for but we don't use them -->
         <pluginManagement>
             <plugins>
                 <plugin>
@@ -243,16 +241,15 @@
                     <artifactId>maven-resources-plugin</artifactId>
                     <version>${maven.resources-plugin.version}</version>
                 </plugin>
-                <!-- TODO Make properties of these versions -->
                 <plugin>
                     <groupId>org.apache.rat</groupId>
                     <artifactId>apache-rat-plugin</artifactId>
-                    <version>0.13</version>
+                    <version>${maven.rat-plugin.version}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>license-maven-plugin</artifactId>
-                    <version>2.0.0</version>
+                    <version>${maven.license-plugin.version}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
@@ -440,7 +437,7 @@
     </reporting>
 
     <profiles>
-        <!-- profile for downloading test log data,checks and running test-->
+        <!-- profile for downloading test log data,checks and running test -->
         <profile>
             <id>contributor</id>
             <properties>
