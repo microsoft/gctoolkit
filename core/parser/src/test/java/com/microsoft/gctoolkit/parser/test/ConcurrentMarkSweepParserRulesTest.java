@@ -36,7 +36,7 @@ public class ConcurrentMarkSweepParserRulesTest implements CMSPatterns {
 
     /* Code that is useful when testing individual records */
 
-    private boolean debugging = Boolean.getBoolean("microsoft.debug");
+    private final boolean debugging = Boolean.getBoolean("microsoft.debug");
 
     //@Test
     //@Ignore("Not a real test, only for debugging")

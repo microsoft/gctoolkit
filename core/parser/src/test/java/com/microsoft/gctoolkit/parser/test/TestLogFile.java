@@ -11,9 +11,9 @@ import java.util.Optional;
  */
 public class TestLogFile {
 
-    private File logFile;
+    private final File logFile;
 
-    private final String[] relativePaths = {
+    private final static String[] relativePaths = {
             "./",
             "preunified/",
             "preunified/cms/parnew/details/tenuring/",

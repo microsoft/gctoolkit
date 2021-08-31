@@ -147,7 +147,7 @@ public class G1GCForwardReference extends ForwardReference {
     private final static int CLASSSPACE_RESERVED_BEFORE_COLLECTION = 38;
     private final static int CLASSSPACE_RESERVED_AFTER_COLLECTION = 39;
 
-    private long[] memoryPoolMeasurment = {
+    private final long[] memoryPoolMeasurment = {
             -1L, -1L, -1L, -1L, -1L, -1L, -1L, -1L, -1L, -1L,
             -1L, -1L, -1L, -1L, -1L, -1L, -1L, -1L, -1L, -1L,
             -1L, -1L, -1L, -1L, -1L, -1L, -1L, -1L, -1L, -1L,
@@ -388,7 +388,7 @@ public class G1GCForwardReference extends ForwardReference {
     public final static int POST_EVACUATE_COLLECTION_SET = 2;
     public final static int OTHER = 3;
 
-    private double[] youngCollectionPhases = {NOT_SET, NOT_SET, NOT_SET, NOT_SET};
+    private final double[] youngCollectionPhases = {NOT_SET, NOT_SET, NOT_SET, NOT_SET};
     private final Map<String, Double> preEvacuateCSetPhaseDurations = new ConcurrentHashMap<>(3);
     private final Map<String, UnifiedStatisticalSummary> evacuateCSetPhaseDurations = new ConcurrentHashMap<>();
     private final Map<String, Double> postEvacuateCSetPhaseDurations = new ConcurrentHashMap<>();
@@ -506,10 +506,10 @@ public class G1GCForwardReference extends ForwardReference {
         return new SurvivorMemoryPoolSummary(memoryPoolMeasurment[SURVIVOR_OCCUPANCY_BEFORE_COLLECTION], memoryPoolMeasurment[SURVIVOR_OCCUPANCY_AFTER_COLLECTION], memoryPoolMeasurment[SURVIVOR_SIZE_AFTER_COLLECTION]);
     }
 
-    private static int OCCUPANCY_BEFORE_OFFSET = 0;
-    private static int OCCUPANCY_AFTER_OFFSET = 1;
-    private static int SIZE_BEFORE_OFFSET = 2;
-    private static int SIZE_AFTER_OFFSET = 3;
+    private static final int OCCUPANCY_BEFORE_OFFSET = 0;
+    private static final int OCCUPANCY_AFTER_OFFSET = 1;
+    private static final int SIZE_BEFORE_OFFSET = 2;
+    private static final int SIZE_AFTER_OFFSET = 3;
 
     private MemoryPoolSummary getMemoryPoolSummary(int offset) {
         if (memoryPoolMeasurment[offset + OCCUPANCY_BEFORE_OFFSET] == -1L) //do we have recorded values

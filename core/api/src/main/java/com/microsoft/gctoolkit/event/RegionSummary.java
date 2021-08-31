@@ -4,9 +4,9 @@ package com.microsoft.gctoolkit.event;
 
 public class RegionSummary {
 
-    private int before;
-    private int after;
-    private int assigned;
+    private final int before;
+    private final int after;
+    private final int assigned;
 
     public RegionSummary(int before, int after, int assigned) {
         this.before = before;

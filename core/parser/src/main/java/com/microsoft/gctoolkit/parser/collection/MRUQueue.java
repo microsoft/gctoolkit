@@ -12,8 +12,8 @@ import java.util.Set;
 
 public class MRUQueue<K, V> implements Map<K, V>, Iterable<K> {
 
-    private HashMap<K, V> entries;
-    private LinkedList<K> keys;
+    private final HashMap<K, V> entries;
+    private final LinkedList<K> keys;
 
     public MRUQueue() {
         entries = new HashMap<>();

@@ -9,23 +9,23 @@ public class G1JVMConfigurationTest extends LogDiaryTest {
 
 
     // Details
-    private static String[] details = {
+    private static final String[] details = {
             "170_51mastermind.log",
             "g1.details.cause.log"
     };
 
-    private static boolean[][] detailsDiary = {
+    private static final boolean[][] detailsDiary = {
             //    0      1      2      3      4      5      6      7      8      9     10     11     12     13     14     15     16     17     18,    19,    20,    21,    22,    23,    24,    25,    26,    27,
             { false, false, false, false, false, false, false, false, false,  true, false, false,  true, false, false, false, false,  true, false, false, false, false, false, false, false, false, false, false},
             { false, false, false, false, false, false, false, false, false,  true, false, false,  true, false,  true, false, false,  true, false, false, false, false, false, false, false, false, false, false}
     };
 
-    private static int[][] detailsUnknown = {
+    private static final int[][] detailsUnknown = {
             {-1},
             {-1}
     };
 
-    private static int[][] detailsKnown = {
+    private static final int[][] detailsKnown = {
             {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27},
             {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27}
     };
@@ -40,14 +40,14 @@ public class G1JVMConfigurationTest extends LogDiaryTest {
 
 
     // Details Tenuring
-    private static String[] detailsTenuring = {
+    private static final String[] detailsTenuring = {
             "server1-gc.log",
             "server2-gc.log",
             "server3-gc.log",
             "170_45/g1_details_tenuring_cause.log"
     };
 
-    private static boolean[][] detailsTenuringDiary = {
+    private static final boolean[][] detailsTenuringDiary = {
             //    0,     1,     2,     3,     4,     5,     6,     7,     8,     9,    10,    11,    12,    13,    14,    15,    16,    17,    18,    19,    20,    21,    22,    23,    24,    25,    26,    27
             { false, false, false, false, false, false, false, false, false,  true, false, false,  true,  true, false, false, false,  true, false, false, false, false, false, false,  true, false, false, false},
             { false, false, false, false, false, false, false, false, false,  true, false, false,  true,  true, false, false, false,  true, false, false, false, false, false, false,  true, false, false, false},
@@ -55,14 +55,14 @@ public class G1JVMConfigurationTest extends LogDiaryTest {
             {  true, false, false, false, false, false, false, false, false,  true, false, false,  true,  true,  true, false, false,  true, false, false, false, false, false, false, false, false, false, false}
     };
 
-    private static int[][] detailsTenuringUnknown = {
+    private static final int[][] detailsTenuringUnknown = {
             {-1},
             {-1},
             {-1},
             {-1},
     };
 
-    private static int[][] detailsTenuringKnown = {
+    private static final int[][] detailsTenuringKnown = {
             {0, 1, 2, 3, 4, 5, 6, 7, 8, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27},
             {0, 1, 2, 3, 4, 5, 6, 7, 8, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27},
             {0, 1, 2, 3, 4, 5, 6, 7, 8, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27},
@@ -80,21 +80,21 @@ public class G1JVMConfigurationTest extends LogDiaryTest {
 
 
     // Details, Tenuring, Rolling, pre 170_40
-    private static String[] detailsTenuringRolling17040 = {
+    private static final String[] detailsTenuringRolling17040 = {
             "ahjapp02a_gclog/ahj_prod_gc.log.0"
     };
 
     //this is a 7.0_45 log
-    private static boolean[][] detailsTenuringRolling17040Diary = {
+    private static final boolean[][] detailsTenuringRolling17040Diary = {
             //    0,     1,     2,     3,     4,     5,     6,     7,     8,     9,    10,    11,    12,    13,    14,    15,    16,    17,    18,    19,    20,    21,    22,    23,    24,    25,    26,    27
              { true,  true, false, false, false, false, false, false, false,  true, false, false,  true,  true, false, false, false,  true, false, false, false, false, false, false, false, false, false, false}
     };
 
-    private static int[][] detailsTenuringRolling17040Unknown = {
+    private static final int[][] detailsTenuringRolling17040Unknown = {
             {-1}
     };
 
-    private static int[][] detailsTenuringRolling17040Known = {
+    private static final int[][] detailsTenuringRolling17040Known = {
             {0, 1, 2, 3, 4, 5, 6, 7, 8, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27}
     };
 
@@ -108,23 +108,23 @@ public class G1JVMConfigurationTest extends LogDiaryTest {
 
 
     //Details Tenuring 1.8.0
-    private static String[] detailsTenuring80 = {
+    private static final String[] detailsTenuring80 = {
             "neo4j-gc-fragment.log",
             "neo4j-gc.log.20140625"
     };
 
-    private static boolean[][] detailsTenuring80Diary = {
+    private static final boolean[][] detailsTenuring80Diary = {
             //    0,     1,     2,     3,     4,     5,     6,     7,     8,     9,    10,    11,    12,    13,    14,    15,    16,    17,    18,    19,    20,    21,    22,    23,    24,    25,    26,    27
             {  true, false, false, false, false, false, false, false, false,  true, false, false,  true,  true,  true, false, false, false, false,  true, false, false, false, false, false, false, false, false},
             {  true, false, false, false, false, false, false, false, false,  true, false, false,  true,  true,  true, false, false, false, false,  true, false, false, false, false, false, false, false, false}
     };
 
-    private static int[][] detailsTenuring80Unknown = {
+    private static final int[][] detailsTenuring80Unknown = {
             {-1},
             {-1}
     };
 
-    private static int[][] detailsTenuring80Known = {
+    private static final int[][] detailsTenuring80Known = {
             {1, 2, 3, 4, 5, 6, 7, 8, 13, 15, 16, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27},
             {1, 2, 3, 4, 5, 6, 7, 8, 13, 15, 16, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27}
     };
@@ -140,20 +140,20 @@ public class G1JVMConfigurationTest extends LogDiaryTest {
 
 
     // Details, Print Reference GC
-    private static String[] detailsPrintReferenceGC = {
+    private static final String[] detailsPrintReferenceGC = {
             "post17040/170_51_mastermind.log"
     };
 
-    private static boolean[][] detailsPrintReferenceGCDiary = {
+    private static final boolean[][] detailsPrintReferenceGCDiary = {
             //    0      1      2      3      4      5      6      7      8      9     10     11     12     13     14     15     16     17     18,    19,    20    21,     22,    23,    24     25,    26,    27
             { false, false, false, false, false, false, false, false, false,  true, false, false,  true, false, false, false, false,  true, false, false, false, false, false,  true, false, false, false, false}
     };
 
-    private static int[][] detailsPrintReferenceGCUnknown = {
+    private static final int[][] detailsPrintReferenceGCUnknown = {
             {-1}
     };
 
-    private static int[][] detailsPrintReferenceGCKnown = {
+    private static final int[][] detailsPrintReferenceGCKnown = {
             {0, 1, 2, 3, 4, 5, 6, 7, 8, 11, 12, 13, 14, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27}
     };
 
@@ -167,20 +167,20 @@ public class G1JVMConfigurationTest extends LogDiaryTest {
     }
 
     // Details, Print Reference GC, is post 1.7.0_40
-    private static String[] detailsAdaptiveSizeRSet = {
+    private static final String[] detailsAdaptiveSizeRSet = {
             "gc1gc_details_adaptivesizing_rset.log"
     };
 
-    private static boolean[][] detailsAdaptiveSizeRSetDiary = {
+    private static final boolean[][] detailsAdaptiveSizeRSetDiary = {
             //   0      1      2      3      4      5      6      7      8      9     10     11     12     13     14     15     16     17     18,    19,    20,    21,    22,    23,    24,    25,    26,    27
             {false, false, false, false, false, false, false, false, false,  true, false, false,  true, false, false, false,  true,  true, false, false, false, false, false, false, false, false, false, false}
     };
 
-    private static int[][] detailsAdaptiveSizeRSetUnknown = {
+    private static final int[][] detailsAdaptiveSizeRSetUnknown = {
             {-1}
     };
 
-    private static int[][] detailsAdaptiveSizeRSetKnown = {
+    private static final int[][] detailsAdaptiveSizeRSetKnown = {
             {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27}
     };
 

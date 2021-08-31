@@ -17,7 +17,7 @@ import java.util.Objects;
 public abstract class GCEvent extends JVMEvent {
 
     static final double TIMESTAMP_THRESHOLD = 1.0E-6;
-    private GarbageCollectionTypes gcType;
+    private final GarbageCollectionTypes gcType;
     private GCCause cause;
 
     protected GCEvent(DateTimeStamp timeStamp, GarbageCollectionTypes gcType, GCCause cause, double duration) {

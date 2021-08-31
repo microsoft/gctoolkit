@@ -88,7 +88,7 @@ public class ShenandoahParserRulesTest implements ShenandoahPatterns {
             REFERENCE
     };
 
-    private String[][] lines = {
+    private final static String[][] lines = {
             {  //   0
                     "[31.818s][info][gc,start      ] GC(7) Concurrent reset",
                     "[31.953s][info][gc            ] GC(7) Concurrent reset 134.638ms",

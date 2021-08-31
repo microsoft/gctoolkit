@@ -12,7 +12,7 @@ import com.microsoft.gctoolkit.time.DateTimeStamp;
 
 public abstract class G1GCPauseEvent extends G1GCEvent {
 
-    private MemoryPoolSummary NULL_POOL = new MemoryPoolSummary(-1L, -1L, -1L, -1L);
+    private final MemoryPoolSummary NULL_POOL = new MemoryPoolSummary(-1L, -1L, -1L, -1L);
 
     MemoryPoolSummary eden;
     SurvivorMemoryPoolSummary survivor;

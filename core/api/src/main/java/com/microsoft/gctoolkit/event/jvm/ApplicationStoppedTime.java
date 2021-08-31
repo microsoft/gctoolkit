@@ -7,8 +7,8 @@ import com.microsoft.gctoolkit.time.DateTimeStamp;
 public class ApplicationStoppedTime extends JVMEvent {
 
     private static final double NO_TTSP = -1.0d; // negative times.. don't make sense
-    private boolean gcPause;
-    private double timeToStopThreads;
+    private final boolean gcPause;
+    private final double timeToStopThreads;
     private VMOperations safePointReason = null;
 
     public ApplicationStoppedTime(DateTimeStamp timeStamp, double duration, double timeToStopThreads, VMOperations safePointReason) {

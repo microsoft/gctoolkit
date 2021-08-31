@@ -565,7 +565,7 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
         eventQueue.clear();
     }
 
-    private Queue<G1GCPauseEvent> eventQueue = new LinkedList<>();
+    private final Queue<G1GCPauseEvent> eventQueue = new LinkedList<>();
     private void record(G1GCPauseEvent event) {
         if (event == null) return;
         if ( concurrentPhaseActive)

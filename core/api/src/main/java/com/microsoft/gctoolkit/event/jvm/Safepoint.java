@@ -7,7 +7,7 @@ import com.microsoft.gctoolkit.time.DateTimeStamp;
 
 public class Safepoint extends JVMEvent {
 
-    private String vmOperation;
+    private final String vmOperation;
     private int totalNumberOfApplicationThreads;
     private int initiallyRunning;
     private int waitingToBlock;

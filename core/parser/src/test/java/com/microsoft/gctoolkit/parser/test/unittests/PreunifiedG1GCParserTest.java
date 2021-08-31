@@ -27,15 +27,15 @@ public class PreunifiedG1GCParserTest extends ParserTest {
         }
     }
 
-    private static String[] solaris = {
+    private static final String[] solaris = {
             "rightmove_parse_errors.log"
     };
 
-    private static int[] solarisNumberOfDifferentCollectors = {
+    private static final int[] solarisNumberOfDifferentCollectors = {
             9
     };
 
-    private static int[][] solarisCounts = {
+    private static final int[][] solarisCounts = {
             //   0,    1,    2,    3,    4,    5,    6,    7,    8,    9,   10,   11,   12
             {945, 54, 57, 0, 4, 57, 0, 57, 57, 57, 0, 0, 57}
     };
@@ -54,19 +54,19 @@ public class PreunifiedG1GCParserTest extends ParserTest {
         }
     }
 
-    private static String[] details = {
+    private static final String[] details = {
             "170_51mastermind.log",
             "g1.details.cause.log",
             "gc.log.4.31_1_aug_sep_current.zip"
     };
 
-    private static int[] detailsNumberOfDifferentCollectors = {
+    private static final int[] detailsNumberOfDifferentCollectors = {
             1,
             10,
             9
     };
 
-    private static int[][] detailsCounts = {
+    private static final int[][] detailsCounts = {
             //   0,    1,    2,    3,    4,    5,    6,    7,    8,    9,   10,   11,   12
             {480, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
             {130, 2, 33, 0, 19, 33, 0, 17, 5, 17, 3, 0, 33},
@@ -88,7 +88,7 @@ public class PreunifiedG1GCParserTest extends ParserTest {
         }
     }
 
-    private static String[] detailsTenuring = {
+    private static final String[] detailsTenuring = {
             "server1-gc.log",
             "server2-gc.log",
             "server3-gc.log",
@@ -98,7 +98,7 @@ public class PreunifiedG1GCParserTest extends ParserTest {
             "180/seeker.log"
     };
 
-    private static int[] detailsTenuringNumberOfDifferentCollectors = {
+    private static final int[] detailsTenuringNumberOfDifferentCollectors = {
             8,
             9,
             1,
@@ -108,7 +108,7 @@ public class PreunifiedG1GCParserTest extends ParserTest {
             8
     };
 
-    private static int[][] detailsTenuringCounts = {
+    private static final int[][] detailsTenuringCounts = {
             //   0,    1,    2,    3,    4,    5,    6,    7,    8,    9,   10,   11,   12
             {794, 413, 157, 0, 0, 157, 0, 157, 157, 157, 0, 0, 157},
             {2194, 1308, 553, 0, 39, 553, 0, 523, 521, 523, 0, 0, 553},
@@ -135,17 +135,17 @@ public class PreunifiedG1GCParserTest extends ParserTest {
         }
     }
 
-    private static String[] detailsReference = {
+    private static final String[] detailsReference = {
             "post17040/170_51_mastermind.log",
             "post17040/gc_with_overflow.log"
     };
 
-    private static int[] detailsReferenceNumberOfDifferentCollectors = {
+    private static final int[] detailsReferenceNumberOfDifferentCollectors = {
             1,
             7
     };
 
-    private static int[][] detailsReferenceCounts = {
+    private static final int[][] detailsReferenceCounts = {
             //    0,      1,      2,      3,      4,      5,      6,      7,      8,      9,    10,     11,     12
             {468, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
             {158, 0, 40, 0, 401, 40, 0, 3, 0, 3, 0, 0, 40}

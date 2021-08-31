@@ -19,7 +19,8 @@ public class LogFileParser extends AbstractVerticle implements JVMEventConsumer 
     protected static final Logger LOGGER = Logger.getLogger(LogFileParser.class.getName());
     private final GCLogParser parser;
 
-    private String inbox, outbox;
+    private final String inbox;
+    private final String outbox;
 
     public LogFileParser(String inbox, String outbox, ParserFactory factory) {
         this.inbox = inbox;
@@ -27,7 +28,7 @@ public class LogFileParser extends AbstractVerticle implements JVMEventConsumer 
         parser = factory.get(this);
     }
 
-    private DeliveryOptions options = new DeliveryOptions().setCodecName("JVMEvent");
+    private final DeliveryOptions options = new DeliveryOptions().setCodecName("JVMEvent");
 
     public void record(JVMEvent event) {
         try {
@@ -42,7 +43,7 @@ public class LogFileParser extends AbstractVerticle implements JVMEventConsumer 
     }
 
     //Vert.x
-    private StartingGun deployed = new StartingGun();
+    private final StartingGun deployed = new StartingGun();
 
     public void awaitDeployment() {
         deployed.awaitUninterruptibly();

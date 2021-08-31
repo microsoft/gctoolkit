@@ -105,7 +105,7 @@ class GarbageCollectionEventSourceTest {
 
     class GCLogConsumer extends AbstractVerticle {
 
-        private CountDownLatch eof = new CountDownLatch(1);
+        private final CountDownLatch eof = new CountDownLatch(1);
         private int eventCount = 0;
 
         GCLogConsumer() {
