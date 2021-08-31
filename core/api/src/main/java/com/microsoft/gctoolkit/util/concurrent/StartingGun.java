@@ -21,15 +21,12 @@ public class StartingGun {
      * Synchronization control For StartingGun.
      * Uses AQS state to represent count.
      */
-    private static final class Sync extends AbstractQueuedSynchronizer {
+    private static final class Sync extends
+            AbstractQueuedSynchronizer {
         private static final long serialVersionUID = 1L;
 
-        Sync(int count) {
-            setState(count);
-        }
-
         protected int tryAcquireShared(int unused) {
-            return (getState() == 0) ? 1 : -1;
+            return (getState() == 1) ? 1 : -1;
         }
 
         protected boolean tryReleaseShared(int unused) {
@@ -44,7 +41,7 @@ public class StartingGun {
      * Constructs a {@code StartingGun}.
      */
     public StartingGun() {
-        this.sync = new Sync(1);
+        this.sync = new Sync();
     }
 
     /**
