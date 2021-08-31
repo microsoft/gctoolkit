@@ -66,7 +66,7 @@ public class PreUnifiedG1GCParser extends PreUnifiedGCLogParser implements G1GCP
 
     private DateTimeStamp concurrentPhaseStartTimeStamp;
     private GarbageCollectionTypes concurrentCollectionTypeForwardReference;
-    private ConcurrentLinkedQueue<JVMEvent> backlog = new ConcurrentLinkedQueue<JVMEvent>();
+    private ConcurrentLinkedQueue<JVMEvent> backlog = new ConcurrentLinkedQueue<>();
 
     final private MRUQueue<GCParseRule, BiConsumer<GCLogTrace, String>> parseRules;
 

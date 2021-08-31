@@ -8,6 +8,8 @@ import com.microsoft.gctoolkit.event.jvm.MetaspaceRecord;
 import com.microsoft.gctoolkit.parser.jvm.Decorators;
 
 import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 
 import static com.microsoft.gctoolkit.event.GarbageCollectionTypes.ConcurrentModeFailure;
@@ -39,8 +41,8 @@ public class GenerationalForwardReference extends ForwardReference {
     }
 
     private MetaspaceRecord classspace = null;
-    private HashMap<String, Double> remarkPhases = new HashMap<>();
-    private HashMap<String, Double> phases = new HashMap<>();
+    private final Map<String, Double> remarkPhases = new ConcurrentHashMap<>();
+    private final Map<String, Double> phases = new ConcurrentHashMap<>();
 
     public GenerationalForwardReference(GarbageCollectionTypes gcType, Decorators decorators, int gcid) {
         super(decorators, gcid);

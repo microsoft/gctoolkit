@@ -17,7 +17,7 @@ public class MRUQueueTest {
         String[] afterA = {"A", "B", "C"};
         String[] afterC = {"C", "A", "B"};
 
-        MRUQueue<String, String> queue = new MRUQueue<String, String>();
+        MRUQueue<String, String> queue = new MRUQueue<>();
         queue.put("B", "E");
         queue.put("A", "D");
         queue.put("C", "F");

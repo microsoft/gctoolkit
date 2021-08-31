@@ -4,6 +4,7 @@ package com.microsoft.gctoolkit.parser.jvm;
 
 
 import java.util.HashMap;
+import java.util.Map;
 
 public enum JVMFlags {
 
@@ -27,27 +28,24 @@ public enum JVMFlags {
 
     */
 
-    private HashMap<String, Boolean> gcLoggingFlagSupport;
-
-    {
-        gcLoggingFlagSupport = new HashMap<String, Boolean>();
-        gcLoggingFlagSupport.put("PrintGCApplicationConcurrentTime", Boolean.TRUE);
-        gcLoggingFlagSupport.put("PrintGCApplicationStoppedTime", Boolean.TRUE);
-        gcLoggingFlagSupport.put("PrintGCDetails", Boolean.TRUE);
-        gcLoggingFlagSupport.put("PrintGCDateStamps", Boolean.TRUE);
-        gcLoggingFlagSupport.put("PrintTenuringDistribution", Boolean.TRUE);
-        gcLoggingFlagSupport.put("PrintReferenceGC", Boolean.TRUE);
-        gcLoggingFlagSupport.put("PrintGCCause", Boolean.TRUE);
-        gcLoggingFlagSupport.put("PrintFLSStatistics", Boolean.TRUE);
-        gcLoggingFlagSupport.put("PrintFLSCensus", Boolean.TRUE);
-        gcLoggingFlagSupport.put("PrintPromotionFailure", Boolean.TRUE);
-        gcLoggingFlagSupport.put("PrintAdaptiveSizePolicy", Boolean.TRUE);
-        gcLoggingFlagSupport.put("PrintCMSInitiationStatistics", Boolean.TRUE);
-        gcLoggingFlagSupport.put("PrintTLAB", Boolean.FALSE);
-        gcLoggingFlagSupport.put("TLABStats", Boolean.FALSE);
-        gcLoggingFlagSupport.put("PrintPLAB", Boolean.FALSE);
-        gcLoggingFlagSupport.put("PrintOldPLAB", Boolean.FALSE);
-    }
+    private final Map<String, Boolean> gcLoggingFlagSupport = Map.ofEntries(
+            Map.entry("PrintGCApplicationConcurrentTime", true),
+            Map.entry("PrintGCApplicationStoppedTime", true),
+            Map.entry("PrintGCDetails", true),
+            Map.entry("PrintGCDateStamps", true),
+            Map.entry("PrintTenuringDistribution", true),
+            Map.entry("PrintReferenceGC", true),
+            Map.entry("PrintGCCause", true),
+            Map.entry("PrintFLSStatistics", true),
+            Map.entry("PrintFLSCensus", true),
+            Map.entry("PrintPromotionFailure", true),
+            Map.entry("PrintAdaptiveSizePolicy", true),
+            Map.entry("PrintCMSInitiationStatistics", true),
+            Map.entry("PrintTLAB", false),
+            Map.entry("TLABStats", false),
+            Map.entry("PrintPLAB", false),
+            Map.entry("PrintOldPLAB", false)
+    );
 
     public boolean supported(String flag) {
         return gcLoggingFlagSupport.get(flag);

@@ -67,7 +67,7 @@ public class SurvivorRecord extends JVMEvent {
     public void add(int age, long bytes) {
 
         if (bytesAtAge == null) {
-            bytesAtAge = new ArrayList<Long>();
+            bytesAtAge = new ArrayList<>();
             bytesAtAge.add(0L); //throw away the first slow.
         }
 
