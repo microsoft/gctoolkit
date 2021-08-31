@@ -89,7 +89,7 @@ class RotatingGarbageCollectionLogFileTest {
         }
     }
 
-    static final RotatingGCLogFile createRotatingGarbageCollectionLogFile(String partialPath) throws IOException {
+    static RotatingGCLogFile createRotatingGarbageCollectionLogFile(String partialPath) throws IOException {
         Path path = getPath(partialPath);
         List<GarbageCollectionLogFileSegment> segments = getSegments(path);
         return new RotatingGCLogFile(path.getParent(), segments);
