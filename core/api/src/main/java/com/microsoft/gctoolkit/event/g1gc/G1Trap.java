@@ -21,7 +21,7 @@ public class G1Trap extends G1GCPauseEvent {
 
     private static final Logger LOGGER = Logger.getLogger(G1Trap.class.getName());
 
-    private final String message = "Internal EventSource Error @ ";
+    private static final String message = "Internal EventSource Error @ ";
 
     public G1Trap() {
         super(new DateTimeStamp(0.0d), GarbageCollectionTypes.G1Trap, GCCause.UNKNOWN_GCCAUSE, 0.0d);

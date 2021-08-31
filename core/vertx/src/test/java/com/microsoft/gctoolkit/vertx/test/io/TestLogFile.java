@@ -13,7 +13,7 @@ public class TestLogFile {
 
     private final File logFile;
 
-    private final String[] relativePaths = {
+    private final static String[] relativePaths = {
             "./",
             "preunified/",
             "preunified/cms/parnew/details/tenuring/",
