@@ -24,7 +24,7 @@ public class Main {
         JavaVirtualMachine machine = gcToolKit.analyze(logFile);
         HeapOccupancyAfterCollectionSummary results = machine.getAggregation(HeapOccupancyAfterCollectionSummary.class);
         results.get().forEach((gcType, dataSet) ->
-                System.out.println("The XYDataSet for " + gcType + " contains " + dataSet.size() + " items.")
+            System.out.println("The XYDataSet for " + gcType + " contains " + dataSet.size() + " items.")
         );
     }
 }
