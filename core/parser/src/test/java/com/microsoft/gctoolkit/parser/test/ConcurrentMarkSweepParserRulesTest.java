@@ -7,6 +7,9 @@ import com.microsoft.gctoolkit.parser.GCLogTrace;
 import com.microsoft.gctoolkit.parser.GCParseRule;
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
+import java.util.Objects;
+
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ConcurrentMarkSweepParserRulesTest implements CMSPatterns {
@@ -19,7 +22,7 @@ public class ConcurrentMarkSweepParserRulesTest implements CMSPatterns {
         assertTrue( rules.length == lines.length, "Number of rules differs from the numbers of log entries");
         for (int i = 0; i < rules.length; i++) {
             for (int j = 0; j < lines.length; j++) {
-                int captured = captureTest(rules[i], lines[j]);
+                int captured = CommonTestHelper.captureTest(rules[i], lines[j]);
                 if (i == j) {
                     assertTrue(captured == lines[j].length, i + " failed to captured it's lines");
                 } else {
@@ -30,16 +33,6 @@ public class ConcurrentMarkSweepParserRulesTest implements CMSPatterns {
 
         assertTrue(true);
     }
-
-    private int captureTest(GCParseRule rule, String[] lines) {
-        int captureCount = 0;
-        for (int i = 0; i < lines.length; i++)
-            if (rule.parse(lines[i]) != null) {
-                captureCount++;
-            }
-        return captureCount;
-    }
-
 
     /* Code that is useful when testing individual records */
 

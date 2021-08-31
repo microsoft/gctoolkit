@@ -93,7 +93,7 @@ public class GenerationalHeapParser extends PreUnifiedGCLogParser implements Sim
     final private MRUQueue<GCParseRule, BiConsumer<GCLogTrace, String>> parseRules;
 
     {
-        parseRules = new MRUQueue<GCParseRule, BiConsumer<GCLogTrace, String>>();
+        parseRules = new MRUQueue<>();
         parseRules.put(DEFNEW, this::defNew);
         parseRules.put(DEFNEW_TENURING, this::defNewWithTenuring);
         parseRules.put(SERIAL_FULL, this::serialFull);

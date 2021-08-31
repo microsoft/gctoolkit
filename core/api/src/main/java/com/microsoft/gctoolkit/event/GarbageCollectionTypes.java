@@ -2,10 +2,12 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.event;
 
+import java.util.Arrays;
+
 /**
  * Representation of GC Collection Events
  */
-public enum GarbageCollectionTypes {
+public enum GarbageCollectionTypes implements LabelledGCEventType {
 
     GC("GC"),
     Young("Young"),
@@ -64,11 +66,7 @@ public enum GarbageCollectionTypes {
     }
 
     public static GarbageCollectionTypes fromLabel(String label) {
-        for (GarbageCollectionTypes gcType : GarbageCollectionTypes.values()) {
-            if (gcType.label.equals(label))
-                return gcType;
-        }
-        return null;
+        return LabelledGCEventType.fromLabel(GarbageCollectionTypes.class, label);
     }
 
     public String getLabel() {

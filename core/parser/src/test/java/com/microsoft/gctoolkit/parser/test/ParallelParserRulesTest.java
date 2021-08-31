@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.logging.Logger;
 
+import static com.microsoft.gctoolkit.parser.test.CommonTestHelper.captureTest;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ParallelParserRulesTest implements ParallelPatterns {
@@ -27,15 +28,6 @@ public class ParallelParserRulesTest implements ParallelPatterns {
                 }
             }
     }
-
-    private int captureTest(GCParseRule rule, String[] lines) {
-        int captureCount = 0;
-        for (int i = 0; i < lines.length; i++)
-            if (rule.parse(lines[i]) != null)
-                captureCount++;
-        return captureCount;
-    }
-
 
     /* Code that is useful when testing individual records */
 

@@ -9,7 +9,6 @@ import com.microsoft.gctoolkit.io.SingleGCLogFile;
 import com.microsoft.gctoolkit.jvm.JavaVirtualMachine;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.ServiceLoader;
@@ -28,13 +27,13 @@ public class GCToolKit {
         try {
             // TODO: property for to allow override of default implementation.
             Class<?> clazz =
-                    Class.forName("com.microsoft.gctoolkit.vertx.jvm.DefaultJavaVirtualMachine", true, Thread.currentThread().getContextClassLoader());
+                    Class.forName("com.microsoft.gctoolkit.vertx.jvm.DefaultJavaVirtualMachine", true, Thread.currentThread()
+                            .getContextClassLoader());
             Constructor<?> constructor = clazz.getConstructor();
             JavaVirtualMachine javaVirtualMachine = (JavaVirtualMachine) constructor.newInstance();
             return javaVirtualMachine;
-        } catch (ClassNotFoundException | NoSuchMethodException | InvocationTargetException |
-                InstantiationException | IllegalAccessException e) {
-            LOGGER.log(Level.SEVERE, "Cannot load \"com.microsoft.gctoolkit.vertx.jvm.DefaultJavaVirtualMachine\"",e);
+        } catch (ReflectiveOperationException e) {
+            LOGGER.log(Level.SEVERE, "Cannot load \"com.microsoft.gctoolkit.vertx.jvm.DefaultJavaVirtualMachine\"", e);
         }
         return null;
     }
@@ -89,9 +88,10 @@ public class GCToolKit {
      * Perform an analysis on a GC log file. The analysis will use the Aggregations
      * that were {@link #registerAggregation(Class) registered}, if appropriate for
      * the GC log file.
+     *
      * @param dataSource The log to analyze, typically a
-     * {@link SingleGCLogFile} or
-     * {@link RotatingGCLogFile}.
+     *                   {@link SingleGCLogFile} or
+     *                   {@link RotatingGCLogFile}.
      * @return a representation of the state of the Java Virtual Machine resulting
      * from the analysis of the GC log file.
      */
@@ -99,10 +99,11 @@ public class GCToolKit {
         // Potential NPE, but would have logged if there was trouble creating the instance.
         JavaVirtualMachine javaVirtualMachine = loadJavaVirtualMachine();
         try {
-            Method analyze = javaVirtualMachine.getClass().getMethod("analyze", Set.class, DataSource.class);
+            Method analyze = javaVirtualMachine.getClass()
+                    .getMethod("analyze", Set.class, DataSource.class);
             analyze.invoke(javaVirtualMachine, this.registeredAggregations, dataSource);
-        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-            LOGGER.log(Level.SEVERE, "Cannot invoke analyze method",e);
+        } catch (ReflectiveOperationException e) {
+            LOGGER.log(Level.SEVERE, "Cannot invoke analyze method", e);
         }
         return javaVirtualMachine;
     }

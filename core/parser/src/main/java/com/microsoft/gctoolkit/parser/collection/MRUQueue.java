@@ -16,8 +16,8 @@ public class MRUQueue<K, V> implements Map<K, V>, Iterable<K> {
     private LinkedList<K> keys;
 
     public MRUQueue() {
-        entries = new HashMap<K, V>();
-        keys = new LinkedList<K>();
+        entries = new HashMap<>();
+        keys = new LinkedList<>();
     }
 
     public V get(Object key) {

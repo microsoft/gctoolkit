@@ -26,10 +26,12 @@ import com.microsoft.gctoolkit.event.g1gc.G1Remark;
 import com.microsoft.gctoolkit.event.g1gc.G1SystemGC;
 import com.microsoft.gctoolkit.event.g1gc.G1Young;
 import com.microsoft.gctoolkit.event.g1gc.G1YoungInitialMark;
-import com.microsoft.gctoolkit.time.DateTimeStamp;
 import com.microsoft.gctoolkit.parser.jvm.Decorators;
+import com.microsoft.gctoolkit.time.DateTimeStamp;
 
 import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 
@@ -387,9 +389,9 @@ public class G1GCForwardReference extends ForwardReference {
     public final static int OTHER = 3;
 
     private double[] youngCollectionPhases = {NOT_SET, NOT_SET, NOT_SET, NOT_SET};
-    private HashMap<String, Double> preEvacuateCSetPhaseDurations = new HashMap<>(3);
-    private HashMap<String, UnifiedStatisticalSummary> evacuateCSetPhaseDurations = new HashMap<>();
-    private HashMap<String, Double> postEvacuateCSetPhaseDurations = new HashMap<>();
+    private final Map<String, Double> preEvacuateCSetPhaseDurations = new ConcurrentHashMap<>(3);
+    private final Map<String, UnifiedStatisticalSummary> evacuateCSetPhaseDurations = new ConcurrentHashMap<>();
+    private final Map<String, Double> postEvacuateCSetPhaseDurations = new ConcurrentHashMap<>();
 
     public void setPreEvacuateCSetDuration(double duration) {
         this.youngCollectionPhases[PRE_EVACUATE_COLLECTION_SET] = duration;
@@ -757,8 +759,8 @@ public class G1GCForwardReference extends ForwardReference {
         return collection;
     }
 
-    private HashMap<String, Double> fullGCInternalPhases = new HashMap<>();
-    private HashMap<Integer, String> fullGCInternalPhaseOrder = new HashMap<>();
+    private final Map<String, Double> fullGCInternalPhases = new ConcurrentHashMap<>();
+    private final Map<Integer, String> fullGCInternalPhaseOrder = new ConcurrentHashMap<>();
 
     public void fullPhase(int integerGroup, String fullGCInternalPhase, double duration) {
         fullGCInternalPhaseOrder.put(integerGroup, fullGCInternalPhase);

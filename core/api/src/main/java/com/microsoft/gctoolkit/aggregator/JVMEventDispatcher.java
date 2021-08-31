@@ -4,15 +4,15 @@ package com.microsoft.gctoolkit.aggregator;
 
 import com.microsoft.gctoolkit.event.jvm.JVMEvent;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
 /**
  * This is a utility class that supports the {@link Aggregator#register(Class, Consumer)} method.
  */
 public class JVMEventDispatcher {
-    private final Map<Class<? extends JVMEvent>, Consumer<JVMEvent>> eventConsumers = new HashMap<>();
+    private final Map<Class<? extends JVMEvent>, Consumer<JVMEvent>> eventConsumers = new ConcurrentHashMap<>();
 
     private final Consumer<JVMEvent> nopConsumer = (evt) -> {
     };

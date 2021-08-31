@@ -50,7 +50,7 @@ public class FileDataSourceMetaData {
 
         try {
             if (Files.isDirectory(path)) {
-                Files.list(path).forEach(child -> logFiles.add(child));
+                Files.list(path).forEach(logFiles::add);
                 this.numberOfFiles = logFiles.size();
             } else if (Files.isRegularFile(path)) {
                 if (magic(path, ZIP_MAGIC1, ZIP_MAGIC2)) {

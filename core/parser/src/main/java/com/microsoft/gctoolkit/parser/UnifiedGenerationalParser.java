@@ -28,13 +28,25 @@ import com.microsoft.gctoolkit.parser.jvm.LoggingDiary;
 import com.microsoft.gctoolkit.parser.unified.UnifiedGenerationalPatterns;
 
 import java.util.AbstractMap;
-import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static com.microsoft.gctoolkit.event.GarbageCollectionTypes.*;
+import static com.microsoft.gctoolkit.event.GarbageCollectionTypes.Abortable_Preclean;
+import static com.microsoft.gctoolkit.event.GarbageCollectionTypes.ConcurrentModeFailure;
+import static com.microsoft.gctoolkit.event.GarbageCollectionTypes.Concurrent_Mark;
+import static com.microsoft.gctoolkit.event.GarbageCollectionTypes.Concurrent_Preclean;
+import static com.microsoft.gctoolkit.event.GarbageCollectionTypes.Concurrent_Reset;
+import static com.microsoft.gctoolkit.event.GarbageCollectionTypes.Concurrent_Sweep;
+import static com.microsoft.gctoolkit.event.GarbageCollectionTypes.DefNew;
+import static com.microsoft.gctoolkit.event.GarbageCollectionTypes.FullGC;
+import static com.microsoft.gctoolkit.event.GarbageCollectionTypes.InitialMark;
+import static com.microsoft.gctoolkit.event.GarbageCollectionTypes.PSFull;
+import static com.microsoft.gctoolkit.event.GarbageCollectionTypes.PSYoungGen;
+import static com.microsoft.gctoolkit.event.GarbageCollectionTypes.ParNew;
+import static com.microsoft.gctoolkit.event.GarbageCollectionTypes.Remark;
 
 /**
  * TODO No reports or views generated from this data yet.
@@ -50,8 +62,7 @@ public class UnifiedGenerationalParser extends UnifiedGCLogParser implements Uni
     private static final Logger LOGGER = Logger.getLogger(UnifiedGenerationalParser.class.getName());
     boolean debugging = "true".equalsIgnoreCase(System.getProperty("microsoft.debug", "false"));
 
-    final private RuleSet<GCParseRule, BiConsumer<GCLogTrace, String>> parseRules;
-    final private HashMap<String, GarbageCollectionTypes> concurrentPhases;
+    private final RuleSet<GCParseRule, BiConsumer<GCLogTrace, String>> parseRules;
 
     {
         parseRules = new RuleSet<>();
@@ -85,13 +96,15 @@ public class UnifiedGenerationalParser extends UnifiedGCLogParser implements Uni
         parseRules.put(END_OF_FILE, this::jvmExit);
         parseRules.put(METASPACE_DETAILED, this::metaSpaceDetails);
 
-        concurrentPhases = new HashMap<>();
-        concurrentPhases.put("Mark", Concurrent_Mark);
-        concurrentPhases.put("Preclean", Concurrent_Preclean);
-        concurrentPhases.put("Abortable Preclean", Abortable_Preclean);
-        concurrentPhases.put("Sweep", Concurrent_Sweep);
-        concurrentPhases.put("Reset", Concurrent_Reset);
     }
+
+    private final Map<String, GarbageCollectionTypes> concurrentPhases = Map.of(
+            "Mark", Concurrent_Mark,
+            "Preclean", Concurrent_Preclean,
+            "Abortable Preclean", Abortable_Preclean,
+            "Sweep", Concurrent_Sweep,
+            "Reset", Concurrent_Reset
+    );
 
     public UnifiedGenerationalParser(LoggingDiary diary, JVMEventConsumer consumer) {
         super(diary, consumer);

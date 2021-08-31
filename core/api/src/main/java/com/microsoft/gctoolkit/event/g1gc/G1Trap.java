@@ -150,6 +150,6 @@ public class G1Trap extends G1GCPauseEvent {
         trap(new Exception());
     }
 
-    public void execute(Aggregator aggregator) {
+    public void execute(Aggregator<?> aggregator) {
     }
 }
