@@ -19,18 +19,18 @@ public class ParallelCollectorParserTest extends ParserTest {
             }
         }
     */
-    private static String[] detailsTenuringGCCause170 = {
+    private static final String[] detailsTenuringGCCause170 = {
             "ps.cause.tenuring.details.v17051.log",
             "ps.dates.cause.tenuring.details.v17051.log",
     };
 
-    private static int[] detailsTenuringGCCause170CountsNumberOfDifferentCollectors = {
+    private static final int[] detailsTenuringGCCause170CountsNumberOfDifferentCollectors = {
             2,
             2
 
     };
 
-    private static int[][] detailsTenuringGCCause170Counts = {
+    private static final int[][] detailsTenuringGCCause170Counts = {
             //    0,     1,     2,     3,     4,     5,     6,     7,     8,     9,    10,    11,    12
             {0, 0, 0, 0, 0, 0, 0, 90, 4, 0, 0, 0, 0},
             {0, 0, 0, 0, 0, 0, 0, 95, 3, 0, 0, 0, 0}
@@ -50,16 +50,16 @@ public class ParallelCollectorParserTest extends ParserTest {
             }
         }
     */
-    private static String[] details = {
+    private static final String[] details = {
             "long_pause.log"
     };
 
-    private static int[] detailsNumberOfDifferentCollectors = {
+    private static final int[] detailsNumberOfDifferentCollectors = {
             2
 
     };
 
-    private static int[][] detailsCounts = {
+    private static final int[][] detailsCounts = {
             //    0,     1,     2,     3,     4,     5,     6,     7,     8,     9,    10,    11,    12
             {0, 0, 0, 0, 0, 0, 0, 21, 1, 0, 0, 0, 0}
     };

@@ -31,7 +31,7 @@ public class ParallelParserRulesTest implements ParallelPatterns {
 
     /* Code that is useful when testing individual records */
 
-    private boolean debugging = ("true".equals(System.getProperty("microsoft.debug", "true").toLowerCase()));
+    private final boolean debugging = ("true".equals(System.getProperty("microsoft.debug", "true").toLowerCase()));
 
     //@Test
     public void testDebugParallelParseRules() {

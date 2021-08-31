@@ -150,7 +150,7 @@ public abstract class ParserTest {
 
     class TestResults implements JVMEventConsumer {
 
-        private int[] counts = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+        private final int[] counts = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
         private int metaSpaceRecordCount = 0;
 
         public int getCount(int index) {

@@ -126,7 +126,7 @@ public class GarbageCollectionLogFileSegment {
     }
 
     // Define the maximum time (in milliseconds) between two rotating logs for them to be considered contiguous.
-    private static long MAX_INTERSITCE = Long.getLong("max-rotating-log-interstice", 30 * 1000);
+    private static final long MAX_INTERSITCE = Long.getLong("max-rotating-log-interstice", 30 * 1000);
 
     // does this log begin after otherSegment ends
     // log roll over has no JVM age.. can we estimate this...

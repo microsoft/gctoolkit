@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ConcurrentMarkSweepPhaseParserRulesTest implements CMSPatterns {
 
-    private static Logger LOGGER = Logger.getLogger(ConcurrentMarkSweepPhaseParserRulesTest.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(ConcurrentMarkSweepPhaseParserRulesTest.class.getName());
 
     @Test
     public void testCMSParseRules() {
@@ -33,7 +33,7 @@ public class ConcurrentMarkSweepPhaseParserRulesTest implements CMSPatterns {
 
     /* Code that is useful when testing individual records */
 
-    private boolean debugging = ("true".equals(System.getProperty("microsoft.debug", "false").toLowerCase()));
+    private final boolean debugging = ("true".equals(System.getProperty("microsoft.debug", "false").toLowerCase()));
 
     @Test
     public void testDebugCMSParseRules() {

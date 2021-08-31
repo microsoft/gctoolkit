@@ -21,7 +21,7 @@ import java.util.logging.Logger;
  */
 public class GCToolKit {
 
-    private static Logger LOGGER = Logger.getLogger(GCToolKit.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(GCToolKit.class.getName());
 
     private static JavaVirtualMachine loadJavaVirtualMachine() {
         try {

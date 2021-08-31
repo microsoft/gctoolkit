@@ -56,9 +56,9 @@ public class AggregatorVerticle extends AbstractVerticle {
     }
     private static final Logger LOGGER = Logger.getLogger(AggregatorVerticle.class.getName());
 
-    private Set<Aggregator<?>> aggregators = new HashSet<>();
-    private StartingGun deployed = new StartingGun();
-    private StartingGun completion = new StartingGun();
+    private final Set<Aggregator<?>> aggregators = new HashSet<>();
+    private final StartingGun deployed = new StartingGun();
+    private final StartingGun completion = new StartingGun();
 
     private DateTimeStamp timeOfTerminationEvent;
 

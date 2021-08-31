@@ -6,7 +6,7 @@ import com.microsoft.gctoolkit.event.MemoryPoolSummary;
 
 public class ClassspaceSummary extends MemoryPoolSummary {
 
-    private long reserved;
+    private final long reserved;
     private long available;
 
     public ClassspaceSummary(long before, long after, long committed, long reserved) {

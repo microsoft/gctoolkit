@@ -13,9 +13,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class IncrementialConcurrentMarkSweepParserRulesTest implements ICMSPatterns {
 
-    private static Logger LOGGER = Logger.getLogger(IncrementialConcurrentMarkSweepParserRulesTest.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(IncrementialConcurrentMarkSweepParserRulesTest.class.getName());
 
-    private GCParseRule[] rules = {
+    private final GCParseRule[] rules = {
             iCMS_FULL,
             iCMS_PARNEW,
             iCMS_PARNEW_PROMOTION_FAILURE_RECORD,

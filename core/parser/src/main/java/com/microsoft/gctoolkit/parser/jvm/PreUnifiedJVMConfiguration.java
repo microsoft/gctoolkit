@@ -98,7 +98,7 @@ public class PreUnifiedJVMConfiguration implements SimplePatterns, CMSPatterns, 
     final static private Pattern excludeG1Ergonomics = Pattern.compile("^\\d+(\\.|,)\\d+: \\[G1Ergonomics");
 
 
-    private LoggingDiary diary;
+    private final LoggingDiary diary;
 
     @Override
     public LoggingDiary getDiary() {

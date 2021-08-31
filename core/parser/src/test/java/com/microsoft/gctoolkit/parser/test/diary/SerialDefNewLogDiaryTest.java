@@ -32,54 +32,54 @@ public class SerialDefNewLogDiaryTest extends LogDiaryTest {
     }
 
 
-    private static String[] serialDefNewDetails = {
+    private static final String[] serialDefNewDetails = {
             "serial/defnew/details/server_app2_1_gc_2012-10-31_18h07min24s.log"
     };
 
-    private static boolean[][] serialDefNewDetailsDiary = {
+    private static final boolean[][] serialDefNewDetailsDiary = {
             //   0      1      2      3      4      5      6      7      8      9     10     11     12     13     14     15     16     17     18     19     20     21     22     23     24     25     26     27
             {false, false,  true, false, false, false, false, false,  true, false, false, false,  true, false, false, false, false,  true, false, false, false, false, false, false, false, false, false, false}
     };
 
-    private static int[][] serialDefNewDetailsUnknown = {
+    private static final int[][] serialDefNewDetailsUnknown = {
             {18}
     };
 
-    private static int[][] serialDefNewDetailsKnown = {
+    private static final int[][] serialDefNewDetailsKnown = {
             {-1}
     };
 
-    private static String[] serialDefNewDetailsTenuring = {
+    private static final String[] serialDefNewDetailsTenuring = {
             "serial/defnew/details/tenuring/amit.barcap.log"
     };
 
-    private static boolean[][] serialDefNewDetailsTenuringDiary = {
+    private static final boolean[][] serialDefNewDetailsTenuringDiary = {
             //   0      1      2      3      4      5      6      7      8      9     10     11     12     13     14     15     16     17     18     19     20     21     22     23     24     25     26     27
             {false, false,  true, false, false, false, false, false,  true, false, false, false,  true,  true, false, false, false,  true,  true, false, false, false, false, false, false, false, false, false, false}
     };
 
-    private static int[][] serialDefNewDetailsTenuringUnknown = {
+    private static final int[][] serialDefNewDetailsTenuringUnknown = {
             {-1}
     };
 
-    private static int[][] serialDefNewDetailsTenuringKnown = {
+    private static final int[][] serialDefNewDetailsTenuringKnown = {
             {18}
     };
 
-    private static String[] serialDefNewDetailsTenuring180 = {
+    private static final String[] serialDefNewDetailsTenuring180 = {
             "serial/defnew/details/tenuring/180/serial180.log"
     };
 
-    private static boolean[][] serialDefNewDetailsTenuring180Diary = {
+    private static final boolean[][] serialDefNewDetailsTenuring180Diary = {
             //   0      1      2      3      4      5      6      7      8      9     10     11     12     13     14     15     16     17     18     19     20     21     22     23     24     25     26     27
             {false, false,  true, false, false, false, false, false,  true, false, false, false,  true,  true,  true, false, false, false, false,  true, false, false, false, false, false, false, false, false}
     };
 
-    private static int[][] serialDefNewDetailsTenuring180Unknown = {
+    private static final int[][] serialDefNewDetailsTenuring180Unknown = {
             {}
     };
 
-    private static int[][] serialDefNewDetailsTenuring180Known = {
+    private static final int[][] serialDefNewDetailsTenuring180Known = {
             {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20 , 21, 22, 23, 24, 25, 26, 27}
     };
 }

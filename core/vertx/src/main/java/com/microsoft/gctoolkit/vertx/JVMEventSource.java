@@ -15,7 +15,7 @@ public class JVMEventSource extends AbstractVerticle {
 
     private static final Logger LOGGER = Logger.getLogger(JVMEventSource.class.getName());
 
-    private String publicationChannel;
+    private final String publicationChannel;
 
     public JVMEventSource(String publicationChannel) {
         this.publicationChannel = publicationChannel;
