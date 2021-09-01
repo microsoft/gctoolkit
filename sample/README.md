@@ -4,34 +4,36 @@ This sample shows how to use [GCToolKit](../README.md) to analyze a GC log file 
 
 ## To run the sample
 
+We use the Maven wrapper (`mvnw`) so you don't have to change your system wide Maven.
+
 ### From Maven
 
-Compile the sample with `mvn compile`, then use `mvn exec:exec` to run the sample.
+Compile the sample with `mvnw compile`, then use `mvnw exec:exec` to run the sample.
 
 ```shell
-mvn clean compile
-mvn exec:exec
+mvnw clean compile
+mvnw exec:exec
 ```
 
 By default, the sample analyzes `../gclogs/preunified/cms/defnew/details/defnew.log`. Set the parameter `gcLogPath` to analyze a different GC log file.
 
 ```shell
-mvn exec:exec -DgcLogFile=../gclogs/unified/parallel/parallelgc.log
+mvnw exec:exec -DgcLogFile=../gclogs/unified/parallel/parallelgc.log
 ```
 
 ### From the command line
 
-The sample can also be run from the command line with Java 11 or higher. Compile the sample with `mvn compile dependency:copy-dependencies`,
+The sample can also be run from the command line with Java 11 or higher. Compile the sample with `mvnw compile dependency:copy-dependencies`,
 then run `java` with `--module-path` and give it the path to a GC log file as an argument.
 
 ```shell
-mvn clean compile dependency:copy-dependencies
+mvnw clean compile dependency:copy-dependencies
 java java --module-path target/classes:target/lib --module com.microsoft.gctoolkit.sample/com.microsoft.gctoolkit.sample.Main ../gclogs/preunified/cms/defnew/details/defnew.log
 ```
 
 ## Troubleshooting
 
-### `mvn exec:java` fails
+### `mvnw exec:java` fails
 
 If you try to run the `exec:java` goal, you may see the following error:
 
@@ -43,5 +45,5 @@ This has something to do with the [Exec Maven Plugin](https://www.mojohaus.org/e
 
 There are two possible issues here.
 
-1. There is no `gclogs` directory in the _top-level_ directory. The sample uses `unit-test` data from building GCToolKit. Either run `mvn test` from the _top-level_ directory, or use `-DgcLogFile=<path-to-gc-log-file>` argument to specify a log file.
-1. The sample is not being run from the `sample` directory. Please ensure you are in the sample directory before executing `mvn exec:exec`.
+1. There is no `gclogs` directory in the _top-level_ directory. The sample uses `unit-test` data from building GCToolKit. Either run `mvnw test` from the _top-level_ directory, or use `-DgcLogFile=<path-to-gc-log-file>` argument to specify a log file.
+1. The sample is not being run from the `sample` directory. Please ensure you are in the sample directory before executing `mvnw exec:exec`.
