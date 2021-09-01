@@ -38,8 +38,6 @@ public class GCToolKit {
         return null;
     }
 
-    private static boolean aggregationsLoadedFromServiceLoader = false;
-
     private final Set<Class<? extends Aggregation>> registeredAggregations;
 
     /**
@@ -70,15 +68,11 @@ public class GCToolKit {
      * </pre>
      */
     public void loadAggregationsFromServiceLoader() {
-        if (aggregationsLoadedFromServiceLoader == true) return;
-
         ServiceLoader.load(Aggregation.class)
                 .stream()
                 .map(ServiceLoader.Provider::get)
                 .map(Aggregation::getClass)
                 .forEach(registeredAggregations::add);
-
-        aggregationsLoadedFromServiceLoader = true;
     }
 
     /**
