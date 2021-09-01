@@ -10,7 +10,7 @@ import static java.util.Collections.unmodifiableList;
 
 public class XYDataSet {
 
-    protected List<Point> dataSeries;
+    private List<Point> dataSeries;
 
     public XYDataSet() {
         dataSeries = new ArrayList<>();

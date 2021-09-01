@@ -194,10 +194,10 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
         //trace.notYetImplemented();
     }
 
-    long[] markStart = new long[3];
-    long[] markEnd = new long[3];
-    long[] relocateStart = new long[3];
-    long[] relocateEnd = new long[3];
+    private long[] markStart = new long[3];
+    private long[] markEnd = new long[3];
+    private long[] relocateStart = new long[3];
+    private long[] relocateEnd = new long[3];
 
     private void captureAtIndex(GCLogTrace trace, int index) {
         markStart[index] = trace.getLongGroup(2);

@@ -27,7 +27,7 @@ public class G1Trap extends G1GCPauseEvent {
         super(new DateTimeStamp(0.0d), GarbageCollectionTypes.G1Trap, GCCause.UNKNOWN_GCCAUSE, 0.0d);
     }
 
-    int errorCount = 0;
+    private int errorCount = 0;
 
     private void trap(Exception e) {
         if (errorCount > 100) return;

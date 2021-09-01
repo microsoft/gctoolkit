@@ -11,20 +11,20 @@ import com.microsoft.gctoolkit.time.DateTimeStamp;
 
 public abstract class GenerationalGCPauseEvent extends GenerationalGCEvent {
 
-    MemoryPoolSummary young;
-    MemoryPoolSummary tenured;
-    MemoryPoolSummary heap;
-    MemoryPoolSummary permOrMetaspace;
-    MemoryPoolSummary nonClassspace;
-    MemoryPoolSummary classspace;
-    ReferenceGCSummary referenceGCSummary;
-    double classUnloadingProcessingTime;
-    double symbolTableProcessingTime;
-    double stringTableProcessingTime;
-    double symbolAndStringTableProcessingTime;
-    BinaryTreeDictionary binaryTreeDictionary;
+    private MemoryPoolSummary young;
+    private MemoryPoolSummary tenured;
+    private MemoryPoolSummary heap;
+    private MemoryPoolSummary permOrMetaspace;
+    private MemoryPoolSummary nonClassspace;
+    private MemoryPoolSummary classspace;
+    private ReferenceGCSummary referenceGCSummary;
+    private double classUnloadingProcessingTime;
+    private double symbolTableProcessingTime;
+    private double stringTableProcessingTime;
+    private double symbolAndStringTableProcessingTime;
+    private BinaryTreeDictionary binaryTreeDictionary;
 
-    CPUSummary cpuSummary;
+    private CPUSummary cpuSummary;
 
     public GenerationalGCPauseEvent(DateTimeStamp timeStamp, GarbageCollectionTypes type, GCCause cause, double duration) {
         super(timeStamp, type, cause, duration);

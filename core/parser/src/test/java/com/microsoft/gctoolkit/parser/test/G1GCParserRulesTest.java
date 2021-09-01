@@ -52,7 +52,7 @@ public class G1GCParserRulesTest implements G1GCPatterns {
     }
 
     String FIXUP_STATS = "Min: " + REAL_VALUE + ", Avg: " + REAL_VALUE + ", Max: " + REAL_VALUE + ", Diff: " + REAL_VALUE + ", Sum: " + REAL_VALUE;
-    GCParseRule[] rules = {
+    private GCParseRule[] rules = {
             G1_YOUNG_SPLIT_START,                     //  0
             G1_YOUNG_RS_SUMMARY,
             CONCURRENT_STRING_DEDUP,
@@ -98,7 +98,7 @@ public class G1GCParserRulesTest implements G1GCPatterns {
             G1_CONCURRENT_ABORT
     };
 
-    String[][] lines = {
+    private String[][] lines = {
 
             {   //  0
                     "2015-09-10T11:05:53.786+0200: 10718.451: [GC pause (G1 Evacuation Pause) (young)"
