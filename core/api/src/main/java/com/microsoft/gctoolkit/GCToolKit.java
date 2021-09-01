@@ -38,16 +38,7 @@ public class GCToolKit {
         return null;
     }
 
-    private static final Set<Class<? extends Aggregation>> aggregationsFromServiceLoader;
-
-    static {
-        aggregationsFromServiceLoader = new HashSet<>();
-        ServiceLoader<Aggregation> serviceLoader = ServiceLoader.load(Aggregation.class);
-        serviceLoader.stream()
-                .map(ServiceLoader.Provider::get)
-                .map(Aggregation::getClass)
-                .forEach(aggregationsFromServiceLoader::add);
-    }
+    private static boolean aggregationsLoadedFromServiceLoader = false;
 
     private final Set<Class<? extends Aggregation>> registeredAggregations;
 
@@ -60,16 +51,39 @@ public class GCToolKit {
     public GCToolKit() {
         // Allow for adding aggregations from source code,
         // but don't corrupt the ones loaded by the service loader
-        this.registeredAggregations = new HashSet<>(aggregationsFromServiceLoader);
+        this.registeredAggregations = new HashSet<>();
+    }
+
+    /**
+     * Loads all Aggregations defined in the application module through
+     * the java.util.ServiceLoader model. To register a class that
+     * provides the {@link Aggregation} API, define the following
+     * in {@code module-info.java}:
+     * <pre>
+     * import com.microsoft.gctoolkit.aggregator.Aggregation;
+     * import com.microsoft.gctoolkit.sample.aggregation.HeapOccupancyAfterCollectionSummary;
+     * 
+     * module com.microsoft.gctoolkit.sample {
+     *     ...
+     *     provides Aggregation with HeapOccupancyAfterCollectionSummary;
+     * }
+     * </pre>
+     */
+    public void loadAggregationsFromServiceLoader() {
+        if (aggregationsLoadedFromServiceLoader == true) return;
+
+        ServiceLoader.load(Aggregation.class)
+                .stream()
+                .map(ServiceLoader.Provider::get)
+                .map(Aggregation::getClass)
+                .forEach(registeredAggregations::add);
+
+        aggregationsLoadedFromServiceLoader = true;
     }
 
     /**
      * Registers an {@code Aggregation} class which can be used to perform analysis
      * on {@code JVMEvent}s. GCToolKit will instantiate the Aggregation when needed.
-     * <p>
-     * An alternative, and preferred, method of registering Aggregations is through
-     * the java.util.ServiceLoader model. GCToolKit will automatically load classes that
-     * provide the {@link Aggregation} API.
      * <p>
      * The {@link JavaVirtualMachine#getAggregation(Class)}
      * API will return an Aggregation that was used in the log analysis. Even though
