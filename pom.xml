@@ -443,6 +443,7 @@
         <profile>
             <id>contributor</id>
             <properties>
+                <!-- TODO Investigate whether we need both of the test properties -->
                 <maven.test.skip>false</maven.test.skip>
                 <skipTests>false</skipTests>
                 <skipUnpack>false</skipUnpack>
