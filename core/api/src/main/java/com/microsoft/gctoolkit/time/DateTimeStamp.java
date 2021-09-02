@@ -6,6 +6,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
 import java.util.Comparator;
+import java.util.Locale;
 import java.util.Objects;
 
 import static java.util.Comparator.comparing;
@@ -143,9 +144,9 @@ public class DateTimeStamp implements Comparable<DateTimeStamp> {
     @Override
     public String toString() {
         if (dateTime == null)
-            return "@" + String.format("%.3f", timeStamp);
+            return "@" + String.format(Locale.ROOT, "%.3f", timeStamp);
         else
-            return dateTime + "@" + String.format("%.3f", timeStamp);
+            return dateTime + "@" + String.format(Locale.ROOT, "%.3f", timeStamp);
     }
 
     /**
