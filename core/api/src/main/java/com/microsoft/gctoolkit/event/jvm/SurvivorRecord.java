@@ -17,7 +17,7 @@ public class SurvivorRecord extends JVMEvent {
 
     // JDK bug, we have now seen a max tenuring threshold of 32, even 64
     // Fold anything older than 15 back into the 15th slot
-    ArrayList<Long> bytesAtAge = null;
+    private ArrayList<Long> bytesAtAge = null;
 
     public SurvivorRecord(DateTimeStamp timeStamp, long desiredOccupancy, int calculatedTenuringThreshold, int maxTenuringThreshold) {
         super(timeStamp, 0.0d);

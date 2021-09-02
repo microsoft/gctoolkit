@@ -24,9 +24,9 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 public class CMSTenuredParserTest extends ParserTest {
 
-    CMSTenuredPoolParser parser;
+    private CMSTenuredPoolParser parser;
 
-    ArrayList<JVMEvent> jvmEvents;
+    private ArrayList<JVMEvent> jvmEvents;
 
     @BeforeEach
     public void setUp() {

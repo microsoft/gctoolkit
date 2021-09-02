@@ -29,11 +29,11 @@ public class G1GCMetaspaceTest extends ParserTest {
 
     }
 
-    String[] details = {
+    private String[] details = {
             "gc.log.4.31_1_aug_sep_current.zip"
     };
 
-    int[] permGenMetaspaceCounts = {
+    private int[] permGenMetaspaceCounts = {
             15
     };
 }

@@ -330,8 +330,8 @@ public class G1GCForwardReference extends ForwardReference {
     final static int FINAL_REFERENCE = 3;
     final static int JNI_WEAK_REFERENCE = 4;
     final static int CLEANER_REFERENCE = 5;
-    double[] referenceProcessingDuarations = {-1.0d, -1.0d, -1.0d, -1.0d, -1.0d, -1.0d};
-    int[] referenceCounts = {-1, -1, -1, -1, -1, -1};
+    private double[] referenceProcessingDuarations = {-1.0d, -1.0d, -1.0d, -1.0d, -1.0d, -1.0d};
+    private int[] referenceCounts = {-1, -1, -1, -1, -1, -1};
 
     public void setSoftReferenceProcessingDuation(double duration) {
         referenceProcessingDuarations[SOFT_REFERENCE] = duration;
@@ -464,8 +464,8 @@ public class G1GCForwardReference extends ForwardReference {
         toSpaceExhausted = true;
     }
 
-    int evacuationWorkersUsed = 0;
-    int evacuationWorkersAvailable = 0;
+    private int evacuationWorkersUsed = 0;
+    private int evacuationWorkersAvailable = 0;
 
     public void evacuationWorkers(int workersUsed, int available) {
         this.evacuationWorkersUsed = workersUsed;
@@ -473,8 +473,8 @@ public class G1GCForwardReference extends ForwardReference {
     }
 
     // Concurrent Remark values
-    int concurrentMarkWorkersUsed = 0;
-    int concurrentMarkWorkersAvailable = 0;
+    private int concurrentMarkWorkersUsed = 0;
+    private int concurrentMarkWorkersAvailable = 0;
 
     public void concurrentMarkWorkers(int used, int available) {
         this.concurrentMarkWorkersUsed = used;

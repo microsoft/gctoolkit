@@ -59,7 +59,7 @@ public class ConcurrentMarkSweepParserRulesTest implements CMSPatterns {
         }
     }
 
-    GCParseRule[] rules = {
+    private GCParseRule[] rules = {
             FULL_GC_INTERRUPTS_CONCURRENT_PHASE,
             FULL_GC_REFERENCE_CMF,
             PARNEW_PROMOTION_FAILED,
@@ -103,7 +103,7 @@ public class ConcurrentMarkSweepParserRulesTest implements CMSPatterns {
             PRECLEAN_REFERENCE_PAR_NEW_REFERENCE
     };
 
-    String[][] lines = {
+    private String[][] lines = {
             {       // 0
                     "2015-08-07T00:28:24.210+0200: 32810.963: [Full GC (System) 2015-08-07T00:28:24.210+0200: 32810.963: [CMS2015-08-07T00:28:24.851+0200: 32811.604: [CMS-concurrent-mark: 0.638/9713.769 secs] [Times: user=342.99 sys=126.60, real=9713.77 secs]"
             },
