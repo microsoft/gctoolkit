@@ -8,7 +8,6 @@ import com.microsoft.gctoolkit.event.StatisticalSummary;
 import com.microsoft.gctoolkit.event.UnifiedStatisticalSummary;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
 
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

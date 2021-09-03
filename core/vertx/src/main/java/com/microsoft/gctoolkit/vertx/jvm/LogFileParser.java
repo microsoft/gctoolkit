@@ -9,7 +9,6 @@ import io.vertx.core.eventbus.DeliveryOptions;
 import com.microsoft.gctoolkit.parser.GCLogParser;
 import com.microsoft.gctoolkit.parser.JVMEventConsumer;
 
-import java.util.concurrent.CountDownLatch;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
