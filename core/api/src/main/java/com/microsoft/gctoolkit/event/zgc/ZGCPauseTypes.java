@@ -2,7 +2,9 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.event.zgc;
 
-public enum ZGCPauseTypes {
+import com.microsoft.gctoolkit.event.LabelledGCEventType;
+
+public enum ZGCPauseTypes implements LabelledGCEventType {
 
     MARK_START("Mark Start"),
     MARK_END( "Mark End"),
@@ -15,11 +17,7 @@ public enum ZGCPauseTypes {
     }
 
     public static ZGCPauseTypes fromLabel(String label) {
-        for (ZGCPauseTypes gcType : ZGCPauseTypes.values()) {
-            if (gcType.label.equals(label))
-                return gcType;
-        }
-        return null;
+        return LabelledGCEventType.fromLabel(ZGCPauseTypes.class, label);
     }
 
     public String getLabel() {

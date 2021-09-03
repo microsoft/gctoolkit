@@ -48,7 +48,7 @@ import java.util.logging.Logger;
 public class PreUnifiedG1GCParser extends PreUnifiedGCLogParser implements G1GCPatterns {
 
     private static final Logger LOGGER = Logger.getLogger(PreUnifiedG1GCParser.class.getName());
-    boolean debugging = "true".equalsIgnoreCase(System.getProperty("microsoft.debug", "false"));
+    private boolean debugging = "true".equalsIgnoreCase(System.getProperty("microsoft.debug", "false"));
 
     //values show up at the end of GC log file from a normally terminated JVM
     private long heapTotal, heapUsed;
@@ -56,7 +56,7 @@ public class PreUnifiedG1GCParser extends PreUnifiedGCLogParser implements G1GCP
     private long metaSpaceUsed, metaCapacity, metaCommitted, metaReserved;
     private long classSpaceUsed, classSpaceCapacity, classSpaceCommitted, classSpaceReserved;
 
-    private G1GCPauseEvent trap = new G1Trap();
+    private final G1GCPauseEvent trap = new G1Trap();
     private G1GCPauseEvent forwardReference = trap;
 
     private DateTimeStamp timeStampForwardReference;
@@ -66,7 +66,7 @@ public class PreUnifiedG1GCParser extends PreUnifiedGCLogParser implements G1GCP
 
     private DateTimeStamp concurrentPhaseStartTimeStamp;
     private GarbageCollectionTypes concurrentCollectionTypeForwardReference;
-    private ConcurrentLinkedQueue<JVMEvent> backlog = new ConcurrentLinkedQueue<JVMEvent>();
+    private final ConcurrentLinkedQueue<JVMEvent> backlog = new ConcurrentLinkedQueue<>();
 
     final private MRUQueue<GCParseRule, BiConsumer<GCLogTrace, String>> parseRules;
 
@@ -312,7 +312,7 @@ public class PreUnifiedG1GCParser extends PreUnifiedGCLogParser implements G1GCP
      * @param line log line
      * @return boolean true is the line should be ignored.
      */
-    private GCParseRule corruptedApplicationTime = new GCParseRule("corruptedApplicationTime", DATE_TIMESTAMP + TIMESTAMP);
+    private final GCParseRule corruptedApplicationTime = new GCParseRule("corruptedApplicationTime", DATE_TIMESTAMP + TIMESTAMP);
 
     private boolean ignoreFrequentlySeenButUnwantedLines(String line) {
         if (line.contains("- age ")) return true;

@@ -26,10 +26,12 @@ import com.microsoft.gctoolkit.event.g1gc.G1Remark;
 import com.microsoft.gctoolkit.event.g1gc.G1SystemGC;
 import com.microsoft.gctoolkit.event.g1gc.G1Young;
 import com.microsoft.gctoolkit.event.g1gc.G1YoungInitialMark;
-import com.microsoft.gctoolkit.time.DateTimeStamp;
 import com.microsoft.gctoolkit.parser.jvm.Decorators;
+import com.microsoft.gctoolkit.time.DateTimeStamp;
 
 import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 
@@ -145,7 +147,7 @@ public class G1GCForwardReference extends ForwardReference {
     private final static int CLASSSPACE_RESERVED_BEFORE_COLLECTION = 38;
     private final static int CLASSSPACE_RESERVED_AFTER_COLLECTION = 39;
 
-    private long[] memoryPoolMeasurment = {
+    private final long[] memoryPoolMeasurment = {
             -1L, -1L, -1L, -1L, -1L, -1L, -1L, -1L, -1L, -1L,
             -1L, -1L, -1L, -1L, -1L, -1L, -1L, -1L, -1L, -1L,
             -1L, -1L, -1L, -1L, -1L, -1L, -1L, -1L, -1L, -1L,
@@ -328,8 +330,8 @@ public class G1GCForwardReference extends ForwardReference {
     final static int FINAL_REFERENCE = 3;
     final static int JNI_WEAK_REFERENCE = 4;
     final static int CLEANER_REFERENCE = 5;
-    double[] referenceProcessingDuarations = {-1.0d, -1.0d, -1.0d, -1.0d, -1.0d, -1.0d};
-    int[] referenceCounts = {-1, -1, -1, -1, -1, -1};
+    private double[] referenceProcessingDuarations = {-1.0d, -1.0d, -1.0d, -1.0d, -1.0d, -1.0d};
+    private int[] referenceCounts = {-1, -1, -1, -1, -1, -1};
 
     public void setSoftReferenceProcessingDuation(double duration) {
         referenceProcessingDuarations[SOFT_REFERENCE] = duration;
@@ -386,10 +388,10 @@ public class G1GCForwardReference extends ForwardReference {
     public final static int POST_EVACUATE_COLLECTION_SET = 2;
     public final static int OTHER = 3;
 
-    private double[] youngCollectionPhases = {NOT_SET, NOT_SET, NOT_SET, NOT_SET};
-    private HashMap<String, Double> preEvacuateCSetPhaseDurations = new HashMap<>(3);
-    private HashMap<String, UnifiedStatisticalSummary> evacuateCSetPhaseDurations = new HashMap<>();
-    private HashMap<String, Double> postEvacuateCSetPhaseDurations = new HashMap<>();
+    private final double[] youngCollectionPhases = {NOT_SET, NOT_SET, NOT_SET, NOT_SET};
+    private final Map<String, Double> preEvacuateCSetPhaseDurations = new ConcurrentHashMap<>(3);
+    private final Map<String, UnifiedStatisticalSummary> evacuateCSetPhaseDurations = new ConcurrentHashMap<>();
+    private final Map<String, Double> postEvacuateCSetPhaseDurations = new ConcurrentHashMap<>();
 
     public void setPreEvacuateCSetDuration(double duration) {
         this.youngCollectionPhases[PRE_EVACUATE_COLLECTION_SET] = duration;
@@ -462,8 +464,8 @@ public class G1GCForwardReference extends ForwardReference {
         toSpaceExhausted = true;
     }
 
-    int evacuationWorkersUsed = 0;
-    int evacuationWorkersAvailable = 0;
+    private int evacuationWorkersUsed = 0;
+    private int evacuationWorkersAvailable = 0;
 
     public void evacuationWorkers(int workersUsed, int available) {
         this.evacuationWorkersUsed = workersUsed;
@@ -471,8 +473,8 @@ public class G1GCForwardReference extends ForwardReference {
     }
 
     // Concurrent Remark values
-    int concurrentMarkWorkersUsed = 0;
-    int concurrentMarkWorkersAvailable = 0;
+    private int concurrentMarkWorkersUsed = 0;
+    private int concurrentMarkWorkersAvailable = 0;
 
     public void concurrentMarkWorkers(int used, int available) {
         this.concurrentMarkWorkersUsed = used;
@@ -504,10 +506,10 @@ public class G1GCForwardReference extends ForwardReference {
         return new SurvivorMemoryPoolSummary(memoryPoolMeasurment[SURVIVOR_OCCUPANCY_BEFORE_COLLECTION], memoryPoolMeasurment[SURVIVOR_OCCUPANCY_AFTER_COLLECTION], memoryPoolMeasurment[SURVIVOR_SIZE_AFTER_COLLECTION]);
     }
 
-    private static int OCCUPANCY_BEFORE_OFFSET = 0;
-    private static int OCCUPANCY_AFTER_OFFSET = 1;
-    private static int SIZE_BEFORE_OFFSET = 2;
-    private static int SIZE_AFTER_OFFSET = 3;
+    private static final int OCCUPANCY_BEFORE_OFFSET = 0;
+    private static final int OCCUPANCY_AFTER_OFFSET = 1;
+    private static final int SIZE_BEFORE_OFFSET = 2;
+    private static final int SIZE_AFTER_OFFSET = 3;
 
     private MemoryPoolSummary getMemoryPoolSummary(int offset) {
         if (memoryPoolMeasurment[offset + OCCUPANCY_BEFORE_OFFSET] == -1L) //do we have recorded values
@@ -757,8 +759,8 @@ public class G1GCForwardReference extends ForwardReference {
         return collection;
     }
 
-    private HashMap<String, Double> fullGCInternalPhases = new HashMap<>();
-    private HashMap<Integer, String> fullGCInternalPhaseOrder = new HashMap<>();
+    private final Map<String, Double> fullGCInternalPhases = new ConcurrentHashMap<>();
+    private final Map<Integer, String> fullGCInternalPhaseOrder = new ConcurrentHashMap<>();
 
     public void fullPhase(int integerGroup, String fullGCInternalPhase, double duration) {
         fullGCInternalPhaseOrder.put(integerGroup, fullGCInternalPhase);

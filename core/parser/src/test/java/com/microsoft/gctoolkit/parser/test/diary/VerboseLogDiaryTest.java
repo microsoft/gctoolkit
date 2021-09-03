@@ -24,7 +24,7 @@ public class VerboseLogDiaryTest extends LogDiaryTest {
     }
 
 
-    private static String[] verbose = {
+    private static final String[] verbose = {
             "282_sun_gc.log",
             "600_gc.log",
             "755_gc.log",
@@ -32,7 +32,7 @@ public class VerboseLogDiaryTest extends LogDiaryTest {
             "814_gc_interesting.log"
     };
 
-    private static boolean[][] verboseDiary = {
+    private static final boolean[][] verboseDiary = {
             //   0      1      2      3      4      5      6      7      8      9     10     11     12     13     14     15     16     17     18     19     20     21     22     23     24     25     26     27
             {false, false, false, false, false, false,  true,  true, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false},
             {false, false, false, false, false, false,  true,  true, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false},
@@ -41,7 +41,7 @@ public class VerboseLogDiaryTest extends LogDiaryTest {
             {false, false, false, false, false, false,  true,  true, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false}
     };
 
-    private static int[][] verboseUnknown = {
+    private static final int[][] verboseUnknown = {
             {-1},
             {-1},
             {-1},
@@ -49,7 +49,7 @@ public class VerboseLogDiaryTest extends LogDiaryTest {
             {-1}
     };
 
-    private static int[][] verboseKnown = {
+    private static final int[][] verboseKnown = {
             {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27},
             {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27},
             {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27},
@@ -57,26 +57,26 @@ public class VerboseLogDiaryTest extends LogDiaryTest {
             {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27},
     };
 
-    private static String[] verboseTenuring = {
+    private static final String[] verboseTenuring = {
             "931_def.par.nd.wt.log",
             "943_par.def.nd.wt.log",
             "947_par.par.nd.wt.log"
     };
 
-    private static boolean[][] verboseTenuringDiary = {
+    private static final boolean[][] verboseTenuringDiary = {
             //   0      1      2      3      4      5      6      7      8      9     10     11     12     13     14     15     16     17     18     19     20     21     22     23     24     25     26     27
             {false, false, false, false, false, false,  true,  true, false, false, false, false, false,  true, false, false, false, false, false, false, false, false, false, false, false, false, false, false},
             {false, false, false,  true, false, false, false, false,  true, false, false, false, false,  true, false, false, false, false, false, false, false, false, false, false, false, false, false, false},
             {false, false, false, false, false, false,  true,  true, false, false, false, false, false,  true, false, false, false, false, false, false, false, false, false, false, false, false, false, false}
     };
 
-    private static int[][] verboseTenuringUnknown = {
+    private static final int[][] verboseTenuringUnknown = {
             {-1},
             {-1},
             {-1}
     };
 
-    private static int[][] verboseTenuringKnown = {
+    private static final int[][] verboseTenuringKnown = {
             {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27},
             {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27},
             {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27}

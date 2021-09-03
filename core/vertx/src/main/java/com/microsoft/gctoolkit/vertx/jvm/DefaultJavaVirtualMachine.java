@@ -14,10 +14,10 @@ import com.microsoft.gctoolkit.parser.jvm.PreUnifiedJVMConfiguration;
 import com.microsoft.gctoolkit.parser.jvm.UnifiedJVMConfiguration;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -37,7 +37,8 @@ public class DefaultJavaVirtualMachine implements JavaVirtualMachine {
     private JVMConfiguration jvmConfigurationFromParser;
     private JvmConfiguration jvmConfigurationForCoreApi;
     private DateTimeStamp timeOfLastEvent;
-    private Map<Class<? extends Aggregation>, Aggregation> aggregatedData;
+    private final Map<Class<? extends Aggregation>, Aggregation> aggregatedData =
+            new ConcurrentHashMap<>();
 
     @Override
     public boolean isG1GC() {
@@ -104,8 +105,6 @@ public class DefaultJavaVirtualMachine implements JavaVirtualMachine {
     public JvmConfiguration getJvmConfiguration() {
         return jvmConfigurationForCoreApi;
     }
-
-    public DefaultJavaVirtualMachine() { this.aggregatedData = new HashMap<>(); }
 
     // Invoked reflectively from GCToolKit
     @SuppressWarnings("unchecked")

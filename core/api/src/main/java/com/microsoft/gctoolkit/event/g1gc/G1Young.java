@@ -8,8 +8,9 @@ import com.microsoft.gctoolkit.event.StatisticalSummary;
 import com.microsoft.gctoolkit.event.UnifiedStatisticalSummary;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
 
-import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 
 
@@ -34,8 +35,8 @@ public class G1Young extends G1RealPause {
     private StatisticalSummary processedBuffersSummary;
     private boolean toSpaceExhausted = false;
 
-    private final HashMap<String, StatisticalSummary> parallelPhaseSummaries = new HashMap<String, StatisticalSummary>();
-    private final HashMap<String, Double> phaseDurations = new HashMap<>();
+    private final Map<String, StatisticalSummary> parallelPhaseSummaries = new ConcurrentHashMap<>();
+    private final Map<String, Double> phaseDurations = new ConcurrentHashMap<>();
 
     public G1Young(DateTimeStamp dateTimeStamp, GarbageCollectionTypes gcType, GCCause gcCause, double pauseTime) {
         super(dateTimeStamp, gcType, gcCause, pauseTime);
@@ -213,9 +214,9 @@ public class G1Young extends G1RealPause {
         this.tableFixupStatistics = summary;
     }
 
-    private HashMap<String, Double> preEvacuateCSetPhase = new HashMap<>(3);
-    private HashMap<String, UnifiedStatisticalSummary> evacuateCSetPhase = new HashMap<>();
-    private HashMap<String, Double> postEvacuateCSetPhase = new HashMap<>();
+    private final Map<String, Double> preEvacuateCSetPhase = new ConcurrentHashMap<>(3);
+    private final Map<String, UnifiedStatisticalSummary> evacuateCSetPhase = new ConcurrentHashMap<>();
+    private final Map<String, Double> postEvacuateCSetPhase = new ConcurrentHashMap<>();
 
     public void addPreEvacuationCollectionPhase(String name, double duration) {
         preEvacuateCSetPhase.put(name, duration);

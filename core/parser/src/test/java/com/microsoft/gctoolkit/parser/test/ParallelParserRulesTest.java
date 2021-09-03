@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.logging.Logger;
 
+import static com.microsoft.gctoolkit.parser.test.CommonTestHelper.captureTest;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ParallelParserRulesTest implements ParallelPatterns {
@@ -28,18 +29,9 @@ public class ParallelParserRulesTest implements ParallelPatterns {
             }
     }
 
-    private int captureTest(GCParseRule rule, String[] lines) {
-        int captureCount = 0;
-        for (int i = 0; i < lines.length; i++)
-            if (rule.parse(lines[i]) != null)
-                captureCount++;
-        return captureCount;
-    }
-
-
     /* Code that is useful when testing individual records */
 
-    private boolean debugging = ("true".equals(System.getProperty("microsoft.debug", "true").toLowerCase()));
+    private final boolean debugging = ("true".equals(System.getProperty("microsoft.debug", "true").toLowerCase()));
 
     //@Test
     public void testDebugParallelParseRules() {
@@ -64,7 +56,7 @@ public class ParallelParserRulesTest implements ParallelPatterns {
     }
 
 
-    GCParseRule[] rules = {
+    private GCParseRule[] rules = {
             PSYOUNGGEN_NO_DETAILS,
             PSFULL,
             PS_FULL_BODY_FLOATING,
@@ -79,7 +71,7 @@ public class ParallelParserRulesTest implements ParallelPatterns {
 
     };
 
-    String[][] lines = {
+    private String[][] lines = {
             {   //  0
                     "2017-03-28T12:17:34.744+0200: 1.895: [GC (Allocation Failure)  137969K->21806K(491008K), 0.0082985 secs]",
                     "2017-03-28T12:17:33.823+0200: 0.974: [GC (System.gc())  92578K->9947K(491008K), 0.0135426 secs]"  // buggy full gc

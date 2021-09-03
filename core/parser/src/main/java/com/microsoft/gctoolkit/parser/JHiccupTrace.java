@@ -22,7 +22,7 @@ public class JHiccupTrace {
     // TODO Why -1.0d as the default?
     private static final double DEFAULT_TIMESTAMP = -1.0d;
 
-    private Matcher trace;
+    private final Matcher trace;
 
     public static JHiccupTrace toTrace(String line) {
         Matcher m = JHICCUP_LOG_ENTRY.matcher(line);

@@ -32,9 +32,9 @@ public class ShenandoahParserRulesTest implements ShenandoahPatterns {
 
     private int captureTest(GCParseRule rule, String[] lines) {
         int captureCount = 0;
-        for (int i = 0; i < lines.length; i++) {
-            GCLogTrace trace = rule.parse(lines[i]);
-            if (rule.parse(lines[i]) != null) {
+        for (String line : lines) {
+            GCLogTrace trace = rule.parse(line);
+            if (rule.parse(line) != null) {
                 captureCount++;
             }
         }
@@ -61,7 +61,7 @@ public class ShenandoahParserRulesTest implements ShenandoahPatterns {
         }
     }
 
-    GCParseRule[] rules = {
+    private GCParseRule[] rules = {
             CONCURRENT,                 //   0
             CLEANUP,
             WORKERS,
@@ -88,7 +88,7 @@ public class ShenandoahParserRulesTest implements ShenandoahPatterns {
             REFERENCE
     };
 
-    private String[][] lines = {
+    private final static String[][] lines = {
             {  //   0
                     "[31.818s][info][gc,start      ] GC(7) Concurrent reset",
                     "[31.953s][info][gc            ] GC(7) Concurrent reset 134.638ms",

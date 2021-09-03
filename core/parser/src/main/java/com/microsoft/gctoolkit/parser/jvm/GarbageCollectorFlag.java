@@ -25,7 +25,7 @@ public enum GarbageCollectorFlag {
         return getEnumFromString(name);
     }
 
-    private String label;
+    private final String label;
 
     GarbageCollectorFlag(String label) {
         this.label = label;

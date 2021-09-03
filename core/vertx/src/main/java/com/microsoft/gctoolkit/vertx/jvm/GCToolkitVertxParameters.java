@@ -10,7 +10,6 @@ import com.microsoft.gctoolkit.aggregator.EventSource;
 import com.microsoft.gctoolkit.vertx.aggregator.AggregatorVerticle;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -22,7 +21,9 @@ import java.util.logging.Logger;
     private static final Logger LOGGER = Logger.getLogger(GCToolkitVertxParameters.class.getName());
 
     abstract Set<LogFileParser> logFileParsers();
+
     abstract Set<AggregatorVerticle> aggregatorVerticles();
+
     abstract String mailBox();
 
     // routine to find what this Aggregator Aggregates.
@@ -43,7 +44,7 @@ import java.util.logging.Logger;
         aggregatorAggregates((Class<?>) clazz.getSuperclass(), eventSources);
 
         Class<?>[] interfaces = clazz.getInterfaces();
-        for(Class<?> iface : interfaces) {
+        for (Class<?> iface : interfaces) {
             aggregatorAggregates(iface, eventSources);
         }
 
@@ -78,21 +79,19 @@ import java.util.logging.Logger;
         try {
             Constructor<?>[] constructors = aggregatorClass.getConstructors();
             if (constructors.length == 0) {
-                LOGGER.log(Level.WARNING, aggregatorClass + " must have a public constructor which takes a " +  Aggregation.class);
+                LOGGER.log(Level.WARNING, aggregatorClass + " must have a public constructor which takes a " + Aggregation.class);
                 return null;
             }
             return (Aggregator<?>) aggregatorClass.getConstructors()[0].newInstance(aggregationClass.getConstructors()[0].newInstance());
-        } catch (InstantiationException | IllegalAccessException |
-                IllegalArgumentException | InvocationTargetException e) {
+        } catch (ReflectiveOperationException e) {
             LOGGER.log(Level.WARNING, e + ": Cannot construct instance of " + aggregatorClass);
         }
         return null;
     }
 
-    Set<Aggregator<?>> getAggregators (
+    Set<Aggregator<?>> getAggregators(
             EventSource eventSource,
-            Set<Class<? extends Aggregation>> registeredAggregations)
-    {
+            Set<Class<? extends Aggregation>> registeredAggregations) {
         final Set<Aggregator<?>> aggregators = new HashSet<>();
         final Set<EventSource> eventSources = new HashSet<>();
 

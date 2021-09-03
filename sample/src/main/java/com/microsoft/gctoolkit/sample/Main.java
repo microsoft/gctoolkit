@@ -4,18 +4,16 @@ import com.microsoft.gctoolkit.GCToolKit;
 import com.microsoft.gctoolkit.io.GCLogFile;
 import com.microsoft.gctoolkit.io.SingleGCLogFile;
 import com.microsoft.gctoolkit.jvm.JavaVirtualMachine;
-import com.microsoft.gctoolkit.sample.aggregation.HeapOccupancyAfterCollectionAggregation;
 import com.microsoft.gctoolkit.sample.aggregation.HeapOccupancyAfterCollectionSummary;
 
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class Main {
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         if (args.length == 0) {
             throw new IllegalArgumentException("This sample requires a path to a GC log file as an argument.");
-        }        
+        }
         Main main = new Main();
         main.execute(args[0]);
     }

@@ -18,7 +18,7 @@ public class JVMEventParser extends PreUnifiedGCLogParser implements JVMPatterns
 
     private static final double GCPAUSE_TIME_NOT_SET = -1.0; // a value that doesn't make sense
     private static final Logger LOGGER = Logger.getLogger(JVMEventParser.class.getName());
-    private final Collection<SafePointData> safePoints = new ArrayList<SafePointData>();
+    private final Collection<SafePointData> safePoints = new ArrayList<>();
     private DateTimeStamp timeStamp = new DateTimeStamp(0.0d);
     private boolean lastEventWasGC = false;
     private double gcPauseTime = GCPAUSE_TIME_NOT_SET;
