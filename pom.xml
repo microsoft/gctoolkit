@@ -88,7 +88,7 @@
         <maven.jar-plugin.version>3.2.0</maven.jar-plugin.version>
         <maven.javadoc-plugin.version>3.3.0</maven.javadoc-plugin.version>
         <maven.jxr-plugin.version>3.1.1</maven.jxr-plugin.version>
-        <maven.license-plugin.version>2.0.0</maven.license-plugin.version>
+        <maven.license-plugin.version>1.20</maven.license-plugin.version>
         <maven.pmd-plugin.version>3.14.0</maven.pmd-plugin.version>
         <maven.project-info-reports-plugin.version>3.1.2</maven.project-info-reports-plugin.version>
         <maven.rat-plugin.version>0.13</maven.rat-plugin.version>
@@ -411,12 +411,12 @@
                 <artifactId>apache-rat-plugin</artifactId>
             </plugin>
             <!-- TODO https://github.com/microsoft/gctoolkit/issues/68 -->
-            <!--
+
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>license-maven-plugin</artifactId>
             </plugin>
-            -->
+
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>versions-maven-plugin</artifactId>
