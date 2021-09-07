@@ -59,7 +59,7 @@ public class G1GCUnifiedParserRulesTest implements UnifiedG1GCPatterns {
         }
     }
 
-    GCParseRule[] rules = {
+    private GCParseRule[] rules = {
             G1_COLLECTION,
             WORKER_SUMMARY,
             REFERENCES,
@@ -104,7 +104,7 @@ public class G1GCUnifiedParserRulesTest implements UnifiedG1GCPatterns {
        FINE: Missed: [73.158s][debug][gc,phases    ] GC(263) Reference Processing 19.485ms
      */
 
-    String[][] lines = {
+    private String[][] lines = {
             {   //  0
                     "[2018-03-09T11:14:04.994-0100][12.269s][info][gc,start     ] GC(0) Pause Young (G1 Evacuation Pause)",
                     "[85.690s][info ][gc,start      ] GC(390) Pause Initial Mark (G1 Humongous Allocation)",
@@ -262,7 +262,7 @@ public class G1GCUnifiedParserRulesTest implements UnifiedG1GCPatterns {
             }
     };
 
-    String[] decoratorLines = {
+    private String[] decoratorLines = {
             "[2018-04-04T09:10:00.586-0100][0.018s][1522825800586ms][18ms][10026341461044ns][17738937ns][1375][7427][info][gc] Using G1",
             "[0.018s][1522825800586ms][18ms][10026341461044ns][17738937ns][1375][7427][info][gc] Using G1",
             "[0.018s][1522825800586ms][7427][info][gc] Using G1",

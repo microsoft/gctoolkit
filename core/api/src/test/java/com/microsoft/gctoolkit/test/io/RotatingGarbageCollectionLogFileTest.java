@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 class RotatingGarbageCollectionLogFileTest {
 
-    String[][] expected = new String[][] {
+    private String[][] expected = new String[][] {
             new String[] {
                     "rolling/jdk14/rollinglogs/long_restart.log",
                     "long_restart.log.3", "long_restart.log.4", "long_restart.log.0", "long_restart.log.1", "long_restart.log"

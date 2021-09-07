@@ -2,7 +2,6 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.event;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import static com.microsoft.gctoolkit.event.GCCause.*;

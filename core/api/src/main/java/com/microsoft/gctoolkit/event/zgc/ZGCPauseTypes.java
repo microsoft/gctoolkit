@@ -2,7 +2,6 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.event.zgc;
 
-import com.microsoft.gctoolkit.event.GarbageCollectionTypes;
 import com.microsoft.gctoolkit.event.LabelledGCEventType;
 
 public enum ZGCPauseTypes implements LabelledGCEventType {

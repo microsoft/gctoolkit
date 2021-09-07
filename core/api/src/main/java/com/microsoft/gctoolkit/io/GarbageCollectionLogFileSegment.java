@@ -63,7 +63,7 @@ public class GarbageCollectionLogFileSegment {
     public GarbageCollectionLogFileSegment(Path path) {
         this.path = path;
 
-        final String filename = path.getFileName().toString();
+        String filename = path.getFileName().toString();
         Matcher matcher = ROTATING_LOG_PATTERN.matcher(filename);
         if (matcher.matches()) {
             segmentIndex = Integer.parseInt(matcher.group(1));
@@ -150,8 +150,8 @@ public class GarbageCollectionLogFileSegment {
 
     // calculate the delta between the start of newSegment and the end of oldSegment.
     /* package scope for testing */ static double rolloverDelta(GarbageCollectionLogFileSegment newSegment, GarbageCollectionLogFileSegment oldSegment) {
-        DateTimeStamp startAge = null;
-        DateTimeStamp endAge = null;
+        DateTimeStamp startAge;
+        DateTimeStamp endAge;
         try {
             startAge = newSegment.ageOfJVMAtLogStart();
             endAge = oldSegment.ageOfJVMAtLogEnd();
@@ -165,8 +165,8 @@ public class GarbageCollectionLogFileSegment {
         }
 
         // Compare by calendar date, not uptime, if possible.
-        final double startTime;
-        final double endTime;
+        double startTime;
+        double endTime;
         if (startAge.hasDateStamp() && endAge.hasDateStamp()) {
             ZonedDateTime startDate = startAge.getDateTime();
             startTime = (double)startDate.toEpochSecond() + (double)startDate.getNano() / 1_000_000_000d;

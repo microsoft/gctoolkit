@@ -14,13 +14,13 @@ public abstract class G1GCPauseEvent extends G1GCEvent {
 
     private final MemoryPoolSummary NULL_POOL = new MemoryPoolSummary(-1L, -1L, -1L, -1L);
 
-    MemoryPoolSummary eden;
-    SurvivorMemoryPoolSummary survivor;
-    MemoryPoolSummary heap;
-    MemoryPoolSummary permOrMetaspace;
-    ReferenceGCSummary referenceGCSummary = null;
+    private MemoryPoolSummary eden;
+    private SurvivorMemoryPoolSummary survivor;
+    private MemoryPoolSummary heap;
+    private MemoryPoolSummary permOrMetaspace;
+    private ReferenceGCSummary referenceGCSummary = null;
 
-    CPUSummary cpuSummary;
+    private CPUSummary cpuSummary;
 
     public G1GCPauseEvent(DateTimeStamp timeStamp, GarbageCollectionTypes type, GCCause cause, double duration) {
         super(timeStamp, type, cause, duration);
