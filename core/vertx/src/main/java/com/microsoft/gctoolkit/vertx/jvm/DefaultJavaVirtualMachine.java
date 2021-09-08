@@ -16,6 +16,7 @@ import com.microsoft.gctoolkit.parser.jvm.UnifiedJVMConfiguration;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
@@ -97,8 +98,8 @@ public class DefaultJavaVirtualMachine implements JavaVirtualMachine {
 
     @Override
     @SuppressWarnings("unchecked")
-    public <T extends Aggregation> T getAggregation(Class<T> aggregationClass) {
-        return aggregatedData != null ? (T)aggregatedData.get(aggregationClass) : null;
+    public <T extends Aggregation> Optional<T> getAggregation(Class<T> aggregationClass) {
+        return Optional.ofNullable((T) aggregatedData.get(aggregationClass));
     }
 
     @Override
