@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash
 
 # This script is an alternative method for not having to deal
 # with GitHub Package Registry.
