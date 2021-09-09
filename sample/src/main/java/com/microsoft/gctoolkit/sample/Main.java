@@ -3,9 +3,11 @@ package com.microsoft.gctoolkit.sample;
 import com.microsoft.gctoolkit.GCToolKit;
 import com.microsoft.gctoolkit.io.GCLogFile;
 import com.microsoft.gctoolkit.io.SingleGCLogFile;
+import com.microsoft.gctoolkit.jvm.JavaVirtualMachine;
 import com.microsoft.gctoolkit.sample.aggregation.HeapOccupancyAfterCollectionSummary;
 
 import java.nio.file.Path;
+import java.util.Optional;
 
 public class Main {
 
