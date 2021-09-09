@@ -6,6 +6,7 @@ import com.microsoft.gctoolkit.io.SingleGCLogFile;
 import com.microsoft.gctoolkit.sample.aggregation.HeapOccupancyAfterCollectionSummary;
 
 import java.nio.file.Path;
+import java.util.Optional;
 
 public class Main {
 
