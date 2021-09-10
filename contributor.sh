@@ -27,7 +27,7 @@ revert() {
 
 # Download latest GCToolkit Test Data pack
 download() {
-    rm -rf gctoolkit-testdata
+    rm -rf .tmp-gctoolkit-testdata
 
     wget $(curl -s https://api.github.com/repos/microsoft/gctoolkit-testdata/releases/latest | grep 'zipball_url' | cut -d\" -f4) -O gctoolkit-testdata.zip
 
@@ -36,13 +36,13 @@ download() {
     rm gctoolkit-testdata.zip
 
     # Rename folder, as it comes with git hash in the name
-    mv microsoft-gctoolkit-testdata-* gctoolkit-testdata
+    mv microsoft-gctoolkit-testdata-* .tmp-gctoolkit-testdata
 
     # Remove -SNAPSHOT (See issue: https://github.com/microsoft/gctoolkit-testdata/issues/6)
-    sh mvnw -f gctoolkit-testdata versions:set -DremoveSnapshot
-    sh mvnw -f gctoolkit-testdata install
+    sh mvnw -f .tmp-gctoolkit-testdata versions:set -DremoveSnapshot
+    sh mvnw -f .tmp-gctoolkit-testdata install
 
-    rm -rf gctoolkit-testdata
+    rm -rf .gctoolkit-testdata
 
     echo "GCToolKit Test Data downloaded and installed in your local Maven repository."
 }
@@ -50,7 +50,7 @@ download() {
 # Prints usage help
 printhelp() {
     cat << EOF
-Microsoft GCToolKit Test Data
+Microsoft GCToolKit Test Data Installer
 Copyright (c) 2021, Microsoft Corporation
 
 $ contributor.sh [ [-d] [-a] | [-r] ] | [-h]
@@ -66,7 +66,10 @@ EOF
 
 # Parse flags
 
-if [ "$#" -eq 0 ]; then printhelp; fi
+if [ "$#" -eq 0 ]; then 
+    printhelp;
+    exit 0
+fi
 
 dflag=0
 aflag=0
