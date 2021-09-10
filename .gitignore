@@ -1,4 +1,5 @@
 gclogs/
+gctoolkit-testdata-*/
 
 # Maven
 target/

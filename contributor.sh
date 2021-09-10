@@ -1,66 +1,33 @@
 #!/bin/bash
 
-# This script is an alternative method for not having to deal
-# with GitHub Package Registry.
-# 
-# By calling this script, the latest source code of gctoolkit-testdata 
-# will be downloaded, and the project will be built and installed in the
-# local Maven repository.
-# 
-# This script will also enable the 'contributor' profile to ensure all 
+# This script will enable/disable the 'contributor' profile to ensure all 
 # tests and checks pass, since the GC logs will be available.
 
 # Turn on the Maven Config file with Contributor Profile activated
-activate() {
+enable() {
     if [ -f .mvn/maven.config.contributor ]; then
         cp .mvn/maven.config.contributor .mvn/maven.config
     fi
     echo "Maven 'contributor' profile activated. See ./mvn/maven.config"
 }
 
-revert() {
+disable() {
     if [ -f .mvn/maven.config ]; then
         rm .mvn/maven.config
     fi
     echo "./mvn/maven.config file removed."
 }
 
-# Download latest GCToolkit Test Data pack
-download() {
-    rm -rf gclogs .tmp-gctoolkit-testdata
-
-    mkdir gclogs
-
-    wget https://github.com/microsoft/gctoolkit-testdata/archive/refs/heads/main.zip -O gctoolkit-testdata.zip
-
-    # Extract to ../gctoolkit-testdata
-    unzip gctoolkit-testdata.zip
-    rm gctoolkit-testdata.zip
-
-    # Rename folder, as it comes with git hash in the name
-    mv gctoolkit-testdata-main .tmp-gctoolkit-testdata
-
-    cp -r .tmp-gctoolkit-testdata/gctoolkit-gclogs/preunified gclogs/
-    cp -r .tmp-gctoolkit-testdata/gctoolkit-gclogs/streaming gclogs/
-    cp -r .tmp-gctoolkit-testdata/gctoolkit-gclogs/unified gclogs/
-    cp -r .tmp-gctoolkit-testdata/gctoolkit-gclogs-rolling/rolling gclogs/
-    cp -r .tmp-gctoolkit-testdata/gctoolkit-shenandoah-logs/shenandoah gclogs/
-    cp -r .tmp-gctoolkit-testdata/gctoolkit-zgc-logs/zgc gclogs/
-
-    rm -rf .tmp-gctoolkit-testdata
-}
-
 # Prints usage help
 printhelp() {
     cat << EOF
-Microsoft GCToolKit Test Data Downloader
+Microsoft GCToolKit
 Copyright (c) 2021, Microsoft Corporation
 
-$ contributor.sh [ [-d] [-a] | [-r] ] | [-h]
+$ contributor.sh [-e] | [-d] | [-h]
 Arguments:
--d: downloads gctoolkit-testdata, builds and installs artifacts in local Maven repository.
--a: activates the 'contributor' profile by creating Fa .mvn/maven.config file with -Pcontributor.
--r: reverts the .mvn/maven.config file to disable 'contributor' Maven profile.
+-e: enables the 'contributor' profile by creating .mvn/maven.config file with -Pcontributor.
+-d: disables the 'contributor' profile by deleting .mvn/maven.config file.
 EOF
     exit 0
 }
@@ -69,15 +36,14 @@ EOF
 
 # Parse flags
 
-if [ "$#" -eq 0 ] || [ "$#" -gt 2 ]; then 
+if [ "$#" -eq 0 ] || [ "$#" -gt 1 ]; then 
     printhelp;
 fi
 
+eflag=0
 dflag=0
-aflag=0
-rflag=0
 
-while getopts "hdar" optname; do
+while getopts "hed" optname; do
   case "$optname" in
     "h")
       printhelp
@@ -85,11 +51,8 @@ while getopts "hdar" optname; do
     "d")
       dflag=1
       ;;
-    "a")
-      aflag=1
-      ;;
-    "r")
-      rflag=1
+    "e")
+      eflag=1
       ;;
     *)
       echo "Unknow argument. See ./contributor.sh -h"
@@ -97,16 +60,10 @@ while getopts "hdar" optname; do
   esac
 done
 
-if [ $rflag -eq 1 ] && [ "$#" -eq 1 ]; then
-    revert
-elif [ $rflag -ne 1 ]; then
-    if [ $dflag -eq 1 ]; then
-        download 
-    fi
-
-    if [ $aflag -eq 1 ]; then
-        activate
-    fi
+if [ $dflag -eq 1 ] && [ "$#" -eq 1 ]; then
+    disable
+elif [ $eflag -eq 1 ] && [ "$#" -eq 1 ]; then
+    enable
 else
     printhelp
 fi    
