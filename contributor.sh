@@ -42,7 +42,7 @@ download() {
     sh mvnw -f .tmp-gctoolkit-testdata versions:set -DremoveSnapshot
     sh mvnw -f .tmp-gctoolkit-testdata install
 
-    rm -rf .gctoolkit-testdata
+    # rm -rf .gctoolkit-testdata
 
     echo "GCToolKit Test Data downloaded and installed in your local Maven repository."
 }
@@ -66,9 +66,8 @@ EOF
 
 # Parse flags
 
-if [ "$#" -eq 0 ]; then 
+if [ "$#" -eq 0 ] || [ "$#" -gt 2 ]; then 
     printhelp;
-    exit 0
 fi
 
 dflag=0
@@ -95,18 +94,16 @@ while getopts "hdar" optname; do
   esac
 done
 
-if [ $((dflag + rflag)) -gt 1 ]; then
-    printhelp
-elif [ $dflag -eq 1 ]; then
-    download
-fi
-
-if [ $((aflag + rflag)) -gt 1 ]; then
-    printhelp
-elif [ $aflag -eq 1 ]; then
-    activate
-elif [ $rflag -eq 1 ]; then
+if [ $rflag -eq 1 ] && [ "$#" -eq 1 ]; then
     revert
+elif [ $rflag -ne 1 ]; then
+    if [ $dflag -eq 1 ]; then
+        download 
+    fi
+
+    if [ $aflag -eq 1 ]; then
+        activate
+    fi
 else
     printhelp
-fi
+fi    
