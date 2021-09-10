@@ -27,7 +27,9 @@ revert() {
 
 # Download latest GCToolkit Test Data pack
 download() {
-    rm -rf .tmp-gctoolkit-testdata
+    rm -rf gclogs .tmp-gctoolkit-testdata
+
+    mkdir gclogs
 
     wget $(curl -s https://api.github.com/repos/microsoft/gctoolkit-testdata/releases/latest | grep 'zipball_url' | cut -d\" -f4) -O gctoolkit-testdata.zip
 
@@ -38,13 +40,14 @@ download() {
     # Rename folder, as it comes with git hash in the name
     mv microsoft-gctoolkit-testdata-* .tmp-gctoolkit-testdata
 
-    # Remove -SNAPSHOT (See issue: https://github.com/microsoft/gctoolkit-testdata/issues/6)
-    sh mvnw -f .tmp-gctoolkit-testdata versions:set -DremoveSnapshot
-    sh mvnw -f .tmp-gctoolkit-testdata install
+    cp -r .tmp-gctoolkit-testdata/gctoolkit-gclogs/preunified gclogs/
+    cp -r .tmp-gctoolkit-testdata/gctoolkit-gclogs/streaming gclogs/
+    cp -r .tmp-gctoolkit-testdata/gctoolkit-gclogs/unified gclogs/
+    cp -r .tmp-gctoolkit-testdata/gctoolkit-gclogs-rolling/rolling gclogs/
+    cp -r .tmp-gctoolkit-testdata/gctoolkit-shenandoah-logs/shenandoah gclogs/
+    cp -r .tmp-gctoolkit-testdata/gctoolkit-zgc-logs/zgc gclogs/
 
-    # rm -rf .gctoolkit-testdata
-
-    echo "GCToolKit Test Data downloaded and installed in your local Maven repository."
+    rm -rf .tmp-gctoolkit-testdata
 }
 
 # Prints usage help
