@@ -31,14 +31,14 @@ download() {
 
     mkdir gclogs
 
-    wget $(curl -s https://api.github.com/repos/microsoft/gctoolkit-testdata/releases/latest | grep 'zipball_url' | cut -d\" -f4) -O gctoolkit-testdata.zip
+    wget https://github.com/microsoft/gctoolkit-testdata/archive/refs/heads/main.zip -O gctoolkit-testdata.zip
 
     # Extract to ../gctoolkit-testdata
     unzip gctoolkit-testdata.zip
     rm gctoolkit-testdata.zip
 
     # Rename folder, as it comes with git hash in the name
-    mv microsoft-gctoolkit-testdata-* .tmp-gctoolkit-testdata
+    mv gctoolkit-testdata-main .tmp-gctoolkit-testdata
 
     cp -r .tmp-gctoolkit-testdata/gctoolkit-gclogs/preunified gclogs/
     cp -r .tmp-gctoolkit-testdata/gctoolkit-gclogs/streaming gclogs/
@@ -53,7 +53,7 @@ download() {
 # Prints usage help
 printhelp() {
     cat << EOF
-Microsoft GCToolKit Test Data Installer
+Microsoft GCToolKit Test Data Downloader
 Copyright (c) 2021, Microsoft Corporation
 
 $ contributor.sh [ [-d] [-a] | [-r] ] | [-h]
