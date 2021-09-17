@@ -34,9 +34,7 @@ import com.microsoft.gctoolkit.jvm.JavaVirtualMachine;
 module com.microsoft.gctoolkit.api {
 
     exports com.microsoft.gctoolkit;
-    exports com.microsoft.gctoolkit.aggregations;
     exports com.microsoft.gctoolkit.aggregator;
-    exports com.microsoft.gctoolkit.aggregators;
     exports com.microsoft.gctoolkit.event;
     exports com.microsoft.gctoolkit.event.g1gc;
     exports com.microsoft.gctoolkit.event.generational;
