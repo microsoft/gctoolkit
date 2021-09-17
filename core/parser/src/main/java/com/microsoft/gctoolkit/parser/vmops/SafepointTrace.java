@@ -75,17 +75,17 @@ public class SafepointTrace extends AbstractLogTrace {
         return getDoubleGroup(TIME_STAMP);
     }
 
-    private int TIME_STAMP = 1;
-    private int VMOP = 2;
-    private int TOTAL_THREADS = 3;
-    private int INITIALLY_RUNNING_THREADS = 4;
-    private int WAITING_TO_BLOCK = 5;
-    private int SPIN_TIME = 6;
-    private int BLOCK_TIME = 7;
-    private int SYNC_TIME = 8;
-    private int CLEANUP_TIME = 9;
-    private int VMOP_TIME = 10;
-    private int TRAP_COUNT = 11;
+    private final int TIME_STAMP = 1;
+    private final int VMOP = 2;
+    private final int TOTAL_THREADS = 3;
+    private final int INITIALLY_RUNNING_THREADS = 4;
+    private final int WAITING_TO_BLOCK = 5;
+    private final int SPIN_TIME = 6;
+    private final int BLOCK_TIME = 7;
+    private final int SYNC_TIME = 8;
+    private final int CLEANUP_TIME = 9;
+    private final int VMOP_TIME = 10;
+    private final int TRAP_COUNT = 11;
 
 }
 

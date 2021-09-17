@@ -7,6 +7,8 @@ import com.microsoft.gctoolkit.parser.GCLogTrace;
 import com.microsoft.gctoolkit.parser.GCParseRule;
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
+import java.util.Objects;
 import java.util.logging.Logger;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -19,7 +21,7 @@ public class G1GCParserRulesTest implements G1GCPatterns {
     public void testG1GCParseRules() {
         for (int i = 0; i < rules.length; i++)
             for (int j = 0; j < lines.length; j++) {
-                int captured = captureTest(rules[i], lines[j]);
+                int captured = CommonTestHelper.captureTest(rules[i], lines[j]);
                 if (i == j) {
                     assertTrue(captured == lines[j].length, i + " failed to captured it's lines");
                 } else {
@@ -30,18 +32,10 @@ public class G1GCParserRulesTest implements G1GCPatterns {
         assertTrue(true);
     }
 
-    private int captureTest(GCParseRule rule, String[] lines) {
-        int captureCount = 0;
-        for (int i = 0; i < lines.length; i++)
-            if (rule.parse(lines[i]) != null)
-                captureCount++;
-        return captureCount;
-    }
-
     //@Test
     public void testSingeRule() {
         int index = 35;
-        assertTrue(captureTest(rules[index], lines[index]) == 1);
+        assertTrue(CommonTestHelper.captureTest(rules[index], lines[index]) == 1);
     }
 
 
@@ -58,7 +52,7 @@ public class G1GCParserRulesTest implements G1GCPatterns {
     }
 
     String FIXUP_STATS = "Min: " + REAL_VALUE + ", Avg: " + REAL_VALUE + ", Max: " + REAL_VALUE + ", Diff: " + REAL_VALUE + ", Sum: " + REAL_VALUE;
-    GCParseRule[] rules = {
+    private GCParseRule[] rules = {
             G1_YOUNG_SPLIT_START,                     //  0
             G1_YOUNG_RS_SUMMARY,
             CONCURRENT_STRING_DEDUP,
@@ -104,7 +98,7 @@ public class G1GCParserRulesTest implements G1GCPatterns {
             G1_CONCURRENT_ABORT
     };
 
-    String[][] lines = {
+    private String[][] lines = {
 
             {   //  0
                     "2015-09-10T11:05:53.786+0200: 10718.451: [GC pause (G1 Evacuation Pause) (young)"

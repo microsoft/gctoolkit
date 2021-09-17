@@ -21,12 +21,17 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.3.0</version>
+                <version>${maven.javadoc-plugin.version}</version>
                 <configuration>
                     <excludePackageNames>
-                        com.microsoft.gctoolkit.parser.**,com.microsoft.gctoolkit.vertx.**,com.microsoft.gctoollkit.sample.**
+                        com.microsoft.gctoolkit.parser.**,com.microsoft.gctoolkit.vertx.**,com.microsoft.gctoolkit.sample.**
                     </excludePackageNames>
                 </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
             </plugin>
         </plugins>
     </build>

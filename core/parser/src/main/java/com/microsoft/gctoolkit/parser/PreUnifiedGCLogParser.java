@@ -15,7 +15,7 @@ import java.util.logging.Logger;
 public abstract class PreUnifiedGCLogParser extends GCLogParser {
 
     private static final Logger LOGGER = Logger.getLogger(PreUnifiedGCLogParser.class.getName());
-    final GCParseRule TIMESTAMP_BLOCK = new GCParseRule("TIMESTAMP_BLOCK", "^" + DATE_TIMESTAMP);
+    private final GCParseRule TIMESTAMP_BLOCK = new GCParseRule("TIMESTAMP_BLOCK", "^" + DATE_TIMESTAMP);
 
     public PreUnifiedGCLogParser(LoggingDiary diary, JVMEventConsumer consumer) {
         super(diary, consumer);

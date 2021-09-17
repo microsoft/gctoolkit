@@ -30,17 +30,17 @@ public class CMSParNewParserTest extends ParserTest {
         }
     }
 
-    private static String[] simple = {
+    private static final String[] simple = {
             "530_gc.log",
             "713_gc.log"
     };
 
-    private static int[] simpleCountsNumberOfDifferentCollectors = {
+    private static final int[] simpleCountsNumberOfDifferentCollectors = {
             4,
             4
     };
 
-    private static int[][] simpleCounts = {
+    private static final int[][] simpleCounts = {
             //   0,    1,    2,    3,    4,    5,    6,    7,    8,    9,   10,   11,   12
             {30, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 4, 3},
             {79, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 24, 24}
@@ -60,7 +60,7 @@ public class CMSParNewParserTest extends ParserTest {
         }
     }
 
-    private static String[] details = {
+    private static final String[] details = {
             "1073_1.log",
             "apptio_gc.log",
             "gc_www1_2013_10_19.log",
@@ -73,7 +73,7 @@ public class CMSParNewParserTest extends ParserTest {
             "tidied_gc_www1_2013_10_19.log"
     };
 
-    private static int[] detailsCountsNumberOfDifferentCollectors = {
+    private static final int[] detailsCountsNumberOfDifferentCollectors = {
             6,
             5,
             4,
@@ -87,7 +87,7 @@ public class CMSParNewParserTest extends ParserTest {
 
     };
 
-    private static int[][] detailsCounts = {
+    private static final int[][] detailsCounts = {
             //    0,    1,     2,     3,     4,     5,     6,     7,     8,     9,   10,    11,   12
             {0, 0, 3668, 12, 0, 96, 0, 0, 22, 0, 0, 156, 68},   //todo: these numbers don't seem to add up
             {0, 0, 2021, 1, 0, 8, 0, 0, 0, 0, 0, 71, 70},
@@ -117,18 +117,18 @@ public class CMSParNewParserTest extends ParserTest {
         }
     }
 
-    private static String[] detailsGCCause170 = {
+    private static final String[] detailsGCCause170 = {
             "1.7.0_cms_mixed.log",
             "1.7.0_cms.log",
     };
 
-    private static int[] detailsGCCause170CountsNumberOfDifferentCollectors = {
+    private static final int[] detailsGCCause170CountsNumberOfDifferentCollectors = {
             3,
             3,
 
     };
 
-    private static int[][] detailsGCCause170Counts = {
+    private static final int[][] detailsGCCause170Counts = {
             //    0,     1,     2,     3,     4,     5,     6,     7,     8,     9,    10
             {0, 0, 603, 0, 0, 0, 0, 0, 0, 0, 0, 13, 13},
             {0, 0, 603, 0, 0, 0, 0, 0, 0, 0, 0, 13, 13},
@@ -148,7 +148,7 @@ public class CMSParNewParserTest extends ParserTest {
         }
     }
 
-    private static String[] detailsTenuring = {
+    private static final String[] detailsTenuring = {
             "9f1dfc0c-4dab-4e41-892c-7f4c01c91e70-1396054737854.log",
             "36bbe73f-181c-485b-b162-de2731668227-1390297131935.log",
             "239_1280857178635par.cms.wd.wt.log",
@@ -170,7 +170,7 @@ public class CMSParNewParserTest extends ParserTest {
             "web1-gc.log"
     };
 
-    private static int[] detailsTenuringCountsNumberOfDifferentCollectors = {
+    private static final int[] detailsTenuringCountsNumberOfDifferentCollectors = {
             1,
             3,
             6,
@@ -193,7 +193,7 @@ public class CMSParNewParserTest extends ParserTest {
 
     };
 
-    private static int[][] detailsTenuringCounts = {
+    private static final int[][] detailsTenuringCounts = {
             //    0,    1,     2,     3,     4,     5,     6,    7,    8,     9,    10
             {0, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
             {0, 0, 14816, 0, 0, 0, 0, 0, 0, 0, 0, 30, 30},
@@ -231,16 +231,16 @@ public class CMSParNewParserTest extends ParserTest {
         }
     }
 
-    private static String[] defNewDetailsLog = {
+    private static final String[] defNewDetailsLog = {
             "defnew.log"
     };
 
-    private static int[] defNewDetailsNumberOfDifferentCollectors = {
+    private static final int[] defNewDetailsNumberOfDifferentCollectors = {
             3,
 
     };
 
-    private static int[][] defnewDetailsCounts = {
+    private static final int[][] defnewDetailsCounts = {
             //    0,     1,     2,     3,     4,     5,     6,     7,     8,     9,    10
             {0, 19114, 0, 0, 0, 0, 0, 0, 0, 0, 0, 26, 26}
     };
@@ -259,16 +259,16 @@ public class CMSParNewParserTest extends ParserTest {
         }
     }
 
-    private static String[] parNewDetailsTenuringReference180 = {
+    private static final String[] parNewDetailsTenuringReference180 = {
             "parnew-reference.log"
     };
 
-    private static int[] parNewDetailsTenuringReference180NumberOfDifferentCollectors = {
+    private static final int[] parNewDetailsTenuringReference180NumberOfDifferentCollectors = {
             6
 
     };
 
-    private static int[][] parNewDetailsTenuringReference180Counts = {
+    private static final int[][] parNewDetailsTenuringReference180Counts = {
             //    0,     1,     2,     3,     4,     5,     6,     7,     8,     9,    10,    11,    12
             {0, 0, 15338, 0, 0, 3, 0, 0, 3, 0, 7, 7, 1}
     };
@@ -288,17 +288,17 @@ public class CMSParNewParserTest extends ParserTest {
         }
     }
 
-    private static String[] parNewDetailsTenuringTLAB = {
+    private static final String[] parNewDetailsTenuringTLAB = {
             "tlab_broken_gc_locker.log"
             //"tlab_broken_gc_locker _fragment.txt"
     };
 
-    private static int[] parNewDetailsTenuringTLABNumberOfDifferentCollectors = {
+    private static final int[] parNewDetailsTenuringTLABNumberOfDifferentCollectors = {
             3,
 
     };
 
-    private static int[][] parNewDetailsTenuringTLABCounts = {
+    private static final int[][] parNewDetailsTenuringTLABCounts = {
             //    0,     1,     2,     3,     4,     5,     6,     7,     8,     9,    10,    11,    12
             {0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1}
     };

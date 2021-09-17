@@ -6,12 +6,13 @@ import com.microsoft.gctoolkit.event.GCCause;
 import com.microsoft.gctoolkit.event.GarbageCollectionTypes;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
 
-import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 
 public class G1FullGC extends G1RealPause {
 
-    HashMap<String, Double> internalPhaseTimes = new HashMap<>();
+    private final Map<String, Double> internalPhaseTimes = new ConcurrentHashMap<>();
 
     public G1FullGC(DateTimeStamp timeStamp, GCCause cause, double pauseTime) {
         this(timeStamp, GarbageCollectionTypes.Full, cause, pauseTime);

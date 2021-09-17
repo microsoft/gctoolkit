@@ -33,17 +33,17 @@ public class ZGCParserRulesTest implements ZGCPatterns {
 
     @Test
     public void testUnifiedLoggingDecorators() {
-        for (int i = 0; i < decoratorLines.length; i++) {
-            Decorators decorators = new Decorators(decoratorLines[i]);
+        for (String decoratorLine : decoratorLines) {
+            Decorators decorators = new Decorators(decoratorLine);
             assertTrue(decorators.getNumberOfDecorators() != 0);
         }
     }
 
     private int captureTest(GCParseRule rule, String[] lines) {
         int captureCount = 0;
-        for (int i = 0; i < lines.length; i++) {
-            GCLogTrace trace = rule.parse(lines[i]);
-            if (rule.parse(lines[i]) != null) {
+        for (String line : lines) {
+            GCLogTrace trace = rule.parse(line);
+            if (rule.parse(line) != null) {
                 captureCount++;
             }
         }
@@ -70,7 +70,7 @@ public class ZGCParserRulesTest implements ZGCPatterns {
         }
     }
 
-    GCParseRule[] rules = {
+    private GCParseRule[] rules = {
             CYCLE_START,                   //  0
             PAUSE_PHASE,                   //  1
             CONCURRENT_PHASE,
@@ -89,7 +89,7 @@ public class ZGCParserRulesTest implements ZGCPatterns {
             MEMORY_SUMMARY
     };
 
-    String[][] lines = {
+    private String[][] lines = {
 
             {  //   0
                     "[3.558s][info ][gc,start       ] GC(3) Garbage Collection (Warmup)"
@@ -157,7 +157,7 @@ public class ZGCParserRulesTest implements ZGCPatterns {
             }
     };
 
-    String[] decoratorLines = {
+    private String[] decoratorLines = {
             "[2018-04-04T09:10:00.586-0100][0.018s][1522825800586ms][18ms][10026341461044ns][17738937ns][1375][7427][info][gc] Using Concurrent Mark Sweep",
             "[0.018s][1522825800586ms][18ms][10026341461044ns][17738937ns][1375][7427][info][gc] Using Concurrent Mark Sweep",
             "[0.018s][1522825800586ms][7427][info][gc] Using Concurrent Mark Sweep",

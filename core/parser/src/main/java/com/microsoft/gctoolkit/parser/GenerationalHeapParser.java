@@ -71,8 +71,8 @@ public class GenerationalHeapParser extends PreUnifiedGCLogParser implements Sim
     private int numberOfBlocksForwardReference;
     private long averageBlockSizeForwardReference;
     private int treeHeightForwardReference;
-    private boolean debugging = ("true".equals(System.getProperty("microsoft.debug", "false").toLowerCase()));
-    private boolean develop = ("true".equals(System.getProperty("microsoft.develop", "false").toLowerCase()));
+    private final boolean debugging = ("true".equals(System.getProperty("microsoft.debug", "false").toLowerCase()));
+    private final boolean develop = ("true".equals(System.getProperty("microsoft.develop", "false").toLowerCase()));
 
     //Expect Remark
     private boolean expectRemark = false;
@@ -93,7 +93,7 @@ public class GenerationalHeapParser extends PreUnifiedGCLogParser implements Sim
     final private MRUQueue<GCParseRule, BiConsumer<GCLogTrace, String>> parseRules;
 
     {
-        parseRules = new MRUQueue<GCParseRule, BiConsumer<GCLogTrace, String>>();
+        parseRules = new MRUQueue<>();
         parseRules.put(DEFNEW, this::defNew);
         parseRules.put(DEFNEW_TENURING, this::defNewWithTenuring);
         parseRules.put(SERIAL_FULL, this::serialFull);
@@ -1907,7 +1907,7 @@ public class GenerationalHeapParser extends PreUnifiedGCLogParser implements Sim
     }
 
     //Bug: weak reference processing record is fragmented.
-    private GCParseRule weakReferenceFragmentRule = new GCParseRule("weakReferenceFragmentRule", "\\], " + PAUSE_TIME);
+    private final GCParseRule weakReferenceFragmentRule = new GCParseRule("weakReferenceFragmentRule", "\\], " + PAUSE_TIME);
 
     /**
      *     public void remarkWithReferenceAndScavenge(GCLogTrace trace, String line) {

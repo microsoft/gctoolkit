@@ -7,6 +7,9 @@ import com.microsoft.gctoolkit.parser.GCLogTrace;
 import com.microsoft.gctoolkit.parser.GCParseRule;
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
+import java.util.Objects;
+
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ConcurrentMarkSweepParserRulesTest implements CMSPatterns {
@@ -19,7 +22,7 @@ public class ConcurrentMarkSweepParserRulesTest implements CMSPatterns {
         assertTrue( rules.length == lines.length, "Number of rules differs from the numbers of log entries");
         for (int i = 0; i < rules.length; i++) {
             for (int j = 0; j < lines.length; j++) {
-                int captured = captureTest(rules[i], lines[j]);
+                int captured = CommonTestHelper.captureTest(rules[i], lines[j]);
                 if (i == j) {
                     assertTrue(captured == lines[j].length, i + " failed to captured it's lines");
                 } else {
@@ -31,19 +34,9 @@ public class ConcurrentMarkSweepParserRulesTest implements CMSPatterns {
         assertTrue(true);
     }
 
-    private int captureTest(GCParseRule rule, String[] lines) {
-        int captureCount = 0;
-        for (int i = 0; i < lines.length; i++)
-            if (rule.parse(lines[i]) != null) {
-                captureCount++;
-            }
-        return captureCount;
-    }
-
-
     /* Code that is useful when testing individual records */
 
-    private boolean debugging = Boolean.getBoolean("microsoft.debug");
+    private final boolean debugging = Boolean.getBoolean("microsoft.debug");
 
     //@Test
     //@Ignore("Not a real test, only for debugging")
@@ -66,7 +59,7 @@ public class ConcurrentMarkSweepParserRulesTest implements CMSPatterns {
         }
     }
 
-    GCParseRule[] rules = {
+    private GCParseRule[] rules = {
             FULL_GC_INTERRUPTS_CONCURRENT_PHASE,
             FULL_GC_REFERENCE_CMF,
             PARNEW_PROMOTION_FAILED,
@@ -110,7 +103,7 @@ public class ConcurrentMarkSweepParserRulesTest implements CMSPatterns {
             PRECLEAN_REFERENCE_PAR_NEW_REFERENCE
     };
 
-    String[][] lines = {
+    private String[][] lines = {
             {       // 0
                     "2015-08-07T00:28:24.210+0200: 32810.963: [Full GC (System) 2015-08-07T00:28:24.210+0200: 32810.963: [CMS2015-08-07T00:28:24.851+0200: 32811.604: [CMS-concurrent-mark: 0.638/9713.769 secs] [Times: user=342.99 sys=126.60, real=9713.77 secs]"
             },

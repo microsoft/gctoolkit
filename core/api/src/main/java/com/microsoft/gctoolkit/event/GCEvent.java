@@ -5,6 +5,8 @@ package com.microsoft.gctoolkit.event;
 import com.microsoft.gctoolkit.event.jvm.JVMEvent;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
 
+import java.util.Objects;
+
 /**
  * A GCEvent is something that happens in the GC sub system that is captured in
  * the log, e.g. a Full GC
@@ -12,10 +14,10 @@ import com.microsoft.gctoolkit.time.DateTimeStamp;
  * A GCEvent has meta data which it expects to be overridden, e.g. whether or
  * not it was a young collection
  */
-abstract public class GCEvent extends JVMEvent {
+public abstract class GCEvent extends JVMEvent {
 
     static final double TIMESTAMP_THRESHOLD = 1.0E-6;
-    private GarbageCollectionTypes gcType;
+    private final GarbageCollectionTypes gcType;
     private GCCause cause;
 
     protected GCEvent(DateTimeStamp timeStamp, GarbageCollectionTypes gcType, GCCause cause, double duration) {
@@ -90,8 +92,14 @@ abstract public class GCEvent extends JVMEvent {
         return TIMESTAMP_THRESHOLD > Math.abs(x - y);
     }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(gcType.getLabel(),getDateTimeStamp().getTimeStamp(),getDuration());
+    }
+
     public boolean equals(Object o) {
         if (o == this) return true;
+        if (o == null || getClass() != o.getClass()) return false;
         GCEvent gcEvent = (GCEvent) o;
         return gcType.getLabel().equals(gcEvent.gcType.getLabel())
                 && withinThreshold(getDateTimeStamp().getTimeStamp(), gcEvent.getDateTimeStamp().getTimeStamp())

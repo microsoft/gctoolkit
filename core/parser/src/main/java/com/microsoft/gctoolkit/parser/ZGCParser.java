@@ -36,8 +36,8 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
 
     private static final Logger LOGGER = Logger.getLogger(ZGCParser.class.getName());
 
-    private boolean debugging = ("true".equals(System.getProperty("microsoft.debug", "false").toLowerCase()));
-    private boolean develop = ("true".equals(System.getProperty("microsoft.develop", "false").toLowerCase()));
+    private final boolean debugging = ("true".equals(System.getProperty("microsoft.debug", "false").toLowerCase()));
+    private final boolean develop = ("true".equals(System.getProperty("microsoft.develop", "false").toLowerCase()));
 
     final private MRUQueue<GCParseRule, BiConsumer<GCLogTrace, String>> parseRules;
 
@@ -94,7 +94,7 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
     }
 
     // TODO populate with lines that should be ignored
-    private boolean inPrintHeapAtGC = false;
+    private final boolean inPrintHeapAtGC = false;
 
     private boolean ignoreFrequentButUnwantedEntries(String line) {
         if ( MEMORY_TABLE_HEADER.parse(line) != null) return true;
@@ -194,10 +194,10 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
         //trace.notYetImplemented();
     }
 
-    long[] markStart = new long[3];
-    long[] markEnd = new long[3];
-    long[] relocateStart = new long[3];
-    long[] relocateEnd = new long[3];
+    private long[] markStart = new long[3];
+    private long[] markEnd = new long[3];
+    private long[] relocateStart = new long[3];
+    private long[] relocateEnd = new long[3];
 
     private void captureAtIndex(GCLogTrace trace, int index) {
         markStart[index] = trace.getLongGroup(2);
@@ -270,8 +270,8 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
     }
 
     private class ZGCForwardReference {
-        private DateTimeStamp startTimeStamp;
-        private GCCause gcCause;
+        private final DateTimeStamp startTimeStamp;
+        private final GCCause gcCause;
 
         // Timing
         private DateTimeStamp pauseMarkStart;

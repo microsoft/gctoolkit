@@ -12,18 +12,20 @@ import java.util.Set;
 
 public class MRUQueue<K, V> implements Map<K, V>, Iterable<K> {
 
-    private HashMap<K, V> entries;
-    private LinkedList<K> keys;
+    private final HashMap<K, V> entries;
+    private final LinkedList<K> keys;
 
     public MRUQueue() {
-        entries = new HashMap<K, V>();
-        keys = new LinkedList<K>();
+        entries = new HashMap<>();
+        keys = new LinkedList<>();
     }
 
+    @Override
+    @SuppressWarnings("unchecked")
     public V get(Object key) {
         keys.remove(key);
         if (key != null) {
-            keys.offerFirst((K) key);
+            keys.offerFirst((K)key); // unchecked cast
             return entries.get(key);
         }
         return null;

@@ -26,16 +26,16 @@ public class UnifiedG1GCParserTest extends ParserTest {
         }
     }
 
-    private static String[] details = {
+    private static final String[] details = {
             "details_reference.log",
             "jdk11_details.log",
     };
 
-    private static int[] detailsNumberOfDifferentCollectors = {
+    private static final int[] detailsNumberOfDifferentCollectors = {
             8,
             9
     };
-    private static int[][] detailsCounts = {
+    private static final int[][] detailsCounts = {
             //  0,   1,   2, 3,  4,   5, 6,   7,   8,   9, 10, 11,  12
             {1129, 141, 146, 0,  0, 146, 0, 146,   0, 145,  1,  0, 146},
             {9944,  40, 194, 0, 42, 198, 0, 156, 152, 152,  0,  0, 194}

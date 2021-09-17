@@ -9,7 +9,6 @@ import com.microsoft.gctoolkit.io.SingleGCLogFile;
 import com.microsoft.gctoolkit.jvm.JavaVirtualMachine;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.ServiceLoader;
@@ -22,32 +21,21 @@ import java.util.logging.Logger;
  */
 public class GCToolKit {
 
-    private static Logger LOGGER = Logger.getLogger(GCToolKit.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(GCToolKit.class.getName());
 
     private static JavaVirtualMachine loadJavaVirtualMachine() {
         try {
             // TODO: property for to allow override of default implementation.
             Class<?> clazz =
-                    Class.forName("com.microsoft.gctoolkit.vertx.jvm.DefaultJavaVirtualMachine", true, Thread.currentThread().getContextClassLoader());
+                    Class.forName("com.microsoft.gctoolkit.vertx.jvm.DefaultJavaVirtualMachine", true, Thread.currentThread()
+                            .getContextClassLoader());
             Constructor<?> constructor = clazz.getConstructor();
             JavaVirtualMachine javaVirtualMachine = (JavaVirtualMachine) constructor.newInstance();
             return javaVirtualMachine;
-        } catch (ClassNotFoundException | NoSuchMethodException | InvocationTargetException |
-                InstantiationException | IllegalAccessException e) {
-            LOGGER.log(Level.SEVERE, "Cannot load \"com.microsoft.gctoolkit.vertx.jvm.DefaultJavaVirtualMachine\"",e);
+        } catch (ReflectiveOperationException e) {
+            LOGGER.log(Level.SEVERE, "Cannot load \"com.microsoft.gctoolkit.vertx.jvm.DefaultJavaVirtualMachine\"", e);
         }
         return null;
-    }
-
-    private static final Set<Class<? extends Aggregation>> aggregationsFromServiceLoader;
-
-    static {
-        aggregationsFromServiceLoader = new HashSet<>();
-        ServiceLoader<Aggregation> serviceLoader = ServiceLoader.load(Aggregation.class);
-        serviceLoader.stream()
-                .map(ServiceLoader.Provider::get)
-                .map(Aggregation::getClass)
-                .forEach(aggregationsFromServiceLoader::add);
     }
 
     private final Set<Class<? extends Aggregation>> registeredAggregations;
@@ -61,16 +49,35 @@ public class GCToolKit {
     public GCToolKit() {
         // Allow for adding aggregations from source code,
         // but don't corrupt the ones loaded by the service loader
-        this.registeredAggregations = new HashSet<>(aggregationsFromServiceLoader);
+        this.registeredAggregations = new HashSet<>();
+    }
+
+    /**
+     * Loads all Aggregations defined in the application module through
+     * the java.util.ServiceLoader model. To register a class that
+     * provides the {@link Aggregation} API, define the following
+     * in {@code module-info.java}:
+     * <pre>
+     * import com.microsoft.gctoolkit.aggregator.Aggregation;
+     * import com.microsoft.gctoolkit.sample.aggregation.HeapOccupancyAfterCollectionSummary;
+     * 
+     * module com.microsoft.gctoolkit.sample {
+     *     ...
+     *     provides Aggregation with HeapOccupancyAfterCollectionSummary;
+     * }
+     * </pre>
+     */
+    public void loadAggregationsFromServiceLoader() {
+        ServiceLoader.load(Aggregation.class)
+                .stream()
+                .map(ServiceLoader.Provider::get)
+                .map(Aggregation::getClass)
+                .forEach(registeredAggregations::add);
     }
 
     /**
      * Registers an {@code Aggregation} class which can be used to perform analysis
      * on {@code JVMEvent}s. GCToolKit will instantiate the Aggregation when needed.
-     * <p>
-     * An alternative, and preferred, method of registering Aggregations is through
-     * the java.util.ServiceLoader model. GCToolKit will automatically load classes that
-     * provide the {@link Aggregation} API.
      * <p>
      * The {@link JavaVirtualMachine#getAggregation(Class)}
      * API will return an Aggregation that was used in the log analysis. Even though
@@ -89,9 +96,10 @@ public class GCToolKit {
      * Perform an analysis on a GC log file. The analysis will use the Aggregations
      * that were {@link #registerAggregation(Class) registered}, if appropriate for
      * the GC log file.
+     *
      * @param dataSource The log to analyze, typically a
-     * {@link SingleGCLogFile} or
-     * {@link RotatingGCLogFile}.
+     *                   {@link SingleGCLogFile} or
+     *                   {@link RotatingGCLogFile}.
      * @return a representation of the state of the Java Virtual Machine resulting
      * from the analysis of the GC log file.
      */
@@ -99,10 +107,11 @@ public class GCToolKit {
         // Potential NPE, but would have logged if there was trouble creating the instance.
         JavaVirtualMachine javaVirtualMachine = loadJavaVirtualMachine();
         try {
-            Method analyze = javaVirtualMachine.getClass().getMethod("analyze", Set.class, DataSource.class);
+            Method analyze = javaVirtualMachine.getClass()
+                    .getMethod("analyze", Set.class, DataSource.class);
             analyze.invoke(javaVirtualMachine, this.registeredAggregations, dataSource);
-        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-            LOGGER.log(Level.SEVERE, "Cannot invoke analyze method",e);
+        } catch (ReflectiveOperationException e) {
+            LOGGER.log(Level.SEVERE, "Cannot invoke analyze method", e);
         }
         return javaVirtualMachine;
     }

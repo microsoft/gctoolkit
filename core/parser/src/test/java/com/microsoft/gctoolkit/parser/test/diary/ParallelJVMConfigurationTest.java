@@ -46,7 +46,7 @@ public class ParallelJVMConfigurationTest extends LogDiaryTest {
         }
     }
 
-    private static String[] details = {
+    private static final String[] details = {
             "ps/details/1074_2.log",
             "ps/details/854_gcstats_rdms3_20110124.txt",
             "ps/details/932_def.par.wd.nt.log",
@@ -64,7 +64,7 @@ public class ParallelJVMConfigurationTest extends LogDiaryTest {
             "ps/details/memoryleak2.log"
     };
 
-    private static boolean[][] detailsDiary = {
+    private static final boolean[][] detailsDiary = {
             //    0,     1,     2,     3,     4,     5,     6,     7,     8,     9,    10,    11,    12,    13,    14,    15,    16,    17,    18,    19,    20,    21,    22,    23,    24,    25,    26,    27
              {false, false, false, false, false, false,  true,  true, false, false, false, false,  true, false, false, false, false,  true, false, false, false, false, false, false, false, false, false, false},  //18 is unknown
              {false, false, false, false, false, false,  true,  true, false, false, false, false,  true, false, false, false, false,  true, false, false, false, false, false, false, false, false, false, false},
@@ -83,14 +83,14 @@ public class ParallelJVMConfigurationTest extends LogDiaryTest {
              {false, false, false, false, false, false,  true,  true, false, false, false, false,  true, false, false, false, false,  true,  true, false, false, false, false, false, false, false, false, false}
     };
 
-    private static int[][] detailsUnknown = {
+    private static final int[][] detailsUnknown = {
             {18}, {-1}, {-1}, {-1},
             {18}, {13, 18}, {-1}, {18},
             {-1}, {18}, {18}, {18},
             {18}, {18}, {-1}
     };
 
-    private static int[][] detailsKnown = {
+    private static final int[][] detailsKnown = {
             {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 19, 20, 21, 22, 23, 24, 25, 26, 27},
             {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27},
             {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27},
@@ -108,50 +108,50 @@ public class ParallelJVMConfigurationTest extends LogDiaryTest {
             {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27},
     };
 
-    private static String[] a170gcCause = {
+    private static final String[] a170gcCause = {
             "1.7.0.parallel.log",
             "psyoung.log",
             "psyoung.nt.wd.log"
     };
 
-    private static boolean[][] a170gcCauseDiary = {
+    private static final boolean[][] a170gcCauseDiary = {
             //    0,     1,     2,     3,     4,     5,     6,     7,     8,     9,    10,    11,    12,    13,    14,    15,    16,    17,    18,    19,    20,    21,    22,    23,    24,    25,    26,    27
              {false, false, false, false, false, false,  true,  true, false, false, false, false,  true, false,  true, false, false,  true, false, false, false, false, false, false, false},
              {false, false, false, false, false, false,  true,  true, false, false, false, false,  true,  true,  true, false, false,  true, false, false, false, false, false, false, false},
              {false, false, false, false, false, false,  true,  true, false, false, false, false,  true, false,  true, false, false,  true, false, false, false, false, false, false, false},
     };
 
-    private static int[][] a170gcCauseUnknown = {
+    private static final int[][] a170gcCauseUnknown = {
             {-1},
             {-1},
             {-1}
     };
 
-    private static int[][] a170CauseKnown = {
+    private static final int[][] a170CauseKnown = {
             {-1},
             {-1},
             {-1}
     };
 
-    private static String[] a180gcCause = {
+    private static final String[] a180gcCause = {
             "ps.negative.recovery80.log"
     };
 
     //PrintTenuringDistribution is set but it cannot be seen in the log as there are only Full collections.
-    private static boolean[][] a180gcCauseDiary = {
+    private static final boolean[][] a180gcCauseDiary = {
             //    0,     1,     2,     3,     4,     5,     6,     7,     8,     9,    10,    11,    12,    13,    14,    15,    16,    17,    18,    19,    20,    21,    22,    23,    24,    25,    26,    27
              { true, false, false, false, false, false,  true,  true, false, false, false, false,  true,  true,  true, false, false, false, false,  true, false, false, false, false, false},
     };
 
-    private static int[][] a180gcCauseKnown = {
+    private static final int[][] a180gcCauseKnown = {
             {-1}
     };
 
-    private static int[][] a180gcCauseUnknown = {
+    private static final int[][] a180gcCauseUnknown = {
             {-1}
     };
 
-    private static String[] detailsTenuring = {
+    private static final String[] detailsTenuring = {
             "ps/details/tenuring/853_gc.log",
             "ps/details/tenuring/949_par.par.wd.wt.log",
             "ps/details/tenuring/933_def.par.wd.wt.log",
@@ -164,7 +164,7 @@ public class ParallelJVMConfigurationTest extends LogDiaryTest {
             "ps/details/tenuring/psy.par.wd.wt.log"
     };
 
-    private static boolean[][] detailsTenuringDiary = {
+    private static final boolean[][] detailsTenuringDiary = {
             //    0,     1,     2,     3,     4,     5,     6,     7,     8,     9,    10,    11,    12,    13,    14,    15,    16,    17,    18,    19,    20,    21,    22,    23,    24,    25,    26,    27
              {false, false, false, false, false, false,  true,  true, false, false, false, false,  true,  true, false, false, false,  true, false, false, false, false, false, false, false},
              {false, false, false, false, false, false,  true,  true, false, false, false, false,  true,  true, false, false, false,  true,  true, false, false, false, false, false, false},
@@ -178,7 +178,7 @@ public class ParallelJVMConfigurationTest extends LogDiaryTest {
              {false, false, false, false, false, false,  true,  true, false, false, false, false,  true,  true, false, false, false,  true, false, false, false, false, false, false, false}
     };
 
-    private static int[][] detailsTenuringUnknown = {
+    private static final int[][] detailsTenuringUnknown = {
             {-1},
             {-1}, {-1}, {-1}, {-1},
             {-1},
@@ -186,7 +186,7 @@ public class ParallelJVMConfigurationTest extends LogDiaryTest {
             {-1}
     };
 
-    private static int[][] detailsTenuringKnown = {
+    private static final int[][] detailsTenuringKnown = {
             {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25},
             {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25},
             {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25},
@@ -199,20 +199,20 @@ public class ParallelJVMConfigurationTest extends LogDiaryTest {
             {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25}
     };
 
-    private static String[] detailsTenuring80 = {
+    private static final String[] detailsTenuring80 = {
             "1398331617.vgc"
     };
 
-    private static boolean[][] detailsTenuring80Diary = {
+    private static final boolean[][] detailsTenuring80Diary = {
             //    0,     1,     2,     3,     4,     5,     6,     7,     8,     9,    10,    11,    12,    13,    14,    15,    16,    17,    18,    19,    20,    21,    22,    23,    24,    25,    26,    27
              {false, false, false, false, false, false,  true,  true, false, false, false, false,  true,  true,  true, false, false, false, false,  true, false, false, false, false, false}
     };
 
-    private static int[][] detailsTenuring80Unknown = {
+    private static final int[][] detailsTenuring80Unknown = {
             {-1}
     };
 
-    private static int[][] detailsTenuring80Known = {
+    private static final int[][] detailsTenuring80Known = {
             {-1}
     };
 
@@ -224,20 +224,20 @@ public class ParallelJVMConfigurationTest extends LogDiaryTest {
         }
     }
 
-    private static String[] detailsTenuringAdpativeSizing = {
+    private static final String[] detailsTenuringAdpativeSizing = {
             "ps/details/tenuring/adaptive_sizing/icap.log"
     };
 
-    private static boolean[][] detailsTenuringAdaptiveSizingDiary = {
+    private static final boolean[][] detailsTenuringAdaptiveSizingDiary = {
             //    0,     1,     2,     3,     4,     5,     6,     7,     8,     9,    10,    11,    12,    13,    14,    15,    16,    17,    18,    19,    20,    21,    22,    23,    24,    25,    26,    27
              { true, false, false, false, false, false,  true,  true, false, false,  false, false, true,  true,  true, false,  true, false, false,  true, false, false, false, false, false}
     };
 
-    private static int[][] detailsTenuringAdaptiveSizingDiaryUnknown = {
+    private static final int[][] detailsTenuringAdaptiveSizingDiaryUnknown = {
             {-1}
     };
 
-    private static int[][] detailsTenuringAdaptiveSizingDiaryKnown = {
+    private static final int[][] detailsTenuringAdaptiveSizingDiaryKnown = {
             {-1}
     };
 }

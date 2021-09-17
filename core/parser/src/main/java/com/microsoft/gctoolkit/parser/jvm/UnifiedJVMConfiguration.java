@@ -22,8 +22,8 @@ public class UnifiedJVMConfiguration implements ShenandoahPatterns, ZGCPatterns,
     private static final int MAXIMUM_LINES_TO_EXAMINE = 10_000; // duplicated in PreUnifedJVMConfiguration
     private int lineCount = MAXIMUM_LINES_TO_EXAMINE;
 
-    private LoggingDiary diary;
-    private TreeSet<String> tagsAndLevels = new TreeSet<>();
+    private final LoggingDiary diary;
+    private final TreeSet<String> tagsAndLevels = new TreeSet<>();
     private DateTimeStamp startTime = null;
     private int collectionCount = 0;
 

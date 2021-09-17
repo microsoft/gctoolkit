@@ -2,9 +2,13 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.vertx.test.io;
 
+import com.microsoft.gctoolkit.event.GCCause;
+import com.microsoft.gctoolkit.event.GCEvent;
+import com.microsoft.gctoolkit.event.generational.DefNew;
 import com.microsoft.gctoolkit.io.GCLogFile;
 import com.microsoft.gctoolkit.io.RotatingGCLogFile;
 import com.microsoft.gctoolkit.io.SingleGCLogFile;
+import com.microsoft.gctoolkit.time.DateTimeStamp;
 import com.microsoft.gctoolkit.vertx.JVMEventSource;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Vertx;
@@ -12,13 +16,13 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.logging.Logger;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
-public class GarbageCollectionEventSourceTest {
+class GarbageCollectionEventSourceTest {
 
     private static final Logger LOG = Logger.getLogger(GarbageCollectionEventSourceTest.class.getName());
 
@@ -30,7 +34,7 @@ public class GarbageCollectionEventSourceTest {
     }
     
     @Test
-    public void testRotatingLogDirectory() {
+    void testRotatingLogDirectory() {
         Path path = new TestLogFile("rotating_directory").getFile().toPath();
         assertExpectedLineCountInLog(72210, loadLogFile(path, true));
     }
@@ -43,31 +47,31 @@ public class GarbageCollectionEventSourceTest {
         }
     */
     @Test
-    public void testGZipTarFileLineCount() {
+    void testGZipTarFileLineCount() {
         Path path = new TestLogFile("streaming/gc.log.tar.gz").getFile().toPath();
         assertExpectedLineCountInLog(410056, loadLogFile(path, false));
     }
 
     @Test
-    public void testSingleLogInZipLineCount() {
+    void testSingleLogInZipLineCount() {
         Path path = new TestLogFile("streaming/gc.log.zip").getFile().toPath();
         assertExpectedLineCountInLog(431604, loadLogFile(path, false));
     }
 
     @Test
-    public void testRotatingLogsLineCount() {
+    void testRotatingLogsLineCount() {
         Path path = new TestLogFile("rotating.zip").getFile().toPath();
         assertExpectedLineCountInLog(72210, loadLogFile(path, true));
     }
 
     @Test
-    public void testRotatingLogsRotatingLineCount() {
+    void testRotatingLogsRotatingLineCount() {
         Path path = new TestLogFile("rotating.zip").getFile().toPath();
         assertExpectedLineCountInLog(72210, loadLogFile(path, true));
     }
 
     @Test
-    public void testZippedDirectoryWithRotatingLogRotatingLineCount() {
+    void testZippedDirectoryWithRotatingLogRotatingLineCount() {
         Path path = new TestLogFile("streaming/rotating_directory.zip").getFile().toPath();
         assertExpectedLineCountInLog(72211, loadLogFile(path, true));
     }
@@ -101,7 +105,7 @@ public class GarbageCollectionEventSourceTest {
 
     class GCLogConsumer extends AbstractVerticle {
 
-        private CountDownLatch eof = new CountDownLatch(1);
+        private final CountDownLatch eof = new CountDownLatch(1);
         private int eventCount = 0;
 
         GCLogConsumer() {
@@ -127,5 +131,11 @@ public class GarbageCollectionEventSourceTest {
         int getEventCount() {
             return eventCount;
         }
+    }
+
+    @Test
+    void testEqualsForDifferentObject() {
+        GCEvent gcEvent = new DefNew(new DateTimeStamp("2018-04-04T09:10:00.586-0100"), GCCause.WARMUP,102);
+        assertNotEquals(gcEvent, new ArrayList<>());
     }
 }

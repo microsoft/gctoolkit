@@ -4,19 +4,20 @@ package com.microsoft.gctoolkit.aggregator;
 
 import com.microsoft.gctoolkit.event.jvm.JVMEvent;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
 /**
  * This is a utility class that supports the {@link Aggregator#register(Class, Consumer)} method.
  */
 public class JVMEventDispatcher {
-    private final Map<Class<? extends JVMEvent>, Consumer<JVMEvent>> eventConsumers = new HashMap<>();
+    private final Map<Class<? extends JVMEvent>, Consumer<JVMEvent>> eventConsumers = new ConcurrentHashMap<>();
 
     private final Consumer<JVMEvent> nopConsumer = (evt) -> {
     };
 
+    @SuppressWarnings("unchecked")
     private <R extends JVMEvent> Consumer<JVMEvent> getConsumerForClass(Class<R> eventClass) {
         Class<? extends JVMEvent> clazz = eventClass;
 
@@ -45,8 +46,8 @@ public class JVMEventDispatcher {
                 // Hit the top of the hierarchy
                 break;
             } else {
-                //Unfortunate cast but assuming register has done its job it is impossible for this cast to fail
-                clazz = (Class<? extends JVMEvent>) clazz.getSuperclass();
+                // Unfortunate cast but assuming register has done its job it is impossible for this cast to fail
+                clazz = (Class<? extends JVMEvent>) clazz.getSuperclass(); // unchecked cast
             }
         } while (clazz != null);
 
@@ -61,8 +62,9 @@ public class JVMEventDispatcher {
      * @param process A method to call back when an event of type {@code eventClass} is captured.
      * @param <R> A type of JVMEvent
      */
+    @SuppressWarnings("unchecked")
     public <R extends JVMEvent> void register(Class<R> eventClass, Consumer<? super R> process) {
-        eventConsumers.put(eventClass, (Consumer<JVMEvent>)process);
+        eventConsumers.put(eventClass, (Consumer<JVMEvent>)process); // unchecked cast
     }
 
     /**
