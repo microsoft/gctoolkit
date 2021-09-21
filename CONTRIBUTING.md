@@ -28,7 +28,10 @@ You must also add `github` as a server in your `~/.m2/settings.xml` file. Replac
       <password>TOKEN</password>
     </server>
 ```
+## Submit an Issue
 
+if you wish to contribute to GCSToolkit we would kindly ask that you submit an issue to the issue tracker. Doing so will help with the management of the project.
+ 
 ## Build
 
 The build is vanilla Maven.
