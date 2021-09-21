@@ -8,7 +8,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>core</artifactId>
+    <artifactId>gctoolkit-core</artifactId>
     <packaging>pom</packaging>
     <modules>
         <module>api</module>
