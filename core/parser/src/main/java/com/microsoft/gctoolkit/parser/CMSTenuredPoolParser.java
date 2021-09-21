@@ -21,7 +21,7 @@ public class CMSTenuredPoolParser extends PreUnifiedGCLogParser implements Simpl
 
     private final static Logger LOG = Logger.getLogger(CMSTenuredPoolParser.class.getName());
     private DateTimeStamp startOfPhase = null;
-    GCParseRule EndOfFile = new GCParseRule("END_OF_DATA_SENTINAL", END_OF_DATA_SENTINAL);
+    private GCParseRule EndOfFile = new GCParseRule("END_OF_DATA_SENTINAL", END_OF_DATA_SENTINAL);
 
     public CMSTenuredPoolParser(LoggingDiary diary, JVMEventConsumer eventConsumer) {
         super(diary, eventConsumer);

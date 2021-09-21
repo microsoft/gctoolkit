@@ -8,8 +8,8 @@ import com.microsoft.gctoolkit.time.DateTimeStamp;
 
 abstract public class CMSConcurrentEvent extends GenerationalGCEvent implements CMSPhase {
 
-    double cpuTime;
-    double wallClockTime;
+    private double cpuTime;
+    private double wallClockTime;
 
     protected CMSConcurrentEvent(DateTimeStamp timeStamp, GarbageCollectionTypes type, GCCause cause, double duration, double cpuTime, double wallClockTime) {
         super(timeStamp, type, cause, duration);

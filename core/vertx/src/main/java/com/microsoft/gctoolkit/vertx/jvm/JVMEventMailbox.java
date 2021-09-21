@@ -6,8 +6,9 @@ import io.vertx.core.AbstractVerticle;
 
 public class JVMEventMailbox extends AbstractVerticle {
 
-    private JVMEventSink sinkPoint;
-    private String lineSource, eventSource;
+    private final JVMEventSink sinkPoint;
+    private final String lineSource;
+    private final String eventSource;
 
     public JVMEventMailbox(String lineSource, String eventSource, JVMEventSink sinkPoint) {
         this.lineSource = lineSource;

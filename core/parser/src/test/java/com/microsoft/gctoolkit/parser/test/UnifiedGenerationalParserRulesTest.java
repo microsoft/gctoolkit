@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.logging.Logger;
 
+import static com.microsoft.gctoolkit.parser.test.CommonTestHelper.captureTest;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class UnifiedGenerationalParserRulesTest implements UnifiedGenerationalPatterns {
@@ -33,19 +34,10 @@ public class UnifiedGenerationalParserRulesTest implements UnifiedGenerationalPa
 
     @Test
     public void testUnifiedLoggingDecorators() {
-        for (int i = 0; i < decoratorLines.length; i++) {
-            Decorators decorators = new Decorators(decoratorLines[i]);
+        for (String decoratorLine : decoratorLines) {
+            Decorators decorators = new Decorators(decoratorLine);
             assertTrue(decorators.getNumberOfDecorators() != 0);
         }
-    }
-
-    private int captureTest(GCParseRule rule, String[] lines) {
-        int captureCount = 0;
-        for (int i = 0; i < lines.length; i++)
-            if (rule.parse(lines[i]) != null) {
-                captureCount++;
-            }
-        return captureCount;
     }
 
     // Convenience test for debugging single rules
@@ -68,9 +60,9 @@ public class UnifiedGenerationalParserRulesTest implements UnifiedGenerationalPa
         }
     }
 
-    private String PARALLEL_PHASES = "(Marking Phase|Summary Phase|Adjust Roots|Compaction Phase|Post Compact)";
+    private final static String PARALLEL_PHASES = "(Marking Phase|Summary Phase|Adjust Roots|Compaction Phase|Post Compact)";
 
-    GCParseRule[] rules = {
+    private GCParseRule[] rules = {
             YOUNG_DETAILS,                  //   0
             CPU_BREAKOUT,
             YOUNG_HEADER,
@@ -95,7 +87,7 @@ public class UnifiedGenerationalParserRulesTest implements UnifiedGenerationalPa
             METASPACE_DETAILED
     };
 
-    String[][] lines = {
+    private String[][] lines = {
             {   //  0
                     "[0.170s][info ][gc           ] GC(1) Pause Young (Allocation Failure) 19M->2M(61M) 5.221ms",
             },
@@ -201,7 +193,7 @@ public class UnifiedGenerationalParserRulesTest implements UnifiedGenerationalPa
             }
     };
 
-    String[] decoratorLines = {
+    private String[] decoratorLines = {
             "[2018-04-04T09:10:00.586-0100][0.018s][1522825800586ms][18ms][10026341461044ns][17738937ns][1375][7427][info][gc] Using Concurrent Mark Sweep",
             "[0.018s][1522825800586ms][18ms][10026341461044ns][17738937ns][1375][7427][info][gc] Using Concurrent Mark Sweep",
             "[0.018s][1522825800586ms][7427][info][gc] Using Concurrent Mark Sweep",

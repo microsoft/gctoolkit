@@ -3,12 +3,12 @@
 package com.microsoft.gctoolkit.vertx.jvm;
 
 import com.microsoft.gctoolkit.event.jvm.JVMEvent;
+import com.microsoft.gctoolkit.util.concurrent.StartingGun;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.eventbus.DeliveryOptions;
 import com.microsoft.gctoolkit.parser.GCLogParser;
 import com.microsoft.gctoolkit.parser.JVMEventConsumer;
 
-import java.util.concurrent.CountDownLatch;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -18,7 +18,8 @@ public class LogFileParser extends AbstractVerticle implements JVMEventConsumer 
     protected static final Logger LOGGER = Logger.getLogger(LogFileParser.class.getName());
     private final GCLogParser parser;
 
-    private String inbox, outbox;
+    private final String inbox;
+    private final String outbox;
 
     public LogFileParser(String inbox, String outbox, ParserFactory factory) {
         this.inbox = inbox;
@@ -26,7 +27,7 @@ public class LogFileParser extends AbstractVerticle implements JVMEventConsumer 
         parser = factory.get(this);
     }
 
-    private DeliveryOptions options = new DeliveryOptions().setCodecName("JVMEvent");
+    private final DeliveryOptions options = new DeliveryOptions().setCodecName("JVMEvent");
 
     public void record(JVMEvent event) {
         try {
@@ -41,13 +42,10 @@ public class LogFileParser extends AbstractVerticle implements JVMEventConsumer 
     }
 
     //Vert.x
-    private CountDownLatch deployed = new CountDownLatch(1);
+    private final StartingGun deployed = new StartingGun();
 
     public void awaitDeployment() {
-        try {
-            deployed.await();
-        } catch (InterruptedException e) {
-        }
+        deployed.awaitUninterruptibly();
     }
 
     @Override
@@ -62,6 +60,6 @@ public class LogFileParser extends AbstractVerticle implements JVMEventConsumer 
                         LOGGER.throwing(this.getClass().getName(), "start", t);
                     }
                 });
-        deployed.countDown();
+        deployed.ready();
     }
 }

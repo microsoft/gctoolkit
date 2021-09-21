@@ -4,10 +4,10 @@ package com.microsoft.gctoolkit.event;
 
 public class MemoryPoolSummary {
 
-    private long occupancyBeforeCollection;
-    private long sizeBeforeCollection;
-    private long occupancyAfterCollection;
-    private long sizeAfterCollection;
+    private final long occupancyBeforeCollection;
+    private final long sizeBeforeCollection;
+    private final long occupancyAfterCollection;
+    private final long sizeAfterCollection;
 
     public MemoryPoolSummary(long occupancyBeforeCollection, long sizeBeforeCollection, long occupancyAfterCollection, long sizeAfterCollection) {
         this.occupancyBeforeCollection = occupancyBeforeCollection;

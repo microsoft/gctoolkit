@@ -4,7 +4,7 @@ package com.microsoft.gctoolkit.event;
 
 public class UnifiedStatisticalSummary extends StatisticalSummary {
 
-    private int threads;
+    private final int threads;
 
     public UnifiedStatisticalSummary(double min, double average, double max, double diff, double sum, int threads) {
         super(min, average, max, diff, sum);

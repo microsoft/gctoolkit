@@ -4,7 +4,9 @@ package com.microsoft.gctoolkit.parser;
 
 import com.microsoft.gctoolkit.parser.vmops.SafepointTrace;
 
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -15,9 +17,9 @@ import java.util.regex.Pattern;
  */
 public class SafepointParseRule {
 
-    private static final ConcurrentHashMap<SafepointParseRule, AtomicInteger> hits = new ConcurrentHashMap<SafepointParseRule, AtomicInteger>();
-    private static final ConcurrentHashMap<SafepointParseRule, AtomicInteger> misses = new ConcurrentHashMap<SafepointParseRule, AtomicInteger>();
-    private static final ConcurrentHashMap<SafepointParseRule, Throwable> origin = new ConcurrentHashMap<SafepointParseRule, Throwable>();
+    private static final ConcurrentMap<SafepointParseRule, AtomicInteger> hits = new ConcurrentHashMap<>();
+    private static final ConcurrentMap<SafepointParseRule, AtomicInteger> misses = new ConcurrentHashMap<>();
+    private static final ConcurrentMap<SafepointParseRule, Throwable> origin = new ConcurrentHashMap<>();
 
     final private Pattern pattern;
 
@@ -64,15 +66,15 @@ public class SafepointParseRule {
         count.getAndIncrement();
     }
 
-    public static ConcurrentHashMap<SafepointParseRule, AtomicInteger> getHits() {
+    public static ConcurrentMap<SafepointParseRule, AtomicInteger> getHits() {
         return hits;
     }
 
-    public static ConcurrentHashMap<SafepointParseRule, AtomicInteger> getMisses() {
+    public static ConcurrentMap<SafepointParseRule, AtomicInteger> getMisses() {
         return misses;
     }
 
-    public static ConcurrentHashMap<SafepointParseRule, Throwable> getOrigin() {
+    public static ConcurrentMap<SafepointParseRule, Throwable> getOrigin() {
         return origin;
     }
 

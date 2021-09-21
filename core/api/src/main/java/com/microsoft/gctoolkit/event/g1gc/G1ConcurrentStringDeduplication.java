@@ -12,10 +12,10 @@ import com.microsoft.gctoolkit.time.DateTimeStamp;
 
 public class G1ConcurrentStringDeduplication extends G1GCConcurrentEvent {
 
-    double startingStringVolume;
-    double endingStringVolume;
-    double reduction;
-    double percentReduction;
+    private double startingStringVolume;
+    private double endingStringVolume;
+    private double reduction;
+    private double percentReduction;
 
     public G1ConcurrentStringDeduplication(DateTimeStamp timeStamp, double startingStringVolume, double endingStringVolume, double reduction, double percentReduction, double duration) {
         this(timeStamp, GCCause.GCCAUSE_NOT_SET, startingStringVolume, endingStringVolume, reduction, percentReduction, duration);

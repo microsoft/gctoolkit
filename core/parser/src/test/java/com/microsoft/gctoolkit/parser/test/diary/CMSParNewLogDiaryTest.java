@@ -41,7 +41,7 @@ public class CMSParNewLogDiaryTest extends LogDiaryTest {
     }
 
 
-    private static String[] cmsParNewDetails = {
+    private static final String[] cmsParNewDetails = {
             "1073_1.log",
             "LS_gc.log.20121116_193624",
             "TC_oy579c2n5.gc.out",
@@ -54,7 +54,7 @@ public class CMSParNewLogDiaryTest extends LogDiaryTest {
             "tidied_gc_www1_2013_10_19.log"
     };
 
-    private static boolean[][] cmsParNewDetailsDiary = {
+    private static final boolean[][] cmsParNewDetailsDiary = {
             //    0      1     2     3     4      5      6      7      8      9    10     11     12     13     14    15     16     17     18     19     20     21     22     23     24     25     26     27
             {false, false, false, true, true, false, false, false, false, false, false, false, true, false, false, false, false, true, false, false, false, false, false, false, false, false, false, false},
             {false, false, false, true, true, false, false, false, false, false, false, false, true, false, false, false, false, true, false, false, false, false, false, false, false, false, false, false},
@@ -68,15 +68,15 @@ public class CMSParNewLogDiaryTest extends LogDiaryTest {
             {false, false, false, true, true, false, false, false, false, false, false, false, true, false, false, false, false, true,  true, false, false, false, false, false, false, false, false, false},
     };
 
-    private static int[][] cmsParNewDetailsUnknown = {
+    private static final int[][] cmsParNewDetailsUnknown = {
             {18}, {18}, {18}, {18}, {18}, {18}, {-1}, {-1}, {-1}, {-1}
     };
 
-    private static int[][] cmsParNewDetailsKnown = {
+    private static final int[][] cmsParNewDetailsKnown = {
             {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}
     };
 
-    private static String[] cmsParNewDetailsTenuring = {
+    private static final String[] cmsParNewDetailsTenuring = {
             "239_1280857178635par.cms.wd.wt.log",
             "36bbe73f-181c-485b-b162-de2731668227-1390297131935.log",
             "705_pa1.log",
@@ -99,7 +99,7 @@ public class CMSParNewLogDiaryTest extends LogDiaryTest {
             "parnew.details.tenuring.cause.18020.log"
     };
 
-    private static boolean[][] cmsParNewDetailsTenuringDiary = {
+    private static final boolean[][] cmsParNewDetailsTenuringDiary = {
             //   0      1      2      3      4      5      6      7      8      9     10     11     12     13     14     15     16     17     18     19     20     21     22     23     24     25     26     27
             {false, false, false,  true,  true, false, false, false, false, false, false, false,  true,  true, false, false, false,  true,  true, false, false, false, false, false, false, false, false, false},
             {false, false, false,  true,  true, false, false, false, false, false, false, false,  true,  true, false, false, false,  true, false, false, false, false, false, false, false, false, false, false},
@@ -123,7 +123,7 @@ public class CMSParNewLogDiaryTest extends LogDiaryTest {
             {false, false, false,  true,  true, false, false, false, false, false, false, false,  true,  true,  true, false, false, false, false,  true, false, false, false, false, false, false, false, false}
     };
 
-    private static int[][] cmsParNewDetailsTenuringUnknown = {
+    private static final int[][] cmsParNewDetailsTenuringUnknown = {
             {-1}, {-1},
             {5, 18}, {-1}, {-1},
             {-1}, {-1}, {-1},
@@ -134,7 +134,7 @@ public class CMSParNewLogDiaryTest extends LogDiaryTest {
 
     };
 
-    private static int[][] cmsParNewDetailsTenuringKnown = {
+    private static final int[][] cmsParNewDetailsTenuringKnown = {
             {-1}, {-1},
             {0, 1, 2, 3, 4, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 19, 20, 21, 22, 23, 24, 25, 26, 27},
             {-1}, {-1}, {-1},
@@ -147,7 +147,7 @@ public class CMSParNewLogDiaryTest extends LogDiaryTest {
             {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21}
     };
 
-    private static String[] cms = {
+    private static final String[] cms = {
             "530_gc.log",
             "718_SERVER.gc_100315_163149.log",
             "815_gc.log",
@@ -157,7 +157,7 @@ public class CMSParNewLogDiaryTest extends LogDiaryTest {
             "parnew.cms.nd.log"
     };
 
-    private static boolean[][] cmsDiary = {
+    private static final boolean[][] cmsDiary = {
             //    0     1      2      3      4      5      6      7      8      9     10     11     12     13     14     15     16     17     18     19     20     21     22     23     24     25     26     27
             {false, false, false,  true,  true, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false},
             {false, false, false,  true,  true, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false},
@@ -168,7 +168,7 @@ public class CMSParNewLogDiaryTest extends LogDiaryTest {
             {false, false, false,  true,  true, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false}
     };
 
-    private static int[][] cmsUnknown = {
+    private static final int[][] cmsUnknown = {
             {-1},
             {-1},
             {-1},
@@ -179,7 +179,7 @@ public class CMSParNewLogDiaryTest extends LogDiaryTest {
     };
 
     //known but are not true
-    private static int[][] cmsKnown = {
+    private static final int[][] cmsKnown = {
             {0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27},
             {0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27},
             {0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27},
@@ -189,24 +189,24 @@ public class CMSParNewLogDiaryTest extends LogDiaryTest {
             {0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27}
     };
 
-    private static String[] cmsParNewDetailsGCCause170 = {
+    private static final String[] cmsParNewDetailsGCCause170 = {
             "1.7.0_cms_mixed.log",
             "1.7.0_cms.log"
     };
 
-    private static boolean[][] cmsParNewDetailsGCCause170Diary = {
+    private static final boolean[][] cmsParNewDetailsGCCause170Diary = {
             //   0      1      2      3      4      5      6      7      8      9     10     11     12     13     14     15     16     17     18     19     20     21     22     23     24     25     26     27
             {false, false, false,  true,  true, false, false, false, false, false, false, false,  true, false,  true, false, false, false, false, false, false, false, false, false, false, false, false, false},
             {false, false, false,  true,  true, false, false, false, false, false, false, false,  true, false,  true, false, false, false, false, false, false, false, false, false, false, false, false, false}
     };
 
-    private static int[][] cmsParNewDetailsGCCause170Unknown = {
+    private static final int[][] cmsParNewDetailsGCCause170Unknown = {
             {17, 19},
             {17, 19}
     };
 
     //known but are not true
-    private static int[][] cmsParNewDetailsGCCause170Known = {
+    private static final int[][] cmsParNewDetailsGCCause170Known = {
             {-1},
             {-1}
     };

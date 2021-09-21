@@ -42,7 +42,7 @@ Recent concurrent refinement statistics
 */
 public class RSetConcurrentRefinement {
 
-    ConcurrentRefinementStatistics concurrentRefinementStatistics;
+    private ConcurrentRefinementStatistics concurrentRefinementStatistics;
     private int totalPerRegionRSetSize;
     private int maxPerRegionRSetSize;
 

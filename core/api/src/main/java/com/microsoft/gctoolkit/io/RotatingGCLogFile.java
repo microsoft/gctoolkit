@@ -38,12 +38,12 @@ public class RotatingGCLogFile extends GCLogFile {
 
     private static boolean isUnifiedLogging(Path path) {
         try {
-            final FileDataSourceMetaData metadata = new FileDataSourceMetaData(path);
+            FileDataSourceMetaData metadata = new FileDataSourceMetaData(path);
 
-            final List<GarbageCollectionLogFileSegment> segments;
+            List<GarbageCollectionLogFileSegment> segments;
             if (metadata.isZip() || metadata.isGZip()) {
                 //TODO: add code to ensure correct order to stream files in zip and gzip files
-                segments = Collections.EMPTY_LIST;
+                segments = List.of();
             } else {
                 segments = findGCLogSegments(path);
             }
@@ -189,9 +189,9 @@ public class RotatingGCLogFile extends GCLogFile {
     private static List<GarbageCollectionLogFileSegment> findGCLogSegments(Path path) throws IOException {
 
         if (Files.isRegularFile(path)) {
-            final String filename = path.getFileName().toString();
-            final Matcher matcher = ROTATING_LOG_PATTERN.matcher(filename);
-            final String rotatingLogBaseName;
+            String filename = path.getFileName().toString();
+            Matcher matcher = ROTATING_LOG_PATTERN.matcher(filename);
+            String rotatingLogBaseName;
             if (matcher.matches()) {
                 String suffix = matcher.group(1);
                 rotatingLogBaseName = filename.substring(0, filename.length()-suffix.length());

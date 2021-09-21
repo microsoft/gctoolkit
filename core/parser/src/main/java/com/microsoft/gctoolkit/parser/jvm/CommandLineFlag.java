@@ -32,7 +32,7 @@ public enum CommandLineFlag {
         return getEnumFromString(name);
     }
 
-    private String label;
+    private final String label;
 
     CommandLineFlag(String label) {
         this.label = label;

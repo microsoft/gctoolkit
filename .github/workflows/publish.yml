@@ -33,12 +33,12 @@ jobs:
           git config user.name "GitHub Actions"
           
       - name: Prepare the release
-        run: mvn -B release:prepare -DpushChanges=false --settings $GITHUB_WORKSPACE/settings.xml
+        run: ./mvnw -B release:prepare -DpushChanges=false --settings $GITHUB_WORKSPACE/settings.xml
         env:
           GITHUB_TOKEN: ${{ github.token }}
 
       - name: Perform the release
-        run: mvn -B release:perform -DlocalCheckout=true -Darguments="-DskipTests -Dmaven.javadoc.skip=true"  --settings $GITHUB_WORKSPACE/settings.xml
+        run: ./mvnw -B release:perform -DlocalCheckout=true -Darguments="-DskipTests -Dmaven.javadoc.skip=true"  --settings $GITHUB_WORKSPACE/settings.xml
         env:
           GITHUB_TOKEN: ${{ github.token }}
 

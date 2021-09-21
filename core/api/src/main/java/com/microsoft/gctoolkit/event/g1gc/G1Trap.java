@@ -21,13 +21,13 @@ public class G1Trap extends G1GCPauseEvent {
 
     private static final Logger LOGGER = Logger.getLogger(G1Trap.class.getName());
 
-    private String message = "Internal EventSource Error @ ";
+    private static final String message = "Internal EventSource Error @ ";
 
     public G1Trap() {
         super(new DateTimeStamp(0.0d), GarbageCollectionTypes.G1Trap, GCCause.UNKNOWN_GCCAUSE, 0.0d);
     }
 
-    int errorCount = 0;
+    private int errorCount = 0;
 
     private void trap(Exception e) {
         if (errorCount > 100) return;
@@ -150,6 +150,6 @@ public class G1Trap extends G1GCPauseEvent {
         trap(new Exception());
     }
 
-    public void execute(Aggregator aggregator) {
+    public void execute(Aggregator<?> aggregator) {
     }
 }

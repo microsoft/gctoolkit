@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 public class TLABSummary {
 
-    ArrayList<String> tlabRecords;
+    private ArrayList<String> tlabRecords;
 
     public TLABSummary() {
     }

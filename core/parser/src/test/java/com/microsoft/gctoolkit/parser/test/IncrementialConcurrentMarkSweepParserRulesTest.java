@@ -13,16 +13,16 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class IncrementialConcurrentMarkSweepParserRulesTest implements ICMSPatterns {
 
-    private static Logger LOGGER = Logger.getLogger(IncrementialConcurrentMarkSweepParserRulesTest.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(IncrementialConcurrentMarkSweepParserRulesTest.class.getName());
 
-    private GCParseRule[] rules = {
+    private final GCParseRule[] rules = {
             iCMS_FULL,
             iCMS_PARNEW,
             iCMS_PARNEW_PROMOTION_FAILURE_RECORD,
             iCMS_PARNEW_PROMOTION_FAILURE
     };
 
-    String[][] lines = {
+    private String[][] lines = {
             {
                     "2015-09-02T12:08:51.106+0200: 36341.777: [Full GC (System) 2015-09-02T12:08:51.106+0200: 36341.778: [CMS: 3067214K->899382K(3397600K), 5.5353585 secs] 3234199K->899382K(4160928K), [CMS Perm : 160338K->160194K(262144K)] icms_dc=3 , 5.5414287 secs]"
             },
