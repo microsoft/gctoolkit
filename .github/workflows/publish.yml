@@ -1,8 +1,12 @@
 name: Publish package to GitHub Packages
 
 on:
-  release:
-    types: [created]
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: "Branch to release from"
+        required: true
+        default: "main"
 
 jobs:
   publish:
@@ -39,14 +43,8 @@ jobs:
           git config user.name "GitHub Actions"
           
       - name: Release
-        run: ./mvnw -B release:prepare release:perform -Drelease=true
+        run: ./mvnw -Darguments="-Drelease=true" -B release:prepare release:perform -Drelease=true
         env:
           MAVEN_USERNAME: ${{ secrets.SONATYPE_NAME }}
           MAVEN_CENTRAL_TOKEN: ${{ secrets.SONATYPE_PASSWORD }}
           MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
-
-      - name: Bump pom version
-        run : git push
-
-      - name: Push tags
-        run: git push --tags
