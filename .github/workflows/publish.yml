@@ -1,12 +1,7 @@
-name: Publish package to GitHub Packages
+name: Publish to Maven Central
 
 on:
   workflow_dispatch:
-    inputs:
-      branch:
-        description: "Branch to release from"
-        required: true
-        default: "main"
 
 jobs:
   publish:
@@ -43,7 +38,11 @@ jobs:
           git config user.name "GitHub Actions"
           
       - name: Release
-        run: ./mvnw -Darguments="-Drelease=true" -B release:prepare release:perform -Drelease=true
+        run: |
+          export GPG_TTY=$(tty)
+          ./mvnw -Darguments="-Drelease=true" -B release:prepare release:perform -Drelease=true \
+            -Drepository.url=https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+
         env:
           MAVEN_USERNAME: ${{ secrets.SONATYPE_NAME }}
           MAVEN_CENTRAL_TOKEN: ${{ secrets.SONATYPE_PASSWORD }}
