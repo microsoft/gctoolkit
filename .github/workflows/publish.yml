@@ -39,7 +39,7 @@ jobs:
           git config user.name "GitHub Actions"
           
       - name: Release
-        run: ./mvnw -B release:prepare release:perform -Prelease
+        run: ./mvnw -B release:prepare release:perform -Drelease=true
         env:
           MAVEN_USERNAME: ${{ secrets.SONATYPE_NAME }}
           MAVEN_CENTRAL_TOKEN: ${{ secrets.SONATYPE_PASSWORD }}
