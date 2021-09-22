@@ -3,7 +3,7 @@
     <parent>
         <artifactId>gctoolkit</artifactId>
         <groupId>com.microsoft.gctoolkit</groupId>
-        <version>2.0.2-SNAPSHOT</version>
+        <version>2.0.2</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
