@@ -15,7 +15,7 @@ import java.util.zip.ZipFile;
  */
 public class FileDataSourceMetaData {
 
-    private final static Logger LOG = Logger.getLogger(FileDataSourceMetaData.class.getName());
+    private static final Logger LOG = Logger.getLogger(FileDataSourceMetaData.class.getName());
 
     private static final int GZIP_MAGIC1 = 0x1F;
     private static final int GZIP_MAGIC2 = 0x8b;

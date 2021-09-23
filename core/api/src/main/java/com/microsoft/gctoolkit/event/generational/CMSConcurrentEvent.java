@@ -6,7 +6,7 @@ import com.microsoft.gctoolkit.event.GCCause;
 import com.microsoft.gctoolkit.event.GarbageCollectionTypes;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
 
-abstract public class CMSConcurrentEvent extends GenerationalGCEvent implements CMSPhase {
+public abstract class CMSConcurrentEvent extends GenerationalGCEvent implements CMSPhase {
 
     private double cpuTime;
     private double wallClockTime;

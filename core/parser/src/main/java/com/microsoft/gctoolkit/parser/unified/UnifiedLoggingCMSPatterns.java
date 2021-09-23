@@ -15,14 +15,14 @@ public interface UnifiedLoggingCMSPatterns extends UnifiedLoggingTokens {
 [1.169s][info   ][gc,cpu      ] GC(0) User=4.60s Sys=0.26s Real=0.92s
      */
 
-//    public final static String DECIMAL_POINT = "(?:\\.|,)";
-//    public final static String INTEGER = "\\d+";
-//    public final static String REAL_NUMBER = INTEGER + DECIMAL_POINT + INTEGER;
-//    public final static String PERCENTAGE = REAL_NUMBER + "\\s?%";
-//    public final static String COUNTER = "(" + INTEGER +")";
-//    public final static String TIME = REAL_NUMBER + "s";
-//    public final static String LOG_LEVEL= "(debug|info|warning|fine|finest)";
-//    public final static String TAG = "(\\w+),?";
+//    public static final String DECIMAL_POINT = "(?:\\.|,)";
+//    public static final String INTEGER = "\\d+";
+//    public static final String REAL_NUMBER = INTEGER + DECIMAL_POINT + INTEGER;
+//    public static final String PERCENTAGE = REAL_NUMBER + "\\s?%";
+//    public static final String COUNTER = "(" + INTEGER +")";
+//    public static final String TIME = REAL_NUMBER + "s";
+//    public static final String LOG_LEVEL= "(debug|info|warning|fine|finest)";
+//    public static final String TAG = "(\\w+),?";
 
     /*
 [0.165s][info ][gc,start     ] GC(1) Pause Young (Allocation Failure)

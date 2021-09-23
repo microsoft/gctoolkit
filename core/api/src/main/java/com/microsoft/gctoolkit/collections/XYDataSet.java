@@ -72,8 +72,8 @@ public class XYDataSet {
 
     public static class Point {
 
-        final private Number x;
-        final private Number y;
+        private final Number x;
+        private final Number y;
 
         public Point(Number x, Number y) {
             this.x = x;

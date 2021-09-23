@@ -51,7 +51,7 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
     private G1GCForwardReference forwardReference;
     private boolean concurrentPhaseActive = false;
 
-    final private RuleSet<GCParseRule, BiConsumer<GCLogTrace, String>> parseRules;
+    private final RuleSet<GCParseRule, BiConsumer<GCLogTrace, String>> parseRules;
 
     {
         parseRules = new RuleSet<>();

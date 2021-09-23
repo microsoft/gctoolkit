@@ -8,7 +8,7 @@ import com.microsoft.gctoolkit.event.GCEvent;
 import com.microsoft.gctoolkit.event.GarbageCollectionTypes;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
 
-abstract public class G1GCEvent extends GCEvent {
+public abstract class G1GCEvent extends GCEvent {
 
     public G1GCEvent(DateTimeStamp timeStamp, GarbageCollectionTypes type, GCCause cause, double duration) {
         super(timeStamp, type, cause, duration);
