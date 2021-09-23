@@ -31,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class UnifiedGenerationalParserTest extends ParserTest {
 
-    ArrayList<JVMEvent> jvmEvents;
+    private ArrayList<JVMEvent> jvmEvents;
 
     private LoggingDiary getDiary(String[] input) {
         UnifiedJVMConfiguration configuration = new UnifiedJVMConfiguration();

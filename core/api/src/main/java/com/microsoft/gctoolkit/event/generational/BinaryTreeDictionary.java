@@ -4,11 +4,11 @@ package com.microsoft.gctoolkit.event.generational;
 
 public class BinaryTreeDictionary {
 
-    long totalFreeSpace;
-    long maxChunkSize;
-    int numberOfBlocks;
-    long averageBlockSize;
-    int treeHeight;
+    private long totalFreeSpace;
+    private long maxChunkSize;
+    private int numberOfBlocks;
+    private long averageBlockSize;
+    private int treeHeight;
 
     public BinaryTreeDictionary(long totalFreeSpace, long maxChunkSize, int numberOfBlocks, long averageBlockSize, int treeHeight) {
         this.totalFreeSpace = totalFreeSpace;

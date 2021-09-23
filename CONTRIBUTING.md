@@ -28,13 +28,16 @@ You must also add `github` as a server in your `~/.m2/settings.xml` file. Replac
       <password>TOKEN</password>
     </server>
 ```
+## Submit an Issue
 
+if you wish to contribute to GCSToolkit we would kindly ask that you submit an issue to the issue tracker. Doing so will help with the management of the project.
+ 
 ## Build
 
-The build is vanilla Maven.
+The build uses the Maven wrapper (`mvnw`) to help ensure reproducible builds and so we don't force you to change your system Maven install.
 
-* `mvn clean` - remove build artifacts
-* `mvn compile` - compile the source code
+* `mvnw clean` - remove build artifacts
+* `mvnw compile` - compile the source code
 
 ### Additional build properties
 
@@ -46,7 +49,7 @@ The build is vanilla Maven.
 
 Once above steps are configured you can execute test cases with following command.
 
-* `mvn test -Pcontributor` - run unit tests (this project uses JUnit 5)
+* `mvnw test -Pcontributor` - run unit tests (this project uses JUnit 5)
 
 ### Contributor maven profile
 
@@ -56,4 +59,8 @@ Once above steps are configured you can execute test cases with following comman
 
 The packaging is vanilla Maven.
 
-* `mvn package` - create the binaries.
+* `mvnw package` - create the binaries.
+
+## Deploy / Publish
+
+This is a task performed by the core project maintainers, if you think they're behind or would like to get a release out please raise a GitHub issue.

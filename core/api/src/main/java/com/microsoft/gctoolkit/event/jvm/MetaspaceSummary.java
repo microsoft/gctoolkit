@@ -6,12 +6,11 @@ import com.microsoft.gctoolkit.event.MemoryPoolSummary;
 
 public class MetaspaceSummary extends MemoryPoolSummary {
 
-    private long reserved = -1L;
-    private long available = -1L;
+    private final long reserved;
+    private final long available;
 
     public MetaspaceSummary(long before, long after, long committed, long reserved) {
-        super(before, after, committed);
-        this.reserved = reserved;
+        this(before, after, -1L, committed, reserved);
     }
 
     public MetaspaceSummary(long before, long after, long available, long committed, long reserved) {

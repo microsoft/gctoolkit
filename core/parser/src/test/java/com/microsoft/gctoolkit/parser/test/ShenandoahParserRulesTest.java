@@ -61,7 +61,7 @@ public class ShenandoahParserRulesTest implements ShenandoahPatterns {
         }
     }
 
-    GCParseRule[] rules = {
+    private GCParseRule[] rules = {
             CONCURRENT,                 //   0
             CLEANUP,
             WORKERS,

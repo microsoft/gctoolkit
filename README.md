@@ -8,16 +8,6 @@ For more detail you can read our [Launch Blog Post](https://devblogs.microsoft.c
 
 ---
 
-## Test Coverage Report
-
-**Core API Coverage** </br>![Coverage](.github/badges/jacoco-api-coverage.svg)
-
-**Core :: Parser</br>**![Coverage::Core::Parser](.github/badges/jacoco-parser-coverage.svg)
-
-**Core :: Vertx**</br>![Coverage::Core::Parser](.github/badges/jacoco-vertx-coverage.svg)
-
----
-
 ## Introduction
 
 Managed memory in the Java Virtual Machine (JVM) is composed of 3 main pieces:
@@ -81,6 +71,16 @@ You'll then want to add the `api`, `parser` and `vertx` modules to your project 
 ### Example
 
 See [sample/README](./sample/README.md)
+
+---
+
+## Test Coverage Report
+
+**Core API Coverage** </br>![Coverage](.github/badges/jacoco-api-coverage.svg)
+
+**Core :: Parser</br>**![Coverage::Core::Parser](.github/badges/jacoco-parser-coverage.svg)
+
+**Core :: Vertx**</br>![Coverage::Core::Parser](.github/badges/jacoco-vertx-coverage.svg)
 
 ## Contributing
 

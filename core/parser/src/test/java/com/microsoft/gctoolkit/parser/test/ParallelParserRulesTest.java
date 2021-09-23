@@ -56,7 +56,7 @@ public class ParallelParserRulesTest implements ParallelPatterns {
     }
 
 
-    GCParseRule[] rules = {
+    private GCParseRule[] rules = {
             PSYOUNGGEN_NO_DETAILS,
             PSFULL,
             PS_FULL_BODY_FLOATING,
@@ -71,7 +71,7 @@ public class ParallelParserRulesTest implements ParallelPatterns {
 
     };
 
-    String[][] lines = {
+    private String[][] lines = {
             {   //  0
                     "2017-03-28T12:17:34.744+0200: 1.895: [GC (Allocation Failure)  137969K->21806K(491008K), 0.0082985 secs]",
                     "2017-03-28T12:17:33.823+0200: 0.974: [GC (System.gc())  92578K->9947K(491008K), 0.0135426 secs]"  // buggy full gc

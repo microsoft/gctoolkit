@@ -8,6 +8,8 @@ import com.microsoft.gctoolkit.io.DataSource;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
 import com.microsoft.gctoolkit.GCToolKit;
 
+import java.util.Optional;
+
 /**
  * JavaVirtualMachine is a representation of the JVM state obtained by analyzing a GC log file.
  * An instance of JavaVirtualMachine is created by calling {@link GCToolKit#analyze(DataSource)}
@@ -91,7 +93,8 @@ public interface JavaVirtualMachine {
      * {@code Aggregation}s are used depends on the GC.
      * @param aggregationClass The class of the Aggregation to be returned.
      * @param <T> type cast for the Aggregation class type.
-     * @return an {@code Aggregation} whose {@code getClass() == aggregationClass}, or {@code null}
+     * @return an {@code Aggregation} whose {@code getClass() == aggregationClass}, or {@code null} 
+     * if given aggregationClass is not available.
      */
-    <T extends Aggregation> T getAggregation(Class<T> aggregationClass);
+    <T extends Aggregation> Optional<T> getAggregation(Class<T> aggregationClass);
 }

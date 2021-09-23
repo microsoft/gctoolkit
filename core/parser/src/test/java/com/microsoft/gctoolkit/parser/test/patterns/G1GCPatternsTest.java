@@ -42,7 +42,7 @@ public class G1GCPatternsTest implements G1GCPatterns {
 //    }
 
 
-    GCParseRule[] rules = {
+    private GCParseRule[] rules = {
             G1_CONCURRENT_START,
             G1_CONCURRENT_END,
             G1_REMARK,
@@ -57,7 +57,7 @@ public class G1GCPatternsTest implements G1GCPatterns {
             START_MIXED_GC
     };
 
-    String[][] lines = {
+    private String[][] lines = {
             { // G1_CONCURRENT_START
                     "657.421: [GC concurrent-root-region-scan-start]",
                     "657.426: [GC concurrent-mark-start]",

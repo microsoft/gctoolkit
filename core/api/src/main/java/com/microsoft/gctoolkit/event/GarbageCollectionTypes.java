@@ -2,8 +2,6 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.event;
 
-import java.util.Arrays;
-
 /**
  * Representation of GC Collection Events
  */

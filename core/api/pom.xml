@@ -4,12 +4,12 @@
 
     <parent>
         <groupId>com.microsoft.gctoolkit</groupId>
-        <artifactId>core</artifactId>
-        <version>2.0.1-SNAPSHOT</version>
+        <artifactId>gctoolkit-core</artifactId>
+        <version>2.0.4-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>api</artifactId>
+    <artifactId>gctoolkit-api</artifactId>
 
     <dependencies>
         <dependency>

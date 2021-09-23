@@ -19,7 +19,7 @@ import java.util.zip.ZipInputStream;
 
 public class SafepointLogFile implements DataSource<String> {
 
-    protected final FileDataSourceMetaData metadata;
+    private final FileDataSourceMetaData metadata;
 
     private final Path path;
 

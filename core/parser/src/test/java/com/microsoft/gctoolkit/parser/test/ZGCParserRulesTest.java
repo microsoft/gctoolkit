@@ -70,7 +70,7 @@ public class ZGCParserRulesTest implements ZGCPatterns {
         }
     }
 
-    GCParseRule[] rules = {
+    private GCParseRule[] rules = {
             CYCLE_START,                   //  0
             PAUSE_PHASE,                   //  1
             CONCURRENT_PHASE,
@@ -89,7 +89,7 @@ public class ZGCParserRulesTest implements ZGCPatterns {
             MEMORY_SUMMARY
     };
 
-    String[][] lines = {
+    private String[][] lines = {
 
             {  //   0
                     "[3.558s][info ][gc,start       ] GC(3) Garbage Collection (Warmup)"
@@ -157,7 +157,7 @@ public class ZGCParserRulesTest implements ZGCPatterns {
             }
     };
 
-    String[] decoratorLines = {
+    private String[] decoratorLines = {
             "[2018-04-04T09:10:00.586-0100][0.018s][1522825800586ms][18ms][10026341461044ns][17738937ns][1375][7427][info][gc] Using Concurrent Mark Sweep",
             "[0.018s][1522825800586ms][18ms][10026341461044ns][17738937ns][1375][7427][info][gc] Using Concurrent Mark Sweep",
             "[0.018s][1522825800586ms][7427][info][gc] Using Concurrent Mark Sweep",
