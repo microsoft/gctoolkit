@@ -9,4 +9,3 @@ ENV JAVA_HOME /usr/lib/jvm/msopenjdk-11-amd64
 ENV PATH "${JAVA_HOME}/bin:${PATH}"
 
 COPY --from=mcr.microsoft.com/openjdk/jdk:11-ubuntu $JAVA_HOME $JAVA_HOME
-

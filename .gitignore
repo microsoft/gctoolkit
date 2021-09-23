@@ -1,6 +1,8 @@
 gclogs/
 gctoolkit-testdata-*/
 
+gctoolkit-testdata-*.zip
+
 # Maven
 target/
 pom.xml.tag

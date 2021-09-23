@@ -17,12 +17,6 @@
 		"redhat.vscode-xml"
 	],
 
-	// Use 'forwardPorts' to make a list of ports inside the container available locally.
-	// "forwardPorts": [],
-
-	// Enable contributor profile and download gctoolkit-testdata
-	"postCreateCommand": "./contributor.sh -e",
-
 	// Comment out connect as root instead. More info: https://aka.ms/vscode-remote/containers/non-root.
 	"remoteUser": "vscode"
 }
