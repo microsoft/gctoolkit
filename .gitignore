@@ -1,4 +1,7 @@
 gclogs/
+gctoolkit-testdata-*/
+
+gctoolkit-testdata-*.zip
 
 # Maven
 target/
@@ -10,6 +13,7 @@ release.properties
 dependency-reduced-pom.xml
 buildNumber.properties
 .mvn/timing.properties
+.mvn/maven.config
 # https://github.com/takari/maven-wrapper#usage-without-binary-jar
 .mvn/wrapper/maven-wrapper.jar
 
