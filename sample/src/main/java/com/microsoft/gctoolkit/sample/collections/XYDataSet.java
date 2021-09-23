@@ -1,6 +1,6 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
-package com.microsoft.gctoolkit.collections;
+package com.microsoft.gctoolkit.sample.collections;
 
 import java.util.ArrayList;
 import java.util.List;

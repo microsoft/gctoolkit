@@ -24,7 +24,7 @@
             <groupId>com.microsoft.gctoolkit</groupId>
             <artifactId>gctoolkit-vertx</artifactId>
             <version>${project.version}</version>
-        </dependency>
+        </dependency><dependency><groupId>org.junit.jupiter</groupId><artifactId>junit-jupiter-api</artifactId></dependency><dependency><groupId>org.junit.jupiter</groupId><artifactId>junit-jupiter-engine</artifactId></dependency>
     </dependencies>
 
     <build>

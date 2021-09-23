@@ -1,9 +1,9 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
-package com.microsoft.gctoolkit.test.collections;
+package com.microsoft.gctoolkit.sample.test.collections;
 
-import com.microsoft.gctoolkit.collections.XYDataSet;
-import com.microsoft.gctoolkit.collections.XYDataSet.Point;
+import com.microsoft.gctoolkit.sample.collections.XYDataSet;
+import com.microsoft.gctoolkit.sample.collections.XYDataSet.Point;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
