@@ -59,7 +59,6 @@
         <module>api</module>
         <module>parser</module>
         <module>vertx</module>
-        <module>sample</module>
     </modules>
 
     <properties>
@@ -437,6 +436,18 @@
     </reporting>
 
     <profiles>
+        <profile>
+            <id>sample</id>
+            <activation>
+                <property>
+                    <name>release</name>
+                    <value>!true</value>
+                </property>
+            </activation>
+            <modules>
+                    <module>sample</module>
+            </modules>
+        </profile>
         <profile>
             <!-- Only active when you add -Prelease to the build-->
             <id>release</id>
