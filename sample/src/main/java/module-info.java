@@ -16,5 +16,7 @@ module com.microsoft.gctoolkit.sample {
     exports com.microsoft.gctoolkit.sample.aggregation to com.microsoft.gctoolkit.vertx;
     exports com.microsoft.gctoolkit.sample.collections to com.microsoft.gctoolkit.sample.test;
 
+    exports com.microsoft.gctoolkit.sample;
+
     provides Aggregation with HeapOccupancyAfterCollectionSummary;
 }
