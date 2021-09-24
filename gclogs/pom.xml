@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.microsoft.gctoolkit</groupId>
+        <artifactId>gctoolkit</artifactId>
+        <version>2.0.4-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <artifactId>gctoolkit-gclogs</artifactId>
+
+    <packaging>pom</packaging>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.commonjava.maven.plugins</groupId>
+                <artifactId>directory-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>directories</id>
+                        <goals>
+                            <goal>directory-of</goal>
+                        </goals>
+                        <phase>initialize</phase>
+                        <configuration>
+                            <property>maven-parent.basedir</property>
+                            <project>
+                                <groupId>com.microsoft.gctoolkit</groupId>
+                                <artifactId>gctoolkit</artifactId>
+                            </project>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>process-test-resources</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <property name="testdata-package" value="gctoolkit-testdata-${gctoolkit-testdata-version}.zip" />
+
+                                <get 
+                                    skipexisting="true" 
+                                    src="https://github.com/microsoft/gctoolkit-testdata/releases/download/${gctoolkit-testdata-version}/${testdata-package}" 
+                                    dest="${maven-parent.basedir}" />
+
+                                <unzip 
+                                    src="${maven-parent.basedir}/${testdata-package}" 
+                                    dest="${maven-parent.basedir}" 
+                                    overwrite="false" />
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

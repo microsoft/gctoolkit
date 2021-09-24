@@ -7,21 +7,34 @@ import com.microsoft.gctoolkit.jvm.JavaVirtualMachine;
 import com.microsoft.gctoolkit.sample.aggregation.HeapOccupancyAfterCollectionSummary;
 
 import java.nio.file.Path;
+import java.nio.file.Files;
 import java.util.Optional;
 
 public class Main {
 
     public static void main(String[] args) {
-        if (args.length == 0) {
-            throw new IllegalArgumentException("This sample requires a path to a GC log file as an argument.");
+        String userInput = args.length > 0 ? args[0] : "";
+        String gcLogFile = System.getProperty("gcLogFile", userInput);
+
+        if (gcLogFile.isBlank()) {
+            throw new IllegalArgumentException("This sample requires a path to a GC log file.");
         }
-        
+
+        if (Files.exists(Path.of(gcLogFile)) == false) {
+            throw new IllegalArgumentException(String.format("File %s not found.", gcLogFile));
+        }
+
+        Main main = new Main();
+        main.analyze(gcLogFile);
+    }
+
+    public void analyze(String gcLogFile) {
         /**
          * GC log files can come in  one of two types: single or series of rolling logs.
          * In this sample, we load a single log file.
          * The log files can be either in text, zip, or gzip format.
          */
-        GCLogFile logFile = new SingleGCLogFile(Path.of(args[0]));
+        GCLogFile logFile = new SingleGCLogFile(Path.of(gcLogFile));
         GCToolKit gcToolKit = new GCToolKit();
 
         /**
@@ -48,4 +61,5 @@ public class Main {
             System.out.println("No aggregation found.");
         }
     }
+
 }
