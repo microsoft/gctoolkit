@@ -63,7 +63,7 @@
 
     <properties>
         <checkstyle.version>9.0</checkstyle.version>
-        <junit5.version>5.7.2</junit5.version>
+        <junit5.version>5.8.1</junit5.version>
         <maven.changes-plugin.version>2.12.1</maven.changes-plugin.version>
         <maven.checkstyle-plugin.version>3.1.2</maven.checkstyle-plugin.version>
         <maven.clean-plugin.version>3.1.0</maven.clean-plugin.version>
@@ -93,7 +93,7 @@
         <maven.exec-plugin.version>3.0.0</maven.exec-plugin.version>
         <mutability.detector.version>0.9.1</mutability.detector.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <spotbugs.version>4.4.0</spotbugs.version>
+        <spotbugs.version>4.4.1</spotbugs.version>
         <project.github.repository>microsoft/gctoolkit</project.github.repository>
         <repository.url>git@github.com:${project.github.repository}.git</repository.url>
     </properties>
