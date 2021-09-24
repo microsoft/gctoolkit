@@ -668,8 +668,8 @@ public class GenerationalHeapParser extends PreUnifiedGCLogParser implements Sim
     /**
      * This rule is linked to 2 similar but not identical rules.
      * The group count for 1 rule is 18 and the group count for the other rule is 16.
-     * @param trace
-     * @param line
+     * @param trace The chunk of GC log that we are attempting to match to a known GC log pattern
+     * @param line The GC log line being parsed
      */
     public void parNewPromotionFailedInConcurrentMarkSweepPhase(GCLogTrace trace, String line) {
         int offset = (trace.groupCount() == 16) ? 2 : 0;
@@ -1456,7 +1456,7 @@ public class GenerationalHeapParser extends PreUnifiedGCLogParser implements Sim
         extractPermOrMetaspaceRecord(line);
     }
 
-    /********** Concurrent mode failures not yet implemented *********/
+    // TODO: Concurrent mode failures not yet implemented
     //4.327: [FUll GC 4.328: [ParNew: 196768K->180907K(471872K), 0.1321291 secs]4.460: [CMS (concurrent mode failure): 473195K->376198K(1048576K), 5.1817732 secs] 668966K->376198K(1520448K), [CMS Perm : 13108K->27169K(13172K)], 5.3146647 secs]
     //8.828: [Full GC 8.828: [CMS (concurrent mode failure): 630985K->795001K(6470068K), 0.0895496 secs] 810101K->790051K(8300392K), [CMS Perm : 10696K->10696K(21248K)], 0.0896445 secs]
 
@@ -1921,8 +1921,8 @@ public class GenerationalHeapParser extends PreUnifiedGCLogParser implements Sim
      *         remark.add(extractCPUSummary(line));
      *         record(remark);
      *     }
-     * @param trace
-     * @param line
+     * @param trace The chunk of GC log that we are attempting to match to a known GC log pattern
+     * @param line The GC log line being parsed
      */
     public void splitRemarkReferenceWithWeakReferenceSplitBug(GCLogTrace trace, String line) {
         GCLogTrace remarkTrace = REMARK_CLAUSE.parse(line);

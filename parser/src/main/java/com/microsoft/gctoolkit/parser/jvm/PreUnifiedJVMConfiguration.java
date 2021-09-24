@@ -28,7 +28,6 @@ import java.util.regex.Pattern;
  * - which JVM version
  * - which flags are being used
  * <p>
- * <p>
  * Collectors
  * - Unknown (no details)
  * - Serial
