@@ -60,7 +60,7 @@ public class UnifiedGenerationalParserRulesTest implements UnifiedGenerationalPa
         }
     }
 
-    private final static String PARALLEL_PHASES = "(Marking Phase|Summary Phase|Adjust Roots|Compaction Phase|Post Compact)";
+    private static final String PARALLEL_PHASES = "(Marking Phase|Summary Phase|Adjust Roots|Compaction Phase|Post Compact)";
 
     private GCParseRule[] rules = {
             YOUNG_DETAILS,                  //   0

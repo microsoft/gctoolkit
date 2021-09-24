@@ -90,7 +90,7 @@ public class GenerationalHeapParser extends PreUnifiedGCLogParser implements Sim
      */
 
 
-    final private MRUQueue<GCParseRule, BiConsumer<GCLogTrace, String>> parseRules;
+    private final MRUQueue<GCParseRule, BiConsumer<GCLogTrace, String>> parseRules;
 
     {
         parseRules = new MRUQueue<>();
@@ -539,8 +539,8 @@ public class GenerationalHeapParser extends PreUnifiedGCLogParser implements Sim
     }
 
     //46.435: [GC 46.435: [ParNew: 19136K->19136K(19136K), 0.0000274 secs]46.435: [CMS46.458: [CMS-concurrent-sweep: 0.060/0.117 secs] [Times: user=0.21 sys=0.01, real=0.12 secs]
-    //final static public ParseRule PARNEW_CONCURRENT_MODE_END = new ParseRule (GC_PREFIX + PARNEW_BLOCK + TIMESTAMP + "\\[CMS" + CMS_PHASE_END + "(?: " + CPU_BREAKDOWN + ")?$");
-    //final static public String CMS_PHASE_END = DATE_TIMESTAMP + "\\[CMS-concurrent-(.+): " + CPU_WALLCLOCK + "\\]";
+    //public static final ParseRule PARNEW_CONCURRENT_MODE_END = new ParseRule (GC_PREFIX + PARNEW_BLOCK + TIMESTAMP + "\\[CMS" + CMS_PHASE_END + "(?: " + CPU_BREAKDOWN + ")?$");
+    //public static final String CMS_PHASE_END = DATE_TIMESTAMP + "\\[CMS-concurrent-(.+): " + CPU_WALLCLOCK + "\\]";
     public void parNewConcurrentModeEnd(GCLogTrace trace, String line) {
         garbageCollectionTypeForwardReference = GarbageCollectionTypes.ParNew;
         scavengeTimeStamp = getClock();

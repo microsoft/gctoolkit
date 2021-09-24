@@ -10,6 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class XYDataSetTest {
+
     @Test
     void shouldScaleOnlyY_AxisDataSet() {
         var xyDataSet = new XYDataSet();
@@ -43,4 +44,5 @@ public class XYDataSetTest {
     void maxOnEmptyDataSet() {
         assertTrue(new XYDataSet().maxOfY().isEmpty());
     }
+
 }

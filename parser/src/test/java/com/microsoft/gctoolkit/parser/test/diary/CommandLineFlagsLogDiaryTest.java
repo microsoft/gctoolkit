@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class CommandLineFlagsLogDiaryTest {
 
-    private final static String[][] gcLogFileHeader = {
+    private static final String[][] gcLogFileHeader = {
             {
                     "Java HotSpot(TM) 64-Bit Server VM (25.40-b25) for bsd-amd64 JRE (1.8.0_40-b25), built on Feb 10 2015 21:07:25 by \"java_re\" with gcc 4.2.1 (Based on Apple Inc. build 5658) (LLVM build 2336.11.00)",
                     "Memory: 4k page, physical 16777216k(920952k free)",

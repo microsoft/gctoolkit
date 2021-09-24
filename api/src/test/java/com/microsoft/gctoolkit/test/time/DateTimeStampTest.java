@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class DateTimeStampTest {
 
     // For some reason, ISO_DATE_TIME doesn't like that time-zone is -0100. It wants -01:00.
-    private final static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 
     @Test
     void getTimeStamp() {

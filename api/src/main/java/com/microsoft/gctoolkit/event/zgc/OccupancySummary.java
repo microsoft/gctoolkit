@@ -4,9 +4,9 @@ package com.microsoft.gctoolkit.event.zgc;
 
 public class OccupancySummary {
 
-    final private long markEnd;
-    final private long reclaimStart;
-    final private long reclaimEnd;
+    private final long markEnd;
+    private final long reclaimStart;
+    private final long reclaimEnd;
 
 
     public OccupancySummary(long markEnd, long reclaimStart, long reclaimEnd) {

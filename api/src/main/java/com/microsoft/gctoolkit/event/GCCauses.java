@@ -7,7 +7,7 @@ import java.util.Map;
 import static com.microsoft.gctoolkit.event.GCCause.*;
 
 public class GCCauses {
-    private final static Map<String, GCCause> GC_CAUSES = Map.ofEntries(
+    private static final Map<String, GCCause> GC_CAUSES = Map.ofEntries(
         Map.entry(GCCause.JAVA_LANG_SYSTEM.getLabel(), GCCause.JAVA_LANG_SYSTEM),
         Map.entry("System", GCCause.JAVA_LANG_SYSTEM),
         Map.entry(GCCause.DIAGNOSTIC_COMMAND.getLabel(), GCCause.JAVA_LANG_SYSTEM),
