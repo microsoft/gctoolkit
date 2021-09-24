@@ -64,7 +64,6 @@
 
     <properties>
         <checkstyle.version>9.0</checkstyle.version>
-        <gctoolkit-testdata-version>1.0.3</gctoolkit-testdata-version>
         <junit5.version>5.7.2</junit5.version>
         <maven.changes-plugin.version>2.12.1</maven.changes-plugin.version>
         <maven.checkstyle-plugin.version>3.1.2</maven.checkstyle-plugin.version>

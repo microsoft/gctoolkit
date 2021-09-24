@@ -11,8 +11,11 @@
     </parent>
 
     <artifactId>gctoolkit-gclogs</artifactId>
-
     <packaging>pom</packaging>
+
+    <properties>
+        <gctoolkit-testdata-version>1.0.3</gctoolkit-testdata-version>
+    </properties>
 
     <build>
         <plugins>
