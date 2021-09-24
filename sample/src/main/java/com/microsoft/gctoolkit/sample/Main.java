@@ -56,10 +56,37 @@ public class Main {
             // Simple treatment of results
             HeapOccupancyAfterCollectionSummary aggregationResult = results.get();
             String message = "The XYDataSet for %s contains %s items.\n";
-            aggregationResult.get().forEach((gcType, dataSet) -> System.out.printf(message, gcType, dataSet.size()));
+            aggregationResult.get().forEach((gcType, dataSet) -> {
+                System.out.printf(message, gcType, dataSet.size());
+
+                String gcTypeName = gcType.toString();
+                if (gcTypeName.equals("InitialMark")) {
+                    initialMarkCount = dataSet.size();
+                } else if (gcTypeName.equals("Remark")) {
+                    remarkCount = dataSet.size();
+                } else if (gcTypeName.equals("DefNew")) {
+                    defNewCount = dataSet.size();
+                }
+            });
         } else {
             System.out.println("No aggregation found.");
         }
+    }
+
+    private int initialMarkCount = 0;
+    private int remarkCount = 0;
+    private int defNewCount = 0;
+
+    public int getInitialMarkCount() {
+        return initialMarkCount;
+    }
+
+    public int getRemarkCount() {
+        return remarkCount;
+    }
+
+    public int getDefNewCount() {
+        return defNewCount;
     }
 
 }
