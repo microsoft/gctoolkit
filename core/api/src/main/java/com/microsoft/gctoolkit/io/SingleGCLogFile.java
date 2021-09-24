@@ -21,7 +21,7 @@ import java.util.zip.ZipInputStream;
  */
 public class SingleGCLogFile extends GCLogFile {
 
-    private final static Logger LOGGER = Logger.getLogger(SingleGCLogFile.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(SingleGCLogFile.class.getName());
 
     private static boolean isUnifiedLogging(Path path) {
         try {

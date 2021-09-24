@@ -20,10 +20,10 @@ import java.util.stream.Collectors;
 
 public class Decorators {
 
-    private final static Logger LOGGER = Logger.getLogger(Decorators.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(Decorators.class.getName());
 
-    private final static long TWENTY_YEARS_IN_MILLIS = 731L * 24L * 60L * 60L * 1000L;
-    private final static long TWENTY_YEARS_IN_NANO = 731L * 24L * 60L * 60L * 1000L;
+    private static final long TWENTY_YEARS_IN_MILLIS = 731L * 24L * 60L * 60L * 1000L;
+    private static final long TWENTY_YEARS_IN_NANO = 731L * 24L * 60L * 60L * 1000L;
 
     private Matcher decorators = null;
     private List<String> tags = new ArrayList<>();
@@ -58,7 +58,7 @@ public class Decorators {
     }
 
     // For some reason, ISO_DATE_TIME doesn't like that time-zone is -0100. It wants -01:00.
-    private final static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 
     public ZonedDateTime getDateStamp() {
         try {

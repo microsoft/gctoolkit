@@ -41,7 +41,7 @@ public abstract class GCLogParser implements SharedPatterns {
 
     public abstract String getName();
 
-    abstract protected void process(String trace);
+    protected abstract void process(String trace);
 
     abstract void advanceClock(String record);
 
@@ -49,7 +49,7 @@ public abstract class GCLogParser implements SharedPatterns {
      * The assumption is, this method will manage the global clock and thus should never be over ridden
      * @param now - DateTimeStamp from the current GC log record
      */
-    final protected void advanceClock(DateTimeStamp now) {
+    protected final void advanceClock(DateTimeStamp now) {
         if (now == null)
             return;
             // now can be the same but it can't be less than

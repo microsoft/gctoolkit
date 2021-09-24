@@ -62,7 +62,7 @@ public abstract class Aggregator<A extends Aggregation> {
 
     /// JVMEventDispatcher manages all of the registered events and event consumers
     private final JVMEventDispatcher jvmEventDispatcher = new JVMEventDispatcher();
-    volatile private boolean done = false;
+    private volatile boolean done = false;
 
     /**
      * Subclass only.

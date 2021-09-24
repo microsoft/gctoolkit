@@ -90,12 +90,12 @@ public class PreUnifiedJVMConfiguration implements SimplePatterns, CMSPatterns, 
     private static final int MAXIMUM_LINES_TO_EXAMINE = 10_000; // duplicated in UnifedJVMConfiguration
     private int lineCount = MAXIMUM_LINES_TO_EXAMINE;
 
-    final static private GCParseRule TENURED_BLOCK = new GCParseRule("TENURED_BLOCK", "\\[Tenured: \\d+K->\\d+K\\(\\d+K\\), \\d+[.|,]\\d{7} secs\\]");
-    final static private GCParseRule PREFIX = new GCParseRule("PREFIX", PreUnifiedTokens.GC_PREFIX);
-    final static private GCParseRule FULL_PREFIX = new GCParseRule("FULL_PREFIX", PreUnifiedTokens.FULL_GC_PREFIX);
-    final static private GCParseRule G1GC_PREFIX = new GCParseRule("G1GC_PREFIX", G1GCTokens.G1GC_PREFIX);
-    final static private GCParseRule REFERENCE_PROCESSING_BLOCK = new GCParseRule("REFERENCE_PROCESSING_BLOCK", PreUnifiedTokens.REFERENCE_RECORDS);
-    final static private Pattern excludeG1Ergonomics = Pattern.compile("^\\d+(\\.|,)\\d+: \\[G1Ergonomics");
+    private static final GCParseRule TENURED_BLOCK = new GCParseRule("TENURED_BLOCK", "\\[Tenured: \\d+K->\\d+K\\(\\d+K\\), \\d+[.|,]\\d{7} secs\\]");
+    private static final GCParseRule PREFIX = new GCParseRule("PREFIX", PreUnifiedTokens.GC_PREFIX);
+    private static final GCParseRule FULL_PREFIX = new GCParseRule("FULL_PREFIX", PreUnifiedTokens.FULL_GC_PREFIX);
+    private static final GCParseRule G1GC_PREFIX = new GCParseRule("G1GC_PREFIX", G1GCTokens.G1GC_PREFIX);
+    private static final GCParseRule REFERENCE_PROCESSING_BLOCK = new GCParseRule("REFERENCE_PROCESSING_BLOCK", PreUnifiedTokens.REFERENCE_RECORDS);
+    private static final Pattern excludeG1Ergonomics = Pattern.compile("^\\d+(\\.|,)\\d+: \\[G1Ergonomics");
 
 
     private final LoggingDiary diary;
@@ -450,7 +450,7 @@ public class PreUnifiedJVMConfiguration implements SimplePatterns, CMSPatterns, 
             getDiary().setTrue(SupportedFlags.SERIAL);
 
             getDiary().setTrue(SupportedFlags.GC_DETAILS);
-            //todo: final private int SupportedFlags.GC_CAUSE = 12;
+            //todo: private final int SupportedFlags.GC_CAUSE = 12;
             getDiary().setFalse(SupportedFlags.CMS_DEBUG_LEVEL_1);
             if (line.contains("Metaspace")) {
                 getDiary().setFalse(SupportedFlags.JDK70);
@@ -864,7 +864,7 @@ public class PreUnifiedJVMConfiguration implements SimplePatterns, CMSPatterns, 
     }
 
     //"Java HotSpot(TM) 64-Bit Server VM (25.40-b25) for bsd-amd64 JRE (1.8.0_40-b25), built on Feb 10 2015 21:07:25 by \"java_re\" with gcc 4.2.1 (Based on Apple Inc. build 5658) (LLVM build 2336.11.00)",
-    static private final Pattern VERSION = Pattern.compile("(1)\\.([6-9])\\.0(_\\d*)?");
+    private static final Pattern VERSION = Pattern.compile("(1)\\.([6-9])\\.0(_\\d*)?");
 
     private void parseJVMVersion(String versionString) {
         Matcher matcher = VERSION.matcher(versionString);

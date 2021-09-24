@@ -4,7 +4,7 @@ package com.microsoft.gctoolkit.event;
 
 public class StatisticalSummary {
 
-    final static public double UNDEFINED = -1.0d;
+    public static final double UNDEFINED = -1.0d;
 
     private final double min;
     private final double average;
