@@ -198,8 +198,8 @@ public interface G1GCPatterns extends G1GCTokens {
 
     //Pre 1.7.0_40 records
 
-    //final public GCParseRule STATS_INT_170PRE40 = new GCParseRule("STATS_INT_170PRE40", "Sum: " + COUNTER + ", Avg: " + COUNTER + ", Min: " + COUNTER + ", Max: " + COUNTER + ", Diff: " + COUNTER + "\\]");
-    //final public GCParseRule STATS_REAL_170PRE40 = new GCParseRule("STATS_REAL_170PRE40", "Avg:\\s+" + REAL_VALUE + ", Min:\\s+" + REAL_VALUE + ", Max:\\s+" + REAL_VALUE + ", Diff:\\s+" + REAL_VALUE);
+    //public final GCParseRule STATS_INT_170PRE40 = new GCParseRule("STATS_INT_170PRE40", "Sum: " + COUNTER + ", Avg: " + COUNTER + ", Min: " + COUNTER + ", Max: " + COUNTER + ", Diff: " + COUNTER + "\\]");
+    //public final GCParseRule STATS_REAL_170PRE40 = new GCParseRule("STATS_REAL_170PRE40", "Avg:\\s+" + REAL_VALUE + ", Min:\\s+" + REAL_VALUE + ", Max:\\s+" + REAL_VALUE + ", Diff:\\s+" + REAL_VALUE);
 
     //[Termination Attempts : 1 1 1 1 1 1 1 1 1 1 1 1
     //GCParseRule TERMINATION_ATTEMPTS_PRE17040 = new GCParseRule("TERMINATION_ATTEMPTS_PRE17040", "\\[Termination Attempts : " + INTEGER);

@@ -19,7 +19,7 @@ import java.util.logging.Logger;
 
 public class CMSTenuredPoolParser extends PreUnifiedGCLogParser implements SimplePatterns, ICMSPatterns {
 
-    private final static Logger LOG = Logger.getLogger(CMSTenuredPoolParser.class.getName());
+    private static final Logger LOG = Logger.getLogger(CMSTenuredPoolParser.class.getName());
     private DateTimeStamp startOfPhase = null;
     private GCParseRule EndOfFile = new GCParseRule("END_OF_DATA_SENTINAL", END_OF_DATA_SENTINAL);
 

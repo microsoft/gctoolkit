@@ -5,11 +5,10 @@
     <parent>
         <groupId>com.microsoft.gctoolkit</groupId>
         <artifactId>gctoolkit</artifactId>
-        <version>2.0.1-SNAPSHOT</version>
-        <relativePath>../pom.xml</relativePath>
+        <version>2.0.4-SNAPSHOT</version>
     </parent>
 
-    <artifactId>sample</artifactId>
+    <artifactId>gctoolkit-sample</artifactId>
 
     <properties>
         <gcLogFile>../gclogs/preunified/cms/defnew/details/defnew.log</gcLogFile>
@@ -18,13 +17,21 @@
     <dependencies>
         <dependency>
             <groupId>com.microsoft.gctoolkit</groupId>
-            <artifactId>api</artifactId>
-            <version>${project.parent.version}</version>
+            <artifactId>gctoolkit-api</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.microsoft.gctoolkit</groupId>
-            <artifactId>vertx</artifactId>
-            <version>${project.parent.version}</version>
+            <artifactId>gctoolkit-vertx</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
         </dependency>
     </dependencies>
 

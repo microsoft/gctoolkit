@@ -106,46 +106,46 @@ public class G1GCForwardReference extends ForwardReference {
     /**
      * memory pool statistics
      */
-    private final static int HEAP_OCCUPANCY_BEFORE_COLLECTION = 0;
-    private final static int HEAP_OCCUPANCY_AFTER_COLLECTION = 1;
-    private final static int HEAP_SIZE_BEFORE_COLLECTION = 2;
-    private final static int HEAP_SIZE_AFTER_COLLECTION = 3;
-    private final static int EDEN_OCCUPANCY_BEFORE_COLLECTION = 4;
-    private final static int EDEN_OCCUPANCY_AFTER_COLLECTION = 5;
-    private final static int EDEN_SIZE_BEFORE_COLLECTION = 6;
-    private final static int EDEN_SIZE_AFTER_COLLECTION = 7;
-    private final static int SURVIVOR_OCCUPANCY_BEFORE_COLLECTION = 8;
-    private final static int SURVIVOR_OCCUPANCY_AFTER_COLLECTION = 9;
-    private final static int SURVIVOR_SIZE_BEFORE_COLLECTION = 10;
-    private final static int SURVIVOR_SIZE_AFTER_COLLECTION = 11;
-    private final static int YOUNG_OCCUPANCY_BEFORE_COLLECTION = 12;
-    private final static int YOUNG_OCCUPANCY_AFTER_COLLECTION = 13;
-    private final static int YOUNG_SIZE_BEFORE_COLLECTION = 14;
-    private final static int YOUNG__SIZE_AFTER_COLLECTION = 15;
-    private final static int OLD_OCCUPANCY_BEFORE_COLLECTION = 16;
-    private final static int OLD_OCCUPANCY_AFTER_COLLECTION = 17;
-    private final static int OLD_SIZE_BEFORE_COLLECTION = 18;
-    private final static int OLD_SIZE_AFTER_COLLECTION = 19;
-    private final static int HUMONGOUS_OCCUPANCY_BEFORE_COLLECTION = 20;
-    private final static int HUMONGOUS_OCCUPANCY_AFTER_COLLECTION = 21;
-    private final static int HUMONGOUS_SIZE_BEFORE_COLLECTION = 22;
-    private final static int HUMONGOUS_SIZE_AFTER_COLLECTION = 23;
-    private final static int METASPACE_OCCUPANCY_BEFORE_COLLECTION = 24;
-    private final static int METASPACE_OCCUPANCY_AFTER_COLLECTION = 25;
-    private final static int METASPACE_SIZE_BEFORE_COLLECTION = 26;
-    private final static int METASPACE_SIZE_AFTER_COLLECTION = 27;
-    private final static int METASPACE_COMMITTED_BEFORE_COLLECTION = 28;
-    private final static int METASPACE_COMMITTED_AFTER_COLLECTION = 29;
-    private final static int METASPACE_RESERVED_BEFORE_COLLECTION = 30;
-    private final static int METASPACE_RESERVED_AFTER_COLLECTION = 31;
-    private final static int CLASSSPACE_OCCUPANCY_BEFORE_COLLECTION = 32;
-    private final static int CLASSSPACE_OCCUPANCY_AFTER_COLLECTION = 33;
-    private final static int CLASSSPACE_SIZE_BEFORE_COLLECTION = 34;
-    private final static int CLASSSPACE_SIZE_AFTER_COLLECTION = 35;
-    private final static int CLASSSPACE_COMMITTED_BEFORE_COLLECTION = 36;
-    private final static int CLASSSPACE_COMMITTED_AFTER_COLLECTION = 37;
-    private final static int CLASSSPACE_RESERVED_BEFORE_COLLECTION = 38;
-    private final static int CLASSSPACE_RESERVED_AFTER_COLLECTION = 39;
+    private static final int HEAP_OCCUPANCY_BEFORE_COLLECTION = 0;
+    private static final int HEAP_OCCUPANCY_AFTER_COLLECTION = 1;
+    private static final int HEAP_SIZE_BEFORE_COLLECTION = 2;
+    private static final int HEAP_SIZE_AFTER_COLLECTION = 3;
+    private static final int EDEN_OCCUPANCY_BEFORE_COLLECTION = 4;
+    private static final int EDEN_OCCUPANCY_AFTER_COLLECTION = 5;
+    private static final int EDEN_SIZE_BEFORE_COLLECTION = 6;
+    private static final int EDEN_SIZE_AFTER_COLLECTION = 7;
+    private static final int SURVIVOR_OCCUPANCY_BEFORE_COLLECTION = 8;
+    private static final int SURVIVOR_OCCUPANCY_AFTER_COLLECTION = 9;
+    private static final int SURVIVOR_SIZE_BEFORE_COLLECTION = 10;
+    private static final int SURVIVOR_SIZE_AFTER_COLLECTION = 11;
+    private static final int YOUNG_OCCUPANCY_BEFORE_COLLECTION = 12;
+    private static final int YOUNG_OCCUPANCY_AFTER_COLLECTION = 13;
+    private static final int YOUNG_SIZE_BEFORE_COLLECTION = 14;
+    private static final int YOUNG__SIZE_AFTER_COLLECTION = 15;
+    private static final int OLD_OCCUPANCY_BEFORE_COLLECTION = 16;
+    private static final int OLD_OCCUPANCY_AFTER_COLLECTION = 17;
+    private static final int OLD_SIZE_BEFORE_COLLECTION = 18;
+    private static final int OLD_SIZE_AFTER_COLLECTION = 19;
+    private static final int HUMONGOUS_OCCUPANCY_BEFORE_COLLECTION = 20;
+    private static final int HUMONGOUS_OCCUPANCY_AFTER_COLLECTION = 21;
+    private static final int HUMONGOUS_SIZE_BEFORE_COLLECTION = 22;
+    private static final int HUMONGOUS_SIZE_AFTER_COLLECTION = 23;
+    private static final int METASPACE_OCCUPANCY_BEFORE_COLLECTION = 24;
+    private static final int METASPACE_OCCUPANCY_AFTER_COLLECTION = 25;
+    private static final int METASPACE_SIZE_BEFORE_COLLECTION = 26;
+    private static final int METASPACE_SIZE_AFTER_COLLECTION = 27;
+    private static final int METASPACE_COMMITTED_BEFORE_COLLECTION = 28;
+    private static final int METASPACE_COMMITTED_AFTER_COLLECTION = 29;
+    private static final int METASPACE_RESERVED_BEFORE_COLLECTION = 30;
+    private static final int METASPACE_RESERVED_AFTER_COLLECTION = 31;
+    private static final int CLASSSPACE_OCCUPANCY_BEFORE_COLLECTION = 32;
+    private static final int CLASSSPACE_OCCUPANCY_AFTER_COLLECTION = 33;
+    private static final int CLASSSPACE_SIZE_BEFORE_COLLECTION = 34;
+    private static final int CLASSSPACE_SIZE_AFTER_COLLECTION = 35;
+    private static final int CLASSSPACE_COMMITTED_BEFORE_COLLECTION = 36;
+    private static final int CLASSSPACE_COMMITTED_AFTER_COLLECTION = 37;
+    private static final int CLASSSPACE_RESERVED_BEFORE_COLLECTION = 38;
+    private static final int CLASSSPACE_RESERVED_AFTER_COLLECTION = 39;
 
     private final long[] memoryPoolMeasurment = {
             -1L, -1L, -1L, -1L, -1L, -1L, -1L, -1L, -1L, -1L,
@@ -324,12 +324,12 @@ public class G1GCForwardReference extends ForwardReference {
 
     // ******
     // Reference processing
-    final static int SOFT_REFERENCE = 0;
-    final static int WEAK_REFERENCE = 1;
-    final static int PHANTOM_REFERENCE = 2;
-    final static int FINAL_REFERENCE = 3;
-    final static int JNI_WEAK_REFERENCE = 4;
-    final static int CLEANER_REFERENCE = 5;
+    static final int SOFT_REFERENCE = 0;
+    static final int WEAK_REFERENCE = 1;
+    static final int PHANTOM_REFERENCE = 2;
+    static final int FINAL_REFERENCE = 3;
+    static final int JNI_WEAK_REFERENCE = 4;
+    static final int CLEANER_REFERENCE = 5;
     private double[] referenceProcessingDuarations = {-1.0d, -1.0d, -1.0d, -1.0d, -1.0d, -1.0d};
     private int[] referenceCounts = {-1, -1, -1, -1, -1, -1};
 
@@ -381,12 +381,12 @@ public class G1GCForwardReference extends ForwardReference {
 
     // ****
     // Young phases
-    private final static double NOT_SET = -1.0d;
+    private static final double NOT_SET = -1.0d;
 
-    public final static int PRE_EVACUATE_COLLECTION_SET = 0;
-    public final static int EVACUATE_COLLECTION_SET = 1;
-    public final static int POST_EVACUATE_COLLECTION_SET = 2;
-    public final static int OTHER = 3;
+    public static final int PRE_EVACUATE_COLLECTION_SET = 0;
+    public static final int EVACUATE_COLLECTION_SET = 1;
+    public static final int POST_EVACUATE_COLLECTION_SET = 2;
+    public static final int OTHER = 3;
 
     private final double[] youngCollectionPhases = {NOT_SET, NOT_SET, NOT_SET, NOT_SET};
     private final Map<String, Double> preEvacuateCSetPhaseDurations = new ConcurrentHashMap<>(3);
@@ -536,14 +536,14 @@ public class G1GCForwardReference extends ForwardReference {
     }
 
     /*
-        private final static int METASPACE_OCCUPANCY_BEFORE_COLLECTION = 24;
-    private final static int METASPACE_OCCUPANCY_AFTER_COLLECTION = 25;
-    private final static int METASPACE_SIZE_BEFORE_COLLECTION = 26;
-    private final static int METASPACE_SIZE_AFTER_COLLECTION = 27;
-    private final static int METASPACE_COMMITTED_BEFORE_COLLECTION = 28;
-    private final static int METASPACE_COMMITTED_AFTER_COLLECTION = 29;
-    private final static int METASPACE_RESERVED_BEFORE_COLLECTION = 30;
-    private final static int METASPACE_RESERVED_AFTER_COLLECTION = 31;
+    private static final int METASPACE_OCCUPANCY_BEFORE_COLLECTION = 24;
+    private static final int METASPACE_OCCUPANCY_AFTER_COLLECTION = 25;
+    private static final int METASPACE_SIZE_BEFORE_COLLECTION = 26;
+    private static final int METASPACE_SIZE_AFTER_COLLECTION = 27;
+    private static final int METASPACE_COMMITTED_BEFORE_COLLECTION = 28;
+    private static final int METASPACE_COMMITTED_AFTER_COLLECTION = 29;
+    private static final int METASPACE_RESERVED_BEFORE_COLLECTION = 30;
+    private static final int METASPACE_RESERVED_AFTER_COLLECTION = 31;
      */
     private void fillInMetaspaceStats(G1GCPauseEvent collection) {
         collection.addPermOrMetaSpaceRecord(getMemoryPoolSummary(METASPACE_OCCUPANCY_BEFORE_COLLECTION));

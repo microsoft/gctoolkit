@@ -44,7 +44,6 @@ module com.microsoft.gctoolkit.api {
     exports com.microsoft.gctoolkit.io;
     exports com.microsoft.gctoolkit.jvm;
     exports com.microsoft.gctoolkit.time;
-    exports com.microsoft.gctoolkit.collections;
     exports com.microsoft.gctoolkit.util.concurrent;
     requires java.logging;
 

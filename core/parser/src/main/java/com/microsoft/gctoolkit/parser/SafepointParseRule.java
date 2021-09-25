@@ -21,7 +21,7 @@ public class SafepointParseRule {
     private static final ConcurrentMap<SafepointParseRule, AtomicInteger> misses = new ConcurrentHashMap<>();
     private static final ConcurrentMap<SafepointParseRule, Throwable> origin = new ConcurrentHashMap<>();
 
-    final private Pattern pattern;
+    private final Pattern pattern;
 
     public SafepointParseRule(String pattern) {
         this.pattern = Pattern.compile(pattern);

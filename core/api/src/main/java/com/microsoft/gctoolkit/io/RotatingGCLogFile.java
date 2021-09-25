@@ -34,7 +34,7 @@ import java.util.zip.ZipFile;
  */
 public class RotatingGCLogFile extends GCLogFile {
 
-    private final static Logger LOGGER = Logger.getLogger(RotatingGCLogFile.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(RotatingGCLogFile.class.getName());
 
     private static boolean isUnifiedLogging(Path path) {
         try {

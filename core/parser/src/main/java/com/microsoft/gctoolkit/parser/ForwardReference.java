@@ -9,8 +9,8 @@ import com.microsoft.gctoolkit.parser.jvm.Decorators;
 
 public class ForwardReference {
 
-    final private Decorators decorators;
-    final private int gcID;
+    private final Decorators decorators;
+    private final int gcID;
     private DateTimeStamp startTime = null;
     private double duration = -1.0d;
     private GCCause gcCause = GCCause.UNKNOWN_GCCAUSE;
