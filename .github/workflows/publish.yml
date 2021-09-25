@@ -1,17 +1,12 @@
-name: Publish package to GitHub Packages
+name: Publish to Maven Central
 
 on:
-  release:
-    types: [created]
+  workflow_dispatch:
 
 jobs:
   publish:
 
     runs-on: ubuntu-latest
-
-    permissions:
-      contents: write
-      packages: write
 
     steps:
       - name: Checkout project
@@ -19,31 +14,36 @@ jobs:
         with:
           ref: main
 
+      - name: Cache Maven
+        uses: actions/cache@v2.1.4
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
+
       - name: Setup Java JDK
         uses: actions/setup-java@v2
         with:
           java-version: '11'
           distribution: 'adopt'
-          server-id: github
-          settings-path: ${{ github.workspace }} # location for the settings.xml file
+          server-id: ossrh
+          server-username: MAVEN_USERNAME
+          server-password: MAVEN_CENTRAL_TOKEN
+          gpg-private-key: ${{ secrets.GPG_PRIVATEKEY }}
+          gpg-passphrase: MAVEN_GPG_PASSPHRASE
 
       - name: Configure Git user
         run: |
           git config user.email "actions@github.com"
           git config user.name "GitHub Actions"
           
-      - name: Prepare the release
-        run: ./mvnw -B release:prepare -DpushChanges=false --settings $GITHUB_WORKSPACE/settings.xml
+      - name: Release
+        run: |
+          export GPG_TTY=$(tty)
+          ./mvnw -Darguments="-Drelease=true" -B release:prepare release:perform -Drelease=true \
+            -Drepository.url=https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+
         env:
-          GITHUB_TOKEN: ${{ github.token }}
-
-      - name: Perform the release
-        run: ./mvnw -B release:perform -DlocalCheckout=true -Darguments="-DskipTests -Dmaven.javadoc.skip=true"  --settings $GITHUB_WORKSPACE/settings.xml
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-
-      - name: Bump pom version
-        run : git push
-
-      - name: Push tags
-        run: git push --tags
+          MAVEN_USERNAME: ${{ secrets.SONATYPE_NAME }}
+          MAVEN_CENTRAL_TOKEN: ${{ secrets.SONATYPE_PASSWORD }}
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}

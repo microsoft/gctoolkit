@@ -28,7 +28,7 @@ public class DecoratorsTest {
     [2018-04-04T09:10:00.586-0100][0.018s][1522825800586ms][18ms][10026341461044ns][17738937ns][1375][7427][info][gc] Using G1
  */
 
-    private final static String[] decoratorsLines = {
+    private static final String[] decoratorsLines = {
             "Using G1",
             "[gc] Using G1",
             "[info][gc] Using G1",
@@ -42,7 +42,7 @@ public class DecoratorsTest {
             "[2018-04-04T09:10:00.586-0100][0.018s][1522825800586ms][18ms][10026341461044ns][17738937ns][1375][7427][info][gc] Using G1"
     };
 
-    private final static String[] decoratorsValuesTestSupport = {
+    private static final String[] decoratorsValuesTestSupport = {
             "[2018-04-04T09:10:00.586-0100][0.018s][1522825800586ms][10026341461044ns][1375][7427][info][gc] Using G1",
             "[2018-04-04T09:10:00.586-0100][0.018s][18ms][17738937ns][1375][7427][info][gc] Using G1"
     };

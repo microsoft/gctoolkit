@@ -3,26 +3,25 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <artifactId>core</artifactId>
         <groupId>com.microsoft.gctoolkit</groupId>
-        <version>2.0.1-SNAPSHOT</version>
-        <relativePath>../pom.xml</relativePath>
+        <artifactId>gctoolkit-core</artifactId>
+        <version>2.0.4-SNAPSHOT</version>
     </parent>
 
-    <artifactId>vertx</artifactId>
+    <artifactId>gctoolkit-vertx</artifactId>
     <name>GCToolKit Vertx</name>
     <description>Event module for creating discrete event from parsing log files.</description>
     <url>${project.parent.url}</url>
     <dependencies>
         <dependency>
             <groupId>com.microsoft.gctoolkit</groupId>
-            <artifactId>api</artifactId>
-            <version>${project.parent.version}</version>
+            <artifactId>gctoolkit-api</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.microsoft.gctoolkit</groupId>
-            <artifactId>parser</artifactId>
-            <version>${project.parent.version}</version>
+            <artifactId>gctoolkit-parser</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>io.vertx</groupId>

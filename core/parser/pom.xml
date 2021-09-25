@@ -4,20 +4,20 @@
 
     <parent>
         <groupId>com.microsoft.gctoolkit</groupId>
-        <artifactId>core</artifactId>
-        <version>2.0.1-SNAPSHOT</version>
+        <artifactId>gctoolkit-core</artifactId>
+        <version>2.0.4-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>parser</artifactId>
+    <artifactId>gctoolkit-parser</artifactId>
     <name>GCToolKit Parser</name>
     <description>Parser module required for GC log analysis.</description>
     <url>${project.parent.url}</url>
     <dependencies>
         <dependency>
             <groupId>com.microsoft.gctoolkit</groupId>
-            <artifactId>api</artifactId>
-            <version>${project.parent.version}</version>
+            <artifactId>gctoolkit-api</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>

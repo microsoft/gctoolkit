@@ -1,16 +1,14 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
-package com.microsoft.gctoolkit.collections;
+package com.microsoft.gctoolkit.sample.collections;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.OptionalDouble;
 import java.util.stream.Stream;
 
-import static java.util.Collections.unmodifiableList;
-
 public class XYDataSet {
-
-    private List<Point> dataSeries;
+    private final List<Point> dataSeries;
 
     public XYDataSet() {
         dataSeries = new ArrayList<>();
@@ -18,7 +16,6 @@ public class XYDataSet {
 
     public XYDataSet(XYDataSet series) {
         dataSeries = new ArrayList<>(series.getItems());
-
     }
 
     public void add(Number x, Number y) {
@@ -37,8 +34,11 @@ public class XYDataSet {
         return dataSeries.isEmpty();
     }
 
+    /**
+     * Returns an immutable List of the items in this DataSet.
+     */
     public List<Point> getItems() {
-        return unmodifiableList(dataSeries);
+        return List.copyOf(dataSeries);
     }
 
     public XYDataSet scaleSeries(double scaleFactor) {
@@ -49,8 +49,15 @@ public class XYDataSet {
         return scaled;
     }
 
-    public double max() {
-        return dataSeries.stream().map(Point::getY).mapToDouble(Number::doubleValue).max().getAsDouble();
+    /**
+     * Returns the largest Y value in the XYDataSet as an OptionalDouble,
+     * with an empty optional if the dataset is empty.
+     */
+    public OptionalDouble maxOfY() {
+        return dataSeries.stream()
+                .map(Point::getY)
+                .mapToDouble(Number::doubleValue)
+                .max();
     }
 
     public XYDataSet scaleAndTranslateXAxis(double scale, double offset) {
@@ -71,9 +78,8 @@ public class XYDataSet {
     }
 
     public static class Point {
-
-        final private Number x;
-        final private Number y;
+        private final Number x;
+        private final Number y;
 
         public Point(Number x, Number y) {
             this.x = x;
@@ -83,6 +89,7 @@ public class XYDataSet {
         public Number getX() {
             return x;
         }
+
         public Number getY() {
             return y;
         }

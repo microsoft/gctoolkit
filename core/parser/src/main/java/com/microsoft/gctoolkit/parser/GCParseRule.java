@@ -11,8 +11,8 @@ import java.util.regex.Pattern;
  */
 public class GCParseRule {
 
-    final private String name;
-    final private Pattern pattern;
+    private final String name;
+    private final Pattern pattern;
 
     public GCParseRule(String name, String pattern) {
         this.name = name;

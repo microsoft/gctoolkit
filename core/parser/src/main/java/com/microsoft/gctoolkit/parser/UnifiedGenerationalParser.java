@@ -2,7 +2,6 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.parser;
 
-
 import com.microsoft.gctoolkit.event.CPUSummary;
 import com.microsoft.gctoolkit.event.GarbageCollectionTypes;
 import com.microsoft.gctoolkit.event.generational.AbortablePreClean;
@@ -28,6 +27,7 @@ import com.microsoft.gctoolkit.parser.jvm.LoggingDiary;
 import com.microsoft.gctoolkit.parser.unified.UnifiedGenerationalPatterns;
 
 import java.util.AbstractMap;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiConsumer;
@@ -140,11 +140,13 @@ public class UnifiedGenerationalParser extends UnifiedGCLogParser implements Uni
      * Data Extraction methods
      */
     private GenerationalForwardReference pauseEvent = null;
+    private GenerationalForwardReference concurrentCyclePauseEvent = null;
     private GenerationalForwardReference concurrentEvent = null;
+    private boolean inConcurrentPhase = false;
 
-    private boolean isCMS;
-    private boolean isParallel;
-    private boolean isSerial;
+//    private boolean isCMS;
+//    private boolean isParallel;
+//    private boolean isSerial;
 
     private void tag(GCLogTrace trace, String line) {
         noop();
@@ -216,16 +218,22 @@ public class UnifiedGenerationalParser extends UnifiedGCLogParser implements Uni
         pauseEvent.setHeap(trace.getOccupancyBeforeAfterWithMemoryPoolSizeSummary(2));
     }
 
+    /**
+     * If the concurrentCyclePauseEvent has not been recorded, something has gone wrong and it's likely
+     * that it doesn't have a consistent state. The default action is to lose it.
+     * @param trace
+     * @param line
+     */
     private void initialMark(GCLogTrace trace, String line) {
-        if (pauseEvent != null)
+        if (concurrentCyclePauseEvent != null)
             LOGGER.warning("Pause event not completely recorded: " + pauseEvent.getGcID());
-        pauseEvent = new GenerationalForwardReference(InitialMark, new Decorators(line), GCID_COUNTER.parse(line).getIntegerGroup(1));
-        pauseEvent.setStartTime(getClock());
+        concurrentCyclePauseEvent = new GenerationalForwardReference(InitialMark, new Decorators(line), GCID_COUNTER.parse(line).getIntegerGroup(1));
+        concurrentCyclePauseEvent.setStartTime(getClock());
     }
 
     private void initialMarkSummary(GCLogTrace trace, String line) {
-        pauseEvent.setHeap(trace.getOccupancyBeforeAfterWithMemoryPoolSizeSummary(1));
-        pauseEvent.setDuration(trace.getDuration() / 1000.0d);
+        concurrentCyclePauseEvent.setHeap(trace.getOccupancyBeforeAfterWithMemoryPoolSizeSummary(1));
+        concurrentCyclePauseEvent .setDuration(trace.getDuration() / 1000.0d);
     }
 
     private void concurrentPhaseStart(GCLogTrace trace, String line) {
@@ -238,6 +246,7 @@ public class UnifiedGenerationalParser extends UnifiedGCLogParser implements Uni
         }
         concurrentEvent = new GenerationalForwardReference(gcType, new Decorators(line), GCID_COUNTER.parse(line).getIntegerGroup(1));
         concurrentEvent.setStartTime(getClock());
+        inConcurrentPhase = true;
     }
 
     private void concurrentPhaseEnd(GCLogTrace trace, String line) {
@@ -248,19 +257,26 @@ public class UnifiedGenerationalParser extends UnifiedGCLogParser implements Uni
         notYetImplemented(trace, line);
     }
 
+    /**
+     * If the forward reference has not been recorded, assume it's state is corrupted so over-write it.
+     * @param trace
+     * @param line
+     */
     private void remark(GCLogTrace trace, String line) {
-        pauseEvent = new GenerationalForwardReference(Remark, new Decorators(line), GCID_COUNTER.parse(line).getIntegerGroup(1));
-        pauseEvent.setStartTime(getClock());
+        if (concurrentCyclePauseEvent != null)
+            LOGGER.warning("Pause event not recorded and is about to be lost: " + pauseEvent.getGcID());
+        concurrentCyclePauseEvent = new GenerationalForwardReference(Remark, new Decorators(line), GCID_COUNTER.parse(line).getIntegerGroup(1));
+        concurrentCyclePauseEvent.setStartTime(getClock());
     }
 
     private void remarkSummary(GCLogTrace trace, String line) {
-        pauseEvent.setHeap(trace.getOccupancyBeforeAfterWithMemoryPoolSizeSummary(1));
-        pauseEvent.setDuration(trace.getDuration() / 1000.0d);
+        concurrentCyclePauseEvent.setHeap(trace.getOccupancyBeforeAfterWithMemoryPoolSizeSummary(1));
+        concurrentCyclePauseEvent.setDuration(trace.getDuration() / 1000.0d);
     }
 
     //Rescan \\(parallel\\)|Reference Processing|Weak Processing|ClassLoaderData|ProtectionDomainCacheTable|ResolvedMethodTable|Class Unloading|Scrub Symbol Table|Scrub String Table
     private void remarkPhase(GCLogTrace trace, String line) {
-        pauseEvent.addCMSRemarkPhase(trace.getGroup(1), trace.getDuration() / 1000.0d);
+        concurrentCyclePauseEvent.addCMSRemarkPhase(trace.getGroup(1), trace.getDuration() / 1000.0d);
     }
 
     private void oldSummary(GCLogTrace trace, String line) {
@@ -325,19 +341,46 @@ public class UnifiedGenerationalParser extends UnifiedGCLogParser implements Uni
         consumer.record(new JVMTermination(getClock()));
     }
 
+    /**
+     *
+     * By convention, events are emitted iini the order that they started. For CMS, it's possible to have a ParNew
+     * intermixed with a concurrent cycle. To cover these cases, the young gen collection is cached, the concurrent
+     * event is completed and then the cached event is emitted.
+     */
+    private ArrayList<GenerationalGCPauseEvent> cache = new ArrayList<>();
+
     private void cpuBreakout(GCLogTrace trace, String line) {
         GCLogTrace gcidTrace = GCID_COUNTER.parse(line);
         if (gcidTrace != null) {
             CPUSummary cpuSummary = new CPUSummary(trace.getDoubleGroup(1), trace.getDoubleGroup(2), trace.getDoubleGroup(3));
             int gcid = gcidTrace.getIntegerGroup(1);
+            // There are 3 cases to consider.
+            // - pause event outside of a concurrent cycle
+            // - pause event that is part of the concurrent cycle
+            // - a non-concurrent cycle pause event during a concurrent cycle
+            // In all cases, the goal is to preserve the time ordering of the events. This translates to, if there
+            // is an external pause event during a concurrent cycle and we're in a concurrent phase, then the
+            // external pause event needs to be cached. When the concurrent phase ends, it should ben published
+            // and then all of the external pause events should be published
             if (pauseEvent != null && pauseEvent.getGcID() == gcid) {
                 pauseEvent.add(cpuSummary);
-                consumer.record(buildPauseEvent(pauseEvent));
+                if (inConcurrentPhase) {
+                    cache.add(buildPauseEvent((pauseEvent)));
+                } else {
+                    consumer.record(buildPauseEvent(pauseEvent));
+                }
                 pauseEvent = null;
+            } else if (concurrentCyclePauseEvent != null && concurrentCyclePauseEvent.getGcID() == gcid) {
+                concurrentCyclePauseEvent.add(cpuSummary);
+                consumer.record(buildPauseEvent(concurrentCyclePauseEvent));
+                concurrentCyclePauseEvent = null;
             } else if ((concurrentEvent != null) && (concurrentEvent.getGcID() == gcid)) {
                 concurrentEvent.add(cpuSummary);
                 consumer.record(buildConcurrentPhase(concurrentEvent));
                 concurrentEvent = null;
+                inConcurrentPhase = false;
+                cache.forEach(consumer::record);
+                cache.clear();
             }
         }
     }

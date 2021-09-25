@@ -4,8 +4,8 @@ package com.microsoft.gctoolkit.event.zgc;
 
 public class ReclaimSummary {
 
-    final private long reclaimStart;
-    final private long reclaimEnd;
+    private final long reclaimStart;
+    private final long reclaimEnd;
 
     public ReclaimSummary(long reclaimStart, long reclaimEnd) {
         this.reclaimStart = reclaimStart;

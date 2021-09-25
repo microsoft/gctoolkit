@@ -120,7 +120,7 @@ public class JVMEventParser extends PreUnifiedGCLogParser implements JVMPatterns
         safePoints.clear();
     }
 
-    private static abstract class SafePointData {
+    private abstract static class SafePointData {
         double duration;
 
         abstract JVMEvent complete(DateTimeStamp timeStamp1);

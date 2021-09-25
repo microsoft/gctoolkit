@@ -20,10 +20,12 @@ public class MRUQueue<K, V> implements Map<K, V>, Iterable<K> {
         keys = new LinkedList<>();
     }
 
+    @Override
+    @SuppressWarnings("unchecked")
     public V get(Object key) {
         keys.remove(key);
         if (key != null) {
-            keys.offerFirst((K) key);
+            keys.offerFirst((K)key); // unchecked cast
             return entries.get(key);
         }
         return null;
