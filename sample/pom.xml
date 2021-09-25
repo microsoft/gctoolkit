@@ -10,7 +10,7 @@
     </parent>
 
     <artifactId>sample</artifactId>
-
+    <name>GCToolKit Sample</name>
     <properties>
         <gcLogFile>../gclogs/preunified/cms/defnew/details/defnew.log</gcLogFile>
     </properties>    

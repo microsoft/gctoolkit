@@ -10,7 +10,7 @@
     </parent>
 
     <artifactId>parser</artifactId>
-
+    <name>GCToolKit Parser</name>
     <dependencies>
         <dependency>
             <groupId>com.microsoft.gctoolkit</groupId>

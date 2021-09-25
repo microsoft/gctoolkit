@@ -10,7 +10,7 @@
     </parent>
 
     <artifactId>vertx</artifactId>
-
+    <name>GCToolKit Vertx</name>
     <dependencies>
         <dependency>
             <groupId>com.microsoft.gctoolkit</groupId>

@@ -10,7 +10,7 @@
     </parent>
 
     <artifactId>api</artifactId>
-
+    <name>GCToolKit API</name>
     <dependencies>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
