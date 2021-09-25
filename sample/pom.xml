@@ -11,6 +11,7 @@
 
     <artifactId>sample</artifactId>
     <description>Sample application for GCToolKit usage</description>
+    <url>${project.parent.url}</url>
     <name>GCToolKit Sample</name>
     <properties>
         <gcLogFile>../gclogs/preunified/cms/defnew/details/defnew.log</gcLogFile>
