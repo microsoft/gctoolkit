@@ -11,6 +11,7 @@
 
     <artifactId>parser</artifactId>
     <name>GCToolKit Parser</name>
+    <description>Parser module required for GC log analysis.</description>
     <dependencies>
         <dependency>
             <groupId>com.microsoft.gctoolkit</groupId>

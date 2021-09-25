@@ -11,6 +11,7 @@
 
     <artifactId>vertx</artifactId>
     <name>GCToolKit Vertx</name>
+    <description>Event module for creating discrete event from parsing log files.</description>
     <dependencies>
         <dependency>
             <groupId>com.microsoft.gctoolkit</groupId>

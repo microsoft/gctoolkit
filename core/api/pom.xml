@@ -11,6 +11,7 @@
 
     <artifactId>api</artifactId>
     <name>GCToolKit API</name>
+    <description>Model api's for aggregator, events, inputs.</description>
     <dependencies>
         <dependency>
             <groupId>org.junit.jupiter</groupId>

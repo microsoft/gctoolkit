@@ -10,6 +10,7 @@
 
     <artifactId>core</artifactId>
     <name>GCToolKit Core</name>
+    <description>GCToolkit Core classes contains api, parser, event modules.</description>
     <packaging>pom</packaging>
     <modules>
         <module>api</module>
