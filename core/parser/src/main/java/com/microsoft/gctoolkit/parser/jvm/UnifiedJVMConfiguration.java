@@ -19,7 +19,6 @@ public class UnifiedJVMConfiguration implements ShenandoahPatterns, ZGCPatterns,
 
     private static final Logger LOGGER = Logger.getLogger(UnifiedJVMConfiguration.class.getName());
 
-    private static final int MAXIMUM_LINES_TO_EXAMINE = 10_000; // duplicated in PreUnifedJVMConfiguration
     private int lineCount = MAXIMUM_LINES_TO_EXAMINE;
 
     private final LoggingDiary diary;

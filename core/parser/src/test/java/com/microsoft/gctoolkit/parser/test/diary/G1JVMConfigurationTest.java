@@ -193,4 +193,30 @@ public class G1JVMConfigurationTest extends LogDiaryTest {
         }
     }
 
+    @Test
+    public void testUnifiedG1GC() {
+        int i = 0;
+        for (String name : unifiedLogs) {
+            testWith(new TestLogFile("g1gc/details/reference/" + name).getFile(), name, unifiedDiary[i], unifiedUnknown[i], unifiedKnown[i++]);
+        }
+    }
+
+    // Details, Print Reference GC, is post 1.7.0_40
+    private static final String[] unifiedLogs = {
+            "gc1gc_details_adaptivesizing_rset.log"
+    };
+
+    private static final boolean[][] unifiedDiary = {
+            //   0      1      2      3      4      5      6      7      8      9     10     11     12     13     14     15     16     17     18,    19,    20,    21,    22,    23,    24,    25,    26,    27
+            {false, false, false, false, false, false, false, false, false,  true, false, false,  true, false, false, false,  true,  true, false, false, false, false, false, false, false, false, false, false}
+    };
+
+    private static final int[][] unifiedUnknown = {
+            {-1}
+    };
+
+    private static final int[][] unifiedKnown = {
+            {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27}
+    };
+
 }
