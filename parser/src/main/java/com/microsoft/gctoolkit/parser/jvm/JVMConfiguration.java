@@ -6,7 +6,7 @@ import com.microsoft.gctoolkit.time.DateTimeStamp;
 
 public interface JVMConfiguration {
 
-    int MAXIMUM_LINES_TO_EXAMINE = 1000;
+    int MAXIMUM_LINES_TO_EXAMINE = 10000;
 
     String getCommandLine();
 

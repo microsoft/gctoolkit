@@ -19,6 +19,9 @@ public class UnifiedJVMConfiguration implements ShenandoahPatterns, ZGCPatterns,
 
     private static final Logger LOGGER = Logger.getLogger(UnifiedJVMConfiguration.class.getName());
 
+    private static final int CYCLES_TO_EXAMINE_BEFORE_GIVING_UP = 10;
+    private static final int CYCLES_TO_EXAMINE_FOR_SAFEPOINT = 2;
+
     private int lineCount = MAXIMUM_LINES_TO_EXAMINE;
 
     private final LoggingDiary diary;
@@ -76,6 +79,8 @@ public class UnifiedJVMConfiguration implements ShenandoahPatterns, ZGCPatterns,
             discoverDetails(line);
         if (!getDiary().isJVMEventsKnown())
             discoverJVMEvents(line);
+        if (CPU_BREAKOUT.parse(line) != null)
+            collectionCount++;
         return this.completed();
     }
 
@@ -143,11 +148,16 @@ public class UnifiedJVMConfiguration implements ShenandoahPatterns, ZGCPatterns,
     /*
     G1 flags
         ADAPTIVE_SIZING,RSET_STATS,PRINT_PROMOTION_FAILURE, PRINT_FLS_STATISTICS
+        todo: test for log segments that are missing the header lines that will contain the "use" keyword
+        ZGC - x
+        Shenandoah - x
+        G1 - done
+        CMS - x
+        Parallel - x
+        Serial - x
      */
 
     private void discoverCollector(String line) {
-        if (CPU_BREAKOUT.parse(line) != null)
-            collectionCount++;
 
         if ( ZGC_TAG.parse(line) != null || CYCLE_START.parse(line) != null) {
             getDiary().setTrue(ZGC);
@@ -161,7 +171,7 @@ public class UnifiedJVMConfiguration implements ShenandoahPatterns, ZGCPatterns,
             return;
         }
 
-        if (G1_TAG.parse(line) != null || line.contains("G1 Evacuation Pause")) {
+        if (G1_TAG.parse(line) != null || line.contains("G1 Evacuation Pause") || (line.contains("Humongous regions: "))) {
             getDiary().setTrue(G1GC);
             getDiary().setFalse(DEFNEW, SERIAL, PARALLELGC, PARALLELOLDGC, PARNEW, CMS, ICMS, ZGC, SHENANDOAH, CMS_DEBUG_LEVEL_1, PRE_JDK70_40, JDK70, JDK80, PRINT_FLS_STATISTICS);
             return;
@@ -190,14 +200,17 @@ public class UnifiedJVMConfiguration implements ShenandoahPatterns, ZGCPatterns,
         }
     }
 
+    /**
+     *
+     * @param line
+     */
     private void discoverDetails(String line) {
 
-        if (collectionCount > 2)
+        if (collectionCount > CYCLES_TO_EXAMINE_BEFORE_GIVING_UP)
             getDiary().setFalse(ADAPTIVE_SIZING, TLAB_DATA, PRINT_REFERENCE_GC, PRINT_PROMOTION_FAILURE, PRINT_FLS_STATISTICS, PRINT_HEAP_AT_GC);
 
         if (CYCLE_START.parse(line) != null) {
             getDiary().setTrue(SupportedFlags.GC_CAUSE);
-            collectionCount++;
         }
     }
 
@@ -205,7 +218,7 @@ public class UnifiedJVMConfiguration implements ShenandoahPatterns, ZGCPatterns,
         GCLogTrace trace = GC_COUNT.parse(line);
         if (trace == null) return;
         int gcCurrentEventCount = trace.getIntegerGroup(1);
-        if (gcCurrentEventCount > 2) {
+        if (gcCurrentEventCount > CYCLES_TO_EXAMINE_FOR_SAFEPOINT) {
             getDiary().setFalse(APPLICATION_STOPPED_TIME, APPLICATION_CONCURRENT_TIME);
         }
     }
