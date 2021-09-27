@@ -1,6 +1,6 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
-package com.microsoft.gctoolkit.vertx.test.io;
+package com.microsoft.gctoolkit.vertx.io;
 
 import com.microsoft.gctoolkit.event.GCCause;
 import com.microsoft.gctoolkit.event.GCEvent;
