@@ -11,6 +11,9 @@
     </parent>
 
     <artifactId>gctoolkit-gclogs</artifactId>
+    <description>GCToolkit test gclogs downloader</description>
+    <url>${project.parent.url}</url>
+    <name>GCToolKit GCLogs</name>
     <packaging>pom</packaging>
 
     <properties>

@@ -11,6 +11,9 @@
 
     <artifactId>gctoolkit-api</artifactId>
 
+    <name>GCToolKit API</name>
+    <description>Model api's for aggregator, events, inputs.</description>
+    <url>${project.parent.url}</url>
     <dependencies>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
