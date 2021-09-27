@@ -1,5 +1,9 @@
-gclogs/
-gctoolkit-testdata-*/
+gclogs/preunified
+gclogs/rolling
+gclogs/shenandoah
+gclogs/streaming
+gclogs/unified
+gclogs/zgc
 
 gctoolkit-testdata-*.zip
 

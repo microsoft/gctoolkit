@@ -78,8 +78,8 @@ public class GCLogTrace extends AbstractLogTrace {
 
     /**
      * Annoyingly we're assuming the field actually is ms instead of confirming
-     * @param index
-     * @return
+     * @param index Index of the capture group.
+     * @return The capture group parsed to a double.
      */
     public double getMilliseconds(int index) {
         return getDoubleGroup(index);
@@ -87,7 +87,7 @@ public class GCLogTrace extends AbstractLogTrace {
 
     /**
      * Assumed to be the last capture group
-     * @return
+     * @return The last capture group parsed to a double.
      */
     public double getMilliseconds() {
         return getMilliseconds(groupCount());

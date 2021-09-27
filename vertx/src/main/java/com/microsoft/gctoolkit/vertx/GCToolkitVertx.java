@@ -61,6 +61,7 @@ public class GCToolkitVertx extends AbstractVerticle {
      * @param aggregatorVerticles The verticles that dispatch events to the aggregators
      * @param mailBox The mailbox for the log file parser.
      * @return The runtime duration
+     * @throws IOException If an IOException is thrown while reading the DataSource
      */
     public static DateTimeStamp aggregateDataSource(
             DataSource<?> dataSource,

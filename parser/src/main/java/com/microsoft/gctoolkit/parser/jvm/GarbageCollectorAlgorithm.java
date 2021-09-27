@@ -13,7 +13,7 @@ public enum GarbageCollectorAlgorithm {
     ICMS,                                       //  4
     /** -XX:+UseParallelGC */
     PARALLELGC,                                 //  5
-    /** -XX:+UseParallelGC -XX:+UseParallelOldGC <br/>-XX:+UseParallelOldGC */
+    /** -XX:+UseParallelGC -XX:+UseParallelOldGC <br>-XX:+UseParallelOldGC */
     PARALLELOLDGC,                              //  6
     /** -XX:+UseSerialGC */
     SERIAL,                                     //  7
