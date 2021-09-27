@@ -1,8 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
-package com.microsoft.gctoolkit.test.time;
+package com.microsoft.gctoolkit.time;
 
-import com.microsoft.gctoolkit.time.DateTimeStamp;
 import org.junit.jupiter.api.Test;
 
 import java.time.ZonedDateTime;

@@ -1,6 +1,5 @@
-package com.microsoft.gctoolkit.test.util.concurrent;
+package com.microsoft.gctoolkit.util.concurrent;
 
-import com.microsoft.gctoolkit.util.concurrent.StartingGun;
 import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.locks.LockSupport;
