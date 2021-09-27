@@ -1,6 +1,6 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
-package com.microsoft.gctoolkit.sample.test.collections;
+package com.microsoft.gctoolkit.sample.collections;
 
 import com.microsoft.gctoolkit.sample.collections.XYDataSet;
 import com.microsoft.gctoolkit.sample.collections.XYDataSet.Point;

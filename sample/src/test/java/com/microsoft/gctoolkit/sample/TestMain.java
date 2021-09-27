@@ -1,4 +1,4 @@
-package com.microsoft.gctoolkit.sample.test;
+package com.microsoft.gctoolkit.sample;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
