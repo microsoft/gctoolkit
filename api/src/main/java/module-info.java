@@ -26,6 +26,7 @@
  * @uses com.microsoft.gctoolkit.aggregator.Aggregator
  */
 module com.microsoft.gctoolkit.api {
+    requires java.logging;
 
     exports com.microsoft.gctoolkit;
     exports com.microsoft.gctoolkit.aggregator;
@@ -39,8 +40,7 @@ module com.microsoft.gctoolkit.api {
     exports com.microsoft.gctoolkit.jvm;
     exports com.microsoft.gctoolkit.time;
     exports com.microsoft.gctoolkit.util.concurrent;
-    requires java.logging;
 
-    uses com.microsoft.gctoolkit.jvm.JavaVirtualMachine;
     uses com.microsoft.gctoolkit.aggregator.Aggregation;
+    uses com.microsoft.gctoolkit.jvm.JavaVirtualMachine;
 }
