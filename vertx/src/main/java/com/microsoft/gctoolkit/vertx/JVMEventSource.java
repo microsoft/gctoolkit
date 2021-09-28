@@ -4,7 +4,7 @@ package com.microsoft.gctoolkit.vertx;
 
 import com.microsoft.gctoolkit.io.DataSource;
 import com.microsoft.gctoolkit.parser.io.SafepointLogFile;
-import com.microsoft.gctoolkit.util.concurrent.StartingGun;
+import com.microsoft.gctoolkit.vertx.internal.util.concurrent.StartingGun;
 import io.vertx.core.AbstractVerticle;
 
 import java.io.IOException;
