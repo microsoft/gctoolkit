@@ -5,7 +5,13 @@
  * Contains the GCToolKit GC log parser. The parser is an internal module.
  */
 module com.microsoft.gctoolkit.parser {
+    requires com.microsoft.gctoolkit.api;
+    requires java.logging;
+
     exports com.microsoft.gctoolkit.parser to
+            com.microsoft.gctoolkit.vertx;
+
+    exports com.microsoft.gctoolkit.parser.datatype to
             com.microsoft.gctoolkit.vertx;
 
     exports com.microsoft.gctoolkit.parser.io to
@@ -19,10 +25,4 @@ module com.microsoft.gctoolkit.parser {
 
     exports com.microsoft.gctoolkit.parser.vmops to
             com.microsoft.gctoolkit.vertx;
-
-    exports com.microsoft.gctoolkit.parser.datatype to
-            com.microsoft.gctoolkit.vertx;
-
-    requires com.microsoft.gctoolkit.api;
-    requires java.logging;
 }

@@ -10,10 +10,11 @@ module com.microsoft.gctoolkit.sample {
     requires com.microsoft.gctoolkit.vertx;
     requires java.logging;
 
-    exports com.microsoft.gctoolkit.sample.aggregation to com.microsoft.gctoolkit.vertx;
-
     exports com.microsoft.gctoolkit.sample;
 
-    provides com.microsoft.gctoolkit.aggregator.Aggregation
-            with com.microsoft.gctoolkit.sample.aggregation.HeapOccupancyAfterCollectionSummary;
+    exports com.microsoft.gctoolkit.sample.aggregation to
+            com.microsoft.gctoolkit.vertx;
+
+    provides com.microsoft.gctoolkit.aggregator.Aggregation with
+            com.microsoft.gctoolkit.sample.aggregation.HeapOccupancyAfterCollectionSummary;
 }
