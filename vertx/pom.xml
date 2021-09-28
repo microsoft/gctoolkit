@@ -13,6 +13,20 @@
     <name>GCToolKit Vertx</name>
     <description>Event module for creating discrete event from parsing log files.</description>
     <url>${project.parent.url}</url>
+
+    <build>
+        <plugins>
+            <plugin>
+               <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <argLine>
+                        --add-opens com.microsoft.gctoolkit.vertx/com.microsoft.gctoolkit.vertx.io=ALL-UNNAMED
+                    </argLine>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
     <dependencies>
         <dependency>
             <groupId>com.microsoft.gctoolkit</groupId>
