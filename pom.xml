@@ -494,6 +494,34 @@
                 </plugins>
             </build>
         </profile>
+        <profile>
+            <!-- Only active in VS Code Java environment, used to bypass duplicate
+    module-info.java check in VS Code. It has no influence on the Maven build itself. -->
+            <id>m2e</id>
+            <activation>
+                <property>
+                    <name>m2e.version</name>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <version>${maven.compiler-plugin.version}</version>
+                        <configuration>
+                            <compilerArgs>
+                                <arg>--module-version=${project.version}</arg>
+                                <arg>-Xlint:unchecked</arg>
+                            </compilerArgs>
+                            <testExcludes>
+                                <testExclude>**/module-info.java</testExclude>
+                            </testExcludes>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
     </profiles>
 
 </project>
