@@ -5,18 +5,58 @@ import com.microsoft.gctoolkit.time.DateTimeStamp;
 
 /**
  * An Aggregation that collates runtime data. This class is meant to be extended by other
- * implementations that need access to runtime data to perform calculations. For example,
- * to calculate the ratio of pause time to runtime duration.
+ * implementations that need access to runtime data to perform calculations.
+ * <p>
+ * The following code shows recommended practice for using this Aggregation. The example
+ * uses {@code RuntimeAggregation} to calculate the ratio of pause time to runtime duration
+ * for a G1GC log.
+ * <pre><code>
+ * {@literal @}Collates(G1PauseTimeAggregator.class)
+ * public abstract class G1PauseTimeAggregation extends RuntimeAggregation {
+ *      public abstract void recordPause(double pauseTime);
+ * }
+ *
+ * {@literal @}Aggregates({EventSource.G1GC)
+ * public class G1PauseTimeAggregator extends RuntimeAggregator{@literal <}G1PauseTimeAggregation{@literal >} {
+ *
+ *     public G1PauseTimeAggregator(G1PauseTimeAggregation aggregation) {
+ *         super(aggregation);
+ *         register(G1RealPause.class, this::process);
+ *     }
+ *
+ *      private void process(G1RealPause event) {
+ *          aggregation().recordPause(event.getDuration());
+ *      }
+ * }
+ *
+ * public class G1PauseTimeRatio extends G1PauseTimeAggregation {
+ *
+ *     long totalPauseTime;
+ *
+ *     public MaxFullGCPauseTime() {}
+ *
+ *     {@literal @}Override
+ *     public void recordPause(double pauseTime) {
+ *         totalPauseTime += pauseTime;
+ *     }
+ *
+ *     public double getPauseTimeRatio() {
+ *         return getRuntimeDuration() > 0.0 ? totalPauseTime / getRuntimeDuration() : 0.0;
+ *     }
+ *
+ *     {@literal @}Override
+ *     public boolean hasWarning() { return false; }
+ *
+ *     {@literal @}Override
+ *     public boolean isEmpty() { return getRuntimeDuration() <= 0.0; }
+ * }
+ * </code></pre>
+
  */
 public abstract class RuntimeAggregation  implements Aggregation {
 
     private volatile DateTimeStamp timeOfFirstEvent = null;
     private volatile DateTimeStamp timeOfLastEvent = new DateTimeStamp(0d);
-
-    /**
-     * Runtime duration (in decimal seconds) after which we no longer consider the GC log to be a fragment
-     */
-    private static final double LOG_FRAGMENT_THRESHOLD = 18d;
 
     /**
      * This class is meant to be extended.
@@ -29,14 +69,17 @@ public abstract class RuntimeAggregation  implements Aggregation {
      * @param duration The duration of the JVMEvent.
      */
     public void record(DateTimeStamp eventTime, double duration) {
-        duration = !Double.isNaN(duration) ? duration : 0d;
 
-        if (timeOfFirstEvent == null || (eventTime != null && eventTime.before(timeOfFirstEvent))) {
-            timeOfFirstEvent = eventTime != null ? eventTime : new DateTimeStamp(0d);
+        if (timeOfFirstEvent == null && eventTime != null) {
+            timeOfFirstEvent = eventTime;
         }
 
-        final DateTimeStamp now =
-                eventTime != null ? eventTime.add(duration) : timeOfLastEvent.add(duration);
+        double eventDuration = !Double.isNaN(duration) ? duration : 0d;
+
+        DateTimeStamp now = eventTime != null
+                ? eventTime.add(duration)
+                : timeOfLastEvent.add(duration);
+
         if (now.after(timeOfLastEvent)) {
             timeOfLastEvent = now;
         }
@@ -63,13 +106,9 @@ public abstract class RuntimeAggregation  implements Aggregation {
     /**
      * Return the duration of the GC log. Fundamentally, this is the difference between the
      * time of the last event and the time of the first event.
-     * @return The time of the first event.
+     * @return The duration of the JVM runtime represented by the log.
      */
     public double getRuntimeDuration() {
-        double duration = getTimeOfLastEvent().minus(getTimeOfFirstEvent());
-        boolean isLogFragment = duration < LOG_FRAGMENT_THRESHOLD;
-        return !isLogFragment
-                ? duration
-                : getTimeOfLastEvent().getTimeStamp();
+        return getTimeOfLastEvent().minus(getTimeOfFirstEvent());
     }
 }
