@@ -13,7 +13,7 @@
 
     <artifactId>gctoolkit-api</artifactId>
     <name>GCToolKit API</name>
-    <description>Model api's for aggregator, events, inputs.</description>
+    <description>Model APIs for aggregator, events, inputs.</description>
     <url>${project.parent.url}</url>
 
     <build>
