@@ -14,19 +14,6 @@
     <description>Messaging backplane for connecting GC log parsers and JVM event consumers.</description>
     <url>${project.parent.url}</url>
 
-    <build>
-        <plugins>
-            <plugin>
-               <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <argLine>
-                        --add-opens com.microsoft.gctoolkit.vertx/com.microsoft.gctoolkit.vertx.io=ALL-UNNAMED
-                    </argLine>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
-
     <dependencies>
         <dependency>
             <groupId>com.microsoft.gctoolkit</groupId>

@@ -16,20 +16,6 @@
     <description>Model APIs for aggregator, events, inputs.</description>
     <url>${project.parent.url}</url>
 
-    <build>
-        <plugins>
-            <plugin>
-               <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <argLine>
-                        --add-opens com.microsoft.gctoolkit.api/com.microsoft.gctoolkit.time=ALL-UNNAMED
-                        --add-opens com.microsoft.gctoolkit.api/com.microsoft.gctoolkit.io=ALL-UNNAMED
-                    </argLine>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
-
     <dependencies>
         <dependency>
             <groupId>org.junit.jupiter</groupId>

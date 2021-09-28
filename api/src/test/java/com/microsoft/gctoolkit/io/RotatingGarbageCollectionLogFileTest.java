@@ -18,7 +18,7 @@ import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
-class RotatingGarbageCollectionLogFileTest {
+public class RotatingGarbageCollectionLogFileTest {
 
     private String[][] expected = new String[][] {
             new String[] {
@@ -52,7 +52,7 @@ class RotatingGarbageCollectionLogFileTest {
     };
 
     @Test
-    void getOrderedGarbageCollectionLogFiles() {
+    public void getOrderedGarbageCollectionLogFiles() {
         for(String[] data : expected) {
             try {
                 RotatingGCLogFile garbageCollectionLogFile = createRotatingGarbageCollectionLogFile(data[0]);
@@ -68,7 +68,7 @@ class RotatingGarbageCollectionLogFileTest {
     }
 
     @Test
-    void testRollingLogOrderUsage() {
+    public void testRollingLogOrderUsage() {
         Path path = getPath( "rolling/jdk14/rollinglogs/rollover.log");
         List<String> expected = Arrays.asList(
                 "rollover.log.3", "rollover.log.4", "rollover.log.0", "rollover.log.1", "rollover.log.2", "rollover.log"
