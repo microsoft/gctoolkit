@@ -11,7 +11,7 @@
 
     <artifactId>gctoolkit-vertx</artifactId>
     <name>GCToolKit Vertx</name>
-    <description>Event module for creating discrete event from parsing log files.</description>
+    <description>Messaging backplane for connecting GC log parsers and JVM event consumers.</description>
     <url>${project.parent.url}</url>
 
     <build>
