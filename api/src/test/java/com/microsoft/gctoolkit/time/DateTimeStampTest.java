@@ -9,13 +9,13 @@ import java.time.format.DateTimeFormatter;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class DateTimeStampTest {
+public class DateTimeStampTest {
 
     // For some reason, ISO_DATE_TIME doesn't like that time-zone is -0100. It wants -01:00.
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 
     @Test
-    void getTimeStamp() {
+    public void getTimeStamp() {
         DateTimeStamp dateTimeStamp = new DateTimeStamp(.586);
         assertEquals(.586, dateTimeStamp.getTimeStamp(), 0.0001);
 
@@ -28,7 +28,7 @@ class DateTimeStampTest {
     }
 
     @Test
-    void getDateStampAsString() {
+    public void getDateStampAsString() {
         DateTimeStamp dateTimeStamp = new DateTimeStamp(.586);
         assertEquals("@0.586", dateTimeStamp.toString());
 
@@ -40,7 +40,7 @@ class DateTimeStampTest {
     }
 
     @Test
-    void getDateTime() {
+    public void getDateTime() {
         DateTimeStamp dateTimeStamp = new DateTimeStamp(.586);
         assertNull(dateTimeStamp.getDateTime());
 
@@ -52,7 +52,7 @@ class DateTimeStampTest {
     }
 
     @Test
-    void hasDateStamp() {
+    public void hasDateStamp() {
         DateTimeStamp dateTimeStamp = new DateTimeStamp(.586);
         assertFalse(dateTimeStamp.hasDateStamp());
 
@@ -64,7 +64,7 @@ class DateTimeStampTest {
     }
 
     @Test
-    void testHash() {
+    public void testHash() {
         DateTimeStamp a = new DateTimeStamp(.586);
         DateTimeStamp b = new DateTimeStamp(.587);
         assertNotEquals(a.hashCode(), b.hashCode());
@@ -100,7 +100,7 @@ class DateTimeStampTest {
     }
 
     @Test
-    void testEquals() {
+    public void testEquals() {
         DateTimeStamp a = new DateTimeStamp(.586);
         DateTimeStamp b = new DateTimeStamp(.587);
         assertNotEquals(a, b);
@@ -135,7 +135,7 @@ class DateTimeStampTest {
     }
 
     @Test
-    void testBefore() {
+    public void testBefore() {
         DateTimeStamp a = new DateTimeStamp(.586);
         DateTimeStamp b = new DateTimeStamp(.587);
         assertTrue(a.before(b));
@@ -183,7 +183,7 @@ class DateTimeStampTest {
     }
 
     @Test
-    void testAfter() {
+    public void testAfter() {
         DateTimeStamp a = new DateTimeStamp(.586);
         DateTimeStamp b = new DateTimeStamp(.587);
         assertTrue(b.after(a));
@@ -231,7 +231,7 @@ class DateTimeStampTest {
     }
 
     @Test
-    void compare() {
+    public void compare() {
         DateTimeStamp a = new DateTimeStamp("2018-04-04T09:10:00.586-0100");
         DateTimeStamp b = new DateTimeStamp("2018-04-04T09:10:00.587-0100");
         assertTrue(a.compare(b.getDateTime()) < 0);
@@ -252,7 +252,7 @@ class DateTimeStampTest {
     }
 
     @Test
-    void add() {
+    public void add() {
         DateTimeStamp a = new DateTimeStamp(.586);
         double a_ts = a.getTimeStamp();
         ZonedDateTime a_dt = a.getDateTime();
@@ -282,7 +282,7 @@ class DateTimeStampTest {
     }
 
     @Test
-    void minus() {
+    public void minus() {
         DateTimeStamp a = new DateTimeStamp(.586);
         double a_ts = a.getTimeStamp();
         ZonedDateTime a_dt = a.getDateTime();
@@ -312,7 +312,7 @@ class DateTimeStampTest {
     }
 
     @Test
-    void testMinus() {
+    public void testMinus() {
         DateTimeStamp a = new DateTimeStamp(.586);
         DateTimeStamp b = new DateTimeStamp(.587);
         double diff = a.minus(b);
@@ -332,7 +332,7 @@ class DateTimeStampTest {
     }
 
     @Test
-    void timeSpanInMinutes() {
+    public void timeSpanInMinutes() {
         DateTimeStamp a = new DateTimeStamp(.586);
         DateTimeStamp b = new DateTimeStamp(.587);
         double diff = a.timeSpanInMinutes(b);
@@ -350,152 +350,150 @@ class DateTimeStampTest {
     }
 
     @Test
-    void testCompareLessThan() {
+    public void testCompareLessThan() {
         DateTimeStamp smaller = new DateTimeStamp("2018-04-04T09:10:00.586-0100");
         DateTimeStamp greater = new DateTimeStamp("2018-04-04T10:10:00.587-0100");
         assertEquals(-1, smaller.compareTo(greater));
     }
 
     @Test
-    void testCompareGreaterThan() {
+    public void testCompareGreaterThan() {
         DateTimeStamp smaller = new DateTimeStamp("2018-04-04T09:10:00.586-0100");
         DateTimeStamp greater = new DateTimeStamp("2018-04-04T10:10:00.587-0100");
         assertEquals(1, greater.compareTo(smaller));
     }
 
     @Test
-    void testCompareEquals() {
+    public void testCompareEquals() {
         DateTimeStamp object1 = new DateTimeStamp("2018-04-04T10:10:00.586-0100");
         DateTimeStamp object2 = new DateTimeStamp("2018-04-04T10:10:00.586-0100");
         assertEquals(0, object1.compareTo(object2));
     }
 
     @Test
-    void testCompareEqualsTimeStamp() {
+    public void testCompareEqualsTimeStamp() {
         DateTimeStamp object1 = new DateTimeStamp("2018-04-04T10:10:00.586-0100", 123);
         DateTimeStamp object2 = new DateTimeStamp("2018-04-04T10:10:00.586-0100", 123);
         assertEquals(0, object2.compareTo(object1));
     }
 
     @Test
-    void testCompareGreaterTimeStamp() {
+    public void testCompareGreaterTimeStamp() {
         DateTimeStamp smaller = new DateTimeStamp("2018-04-04T10:10:00.586-0100", 122);
         DateTimeStamp greater = new DateTimeStamp("2018-04-04T10:10:00.586-0100", 123);
         assertEquals(1, greater.compareTo(smaller));
     }
 
     @Test
-    void testCompareSmallerTimeStamp() {
+    public void testCompareSmallerTimeStamp() {
         DateTimeStamp smaller = new DateTimeStamp("2018-04-04T10:10:00.586-0100", 123);
         DateTimeStamp greater = new DateTimeStamp("2018-04-04T10:10:00.586-0100", 124);
         assertEquals(-1, smaller.compareTo(greater));
     }
 
     @Test
-    void testCompareNullValue() {
+    public void testCompareNullValue() {
         DateTimeStamp smaller = new DateTimeStamp("2018-04-04T09:10:00.586-0100");
         assertEquals(-1, smaller.compareTo(null));
     }
 
     @Test
-    void testCompareEqualsTimeStampWithoutDateTime() {
+    public void testCompareEqualsTimeStampWithoutDateTime() {
         DateTimeStamp object1 = new DateTimeStamp(123);
         DateTimeStamp object2 = new DateTimeStamp(123);
         assertEquals(0, object2.compareTo(object1));
     }
 
     @Test
-    void testCompareGreaterTimeStampWithoutDateTime() {
+    public void testCompareGreaterTimeStampWithoutDateTime() {
         DateTimeStamp smaller = new DateTimeStamp(122);
         DateTimeStamp greater = new DateTimeStamp(124);
         assertEquals(1, greater.compareTo(smaller));
     }
 
     @Test
-    void testCompareSmallerTimeStampWithoutDateTime() {
+    public void testCompareSmallerTimeStampWithoutDateTime() {
         DateTimeStamp smaller = new DateTimeStamp(123);
         DateTimeStamp greater = new DateTimeStamp(124);
         assertEquals(-1, smaller.compareTo(greater));
     }
 
     @Test
-    void testCompareEqualsTimeStampMixed() {
+    public void testCompareEqualsTimeStampMixed() {
         DateTimeStamp object1 = new DateTimeStamp(1.522840200586E9);
         DateTimeStamp object2 = new DateTimeStamp("2018-04-04T10:10:00.586-0100");
         assertEquals(0, object2.compareTo(object1));
     }
 
     @Test
-    void testCompareGreaterTimeStampMixed() {
+    public void testCompareGreaterTimeStampMixed() {
         DateTimeStamp smaller = new DateTimeStamp(122);
         DateTimeStamp greater = new DateTimeStamp("2018-04-04T10:10:00.586-0100");
         assertEquals(1, greater.compareTo(smaller));
     }
 
     @Test
-    void testCompareSmallerTimeStampMixed() {
+    public void testCompareSmallerTimeStampMixed() {
         DateTimeStamp smaller = new DateTimeStamp(123);
         DateTimeStamp greater = new DateTimeStamp("2018-04-04T10:10:00.586-0100");
         assertEquals(-1, smaller.compareTo(greater));
     }
 
     @Test
-    void testNanWithZero() {
+    public void testNanWithZero() {
         DateTimeStamp dateTimeStamp = new DateTimeStamp(0.0);
         DateTimeStamp forComparing = new DateTimeStamp(0.0).add(Double.NaN);
         assertEquals(dateTimeStamp, forComparing);
     }
 
     @Test
-    void testNanWithNonZero() {
+    public void testNanWithNonZero() {
         DateTimeStamp dateTimeStamp = new DateTimeStamp("2018-04-04T10:10:00.586-0100");
         DateTimeStamp forComparing = new DateTimeStamp("2018-04-04T10:10:00.586-0100").add(Double.NaN);
         assertEquals(dateTimeStamp, forComparing);
     }
 
     @Test
-    void testNanWithMinusNonZero() {
+    public void testNanWithMinusNonZero() {
         DateTimeStamp dateTimeStamp = new DateTimeStamp("2018-04-04T10:10:00.586-0100");
         DateTimeStamp forComparing = new DateTimeStamp("2018-04-04T10:10:00.586-0100").minus(Double.NaN);
         assertEquals(dateTimeStamp, forComparing);
     }
 
     @Test
-    void testNanWithMinus() {
+    public void testNanWithMinus() {
         DateTimeStamp dateTimeStamp = new DateTimeStamp("2018-04-04T10:09:59.586-0100");
         DateTimeStamp forComparing = new DateTimeStamp("2018-04-04T10:10:00.586-0100").minus(1);
         assertEquals(dateTimeStamp, forComparing);
     }
 
     @Test
-    void testNanWithConstructor() {
+    public void testNanWithConstructor() {
         DateTimeStamp dateTimeStamp = new DateTimeStamp((String) null,Double.NaN);
         DateTimeStamp forComparing = new DateTimeStamp(0.0);
         assertEquals(dateTimeStamp, forComparing);
     }
 
     @Test
-    void testBeforeForNAN(){
+    public void testBeforeForNAN(){
         DateTimeStamp dateTimeStamp = new DateTimeStamp(-1);
         boolean before = dateTimeStamp.before(Double.NaN);
         assertTrue(before);
     }
 
     @Test
-    void testAfterForNAN(){
+    public void testAfterForNAN(){
         DateTimeStamp dateTimeStamp = new DateTimeStamp(1);
         boolean after = dateTimeStamp.after(Double.NaN);
         assertTrue(after);
     }
 
     @Test
-    void compareWithNANValue(){
+    public void compareWithNANValue(){
         DateTimeStamp dateTimeStamp = new DateTimeStamp(12d);
         DateTimeStamp dateTimeStampCompare = new DateTimeStamp(Double.NaN);
         int compare = dateTimeStamp.compareTo(dateTimeStampCompare);
         assertEquals(1,compare);
 
     }
-
-
 }
