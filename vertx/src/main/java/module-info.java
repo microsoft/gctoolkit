@@ -1,9 +1,6 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import com.microsoft.gctoolkit.jvm.JavaVirtualMachine;
-import com.microsoft.gctoolkit.vertx.jvm.DefaultJavaVirtualMachine;
-
 /**
  * Contains a vertx based implementation of GCToolKit. The vertx implementation is an internal module.
  * @provides com.microsoft.gctoolkit.jvm.JavaVirtualMachine
@@ -22,7 +19,8 @@ module com.microsoft.gctoolkit.vertx {
             com.microsoft.gctoolkit.api,
             gctoolkit.vertx.test;
 
-    provides JavaVirtualMachine with DefaultJavaVirtualMachine;
+    provides com.microsoft.gctoolkit.jvm.JavaVirtualMachine
+            with com.microsoft.gctoolkit.vertx.jvm.DefaultJavaVirtualMachine;
 
     requires com.microsoft.gctoolkit.api;
     requires com.microsoft.gctoolkit.parser;
