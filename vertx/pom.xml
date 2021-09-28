@@ -11,6 +11,19 @@
 
     <artifactId>gctoolkit-vertx</artifactId>
 
+    <build>
+        <plugins>
+            <plugin>
+               <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <argLine>
+                        --add-opens com.microsoft.gctoolkit.vertx/com.microsoft.gctoolkit.vertx.io=ALL-UNNAMED
+                    </argLine>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
     <dependencies>
         <dependency>
             <groupId>com.microsoft.gctoolkit</groupId>

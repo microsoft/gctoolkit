@@ -11,7 +11,6 @@ module com.microsoft.gctoolkit.sample {
     requires java.logging;
 
     exports com.microsoft.gctoolkit.sample.aggregation to com.microsoft.gctoolkit.vertx;
-    exports com.microsoft.gctoolkit.sample.collections to com.microsoft.gctoolkit.sample.test;
 
     exports com.microsoft.gctoolkit.sample;
 

@@ -15,6 +15,7 @@
         <gcLogFile>../gclogs/preunified/cms/defnew/details/defnew.log</gcLogFile>
     </properties>
 
+
     <dependencies>
         <dependency>
             <groupId>com.microsoft.gctoolkit</groupId>
@@ -56,6 +57,9 @@
                             <value>${gcLogFile}</value>
                         </property>
                     </systemProperties>
+                    <argLine>
+                        --add-opens com.microsoft.gctoolkit.sample/com.microsoft.gctoolkit.sample.collections=ALL-UNNAMED
+                    </argLine>
                 </configuration>
             </plugin>
             <plugin>

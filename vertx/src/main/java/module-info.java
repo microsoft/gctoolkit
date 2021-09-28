@@ -6,18 +6,8 @@
  * @provides com.microsoft.gctoolkit.jvm.JavaVirtualMachine
  */
 module com.microsoft.gctoolkit.vertx {
-    exports com.microsoft.gctoolkit.vertx to
-            gctoolkit.vertx.test;
-
-    exports com.microsoft.gctoolkit.vertx.aggregator to
-            gctoolkit.vertx.test;
-
-    exports com.microsoft.gctoolkit.vertx.io to
-            gctoolkit.vertx.test;
-
     exports com.microsoft.gctoolkit.vertx.jvm to
-            com.microsoft.gctoolkit.api,
-            gctoolkit.vertx.test;
+            com.microsoft.gctoolkit.api;
 
     provides com.microsoft.gctoolkit.jvm.JavaVirtualMachine
             with com.microsoft.gctoolkit.vertx.jvm.DefaultJavaVirtualMachine;
