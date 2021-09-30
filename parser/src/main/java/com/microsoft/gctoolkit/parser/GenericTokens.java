@@ -72,6 +72,7 @@ public interface GenericTokens {
 
     String GC_CAUSE = "(\\([a-zA-Z\\. 1]+?\\(?\\){1,2})?\\s*";
     //  (Diagnostic Command) (System.gc())
+    String SAFE_POINT_CAUSE = "\"(.+)\"";
 
     // CMS cycles and Perm Space report using this format
     String MEMORY_SIZE = "(" + INTEGER + ")" + UNITS;
