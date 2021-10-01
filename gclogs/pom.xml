@@ -11,10 +11,17 @@
     </parent>
 
     <artifactId>gctoolkit-gclogs</artifactId>
+    <description>GCToolkit test gclogs downloader</description>
+    <url>${project.parent.url}</url>
+    <name>GCToolKit GCLogs</name>
     <packaging>pom</packaging>
 
     <properties>
+<<<<<<< HEAD
         <gctoolkit-testdata-version>1.0.5-SNAPSHOT</gctoolkit-testdata-version>
+=======
+        <gctoolkit-testdata-version>1.0.4</gctoolkit-testdata-version>
+>>>>>>> 65d6a13d4be20ca68d8eb1328273530b1f9faa07
     </properties>
 
     <build>

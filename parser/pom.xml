@@ -10,7 +10,9 @@
     </parent>
 
     <artifactId>gctoolkit-parser</artifactId>
-
+    <name>GCToolKit Parser</name>
+    <description>Parser module required for GC log analysis.</description>
+    <url>${project.parent.url}</url>
     <dependencies>
         <dependency>
             <groupId>com.microsoft.gctoolkit</groupId>
