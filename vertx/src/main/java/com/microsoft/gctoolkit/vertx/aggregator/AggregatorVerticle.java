@@ -6,7 +6,7 @@ import com.microsoft.gctoolkit.aggregator.Aggregation;
 import com.microsoft.gctoolkit.aggregator.Aggregator;
 import com.microsoft.gctoolkit.event.jvm.JVMEvent;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
-import com.microsoft.gctoolkit.util.concurrent.StartingGun;
+import com.microsoft.gctoolkit.vertx.internal.util.concurrent.StartingGun;
 import io.vertx.core.AbstractVerticle;
 
 import java.util.HashSet;

@@ -1,4 +1,4 @@
-package com.microsoft.gctoolkit.util.concurrent;
+package com.microsoft.gctoolkit.vertx.internal.util.concurrent;
 
 import org.junit.jupiter.api.Test;
 

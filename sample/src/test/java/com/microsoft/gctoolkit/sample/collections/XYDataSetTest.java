@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class XYDataSetTest {
 
     @Test
-    void shouldScaleOnlyY_AxisDataSet() {
+    public void shouldScaleOnlyY_AxisDataSet() {
         var xyDataSet = new XYDataSet();
         xyDataSet.add(new Point(50, 100));
         XYDataSet scaledPoint = xyDataSet.scaleSeries(2);
@@ -21,7 +21,7 @@ public class XYDataSetTest {
     }
 
     @Test
-    void shouldReturnMaximumValueOfY_Axis() {
+    public void shouldReturnMaximumValueOfY_Axis() {
         var xyDataSet = new XYDataSet();
         xyDataSet.add(new Point(50, 100));
         xyDataSet.add(new Point(100, 140));
@@ -32,7 +32,7 @@ public class XYDataSetTest {
     }
 
     @Test
-    void shouldReturnScaledAndTranslatedX_AxisDataSet() {
+    public void shouldReturnScaledAndTranslatedX_AxisDataSet() {
         var xyDataSet = new XYDataSet();
         xyDataSet.add(new Point(50, 100));
         var translated = xyDataSet.scaleAndTranslateXAxis(2, 20);
@@ -41,7 +41,7 @@ public class XYDataSetTest {
     }
 
     @Test
-    void maxOnEmptyDataSet() {
+    public void maxOnEmptyDataSet() {
         assertTrue(new XYDataSet().maxOfY().isEmpty());
     }
 

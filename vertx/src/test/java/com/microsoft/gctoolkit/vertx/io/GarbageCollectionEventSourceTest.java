@@ -22,7 +22,7 @@ import java.util.logging.Logger;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class GarbageCollectionEventSourceTest {
+public class GarbageCollectionEventSourceTest {
 
     private static final Logger LOG = Logger.getLogger(GarbageCollectionEventSourceTest.class.getName());
 
@@ -34,7 +34,7 @@ class GarbageCollectionEventSourceTest {
     }
     
     @Test
-    void testRotatingLogDirectory() {
+    public void testRotatingLogDirectory() {
         Path path = new TestLogFile("rotating_directory").getFile().toPath();
         assertExpectedLineCountInLog(72210, loadLogFile(path, true));
     }
@@ -47,31 +47,31 @@ class GarbageCollectionEventSourceTest {
         }
     */
     @Test
-    void testGZipTarFileLineCount() {
+    public void testGZipTarFileLineCount() {
         Path path = new TestLogFile("streaming/gc.log.tar.gz").getFile().toPath();
         assertExpectedLineCountInLog(410056, loadLogFile(path, false));
     }
 
     @Test
-    void testSingleLogInZipLineCount() {
+    public void testSingleLogInZipLineCount() {
         Path path = new TestLogFile("streaming/gc.log.zip").getFile().toPath();
         assertExpectedLineCountInLog(431604, loadLogFile(path, false));
     }
 
     @Test
-    void testRotatingLogsLineCount() {
+    public void testRotatingLogsLineCount() {
         Path path = new TestLogFile("rotating.zip").getFile().toPath();
         assertExpectedLineCountInLog(72210, loadLogFile(path, true));
     }
 
     @Test
-    void testRotatingLogsRotatingLineCount() {
+    public void testRotatingLogsRotatingLineCount() {
         Path path = new TestLogFile("rotating.zip").getFile().toPath();
         assertExpectedLineCountInLog(72210, loadLogFile(path, true));
     }
 
     @Test
-    void testZippedDirectoryWithRotatingLogRotatingLineCount() {
+    public void testZippedDirectoryWithRotatingLogRotatingLineCount() {
         Path path = new TestLogFile("streaming/rotating_directory.zip").getFile().toPath();
         assertExpectedLineCountInLog(72211, loadLogFile(path, true));
     }
@@ -103,7 +103,7 @@ class GarbageCollectionEventSourceTest {
         assertEquals(expectedNumberOfLines, consumer.getEventCount());
     }
 
-    class GCLogConsumer extends AbstractVerticle {
+    private static class GCLogConsumer extends AbstractVerticle {
 
         private final CountDownLatch eof = new CountDownLatch(1);
         private int eventCount = 0;
@@ -134,7 +134,7 @@ class GarbageCollectionEventSourceTest {
     }
 
     @Test
-    void testEqualsForDifferentObject() {
+    public void testEqualsForDifferentObject() {
         GCEvent gcEvent = new DefNew(new DateTimeStamp("2018-04-04T09:10:00.586-0100"), GCCause.WARMUP,102);
         assertNotEquals(gcEvent, new ArrayList<>());
     }

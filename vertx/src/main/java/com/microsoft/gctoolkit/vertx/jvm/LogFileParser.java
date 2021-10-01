@@ -3,7 +3,7 @@
 package com.microsoft.gctoolkit.vertx.jvm;
 
 import com.microsoft.gctoolkit.event.jvm.JVMEvent;
-import com.microsoft.gctoolkit.util.concurrent.StartingGun;
+import com.microsoft.gctoolkit.vertx.internal.util.concurrent.StartingGun;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.eventbus.DeliveryOptions;
 import com.microsoft.gctoolkit.parser.GCLogParser;
