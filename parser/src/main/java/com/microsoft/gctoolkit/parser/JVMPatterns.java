@@ -12,6 +12,8 @@ public interface JVMPatterns extends PreUnifiedTokens {
     GCParseRule APPLICATION_STOP_TIME_WITH_STOPPING_TIME = new GCParseRule("APPLICATION_STOP_TIME_WITH_STOPPING_TIME", DATE_TIMESTAMP + "Total time for which application threads were stopped: " + TIME + " seconds, Stopping threads took: " + TIME + " seconds");
     //Total time for which application threads were stopped: 0.0006115 seconds, Stopping threads took: 0.0003832 seconds
     GCParseRule UNIFIED_LOGGING_APPLICATION_STOP_TIME_WITH_STOPPING_TIME = new GCParseRule("Unified Logging App stop time", "Total time for which application threads were stopped: " + TIME + " seconds, Stopping threads took: " + TIME + " seconds");
+    //[1.361s][info ][safepoint   ] Safepoint "G1CollectForAllocation", Time since last: 295590960 ns, Reaching safepoint: 238882 ns, At safepoint: 23888872 ns, Total: 24127754 ns
+    GCParseRule UNIFIED_LOGGING_G1_SAFEPOINT = new GCParseRule("", "Safepoint " + SAFE_POINT_CAUSE + ", Time since last: (" + INTEGER + ") ns, Reaching safepoint: (" + INTEGER + ") ns, At safepoint: (" + INTEGER + ") ns, Total: (" + INTEGER + ") ns");
 
     GCParseRule SIMPLE_APPLICATION_TIME = new GCParseRule("SIMPLE_APPLICATION_TIME", "Application time: " + TIME + " seconds");
     GCParseRule APPLICATION_TIME = new GCParseRule("APPLICATION_TIME", DATE_TIMESTAMP + "Application time: " + TIME + " seconds");

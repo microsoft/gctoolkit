@@ -85,8 +85,6 @@ public class PreUnifiedJVMConfiguration implements SimplePatterns, CMSPatterns, 
 
     private static final Logger LOGGER = Logger.getLogger(PreUnifiedJVMConfiguration.class.getName());
 
-    //todo: experimental value that should be parametrized
-    private static final int MAXIMUM_LINES_TO_EXAMINE = 10_000; // duplicated in UnifedJVMConfiguration
     private int lineCount = MAXIMUM_LINES_TO_EXAMINE;
 
     private static final GCParseRule TENURED_BLOCK = new GCParseRule("TENURED_BLOCK", "\\[Tenured: \\d+K->\\d+K\\(\\d+K\\), \\d+[.|,]\\d{7} secs\\]");
