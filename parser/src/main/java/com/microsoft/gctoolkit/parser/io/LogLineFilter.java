@@ -24,7 +24,7 @@ public class LogLineFilter {
 
     static {
         prefixFilter = System.getProperty(PREFIX_FILTER_PROPERTY);
-        verbose = System.getProperty(VERBOSE_PROPERTY, "false").toLowerCase().equals("true");
+        verbose = Boolean.getBoolean(VERBOSE_PROPERTY);
     }
 
     public LogLineFilter() {
