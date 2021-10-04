@@ -60,7 +60,7 @@ import static com.microsoft.gctoolkit.event.GarbageCollectionTypes.Remark;
 public class UnifiedGenerationalParser extends UnifiedGCLogParser implements UnifiedGenerationalPatterns {
 
     private static final Logger LOGGER = Logger.getLogger(UnifiedGenerationalParser.class.getName());
-    private boolean debugging = "true".equalsIgnoreCase(System.getProperty("microsoft.debug", "false"));
+    private boolean debugging = Boolean.getBoolean("microsoft.debug");
 
     private final RuleSet<GCParseRule, BiConsumer<GCLogTrace, String>> parseRules;
 

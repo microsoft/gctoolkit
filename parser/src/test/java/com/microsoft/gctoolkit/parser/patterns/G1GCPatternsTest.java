@@ -31,7 +31,7 @@ public class G1GCPatternsTest implements G1GCPatterns {
 
     /* Code that is useful when testing individual records */
 
-//    private boolean debugging = ("true".equals(System.getProperty( "microsoft.debug", "false").toLowerCase()));
+//    private boolean debugging = Boolean.getBoolean("microsoft.debug");
 //
 //    @Test
 //    public void testDebugParallelParseRules() {
