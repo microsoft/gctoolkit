@@ -8,9 +8,9 @@ import com.microsoft.gctoolkit.event.jvm.JVMTermination;
 /**
  * An Aggregator that collects only the DateTimeStamp and duration of a JVMEvent.
  */
-public class RuntimeAggregator extends Aggregator<RuntimeAggregation> {
+public class RuntimeAggregator<T extends RuntimeAggregation> extends Aggregator<T> {
 
-    protected RuntimeAggregator(RuntimeAggregation aggregation) {
+    protected RuntimeAggregator(T aggregation) {
         super(aggregation);
     }
 

@@ -8,6 +8,7 @@ module com.microsoft.gctoolkit.sample {
     requires com.microsoft.gctoolkit.api;
     requires com.microsoft.gctoolkit.parser;
     requires com.microsoft.gctoolkit.vertx;
+    requires com.microsoft.gctoolkit.aggregations;
     requires java.logging;
 
     exports com.microsoft.gctoolkit.sample;
@@ -16,5 +17,6 @@ module com.microsoft.gctoolkit.sample {
             com.microsoft.gctoolkit.vertx;
 
     provides com.microsoft.gctoolkit.aggregator.Aggregation with
-            com.microsoft.gctoolkit.sample.aggregation.HeapOccupancyAfterCollectionSummary;
+            com.microsoft.gctoolkit.sample.aggregation.HeapOccupancyAfterCollectionSummary,
+            com.microsoft.gctoolkit.sample.aggregation.PauseTimeSummary;
 }

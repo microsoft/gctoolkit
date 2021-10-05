@@ -6,7 +6,7 @@
         <groupId>com.microsoft.gctoolkit</groupId>
         <artifactId>gctoolkit</artifactId>
         <version>2.0.4-SNAPSHOT</version>
-        <relativePath>../</relativePath>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>gctoolkit-sample</artifactId>
@@ -27,7 +27,10 @@
             <groupId>com.microsoft.gctoolkit</groupId>
             <artifactId>gctoolkit-vertx</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>com.microsoft.gctoolkit</groupId>
+            <artifactId>gctoolkit-aggregations</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
@@ -37,6 +40,12 @@
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.microsoft.gctoolkit</groupId>
+            <artifactId>gctoolkit-aggregations</artifactId>
+            <version>2.0.4-SNAPSHOT</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 

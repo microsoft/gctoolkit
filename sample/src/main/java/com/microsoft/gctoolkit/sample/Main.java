@@ -1,10 +1,14 @@
 package com.microsoft.gctoolkit.sample;
 
 import com.microsoft.gctoolkit.GCToolKit;
+import com.microsoft.gctoolkit.event.GarbageCollectionTypes;
 import com.microsoft.gctoolkit.io.GCLogFile;
 import com.microsoft.gctoolkit.io.SingleGCLogFile;
 import com.microsoft.gctoolkit.jvm.JavaVirtualMachine;
 import com.microsoft.gctoolkit.sample.aggregation.HeapOccupancyAfterCollectionSummary;
+import com.microsoft.gctoolkit.sample.aggregation.PauseTimeAggregation;
+import com.microsoft.gctoolkit.sample.aggregation.PauseTimeSummary;
+import com.microsoft.gctoolkit.sample.collections.XYDataSet;
 
 import java.nio.file.Path;
 import java.nio.file.Files;
@@ -50,27 +54,33 @@ public class Main {
         JavaVirtualMachine machine = gcToolKit.analyze(logFile);
 
         // Retrieves the Aggregation for HeapOccupancyAfterCollectionSummary. This is a time-series aggregation.
-        Optional<HeapOccupancyAfterCollectionSummary> results = machine.getAggregation(HeapOccupancyAfterCollectionSummary.class);
+        machine.getAggregation(HeapOccupancyAfterCollectionSummary.class)
+                .map(HeapOccupancyAfterCollectionSummary::get)
+                .ifPresent(summary -> {
+                    summary.forEach((gcType, dataSet) -> {
+                        String message = "The XYDataSet for %s contains %s items.\n";
+                        System.out.printf(message, gcType, dataSet.size());
+                        switch(gcType) {
+                            case InitialMark:
+                                initialMarkCount = dataSet.size();;
+                                break;
+                            case Remark:
+                                remarkCount = dataSet.size();
+                                break;
+                            case DefNew:
+                                defNewCount = dataSet.size();
+                                break;
+                        }
+                    });
+                });
 
-        if (results.isPresent()) {
-            // Simple treatment of results
-            HeapOccupancyAfterCollectionSummary aggregationResult = results.get();
-            String message = "The XYDataSet for %s contains %s items.\n";
-            aggregationResult.get().forEach((gcType, dataSet) -> {
-                System.out.printf(message, gcType, dataSet.size());
+        // Retrieves the Aggregation for PauseTimeSummary. This is a com.microsoft.gctoolkit.aggregations.RuntimeAggregation.
+        machine.getAggregation(PauseTimeSummary.class).ifPresent(pauseTimeSummary -> {
+            System.out.printf("Total pause time  : %.4f\n", pauseTimeSummary.getTotalPauseTime());
+            System.out.printf("Total run time    : %.4f\n", pauseTimeSummary.getRuntimeDuration());
+            System.out.printf("Percent pause time: %.2f\n", pauseTimeSummary.getPercentPaused());
+        });
 
-                String gcTypeName = gcType.toString();
-                if (gcTypeName.equals("InitialMark")) {
-                    initialMarkCount = dataSet.size();
-                } else if (gcTypeName.equals("Remark")) {
-                    remarkCount = dataSet.size();
-                } else if (gcTypeName.equals("DefNew")) {
-                    defNewCount = dataSet.size();
-                }
-            });
-        } else {
-            System.out.println("No aggregation found.");
-        }
     }
 
     private int initialMarkCount = 0;
