@@ -10,10 +10,7 @@ import com.microsoft.gctoolkit.event.jvm.JVMTermination;
 import com.microsoft.gctoolkit.io.GCLogFile;
 import com.microsoft.gctoolkit.io.RotatingGCLogFile;
 import com.microsoft.gctoolkit.io.SingleGCLogFile;
-import com.microsoft.gctoolkit.parser.GenerationalHeapParser;
-import com.microsoft.gctoolkit.parser.JVMEventConsumer;
-import com.microsoft.gctoolkit.parser.PreUnifiedG1GCParser;
-import com.microsoft.gctoolkit.parser.UnifiedG1GCParser;
+import com.microsoft.gctoolkit.parser.*;
 import com.microsoft.gctoolkit.parser.jvm.JVMConfiguration;
 import com.microsoft.gctoolkit.parser.jvm.PreUnifiedJVMConfiguration;
 import com.microsoft.gctoolkit.parser.jvm.UnifiedJVMConfiguration;
@@ -116,12 +113,12 @@ public abstract class ParserTest {
         TestResults testResults = new TestResults();
         GCLogFile logfile = loadLogFile(path, false);
         JVMConfiguration jvmConfiguration = getJVMConfiguration(logfile);
-        GenerationalHeapParser generationalHeapParser = new GenerationalHeapParser(jvmConfiguration.getDiary(), testResults);
+        GCLogParser generationalHeapParser = (jvmConfiguration.getDiary().isUnifiedLogging()) ? new UnifiedGenerationalParser(jvmConfiguration.getDiary(), testResults) : new GenerationalHeapParser(jvmConfiguration.getDiary(), testResults);
         logfile.stream().map(String::trim).forEach(generationalHeapParser::receive);
         return testResults;
     }
 
-    TestResults testUnifiedSingleFile(Path path) throws IOException {
+    TestResults testUnifiedG1GCSingleFile(Path path) throws IOException {
         TestResults testResults = new TestResults();
         SingleGCLogFile logfile = new SingleGCLogFile(path);
         UnifiedJVMConfiguration unifiedJVMConfiguration = new UnifiedJVMConfiguration();

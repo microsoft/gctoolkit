@@ -29,7 +29,7 @@ import java.util.Arrays;
 import static org.junit.jupiter.api.Assertions.*;
 
 
-public class UnifiedGenerationalParserTest extends ParserTest {
+public class UnifiedGenerationalEventsTest extends ParserTest {
 
     private ArrayList<JVMEvent> jvmEvents;
 

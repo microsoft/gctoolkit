@@ -133,6 +133,7 @@ public class UnifiedGenerationalParser extends UnifiedGCLogParser implements Uni
         } catch (Throwable t) {
             LOGGER.throwing(this.getName(), "process", t);
         }
+        log(line);
     }
 
     /*************

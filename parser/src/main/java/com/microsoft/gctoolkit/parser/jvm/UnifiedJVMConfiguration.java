@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.parser.jvm;
 
+import com.microsoft.gctoolkit.event.GCCause;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
 import com.microsoft.gctoolkit.parser.unified.ShenandoahPatterns;
 import com.microsoft.gctoolkit.parser.unified.UnifiedG1GCPatterns;
@@ -39,7 +40,7 @@ public class UnifiedJVMConfiguration implements ShenandoahPatterns, ZGCPatterns,
         return diary;
     }
 
-    @Override
+    //todo: @Override
     public String getCommandLine() {
         // TODO
         return "";
@@ -59,6 +60,7 @@ public class UnifiedJVMConfiguration implements ShenandoahPatterns, ZGCPatterns,
 
     @Override
     public void fillInKnowns() {
+        getDiary().setFalse(ADAPTIVE_SIZING);
     }
 
     @Override
@@ -78,7 +80,7 @@ public class UnifiedJVMConfiguration implements ShenandoahPatterns, ZGCPatterns,
             discoverDetails(line);
         if (!getDiary().isJVMEventsKnown())
             discoverJVMEvents(line);
-        if (CPU_BREAKOUT.parse(line) != null)
+        if ((CPU_BREAKOUT.parse(line) != null) || line.contains("gc,start"))
             stopTheWorldEvents++;
         return this.completed();
     }
@@ -95,13 +97,14 @@ public class UnifiedJVMConfiguration implements ShenandoahPatterns, ZGCPatterns,
         // -Xlog:gc*,gc+ref=debug,gc+phases=debug,gc+age=trace,safepoint
         if (decorators.getLogLevel().isPresent()) {
             UnifiedLoggingLevel logLevel = decorators.getLogLevel().get();
-            if (decorators.tagsContain("gc,age") && logLevel.equals(UnifiedLoggingLevel.trace))
+            if (decorators.tagsContain("gc,age"))
                 getDiary().setTrue(TENURING_DISTRIBUTION);
             else if (decorators.tagsContain("ref") && logLevel.isGreaterThanOrEqualTo(UnifiedLoggingLevel.debug))
                 getDiary().setTrue(PRINT_REFERENCE_GC);
-            else if (decorators.tagsContain("gc,phases") && logLevel.isGreaterThanOrEqualTo(UnifiedLoggingLevel.debug)) {
+            else if (decorators.tagsContain("gc,phases") && logLevel.isGreaterThanOrEqualTo(UnifiedLoggingLevel.debug))
                 getDiary().setTrue(GC_DETAILS);
-            }
+            else if ( decorators.tagsContain("gc,ergo"))
+                getDiary().setTrue(ADAPTIVE_SIZING);
             if (decorators.tagsContain("safepoint"))
                 getDiary().setTrue(APPLICATION_STOPPED_TIME, APPLICATION_CONCURRENT_TIME);
 
@@ -166,7 +169,7 @@ public class UnifiedJVMConfiguration implements ShenandoahPatterns, ZGCPatterns,
 
         if ( SHENANDOAH_TAG.parse(line) != null) {
             getDiary().setTrue(SHENANDOAH);
-            getDiary().setFalse(DEFNEW, SERIAL, PARALLELGC, PARALLELOLDGC, PARNEW, CMS, ICMS, G1GC, RSET_STATS, ZGC, CMS_DEBUG_LEVEL_1, PRE_JDK70_40, JDK70, JDK80, TENURING_DISTRIBUTION, MAX_TENURING_THRESHOLD_VIOLATION, PRINT_PROMOTION_FAILURE, PRINT_FLS_STATISTICS);
+            getDiary().setFalse(DEFNEW, SERIAL, PARALLELGC, PARALLELOLDGC, PARNEW, CMS, ICMS, G1GC, RSET_STATS, ZGC, CMS_DEBUG_LEVEL_1, PRE_JDK70_40, JDK70, JDK80, TENURING_DISTRIBUTION, MAX_TENURING_THRESHOLD_VIOLATION, PRINT_PROMOTION_FAILURE, PRINT_FLS_STATISTICS, PRINT_HEAP_AT_GC);
             return;
         }
 
@@ -187,14 +190,14 @@ public class UnifiedJVMConfiguration implements ShenandoahPatterns, ZGCPatterns,
         if (PARALLEL_TAG.parse(line) != null ||
                 line.contains("ParOldGen") ||
                 line.contains("PSYoungGen")) {
-            getDiary().setTrue(PARALLELGC, PARALLELOLDGC);
-            getDiary().setFalse(DEFNEW, SERIAL, ICMS, CMS_DEBUG_LEVEL_1, G1GC, ZGC, SHENANDOAH, PRE_JDK70_40, JDK70, JDK80);
+            getDiary().setTrue(PARALLELGC, PARALLELOLDGC, SupportedFlags.GC_CAUSE);
+            getDiary().setFalse(DEFNEW, SERIAL, PARNEW, CMS, ICMS, CMS_DEBUG_LEVEL_1, G1GC, ZGC, SHENANDOAH, PRE_JDK70_40, JDK70, JDK80, RSET_STATS);
             return;
         }
 
         if (SERIAL_TAG.parse(line) != null || line.contains("DefNew")) {
-            getDiary().setTrue(DEFNEW, SERIAL);
-            getDiary().setFalse(PARALLELGC, PARALLELOLDGC, ICMS, CMS_DEBUG_LEVEL_1, G1GC, ZGC, SHENANDOAH, PRE_JDK70_40, JDK70, JDK80);
+            getDiary().setTrue(DEFNEW, SERIAL, SupportedFlags.GC_CAUSE);
+            getDiary().setFalse(PARALLELGC, PARALLELOLDGC, PARNEW, CMS, ICMS, CMS_DEBUG_LEVEL_1, G1GC, ZGC, SHENANDOAH, PRE_JDK70_40, JDK70, JDK80, RSET_STATS);
             return;
         }
     }

@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 public class ZGCLogDiaryTest extends LogDiaryTest {
 
 
-    @Test  @Disabled
+    @Test
     public void testForZGCLogDiaryPickups() {
         int i = 0;
         for (String name : zgcLogs) {
