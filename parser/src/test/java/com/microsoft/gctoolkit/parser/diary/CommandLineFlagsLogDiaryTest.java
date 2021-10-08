@@ -7,6 +7,7 @@ import com.microsoft.gctoolkit.parser.jvm.LoggingDiary;
 import com.microsoft.gctoolkit.parser.jvm.PreUnifiedJVMConfiguration;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class CommandLineFlagsLogDiaryTest {
@@ -43,22 +44,22 @@ public class CommandLineFlagsLogDiaryTest {
         assertTrue(diary.isGenerational());
         assertTrue(diary.hasPrintReferenceGC());
 
-        assertTrue(!diary.isDefNew());
-        assertTrue(!diary.isSerialFull());
-        assertTrue(!diary.isICMS());
-        assertTrue(!diary.isPSYoung());
-        assertTrue(!diary.isPSOldGen());
-        assertTrue(!diary.isG1GC());
-        assertTrue(!diary.isZGC());
-        assertTrue(!diary.isShenandoah());
-        assertTrue(!diary.isCMSDebugLevel1());
-        assertTrue(!diary.isApplicationStoppedTime());
-        assertTrue(!diary.isApplicationRunningTime());
-        assertTrue(!diary.isJDK70());
-        assertTrue(!diary.isPre70_40());
-        assertTrue(!diary.isPrintHeapAtGC());
-        assertTrue(!diary.isRSetStats());
-        assertTrue(!diary.isMaxTenuringThresholdViolation());
+        assertFalse(diary.isDefNew());
+        assertFalse(diary.isSerialFull());
+        assertFalse(diary.isICMS());
+        assertFalse(diary.isPSYoung());
+        assertFalse(diary.isPSOldGen());
+        assertFalse(diary.isG1GC());
+        assertFalse(diary.isZGC());
+        assertFalse(diary.isShenandoah());
+        assertFalse(diary.isCMSDebugLevel1());
+        assertFalse(diary.isApplicationStoppedTime());
+        assertFalse(diary.isApplicationRunningTime());
+        assertFalse(diary.isJDK70());
+        assertFalse(diary.isPre70_40());
+        assertFalse(diary.isPrintHeapAtGC());
+        assertFalse(diary.isRSetStats());
+        assertFalse(diary.isMaxTenuringThresholdViolation());
     }
 
     @Test
@@ -72,26 +73,26 @@ public class CommandLineFlagsLogDiaryTest {
         assertTrue(diary.isAdaptiveSizing());
         assertTrue(diary.isPrintGCDetails());
         assertTrue(diary.isTenuringDistribution());
-        assertTrue(!diary.isCMS());
-        assertTrue(!diary.isParNew());
+        assertFalse(diary.isCMS());
+        assertFalse(diary.isParNew());
         assertTrue(diary.isGenerational());
         assertTrue(diary.hasPrintReferenceGC());
 
-        assertTrue(!diary.isDefNew());
-        assertTrue(!diary.isSerialFull());
-        assertTrue(!diary.isICMS());
+        assertFalse(diary.isDefNew());
+        assertFalse(diary.isSerialFull());
+        assertFalse(diary.isICMS());
         assertTrue(diary.isPSYoung());
         assertTrue(diary.isPSOldGen());
-        assertTrue(!diary.isG1GC());
-        assertTrue(!diary.isG1GC());
-        assertTrue(!diary.isZGC());
-        assertTrue(!diary.isCMSDebugLevel1());
-        assertTrue(!diary.isApplicationStoppedTime());
-        assertTrue(!diary.isApplicationRunningTime());
-        assertTrue(!diary.isJDK70());
-        assertTrue(!diary.isPre70_40());
-        assertTrue(!diary.isPrintHeapAtGC());
-        assertTrue(!diary.isRSetStats());
-        assertTrue(!diary.isMaxTenuringThresholdViolation());
+        assertFalse(diary.isG1GC());
+        assertFalse(diary.isG1GC());
+        assertFalse(diary.isZGC());
+        assertFalse(diary.isCMSDebugLevel1());
+        assertFalse(diary.isApplicationStoppedTime());
+        assertFalse(diary.isApplicationRunningTime());
+        assertFalse(diary.isJDK70());
+        assertFalse(diary.isPre70_40());
+        assertFalse(diary.isPrintHeapAtGC());
+        assertFalse(diary.isRSetStats());
+        assertFalse(diary.isMaxTenuringThresholdViolation());
     }
 }

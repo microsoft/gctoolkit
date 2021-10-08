@@ -7,7 +7,8 @@ import org.junit.jupiter.api.Test;
 import java.util.logging.Logger;
 
 import static com.microsoft.gctoolkit.parser.CommonTestHelper.captureTest;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class ParallelParserRulesTest implements ParallelPatterns {
 
@@ -19,9 +20,9 @@ public class ParallelParserRulesTest implements ParallelPatterns {
             for (int j = 0; j < lines.length; j++) {
                 int captured = captureTest(rules[i], lines[j]);
                 if (i == j) {
-                    assertTrue(captured == lines[j].length, i + " failed to captured it's lines");
+                  assertEquals(captured, lines[j].length, i + " failed to captured it's lines");
                 } else {
-                    assertTrue(captured == 0, i + " captured " + j);
+                  assertEquals(0, captured, i + " captured " + j);
                 }
             }
     }
@@ -42,7 +43,7 @@ public class ParallelParserRulesTest implements ParallelPatterns {
     private void evaluate(GCParseRule rule, String string, boolean dump) {
 
         GCLogTrace trace = rule.parse(string);
-        assertTrue(trace != null);
+        assertNotNull(trace);
         if (dump) {
             trace.notYetImplemented();
 //            LOGGER.fine("matches groups " + trace.groupCount());

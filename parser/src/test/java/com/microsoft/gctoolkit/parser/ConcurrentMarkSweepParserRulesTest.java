@@ -4,6 +4,8 @@ package com.microsoft.gctoolkit.parser;
 
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ConcurrentMarkSweepParserRulesTest implements CMSPatterns {
@@ -13,14 +15,14 @@ public class ConcurrentMarkSweepParserRulesTest implements CMSPatterns {
      */
     @Test
     public void testCMSParseRules() {
-        assertTrue( rules.length == lines.length, "Number of rules differs from the numbers of log entries");
+        assertEquals(rules.length, lines.length, "Number of rules differs from the numbers of log entries");
         for (int i = 0; i < rules.length; i++) {
             for (int j = 0; j < lines.length; j++) {
                 int captured = CommonTestHelper.captureTest(rules[i], lines[j]);
                 if (i == j) {
-                    assertTrue(captured == lines[j].length, i + " failed to captured it's lines");
+                  assertEquals(captured, lines[j].length, i + " failed to captured it's lines");
                 } else {
-                    assertTrue(captured == 0, "rule " + i + " is greedy in that is captured dataset " + j);
+                  assertEquals(0, captured, "rule " + i + " is greedy in that is captured dataset " + j);
                 }
             }
         }
@@ -44,7 +46,7 @@ public class ConcurrentMarkSweepParserRulesTest implements CMSPatterns {
     private void evaluate(GCParseRule rule, String string, boolean dump) {
         //The IDE eats messages printed to the log file.. thus this information *is* printed to stout
         GCLogTrace trace = rule.parse(string);
-        assertTrue(trace != null);
+        assertNotNull(trace);
         if (dump) {
             System.out.println("matches groups " + trace.groupCount());
             for (int i = 0; i <= trace.groupCount(); i++) {

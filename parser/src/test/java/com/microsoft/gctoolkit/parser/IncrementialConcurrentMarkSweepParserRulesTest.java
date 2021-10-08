@@ -6,7 +6,9 @@ import org.junit.jupiter.api.Test;
 
 import java.util.logging.Logger;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class IncrementialConcurrentMarkSweepParserRulesTest implements ICMSPatterns {
 
@@ -42,9 +44,9 @@ public class IncrementialConcurrentMarkSweepParserRulesTest implements ICMSPatte
                 for (int k = 0; k < lines[j].length; k++) {
                     GCLogTrace trace = rules[i].parse(lines[j][k]);
                     if (trace != null) {
-                        assertTrue(i == j, "rule @" + i + " matched record @" + j + ":" + k);
+                        assertEquals(i, j, "rule @" + i + " matched record @" + j + ":" + k);
                     } else {
-                        assertTrue(i != j, "Rule missed @" + i + ":" + k);
+                        assertNotEquals(i , j, "Rule missed @" + i + ":" + k);
                     }
 
                 }
@@ -53,7 +55,7 @@ public class IncrementialConcurrentMarkSweepParserRulesTest implements ICMSPatte
 
     private void evaluate(GCParseRule rule, String string, boolean debugging) {
         GCLogTrace trace = rule.parse(string);
-        assertTrue(trace != null);
+        assertNotNull(trace);
         if (debugging) {
             LOGGER.fine("matches groups " + trace.groupCount());
             for (int i = 0; i <= trace.groupCount(); i++) {
