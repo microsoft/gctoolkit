@@ -22,9 +22,9 @@ public class ZGCParserRulesTest implements ZGCPatterns {
             for (int j = 0; j < lines.length; j++) {
                 int captured = captureTest(rules[i], lines[j]);
                 if (i == j) {
-                  assertEquals(captured, lines[j].length, i + " failed to captured it's lines");
+                    assertEquals(captured, lines[j].length, i + " failed to captured it's lines");
                 } else {
-                  assertEquals(0, captured, i + " captured " + j);
+                    assertEquals(0, captured, i + " captured " + j);
                 }
             }
 
@@ -54,7 +54,7 @@ public class ZGCParserRulesTest implements ZGCPatterns {
     //@Test
     public void testSingeRule() {
         int index = 14;
-      assertEquals(captureTest(rules[index], lines[index]), lines[index].length);
+        assertEquals(captureTest(rules[index], lines[index]), lines[index].length);
     }
 
 
