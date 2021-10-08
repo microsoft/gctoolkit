@@ -9,7 +9,7 @@
 
     <name>GCToolKit</name>
     <description>GC log parsing utilities</description>
-    <url>https://github.com/Microsoft/gctoolkit</url>
+    <url>https://github.com/microsoft/gctoolkit</url>
 
     <organization>
         <name>Microsoft Corporation</name>
@@ -43,29 +43,7 @@
         <url>https://github.com/microsoft/gctoolkit/issues</url>
     </issueManagement>
 
-    <!--
-    todo: remove when pub'ed to maven:central repository>
-    <repositories>
-        <repository>
-            <id>central</id>
-            <url>https://repo1.maven.org/maven2</url>
-        </repository>
-        <repository>
-            <id>github</id>
-            <url>https://maven.pkg.github.com/microsoft/*</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
-    -->
-
     <distributionManagement>
-        <!-- todo: remove when pub'ed to maven:central repository>
-            <id>github</id>
-            <name>GC Toolkit packages</name>
-            <url>https://maven.pkg.github.com/microsoft/gctoolkit</url>
-        </repository -->
         <snapshotRepository>
             <id>ossrh</id>
             <url>https://oss.sonatype.org/content/repositories/snapshots</url>
@@ -77,13 +55,16 @@
     </distributionManagement>
 
     <modules>
-        <module>core</module>
+        <module>gclogs</module>
+        <module>api</module>
+        <module>parser</module>
+        <module>vertx</module>
+        <module>sample</module>
     </modules>
 
     <properties>
         <checkstyle.version>9.0</checkstyle.version>
-        <gctoolkit-testdata-version>1.0.2</gctoolkit-testdata-version>
-        <junit5.version>5.7.2</junit5.version>
+        <junit5.version>5.8.1</junit5.version>
         <maven.changes-plugin.version>2.12.1</maven.changes-plugin.version>
         <maven.checkstyle-plugin.version>3.1.2</maven.checkstyle-plugin.version>
         <maven.clean-plugin.version>3.1.0</maven.clean-plugin.version>
@@ -93,6 +74,7 @@
         <maven.deploy-plugin.version>3.0.0-M1</maven.deploy-plugin.version>
         <maven.enforcer-plugin.version>3.0.0</maven.enforcer-plugin.version>
         <maven.install-plugin.version>3.0.0-M1</maven.install-plugin.version>
+        <maven.antrun-plugin.version>3.0.0</maven.antrun-plugin.version>
         <maven.jacoco-plugin.version>0.8.7</maven.jacoco-plugin.version>
         <maven.jar-plugin.version>3.2.0</maven.jar-plugin.version>
         <maven.javadoc-plugin.version>3.3.0</maven.javadoc-plugin.version>
@@ -106,20 +88,40 @@
         <maven.site-plugin.version>3.9.1</maven.site-plugin.version>
         <maven.spotbugs-plugin.version>4.3.0</maven.spotbugs-plugin.version>
         <maven.surefire-plugin.version>3.0.0-M5</maven.surefire-plugin.version>
+        <directory-maven-plugin.version>0.3.1</directory-maven-plugin.version>
         <maven.version>3.8.2</maven.version>
         <maven.versions-plugin.version>2.8.1</maven.versions-plugin.version>
-        <maven.test.skip>true</maven.test.skip>
+        <maven.exec-plugin.version>3.0.0</maven.exec-plugin.version>
         <mutability.detector.version>0.9.1</mutability.detector.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <skipTests>true</skipTests>
-        <skipUnpack>true</skipUnpack>
-        <spotbugs.version>4.4.0</spotbugs.version>
+        <spotbugs.version>4.4.1</spotbugs.version>
         <project.github.repository>microsoft/gctoolkit</project.github.repository>
         <repository.url>git@github.com:${project.github.repository}.git</repository.url>
     </properties>
 
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>com.microsoft.gctoolkit</groupId>
+                <artifactId>gctoolkit-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.microsoft.gctoolkit</groupId>
+                <artifactId>gctoolkit-parser</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.microsoft.gctoolkit</groupId>
+                <artifactId>gctoolkit-vertx</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.microsoft.gctoolkit</groupId>
+                <artifactId>gctoolkit-gclogs</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
             <dependency>
                 <groupId>org.junit.jupiter</groupId>
                 <artifactId>junit-jupiter-engine</artifactId>
@@ -137,9 +139,13 @@
 
     <build>
         <!-- NOTE: Some plugin configuration is set in the reporting section below as opposed to here by design -->
-        <!-- antrun and assembly are the other two plugins that we could define versions for but we don't use them -->
         <pluginManagement>
             <plugins>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>exec-maven-plugin</artifactId>
+                    <version>${maven.exec-plugin.version}</version>
+                </plugin>
                 <plugin>
                     <groupId>com.github.spotbugs</groupId>
                     <artifactId>spotbugs-maven-plugin</artifactId>
@@ -256,6 +262,11 @@
                     <version>${maven.resources-plugin.version}</version>
                 </plugin>
                 <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-antrun-plugin</artifactId>
+                    <version>${maven.antrun-plugin.version}</version>
+                </plugin>
+                <plugin>
                     <groupId>org.apache.rat</groupId>
                     <artifactId>apache-rat-plugin</artifactId>
                     <version>${maven.rat-plugin.version}</version>
@@ -289,6 +300,11 @@
                         </execution>
                     </executions>
                 </plugin>
+                <plugin>
+                    <groupId>org.commonjava.maven.plugins</groupId>
+                    <artifactId>directory-maven-plugin</artifactId>
+                    <version>${directory-maven-plugin.version}</version>
+                </plugin>
             </plugins>
         </pluginManagement>
 
@@ -296,53 +312,6 @@
             <plugin>
                 <groupId>com.github.spotbugs</groupId>
                 <artifactId>spotbugs-maven-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <version>${maven.dependency-plugin.version}</version>
-                <inherited>false</inherited>
-                <executions>
-                    <execution>
-                        <id>download-test-logs</id>
-                        <phase>process-test-resources</phase>
-                        <goals>
-                            <goal>unpack</goal>
-                        </goals>
-                        <configuration>
-                            <skip>${skipUnpack}</skip>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>com.microsoft.gctoolkit</groupId>
-                                    <artifactId>gctoolkit-gclogs</artifactId>
-                                    <version>${gctoolkit-testdata-version}</version>
-                                    <type>zip</type>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>com.microsoft.gctoolkit</groupId>
-                                    <artifactId>gctoolkit-gclogs-rolling</artifactId>
-                                    <version>${gctoolkit-testdata-version}</version>
-                                    <type>zip</type>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>com.microsoft.gctoolkit</groupId>
-                                    <artifactId>gctoolkit-shenandoah-logs</artifactId>
-                                    <version>${gctoolkit-testdata-version}</version>
-                                    <type>zip</type>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>com.microsoft.gctoolkit</groupId>
-                                    <artifactId>gctoolkit-zgc-logs</artifactId>
-                                    <version>${gctoolkit-testdata-version}</version>
-                                    <type>zip</type>
-                                </artifactItem>
-                            </artifactItems>
-                            <includes>**/*</includes>
-                            <outputDirectory>${project.basedir}/gclogs
-                            </outputDirectory>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -369,7 +338,6 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
             </plugin>
-
         </plugins>
     </build>
 
@@ -443,13 +411,10 @@
                 <groupId>org.apache.rat</groupId>
                 <artifactId>apache-rat-plugin</artifactId>
             </plugin>
-            <!-- TODO https://github.com/microsoft/gctoolkit/issues/68 -->
-            <!--
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>license-maven-plugin</artifactId>
             </plugin>
-            -->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>versions-maven-plugin</artifactId>
@@ -472,28 +437,6 @@
     </reporting>
 
     <profiles>
-        <!-- profile for downloading test log data,checks and running test -->
-        <profile>
-            <id>contributor</id>
-            <properties>
-                <!-- TODO Investigate whether we need both of the test properties -->
-                <maven.test.skip>false</maven.test.skip>
-                <skipTests>false</skipTests>
-                <skipUnpack>false</skipUnpack>
-            </properties>
-        </profile>
-        <profile>
-            <id>sample</id>
-            <activation>
-                <property>
-                    <name>release</name>
-                    <value>!true</value>
-                </property>
-            </activation>
-            <modules>
-                    <module>sample</module>
-            </modules>
-        </profile>
         <profile>
             <!-- Only active when you add -Prelease to the build-->
             <id>release</id>
@@ -552,4 +495,5 @@
             </build>
         </profile>
     </profiles>
+
 </project>

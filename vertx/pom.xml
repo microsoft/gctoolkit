@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.microsoft.gctoolkit</groupId>
+        <artifactId>gctoolkit</artifactId>
+        <version>2.0.4-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <artifactId>gctoolkit-vertx</artifactId>
+    <name>GCToolKit Vertx</name>
+    <description>Messaging backplane for connecting GC log parsers and JVM event consumers.</description>
+    <url>${project.parent.url}</url>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.microsoft.gctoolkit</groupId>
+            <artifactId>gctoolkit-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.microsoft.gctoolkit</groupId>
+            <artifactId>gctoolkit-parser</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.vertx</groupId>
+            <artifactId>vertx-core</artifactId>
+            <version>4.1.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+</project>
