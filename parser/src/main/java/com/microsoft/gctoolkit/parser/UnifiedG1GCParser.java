@@ -38,7 +38,7 @@ import static com.microsoft.gctoolkit.event.GarbageCollectionTypes.fromLabel;
 public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GCPatterns {
 
     private static final Logger LOGGER = Logger.getLogger(UnifiedG1GCParser.class.getName());
-    private boolean debugging = "true".equalsIgnoreCase(System.getProperty("microsoft.debug", "false"));
+    private boolean debugging = Boolean.getBoolean("microsoft.debug");
 
     private final Map<Integer, G1GCForwardReference> collectionsUnderway = new ConcurrentHashMap<>();
 

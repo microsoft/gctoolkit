@@ -20,7 +20,7 @@ public class Main {
             throw new IllegalArgumentException("This sample requires a path to a GC log file.");
         }
 
-        if (Files.exists(Path.of(gcLogFile)) == false) {
+        if (Files.notExists(Path.of(gcLogFile))) {
             throw new IllegalArgumentException(String.format("File %s not found.", gcLogFile));
         }
 

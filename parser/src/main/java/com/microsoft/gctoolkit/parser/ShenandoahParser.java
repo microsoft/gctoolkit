@@ -30,8 +30,8 @@ public class ShenandoahParser extends UnifiedGCLogParser implements ShenandoahPa
 
     private static final Logger LOGGER = Logger.getLogger(ShenandoahParser.class.getName());
 
-    private final boolean debugging = ("true".equals(System.getProperty("microsoft.debug", "false").toLowerCase()));
-    private final boolean develop = ("true".equals(System.getProperty("microsoft.develop", "false").toLowerCase()));
+    private final boolean debugging = Boolean.getBoolean("microsoft.debug");
+    private final boolean develop = Boolean.getBoolean("microsoft.develop");
 
     private final MRUQueue<GCParseRule, BiConsumer<GCLogTrace, String>> parseRules;
 

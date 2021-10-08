@@ -12,6 +12,7 @@ import java.util.logging.Logger;
 abstract class UnifiedGCLogParser extends GCLogParser {
 
     private static final Logger LOGGER = Logger.getLogger(UnifiedGCLogParser.class.getName());
+    private static final boolean DEBUG = Boolean.getBoolean("microsoft.debug");
 
     UnifiedGCLogParser(LoggingDiary diary, JVMEventConsumer consumer) {
         super(diary, consumer);
@@ -34,7 +35,7 @@ abstract class UnifiedGCLogParser extends GCLogParser {
      * Some log entries require no actions
      */
     void noop() {
-        if (System.getProperty("microsoft.debug").equalsIgnoreCase("true"))
+        if (DEBUG)
             System.out.println("noop");
     }
 }

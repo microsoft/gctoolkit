@@ -71,8 +71,8 @@ public class GenerationalHeapParser extends PreUnifiedGCLogParser implements Sim
     private int numberOfBlocksForwardReference;
     private long averageBlockSizeForwardReference;
     private int treeHeightForwardReference;
-    private final boolean debugging = ("true".equals(System.getProperty("microsoft.debug", "false").toLowerCase()));
-    private final boolean develop = ("true".equals(System.getProperty("microsoft.develop", "false").toLowerCase()));
+    private final boolean debugging = Boolean.getBoolean("microsoft.debug");
+    private final boolean develop = Boolean.getBoolean("microsoft.develop");
 
     //Expect Remark
     private boolean expectRemark = false;
@@ -2032,8 +2032,7 @@ public class GenerationalHeapParser extends PreUnifiedGCLogParser implements Sim
     }
 
     public void logMissedFirstRecordForEvent(String line) {
-        LOGGER.log(Level.WARNING, "Missing initial reco" +
-                "rd for: {0}", line);
+        LOGGER.log(Level.WARNING, "Missing initial record for: {0}", line);
     }
 
     public void record(JVMEvent event, boolean clear) {
