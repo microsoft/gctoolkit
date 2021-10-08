@@ -20,9 +20,9 @@ public class G1GCParserRulesTest implements G1GCPatterns {
             for (int j = 0; j < lines.length; j++) {
                 int captured = CommonTestHelper.captureTest(rules[i], lines[j]);
                 if (i == j) {
-                  assertEquals(captured, lines[j].length, i + " failed to captured it's lines");
+                    assertEquals(captured, lines[j].length, i + " failed to captured it's lines");
                 } else {
-                  assertEquals(0, captured, i + " captured " + j);
+                    assertEquals(0, captured, i + " captured " + j);
                 }
             }
 

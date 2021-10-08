@@ -23,9 +23,9 @@ public class UnifiedGenerationalParserRulesTest implements UnifiedGenerationalPa
             for (int j = 0; j < lines.length; j++) {
                 int captured = captureTest(rules[i], lines[j]);
                 if (i == j) {
-                  assertEquals(captured, lines[j].length, i + " failed to captured it's lines");
+                    assertEquals(captured, lines[j].length, i + " failed to captured it's lines");
                 } else {
-                  assertEquals(0, captured, i + " captured " + j);
+                    assertEquals(0, captured, i + " captured " + j);
                 }
             }
 
@@ -44,7 +44,7 @@ public class UnifiedGenerationalParserRulesTest implements UnifiedGenerationalPa
     //@Test
     public void testSingeRule() {
         int index = 0;
-      assertEquals(4, captureTest(rules[index], lines[index]));
+        assertEquals(4, captureTest(rules[index], lines[index]));
     }
 
 
