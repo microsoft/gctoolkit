@@ -3,10 +3,9 @@
 package com.microsoft.gctoolkit.parser.collection;
 
 
-import com.microsoft.gctoolkit.parser.collection.MRUQueue;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class MRUQueueTest {
 
@@ -22,24 +21,24 @@ public class MRUQueueTest {
         queue.put("A", "D");
         queue.put("C", "F");
 
-        assertTrue(queue.size() == 3);
+        assertEquals(3, queue.size());
         int i = 0;
         for (String key : queue.keys()) {
-            assertTrue(key.equals(original[i++]));
+            assertEquals(key, original[i++]);
         }
 
         queue.get("A");
-        assertTrue(queue.size() == 3);
+        assertEquals(3, queue.size());
         i = 0;
         for (String key : queue.keys()) {
-            assertTrue(key.equals(afterA[i++]));
+            assertEquals(key, afterA[i++]);
         }
 
         queue.get("C");
-        assertTrue(queue.size() == 3);
+        assertEquals(3, queue.size());
         i = 0;
         for (String key : queue.keys()) {
-            assertTrue(key.equals(afterC[i++]));
+            assertEquals(key, afterC[i++]);
         }
 
     }

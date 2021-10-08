@@ -4,10 +4,10 @@ package com.microsoft.gctoolkit.parser.vmops;
 
 
 import com.microsoft.gctoolkit.event.jvm.Safepoint;
-import com.microsoft.gctoolkit.parser.vmops.SafepointPatterns;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class SafepointPatternsTest implements SafepointPatterns {
 
@@ -39,8 +39,8 @@ public class SafepointPatternsTest implements SafepointPatterns {
         int index = 0;
         for (String line : lines) {
             Safepoint safepoint = TRACE.parse(line).toSafepoint();
-            assertTrue(safepoint != null);
-            assertTrue(safepoint.getVmOperation().equals(reasons[index++]));
+            assertNotNull(safepoint);
+            assertEquals(safepoint.getVmOperation(), reasons[index++]);
         }
     }
 }
