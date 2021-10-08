@@ -48,7 +48,7 @@ import java.util.logging.Logger;
 public class PreUnifiedG1GCParser extends PreUnifiedGCLogParser implements G1GCPatterns {
 
     private static final Logger LOGGER = Logger.getLogger(PreUnifiedG1GCParser.class.getName());
-    private boolean debugging = "true".equalsIgnoreCase(System.getProperty("microsoft.debug", "false"));
+    private boolean debugging = Boolean.getBoolean("microsoft.debug");
 
     //values show up at the end of GC log file from a normally terminated JVM
     private long heapTotal, heapUsed;

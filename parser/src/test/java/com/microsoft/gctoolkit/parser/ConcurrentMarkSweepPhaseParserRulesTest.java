@@ -30,7 +30,7 @@ public class ConcurrentMarkSweepPhaseParserRulesTest implements CMSPatterns {
 
     /* Code that is useful when testing individual records */
 
-    private final boolean debugging = ("true".equals(System.getProperty("microsoft.debug", "false").toLowerCase()));
+    private final boolean debugging = Boolean.getBoolean("microsoft.debug");
 
     @Test
     public void testDebugCMSParseRules() {

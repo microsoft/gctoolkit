@@ -2,7 +2,6 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.sample.collections;
 
-import com.microsoft.gctoolkit.sample.collections.XYDataSet;
 import com.microsoft.gctoolkit.sample.collections.XYDataSet.Point;
 import org.junit.jupiter.api.Test;
 
