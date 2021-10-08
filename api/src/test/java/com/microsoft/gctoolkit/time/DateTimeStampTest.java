@@ -496,4 +496,26 @@ public class DateTimeStampTest {
         assertEquals(1,compare);
 
     }
+
+    @Test
+    public void compareWithNullDates() {
+        DateTimeStamp stamp1 = new DateTimeStamp((String)null, 100);
+        DateTimeStamp stamp2 = new DateTimeStamp((String)null, 200);
+        DateTimeStamp stamp3 = new DateTimeStamp((String)null, 100);
+        assertTrue(stamp1.compareTo(stamp2) < 0);
+        assertTrue(stamp1.compareTo(stamp3) == 0);
+        assertTrue(stamp2.compareTo(stamp3) > 0);
+    }
+
+    @Test
+    public void compareToTransitivity() {
+        DateTimeStamp stamp1 = new DateTimeStamp("2021-09-01T11:12:13.111-0100", 100);
+        DateTimeStamp stamp2 = new DateTimeStamp((String)null, 200);
+        DateTimeStamp stamp3 = new DateTimeStamp("2021-08-31T11:12:13.111-0100", 300);
+        assertTrue(stamp1.compareTo(stamp2) < 0);
+        assertTrue(stamp2.compareTo(stamp3) < 0);
+        // therefore, stamp1.compareTo(stamp3) should be < 0
+        assertTrue(stamp1.compareTo(stamp3) < 0);
+    }
+
 }
