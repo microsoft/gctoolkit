@@ -26,27 +26,19 @@ public class TestLogFile {
     };
 
     public TestLogFile(String fileName) {
-        Optional<File> fileOptional = Arrays.stream(relativePaths)
-                .flatMap(path -> Arrays.stream(
-                        new String[]{
-                                "./" + path,
-                                "../" + path,
-                                "../../" + path,
-                                "./gclogs/" + path,
-                                "../gclogs/" + path,
-                                "../../gclogs/" + path,
-                        }
-                )).
-                        map(path -> new File(path + File.separator + fileName)).
-                        filter(File::exists)
-                .findFirst();
-
-        if (!fileOptional.isPresent()) {
-            throw new RuntimeException(fileName + " not found");
-        } else {
-            logFile = fileOptional.get();
-        }
-
+        logFile = Arrays.stream(relativePaths)
+                        .flatMap(path -> Arrays.stream(new String[]{
+                            "./" + path,
+                            "../" + path,
+                            "../../" + path,
+                            "./gclogs/" + path,
+                            "../gclogs/" + path,
+                            "../../gclogs/" + path,
+                        }))
+                        .map(path -> new File(path + File.separator + fileName))
+                        .filter(File::exists)
+                        .findFirst()
+                        .orElseThrow(() -> new RuntimeException(fileName + " not found"));
     }
 
     public TestLogFile(File file) {

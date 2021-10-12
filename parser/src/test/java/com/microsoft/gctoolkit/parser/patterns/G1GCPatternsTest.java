@@ -10,7 +10,6 @@ import java.util.logging.Logger;
 
 import static com.microsoft.gctoolkit.parser.CommonTestHelper.captureTest;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class G1GCPatternsTest implements G1GCPatterns {
 
@@ -22,9 +21,9 @@ public class G1GCPatternsTest implements G1GCPatterns {
             for (int j = 0; j < lines.length; j++) {
                 int captured = captureTest(rules[i], lines[j]);
                 if (i == j) {
-                    assertTrue(captured == lines[j].length, i + " failed to captured it's lines");
+                    assertEquals(captured, lines[j].length, i + " failed to captured it's lines");
                 } else {
-                    assertTrue(captured == 0, i + " captured " + j);
+                    assertEquals(0, captured, i + " captured " + j);
                 }
             }
     }
