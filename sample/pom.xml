@@ -28,10 +28,6 @@
             <artifactId>gctoolkit-vertx</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.microsoft.gctoolkit</groupId>
-            <artifactId>gctoolkit-aggregations</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
             <scope>test</scope>
@@ -40,12 +36,6 @@
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.microsoft.gctoolkit</groupId>
-            <artifactId>gctoolkit-aggregations</artifactId>
-            <version>2.0.4-SNAPSHOT</version>
-            <scope>compile</scope>
         </dependency>
     </dependencies>
 

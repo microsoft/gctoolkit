@@ -1,6 +1,5 @@
 package com.microsoft.gctoolkit.sample.aggregation;
 
-import com.microsoft.gctoolkit.aggregations.RuntimeAggregation;
 import com.microsoft.gctoolkit.aggregator.Collates;
 
 /**

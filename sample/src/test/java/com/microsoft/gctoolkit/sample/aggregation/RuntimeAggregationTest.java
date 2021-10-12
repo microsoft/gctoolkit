@@ -1,10 +1,9 @@
-package com.microsoft.gctoolkit.aggregations;
+package com.microsoft.gctoolkit.sample.aggregation;
 
-import com.microsoft.gctoolkit.aggregations.RuntimeAggregation;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class RuntimeAggregationTest {
 
@@ -22,7 +21,7 @@ class RuntimeAggregationTest {
     }
 
     @Test
-    void assertRecordAcceptsNull() {
+    public void assertRecordAcceptsNull() {
         final double duration = 1.5d;
         TestRuntimeAggregation testRuntimeAggregation = new TestRuntimeAggregation();
         DateTimeStamp first = new DateTimeStamp(0.0);
@@ -51,7 +50,7 @@ class RuntimeAggregationTest {
     }
 
     @Test
-    void assertRecordAcceptsNaN() {
+    public void assertRecordAcceptsNaN() {
         final double duration = Double.NaN;
         final double deltaTime = 1.0d;
         TestRuntimeAggregation testRuntimeAggregation = new TestRuntimeAggregation();
@@ -81,7 +80,7 @@ class RuntimeAggregationTest {
     }
 
     @Test
-    void getTimeOfFirstEvent() {
+    public void getTimeOfFirstEvent() {
         final double duration = 1.5d;
         final double deltaTime = 1.0d;
         TestRuntimeAggregation testRuntimeAggregation = new TestRuntimeAggregation();
@@ -96,7 +95,7 @@ class RuntimeAggregationTest {
     }
 
     @Test
-    void getTimeOfLastEvent() {
+    public void getTimeOfLastEvent() {
         final double duration = 1.5d;
         final double deltaTime = 1.0d;
         TestRuntimeAggregation testRuntimeAggregation = new TestRuntimeAggregation();

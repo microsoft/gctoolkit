@@ -1,4 +1,4 @@
-package com.microsoft.gctoolkit.aggregations;
+package com.microsoft.gctoolkit.sample.aggregation;
 
 import com.microsoft.gctoolkit.aggregator.Aggregation;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
