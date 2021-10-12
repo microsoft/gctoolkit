@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class RuntimeAggregationTest {
+public class RuntimeAggregationTest {
 
     private static class TestRuntimeAggregation extends RuntimeAggregation {
 
@@ -111,7 +111,7 @@ class RuntimeAggregationTest {
     }
 
     @Test
-    void getRuntimeDuration() {
+    public void getRuntimeDuration() {
         final double duration = 1.5d;
         final double deltaTime = 1.0d;
         TestRuntimeAggregation testRuntimeAggregation = new TestRuntimeAggregation();
