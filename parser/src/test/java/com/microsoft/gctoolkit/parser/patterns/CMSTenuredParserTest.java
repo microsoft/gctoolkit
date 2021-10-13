@@ -53,7 +53,7 @@ public class CMSTenuredParserTest extends ParserTest {
                 "- age   4:         40 bytes,    1423744 total",
                 ": 17194K->17392K(18624K), 0.0023005 secs]28.440: [CMS28.440: [CMS-concurrent-abortable-preclean: 0.032/0.813 secs] [Times: user=1.30 sys=0.06, real=0.81 secs]",
                 " (concurrent mode failure): 62354K->8302K(64768K), 0.0931888 secs] 79477K->8302K(83392K), [CMS Perm : 10698K->10698K(21248K)], 0.0956950 secs] [Times: user=0.09 sys=0.00, real=0.09 secs]",
-                GCLogParser.END_OF_DATA_SENTINAL
+                GCLogParser.END_OF_DATA_SENTINEL
         };
 
         feedParser(parser, lines);
@@ -84,7 +84,7 @@ public class CMSTenuredParserTest extends ParserTest {
                 "41.411: [CMS-concurrent-sweep: 0.001/0.001 secs] [Times: user=0.01 sys=0.00, real=0.00 secs]",
                 "41.411: [CMS-concurrent-reset-start]",
                 "41.416: [CMS-concurrent-reset: 0.005/0.005 secs] [Times: user=0.02 sys=0.00, real=0.01 secs]",
-                GCLogParser.END_OF_DATA_SENTINAL
+                GCLogParser.END_OF_DATA_SENTINEL
         };
 
         feedParser(parser, lines);
@@ -120,7 +120,7 @@ public class CMSTenuredParserTest extends ParserTest {
                 "2011-08-25T08:11:16.818+0100: 8458.295: [CMS-concurrent-sweep: 1.183/1.186 secs] [Times: user=1.71 sys=0.08, real=1.18 secs]",
                 "2011-08-25T08:11:16.819+0100: 8458.295: [CMS-concurrent-reset-start]",
                 "2011-08-25T08:11:16.828+0100: 8458.304: [CMS-concurrent-reset: 0.009/0.009 secs] [Times: user=0.01 sys=0.00, real=0.01 secs]",
-                GCLogParser.END_OF_DATA_SENTINAL
+                GCLogParser.END_OF_DATA_SENTINEL
         };
 
         feedParser(parser, lines);

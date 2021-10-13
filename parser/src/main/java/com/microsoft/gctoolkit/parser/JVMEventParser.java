@@ -73,8 +73,8 @@ public class JVMEventParser extends PreUnifiedGCLogParser implements JVMPatterns
                 extractTLAB(trace, 0);
             } else if ((trace = TLAB_TOTALS.parse(line)) != null) {
                 extractTLABSummary(trace);
-            } else if (line.equals(END_OF_DATA_SENTINAL)) {
-                //todo:  else if (line.equals(END_OF_DATA_SENTINAL)|| (JVM_EXIT.parse(line) != null)) {
+            } else if (line.equals(END_OF_DATA_SENTINEL)) {
+                //todo:  else if (line.equals(END_OF_DATA_SENTINEL)|| (JVM_EXIT.parse(line) != null)) {
                 // if we see "^heap" then we're at the end of the log
                 // at issue is if logs have been concatenated then we're not at the end and we
                 // shouldn't release the

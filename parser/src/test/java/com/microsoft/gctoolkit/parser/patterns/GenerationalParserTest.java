@@ -26,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 
 public class GenerationalParserTest extends ParserTest {
 
-    private static final String END_OF_DATA_SENTINAL = GCLogFile.END_OF_DATA_SENTINAL;
+    private static final String END_OF_DATA_SENTINEL = GCLogFile.END_OF_DATA_SENTINEL;
 
     private GenerationalHeapParser parser;
     private ArrayList<JVMEvent> collection;
@@ -43,7 +43,7 @@ public class GenerationalParserTest extends ParserTest {
 
         String[] lines = {
                 "2019-10-22T23:41:21.852+0000: 21.912: [GC (GCLocker Initiated GC) 2019-10-22T23:41:21.853+0000: 21.912: [DefNew2019-10-22T23:41:21.914+0000: 21.974: [SoftReference, 0 refs, 0.0000842 secs]2019-10-22T23:41:21.914+0000: 21.974: [WeakReference, 76 refs, 0.0000513 secs]2019-10-22T23:41:21.914+0000: 21.974: [FinalReference, 91635 refs, 0.0396861 secs]2019-10-22T23:41:21.954+0000: 22.014: [PhantomReference, 0 refs, 3 refs, 0.0000444 secs]2019-10-22T23:41:21.954+0000: 22.014: [JNI Weak Reference, 0.0000281 secs]: 419520K->19563K(471936K), 0.1019514 secs] 502104K->102148K(2044800K), 0.1020469 secs] [Times: user=0.09 sys=0.01, real=0.10 secs]",
-                END_OF_DATA_SENTINAL
+                END_OF_DATA_SENTINEL
         };
 
         feedParser(parser, lines);
@@ -74,7 +74,7 @@ public class GenerationalParserTest extends ParserTest {
                 "- age   1:      41544 bytes,      41544 total",
                 "        - age   2:    1134064 bytes,    1175608 total",
                 ": 18264K->1199K(18624K), 0.0042402 secs] 23578K->6513K(81280K), 0.0043376 secs] [Times: user=0.00 sys=0.00, real=0.00 secs]",
-                END_OF_DATA_SENTINAL
+                END_OF_DATA_SENTINEL
         };
 
         feedParser(parser, lines);
@@ -115,7 +115,7 @@ public class GenerationalParserTest extends ParserTest {
                 "- age   4:         40 bytes,    1423744 total",
                 ": 17194K->17392K(18624K), 0.0023005 secs]28.440: [CMS28.440: [CMS-concurrent-abortable-preclean: 0.032/0.813 secs] [Times: user=1.30 sys=0.06, real=0.81 secs]",
                 " (concurrent mode failure): 62354K->8302K(64768K), 0.0931888 secs] 79477K->8302K(83392K), [CMS Perm : 10698K->10698K(21248K)], 0.0956950 secs] [Times: user=0.09 sys=0.00, real=0.09 secs]",
-                END_OF_DATA_SENTINAL
+                END_OF_DATA_SENTINEL
         };
 
 
@@ -133,7 +133,7 @@ public class GenerationalParserTest extends ParserTest {
                 "Desired survivor size 119013376 bytes, new threshold 1 (max 15)",
                 "[PSYoungGen: 232960K->116224K(232960K)] 610571K->581588K(819712K), 0.0485326 secs] [Times: user=0.18 sys=0.14, real=0.05 secs] ",
                 "1.154: [Full GC (Ergonomics) [PSYoungGen: 116224K->0K(232960K)] [ParOldGen: 465364K->194938K(575488K)] 581588K->194938K(808448K), [Metaspace: 4211K->4211K(1056768K)], 0.0449697 secs] [Times: user=0.29 sys=0.00, real=0.04 secs] ",
-                END_OF_DATA_SENTINAL
+                END_OF_DATA_SENTINEL
         };
 
         feedParser(parser, lines);
@@ -171,7 +171,7 @@ public class GenerationalParserTest extends ParserTest {
                 "41.411: [CMS-concurrent-sweep: 0.001/0.001 secs] [Times: user=0.01 sys=0.00, real=0.00 secs]",
                 "41.411: [CMS-concurrent-reset-start]",
                 "41.416: [CMS-concurrent-reset: 0.005/0.005 secs] [Times: user=0.02 sys=0.00, real=0.01 secs]",
-                END_OF_DATA_SENTINAL
+                END_OF_DATA_SENTINEL
         };
 
         feedParser(parser, lines);
@@ -207,7 +207,7 @@ public class GenerationalParserTest extends ParserTest {
                 "2011-08-25T08:11:16.818+0100: 8458.295: [CMS-concurrent-sweep: 1.183/1.186 secs] [Times: user=1.71 sys=0.08, real=1.18 secs]",
                 "2011-08-25T08:11:16.819+0100: 8458.295: [CMS-concurrent-reset-start]",
                 "2011-08-25T08:11:16.828+0100: 8458.304: [CMS-concurrent-reset: 0.009/0.009 secs] [Times: user=0.01 sys=0.00, real=0.01 secs]",
-                END_OF_DATA_SENTINAL
+                END_OF_DATA_SENTINEL
         };
 
         feedParser(parser, lines);
