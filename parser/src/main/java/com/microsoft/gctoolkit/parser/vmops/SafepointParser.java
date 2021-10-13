@@ -24,7 +24,7 @@ public class SafepointParser extends PreUnifiedGCLogParser implements SafepointP
         if ((trace = TRACE.parse(line)) != null) {
             Safepoint safepoint = trace.toSafepoint();
             consumer.record(safepoint);
-        } else if (line.equals(END_OF_DATA_SENTINAL))
+        } else if (line.equals(END_OF_DATA_SENTINEL))
             consumer.record(new JVMTermination(getClock()));
     }
 }

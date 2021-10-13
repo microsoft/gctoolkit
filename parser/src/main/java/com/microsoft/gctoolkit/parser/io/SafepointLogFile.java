@@ -30,7 +30,7 @@ public class SafepointLogFile implements DataSource<String> {
 
     @Override
     public String endOfData() {
-        return GCLogFile.END_OF_DATA_SENTINAL;
+        return GCLogFile.END_OF_DATA_SENTINEL;
     }
 
     public Path getPath() { return path; }

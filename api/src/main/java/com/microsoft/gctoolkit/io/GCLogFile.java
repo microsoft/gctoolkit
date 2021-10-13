@@ -18,7 +18,7 @@ public abstract class GCLogFile extends FileDataSource<String> {
     /**
      * The value used for the implementation of {@link #endOfData()}.
      */
-    public static final String END_OF_DATA_SENTINAL = "END_OF_DATA_SENTINAL";
+    public static final String END_OF_DATA_SENTINEL = "END_OF_DATA_SENTINEL";
 
     private final boolean unifiedFormat;
 
@@ -40,7 +40,7 @@ public abstract class GCLogFile extends FileDataSource<String> {
 
     @Override
     public final String endOfData() {
-        return END_OF_DATA_SENTINAL;
+        return END_OF_DATA_SENTINEL;
     }
 
     // match a line starting with a unified logging decorator,
