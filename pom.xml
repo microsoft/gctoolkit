@@ -64,12 +64,12 @@
 
     <properties>
         <checkstyle.version>9.0</checkstyle.version>
+        <base.java.version>11</base.java.version>
         <junit5.version>5.8.1</junit5.version>
         <maven.changes-plugin.version>2.12.1</maven.changes-plugin.version>
         <maven.checkstyle-plugin.version>3.1.2</maven.checkstyle-plugin.version>
         <maven.clean-plugin.version>3.1.0</maven.clean-plugin.version>
         <maven.compiler-plugin.version>3.8.1</maven.compiler-plugin.version>
-        <maven.compiler.release>17</maven.compiler.release>
         <maven.dependency-plugin.version>3.2.0</maven.dependency-plugin.version>
         <maven.deploy-plugin.version>3.0.0-M1</maven.deploy-plugin.version>
         <maven.enforcer-plugin.version>3.0.0</maven.enforcer-plugin.version>
@@ -180,16 +180,60 @@
                     <artifactId>maven-clean-plugin</artifactId>
                     <version>${maven.clean-plugin.version}</version>
                 </plugin>
+<!--                <plugin>-->
+<!--                    <groupId>org.apache.maven.plugins</groupId>-->
+<!--                    <artifactId>maven-toolchains-plugin</artifactId>-->
+<!--                    <version>3.0.0</version>-->
+<!--                    <executions>-->
+<!--                        <execution>-->
+<!--                            <goals>-->
+<!--                                <goal>toolchain</goal>-->
+<!--                            </goals>-->
+<!--                        </execution>-->
+<!--                    </executions>-->
+<!--                    <configuration>-->
+<!--                        <toolchains>-->
+<!--                            <jdk>-->
+<!--                                <version>11</version>-->
+<!--                            </jdk>-->
+<!--                            <jdk>-->
+<!--                                <version>17</version>-->
+<!--                            </jdk>-->
+<!--                        </toolchains>-->
+<!--                    </configuration>-->
+<!--                </plugin>-->
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>${maven.compiler-plugin.version}</version>
                     <configuration>
+                        <source>${base.java.version}</source>
+                        <target>${base.java.version}</target>
                         <compilerArgs>
                             <arg>--module-version=${project.version}</arg>
                             <arg>-Xlint:unchecked</arg>
                         </compilerArgs>
                     </configuration>
+                    <executions>
+                        <!-- for Java 17 -->
+                        <execution>
+                            <id>java17</id>
+                            <phase>none</phase>
+                            <goals>
+                                <goal>compile</goal>
+                            </goals>
+                            <configuration>
+                                <release>17</release>
+                                <jdkToolchain>
+                                    <version>17</version>
+                                </jdkToolchain>
+                                <compileSourceRoots>
+                                    <compileSourceRoot>${project.basedir}/src/main/java17</compileSourceRoot>
+                                </compileSourceRoots>
+                                <multiReleaseOutput>true</multiReleaseOutput>
+                            </configuration>
+                        </execution>
+                    </executions>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -494,6 +538,116 @@
                 </plugins>
             </build>
         </profile>
-    </profiles>
+
+    <profile>
+        <id>compile-java17</id>
+        <activation>
+            <jdk>[17,)</jdk>
+        </activation>
+        <build>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <executions>
+                        <execution>
+                            <id>java17</id>
+                            <phase>compile</phase>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </build>
+    </profile>
+
+    <profile>
+        <id>test-toolchains-bypass</id>
+        <activation>
+            <property>
+                <name>!multi_release</name>
+            </property>
+        </activation>
+
+        <build>
+            <plugins>
+                <!-- Run the unit tests with the JVM used to run maven -->
+                <plugin>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>${maven.surefire-plugin.version}</version>
+                    <configuration>
+                        <jvm>${env.JAVA_HOME}/bin/java</jvm>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </build>
+    </profile>
+
+    <profile>
+        <id>multi_release-jar</id>
+        <activation>
+            <property>
+                <name>multi_release</name>
+            </property>
+        </activation>
+
+        <build>
+            <plugins>
+                <!-- Use toolchains to select the compilers -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-toolchains-plugin</artifactId>
+                    <version>3.0.0</version>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>toolchain</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <toolchains>
+                            <jdk>
+                                <version>${base.java.version}</version>
+<!--                                <vendor>${toolchain.vendor}</vendor>-->
+                            </jdk>
+                        </toolchains>
+                    </configuration>
+                </plugin>
+
+                <!-- enable java9 - java15 compilations -->
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <executions>
+                        <execution>
+                            <id>java17</id>
+                            <phase>compile</phase>
+                        </execution>
+                    </executions>
+                </plugin>
+
+                <!-- add the multi-release:true manifest entry to the default jar -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <version>${maven.jar-plugin.version}</version>
+                    <executions>
+                        <execution>
+                            <id>default-jar</id>
+                            <configuration>
+                                <archive>
+                                    <manifestEntries>
+                                        <Multi-Release>true</Multi-Release>
+                                    </manifestEntries>
+                                </archive>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </build>
+    </profile>
+</profiles>
 
 </project>
