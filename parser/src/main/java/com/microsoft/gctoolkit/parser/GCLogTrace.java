@@ -23,8 +23,8 @@ public class GCLogTrace extends AbstractLogTrace {
 
     private static final Logger LOGGER = Logger.getLogger(GCLogTrace.class.getName());
 
-    private final boolean gcCauseDebugging = "true".equalsIgnoreCase(System.getProperty("microsoft.debug.gccause", "false"));
-    private final boolean debugging = "true".equalsIgnoreCase(System.getProperty("microsoft.debug", "false"));
+    private final boolean gcCauseDebugging = Boolean.getBoolean("microsoft.debug.gccause");
+    private final boolean debugging = Boolean.getBoolean("microsoft.debug");
 
     public GCLogTrace(Matcher matcher) {
         super(matcher);

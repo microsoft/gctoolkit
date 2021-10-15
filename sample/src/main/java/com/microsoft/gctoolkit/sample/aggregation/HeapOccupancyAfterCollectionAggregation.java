@@ -6,6 +6,6 @@ import com.microsoft.gctoolkit.time.DateTimeStamp;
 
 public interface HeapOccupancyAfterCollectionAggregation extends Aggregation {
 
-    public void addDataPoint(GarbageCollectionTypes gcType, DateTimeStamp timeStamp, long heapOccupancy);
+    void addDataPoint(GarbageCollectionTypes gcType, DateTimeStamp timeStamp, long heapOccupancy);
 
 }
