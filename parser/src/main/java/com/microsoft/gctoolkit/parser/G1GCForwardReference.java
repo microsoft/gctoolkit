@@ -130,29 +130,35 @@ public class G1GCForwardReference extends ForwardReference {
     private static final int HUMONGOUS_OCCUPANCY_AFTER_COLLECTION = 21;
     private static final int HUMONGOUS_SIZE_BEFORE_COLLECTION = 22;
     private static final int HUMONGOUS_SIZE_AFTER_COLLECTION = 23;
-    private static final int METASPACE_OCCUPANCY_BEFORE_COLLECTION = 24;
-    private static final int METASPACE_OCCUPANCY_AFTER_COLLECTION = 25;
-    private static final int METASPACE_SIZE_BEFORE_COLLECTION = 26;
-    private static final int METASPACE_SIZE_AFTER_COLLECTION = 27;
-    private static final int METASPACE_COMMITTED_BEFORE_COLLECTION = 28;
-    private static final int METASPACE_COMMITTED_AFTER_COLLECTION = 29;
-    private static final int METASPACE_RESERVED_BEFORE_COLLECTION = 30;
-    private static final int METASPACE_RESERVED_AFTER_COLLECTION = 31;
-    private static final int CLASSSPACE_OCCUPANCY_BEFORE_COLLECTION = 32;
-    private static final int CLASSSPACE_OCCUPANCY_AFTER_COLLECTION = 33;
-    private static final int CLASSSPACE_SIZE_BEFORE_COLLECTION = 34;
-    private static final int CLASSSPACE_SIZE_AFTER_COLLECTION = 35;
-    private static final int CLASSSPACE_COMMITTED_BEFORE_COLLECTION = 36;
-    private static final int CLASSSPACE_COMMITTED_AFTER_COLLECTION = 37;
-    private static final int CLASSSPACE_RESERVED_BEFORE_COLLECTION = 38;
-    private static final int CLASSSPACE_RESERVED_AFTER_COLLECTION = 39;
+    private static final int ARCHIVE_OCCUPANCY_BEFORE_COLLECTION = 24;
+    private static final int ARCHIVE_OCCUPANCY_AFTER_COLLECTION = 25;
+    private static final int ARCHIVE_SIZE_BEFORE_COLLECTION = 26;
+    private static final int ARCHIVE_SIZE_AFTER_COLLECTION = 27;
+    private static final int METASPACE_OCCUPANCY_BEFORE_COLLECTION = 28;
+    private static final int METASPACE_OCCUPANCY_AFTER_COLLECTION = 29;
+    private static final int METASPACE_SIZE_BEFORE_COLLECTION = 30;
+    private static final int METASPACE_SIZE_AFTER_COLLECTION = 31;
+    private static final int METASPACE_COMMITTED_BEFORE_COLLECTION = 32;
+    private static final int METASPACE_COMMITTED_AFTER_COLLECTION = 33;
+    private static final int METASPACE_RESERVED_BEFORE_COLLECTION = 34;
+    private static final int METASPACE_RESERVED_AFTER_COLLECTION = 35;
+    private static final int CLASSSPACE_OCCUPANCY_BEFORE_COLLECTION = 36;
+    private static final int CLASSSPACE_OCCUPANCY_AFTER_COLLECTION = 37;
+    private static final int CLASSSPACE_SIZE_BEFORE_COLLECTION = 38;
+    private static final int CLASSSPACE_SIZE_AFTER_COLLECTION = 39;
+    private static final int CLASSSPACE_COMMITTED_BEFORE_COLLECTION = 40;
+    private static final int CLASSSPACE_COMMITTED_AFTER_COLLECTION = 41;
+    private static final int CLASSSPACE_RESERVED_BEFORE_COLLECTION = 42;
+    private static final int CLASSSPACE_RESERVED_AFTER_COLLECTION = 43;
 
     private final long[] memoryPoolMeasurment = {
             -1L, -1L, -1L, -1L, -1L, -1L, -1L, -1L, -1L, -1L,
             -1L, -1L, -1L, -1L, -1L, -1L, -1L, -1L, -1L, -1L,
             -1L, -1L, -1L, -1L, -1L, -1L, -1L, -1L, -1L, -1L,
             -1L, -1L, -1L, -1L, -1L, -1L, -1L, -1L, -1L, -1L,
-            -1L, -1L, -1L, -1L, -1L, -1L, -1L, -1L, -1L};
+            -1L, -1L, -1L, -1L, -1L, -1L, -1L, -1L, -1L, -1L,
+            -1L, -1L, -1L, -1L
+    };
 
     private boolean setMemoryPoolMeasurement(int index, long value) {
         if (memoryPoolMeasurment[index] < 0L) {
@@ -520,7 +526,7 @@ public class G1GCForwardReference extends ForwardReference {
     }
 
     private void fillInMemoryPoolStats(G1GCPauseEvent collection) {
-        //Eden, survivor, heap, meta and class space
+        //Eden, survivor, and heap
         MemoryPoolSummary heap = getMemoryPoolSummary(HEAP_OCCUPANCY_BEFORE_COLLECTION);
         MemoryPoolSummary young = getMemoryPoolSummary(YOUNG_OCCUPANCY_BEFORE_COLLECTION);
         MemoryPoolSummary eden = getMemoryPoolSummary(EDEN_OCCUPANCY_BEFORE_COLLECTION);
@@ -643,9 +649,9 @@ public class G1GCForwardReference extends ForwardReference {
      * @return
      */
     G1GCPauseEvent buildEvent() {
-        if ( this.gcType == null) {
+        if (gcType == null ) {
             LOGGER.warning("GC Event is undefined (null)");
-            return null;
+            throw new IllegalStateException("G1GC Event type is undefined (null): " + this.toString());
         }
         switch (this.gcType) {
             case Young:
@@ -663,7 +669,7 @@ public class G1GCForwardReference extends ForwardReference {
                     case G1GCCleanup:
                         return buildCleanup();
                     default:
-                        LOGGER.warning("Unrecognized Concurrent Pause Event " + getConcurrentPhase());
+                        LOGGER.warning("Unrecognized (mostly) Concurrent Cycle Pause Event " + getConcurrentPhase());
                 }
                 return null;
             default:
@@ -769,5 +775,21 @@ public class G1GCForwardReference extends ForwardReference {
 
     public String toString() {
         return gcType + ":" + getGCCause() + ":" + getDuration();
+    }
+
+    public boolean setArchiveOccupancyBeforeCollection(int value) {
+        return setMemoryPoolMeasurement(ARCHIVE_OCCUPANCY_BEFORE_COLLECTION, value);
+    }
+
+    public boolean setArchiveOccupancyAfterCollection(int value) {
+        return setMemoryPoolMeasurement(ARCHIVE_OCCUPANCY_AFTER_COLLECTION, value);
+    }
+
+    public boolean setArchiveSizeBeforeCollection(int value) {
+        return setMemoryPoolMeasurement(ARCHIVE_SIZE_BEFORE_COLLECTION, value);
+    }
+
+    public boolean setArchiveSizeAfterCollection(int value) {
+        return setMemoryPoolMeasurement(ARCHIVE_SIZE_AFTER_COLLECTION, value);
     }
 }

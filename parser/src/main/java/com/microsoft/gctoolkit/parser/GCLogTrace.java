@@ -231,7 +231,7 @@ public class GCLogTrace extends AbstractLogTrace {
             long sizeBefore = getMemoryInKBytes(offset + 2);
             long after = getMemoryInKBytes(offset + 4);
             long size = getMemoryInKBytes(offset + 6);
-            return new MetaspaceRecord(before, after, size);
+            return new MetaspaceRecord(before, sizeBefore, after, size);
         } catch (NumberFormatException numberFormatException) {
             LOGGER.fine("Unable to calculate Metaspace summary.");
             notYetImplemented();
@@ -253,7 +253,7 @@ public class GCLogTrace extends AbstractLogTrace {
                 (trace.group(4) != null) ? getIntegerGroup(4) : getIntegerGroup(3));
     }
 
-    // Debugging support
+    // Debugging support **PLEASE DO NOT REMOVE**
     public void notYetImplemented() {
         String threadName = Thread.currentThread().getName();
         LOGGER.log(Level.FINE, "{0}, not implemented: {1}", new Object[]{threadName, getGroup(0)});

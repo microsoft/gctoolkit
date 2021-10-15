@@ -51,7 +51,8 @@ public enum GCCause {
     WARMUP("Warmup"),
     ALLOC_RATE("Allocation Rate"),
     ALLOC_STALL("Allocation Stall"),
-    PROACTIVE("Proactive");
+    PROACTIVE("Proactive"),
+    PREVENTIVE("G1 Preventive Collection");
 
     private final String label;
 

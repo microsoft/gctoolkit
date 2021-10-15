@@ -9,28 +9,38 @@ import org.junit.jupiter.api.Test;
 import java.util.logging.Logger;
 
 import static com.microsoft.gctoolkit.parser.CommonTestHelper.captureTest;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class G1GCUnifiedParserRulesTest implements UnifiedG1GCPatterns {
+
+    /**
+     * The rules are;
+     * A pattern should capture the lines for which it is intended to capture
+     * A pattern should not capture any other lines.
+     *
+     * This testing is designed to run all patterns against all lines
+     */
 
     private static final Logger LOGGER = Logger.getLogger(G1GCUnifiedParserRulesTest.class.getName());
 
     @Test
     public void testG1GCParseRules() {
+        assertEquals(lines.length,rules.length, "Rules and data dont't match");
         for (int i = 0; i < rules.length; i++)
             for (int j = 0; j < lines.length; j++) {
                 int captured = captureTest(rules[i], lines[j]);
                 if (i == j) {
-                    assertTrue(captured == lines[j].length, i + " failed to captured it's lines");
+                    assertEquals(lines[j].length, captured,rules[i].getName() + " failed to capture");
                 } else {
-                    assertTrue(captured == 0, i + " captured " + j);
+                    assertEquals(0, captured, rules[i].getName() + " erroneous capture");
                 }
             }
 
         assertTrue(true);
     }
 
-    @Test
+    //@Test
     public void testUnifiedLoggingDecorators() {
         for (String decoratorLine : decoratorLines) {
             Decorators decorators = new Decorators(decoratorLine);
@@ -39,9 +49,23 @@ public class G1GCUnifiedParserRulesTest implements UnifiedG1GCPatterns {
     }
 
     //@Test
-    public void testSingeRule() {
-        int index = 0;
-        assertTrue(captureTest(rules[index], lines[index]) == lines[index].length);
+    public void testSingeRuleCapture() {
+        int index = 66;
+        assertEquals(lines[index].length, captureTest(rules[index], lines[index]), "Miss for " + rules[index].getName());
+    }
+
+    //@Test
+    public void testSingleRuleMisses() {
+        int index = 66;
+        for (int i = 0; i < rules.length; i++)
+            if ( index != i)
+                assertEquals(0, captureTest(rules[index], lines[i]), rules[index].getName() + " hits on lines for " + rules[i].getName());
+    }
+
+    //@Test
+    public void testSingleRule() {
+        testSingeRuleCapture();
+        testSingleRuleMisses();
     }
 
 
@@ -92,7 +116,39 @@ public class G1GCUnifiedParserRulesTest implements UnifiedG1GCPatterns {
             JVM_EXIT,
             CONCURRENT_MARK_ABORTED,
             CONCURRENT_MARK_PHASE,
-            CONCURRENT_MARK_PHASE_DURATION
+            CONCURRENT_MARK_PHASE_DURATION,
+            META_SPACE_BREAKOUT,           // 35
+            CONCATENATE_DIRTY_CARD_LOGS,
+            REGION_REGISTER,
+            HEAP_ROOTS,
+            EAGER_RECLAIM,
+            REMEMBERED_SETS,               // 40
+            EAGER_RECLAIM_STEP,
+            CARDS,
+            HOT_CARD_CACHE,
+            LOG_BUFFERS,
+            SCAN_HEAP_ROOTS,
+            SCANS,
+            CLAIMED_CHUNKS,
+            CODE_ROOT_SCAN,
+            STRING_DEDUP,
+            WEAK_JFR_SAMPLES,
+            POST_EVAC_CLEANUP,
+            MERGE_THREAD_STATE,
+            COPIED_BYTES,
+            LAB,
+            CLEAR_LOGGED_CARDS,
+            RECALC_USED_MEM,
+            PURGE_CODE_ROOTS,
+            UPDATE_DERIVED_POINTERS,
+            EAGER_HUMONGOUS_RECLAIM,
+            HUMONGOUS,
+            REDIRTY_CARDS,
+            REDIRTIED_CARDS,
+            FREE_CSET,
+            REBUILD_FREELIST,
+            NEW_CSET,
+            RESIZE_TLAB
     };
 
     /*
@@ -157,7 +213,8 @@ public class G1GCUnifiedParserRulesTest implements UnifiedG1GCPatterns {
                     "[2018-03-09T11:14:05.002-0100][12.277s][info ][gc,cpu       ] GC(0) User=0.04s Sys=0.01s Real=0.01s"
             },
             {   // 10
-                    "[73.082s][info ][gc           ] GC(263) Concurrent Cycle"
+                    "[73.082s][info ][gc           ] GC(263) Concurrent Cycle",
+                    "[2.179s][info ][gc          ] GC(9) Concurrent Mark Cycle"
             },
             {   // 11
                     "[73.082s][info ][gc,marking   ] GC(263) Concurrent Clear Claimed Marks",
@@ -167,7 +224,8 @@ public class G1GCUnifiedParserRulesTest implements UnifiedG1GCPatterns {
                     "[73.169xs][info ][gc,marking    ] GC(263) Concurrent Cleanup for Next Mark"
             },
             {   // 12
-                    "[73.171s][info ][gc            ] GC(263) Concurrent Cycle 89.437ms"
+                    "[73.171s][info ][gc            ] GC(263) Concurrent Cycle 89.437ms",
+                    "[2.179s][info ][gc          ] GC(9) Concurrent Mark Cycle 96.518ms"
             },
             {   // 13
                     "[73.082s][info ][gc,marking   ] GC(263) Concurrent Clear Claimed Marks 0.018ms",
@@ -252,11 +310,118 @@ public class G1GCUnifiedParserRulesTest implements UnifiedG1GCPatterns {
             {   // 32
                     "[9.381s][info][gc,marking     ] GC(877) Concurrent Mark Abort"
             },
-            {
+            {   // 33
                     "[73.084s][info ][gc,marking   ] GC(263) Concurrent Mark From Roots"
             },
-            {
+            {   // 34
                     "[73.138s][info ][gc,marking   ] GC(263) Concurrent Mark From Roots 53.902ms",
+            },
+            {   //  35
+                "[1.361s][info ][gc,metaspace] GC(0) Metaspace: 9724K(9856K)->9724K(9856K) NonClass: 8859K(8896K)->8859K(8896K) Class: 864K(960K)->864K(960K)"
+            },
+            {   // 36
+                    "[156.473s][debug][gc,phases   ] GC(2467)     Concatenate Dirty Card Logs: 0.0ms"
+            },
+            {   // 37
+                    "[156.473s][debug][gc,phases   ] GC(2467)     Region Register: 0.1ms"
+            },
+            {   // 38
+                    "[156.473s][debug][gc,phases   ] GC(2467)     Prepare Heap Roots: 0.0ms",
+                    "[156.473s][info ][gc,phases   ] GC(2467)   Merge Heap Roots: 0.3ms",
+                    "[156.473s][debug][gc,phases   ] GC(2467)     Prepare Merge Heap Roots: 0.0ms"
+            },
+            {   // 39
+                    "[156.473s][debug][gc,phases   ] GC(2467)     Eager Reclaim (ms):            Min:  0.0, Avg:  0.0, Max:  0.0, Diff:  0.0, Sum:  0.0, Workers: 1"
+            },
+            {   // 40
+                    "[156.473s][debug][gc,phases   ] GC(2467)     Remembered Sets (ms):          Min:  0.0, Avg:  0.1, Max:  0.2, Diff:  0.2, Sum:  3.6, Workers: 53"
+            },
+            {   // 41
+                    "[156.473s][debug][gc,phases   ] GC(2467)       Merged Sparse:                 Min: 0, Avg:  0.0, Max: 0, Diff: 0, Sum: 0, Workers: 53",
+                    "[156.473s][debug][gc,phases   ] GC(2467)       Merged Fine:                   Min: 0, Avg:  0.0, Max: 0, Diff: 0, Sum: 0, Workers: 53",
+                    "[156.473s][debug][gc,phases   ] GC(2467)       Merged Coarse:                 Min: 0, Avg:  0.0, Max: 0, Diff: 0, Sum: 0, Workers: 53"
+            },
+            {   // 42
+                    "[156.473s][debug][gc,phases   ] GC(2467)       Dirty Cards:                   Min: 0, Avg:  0.0, Max: 0, Diff: 0, Sum: 0, Workers: 53",
+                    "[156.473s][debug][gc,phases   ] GC(2467)       Skipped Cards:                 Min: 0, Avg:  0.0, Max: 0, Diff: 0, Sum: 0, Workers: 53"
+            },
+            {   // 43
+                    "[156.473s][debug][gc,phases   ] GC(2467)     Hot Card Cache (ms):           Min:  0.0, Avg:  0.0, Max:  0.0, Diff:  0.0, Sum:  0.1, Workers: 53",
+                    "[156.473s][debug][gc,phases   ] GC(2467)       Reset Hot Card Cache (ms):     Min:  0.0, Avg:  0.0, Max:  0.0, Diff:  0.0, Sum:  0.0, Workers: 1"
+            },
+            {   // 44
+                    "[156.473s][debug][gc,phases   ] GC(2467)     Log Buffers (ms):              Min:  0.0, Avg:  0.1, Max:  0.2, Diff:  0.2, Sum:  6.9, Workers: 53"
+            },
+            {   // 45
+                    "[156.473s][debug][gc,phases   ] GC(2467)     Scan Heap Roots (ms):          Min:  0.0, Avg:  0.0, Max:  0.1, Diff:  0.1, Sum:  1.8, Workers: 53"
+            },
+            {   // 46
+                    "[156.473s][debug][gc,phases   ] GC(2467)       Scanned Cards:                 Min: 0, Avg: 10.7, Max: 67, Diff: 67, Sum: 569, Workers: 53",
+                    "[156.473s][debug][gc,phases   ] GC(2467)       Scanned Blocks:                Min: 0, Avg:  8.3, Max: 39, Diff: 39, Sum: 440, Workers: 53"
+            },
+            {   // 47
+                    "[156.473s][debug][gc,phases   ] GC(2467)       Claimed Chunks:                Min: 0, Avg:  3.4, Max: 10, Diff: 10, Sum: 179, Workers: 53"
+            },
+            {   // 48
+                    "[156.473s][debug][gc,phases   ] GC(2467)     Code Root Scan (ms):           Min:  0.0, Avg:  0.0, Max:  0.0, Diff:  0.0, Sum:  0.0, Workers: 53"
+            },
+            {   // 49
+                    "[156.473s][debug][gc,phases   ] GC(2467)       StringDedup Requests0 Weak     Min:  0.0, Avg:  0.0, Max:  0.0, Diff:  0.0, Sum:  0.0, Workers: 7",
+                    "[156.473s][debug][gc,phases   ] GC(2467)       StringDedup Requests1 Weak     Min:  0.0, Avg:  0.0, Max:  0.0, Diff:  0.0, Sum:  0.0, Workers: 7"
+            },
+            {   // 50
+                    "[156.473s][debug][gc,phases   ] GC(2467)       Weak JFR Old Object Samples    Min:  0.0, Avg:  0.0, Max:  0.0, Diff:  0.0, Sum:  0.0, Workers: 7"
+            },
+            {   // 51
+                    "[156.473s][debug][gc,phases   ] GC(2467)     Post Evacuate Cleanup 1: 0.1ms"
+            },
+            {   // 52
+                    "[156.473s][debug][gc,phases   ] GC(2467)       Merge Per-Thread State (ms):   Min:  0.1, Avg:  0.1, Max:  0.1, Diff:  0.0, Sum:  0.1, Workers: 1"
+            },
+            {   // 53
+                    "[156.473s][debug][gc,phases   ] GC(2467)         Copied Bytes                   Min: 0, Avg:  4.1, Max: 32, Diff: 32, Sum: 216, Workers: 53"
+            },
+            {   // 54
+                    "[156.473s][debug][gc,phases   ] GC(2467)         LAB Waste                      Min: 0, Avg:  0.0, Max: 0, Diff: 0, Sum: 0, Workers: 53",
+                    "[156.473s][debug][gc,phases   ] GC(2467)         LAB Undo Waste                 Min: 0, Avg:  0.0, Max: 0, Diff: 0, Sum: 0, Workers: 53"
+            },
+            {   // 55
+                    "[156.473s][debug][gc,phases   ] GC(2467)       Clear Logged Cards (ms):       Min:  0.0, Avg:  0.0, Max:  0.0, Diff:  0.0, Sum:  0.3, Workers: 10"
+            },
+            {   // 56
+                    "[156.473s][debug][gc,phases   ] GC(2467)       Recalculate Used Memory (ms):  Min:  0.0, Avg:  0.0, Max:  0.0, Diff:  0.0, Sum:  0.0, Workers: 1"
+            },
+            {   // 57
+                    "[156.473s][debug][gc,phases   ] GC(2467)       Purge Code Roots (ms):         Min:  0.0, Avg:  0.0, Max:  0.0, Diff:  0.0, Sum:  0.0, Workers: 1"
+            },
+            {
+                    "[156.473s][debug][gc,phases   ] GC(2467)       Update Derived Pointers (ms):  Min:  0.0, Avg:  0.0, Max:  0.0, Diff:  0.0, Sum:  0.0, Workers: 1"
+            },
+            {
+                    "[156.473s][debug][gc,phases   ] GC(2467)       Eagerly Reclaim Humongous Objects (ms): Min:  1.1, Avg:  1.1, Max:  1.1, Diff:  0.0, Sum:  1.1, Workers: 1"
+            },
+            {
+                    "[156.473s][debug][gc,phases   ] GC(2467)         Humongous Total                Min: 1685, Avg: 1685.0, Max: 1685, Diff: 0, Sum: 1685, Workers: 1",
+                    "[156.473s][debug][gc,phases   ] GC(2467)         Humongous Candidates           Min: 1685, Avg: 1685.0, Max: 1685, Diff: 0, Sum: 1685, Workers: 1",
+                    "[156.474s][debug][gc,phases   ] GC(2467)         Humongous Reclaimed            Min: 390, Avg: 390.0, Max: 390, Diff: 0, Sum: 390, Workers: 1"
+            },
+            {
+                    "[156.474s][debug][gc,phases   ] GC(2467)       Redirty Logged Cards (ms):     Min:  0.0, Avg:  0.0, Max:  0.0, Diff:  0.0, Sum:  1.1, Workers: 53"
+            },
+            {
+                    "[156.474s][debug][gc,phases   ] GC(2467)         Redirtied Cards:               Min: 0, Avg:  9.1, Max: 130, Diff: 130, Sum: 482, Workers: 53"
+            },
+            {
+                    "[156.474s][debug][gc,phases   ] GC(2467)       Free Collection Set (ms):      Min:  0.0, Avg:  0.0, Max:  0.0, Diff:  0.0, Sum:  0.9, Workers: 53"
+            },
+            {
+                    "[156.474s][debug][gc,phases   ] GC(2467)     Rebuild Free List: 0.1ms"
+            },
+            {
+                    "[156.474s][debug][gc,phases   ] GC(2467)     Start New Collection Set: 0.0ms"
+            },
+            {
+                    "[156.474s][debug][gc,phases   ] GC(2467)     Resize TLABs: 0.0ms"
             }
     };
 

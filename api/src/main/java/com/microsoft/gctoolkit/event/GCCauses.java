@@ -51,7 +51,8 @@ public class GCCauses {
         Map.entry(WARMUP.getLabel(), WARMUP),
         Map.entry(ALLOC_RATE.getLabel(), ALLOC_RATE),
         Map.entry(ALLOC_STALL.getLabel(), ALLOC_STALL),
-        Map.entry(PROACTIVE.getLabel(), PROACTIVE));
+        Map.entry(PROACTIVE.getLabel(), PROACTIVE),
+        Map.entry(GCCause.PREVENTIVE.getLabel(),PREVENTIVE));
 
     public static GCCause get(String gcCauseName) {
 
@@ -110,4 +111,6 @@ public class GCCauses {
     ALLOC_RATE("Allocation Rate"),
     ALLOC_STALL("Allocation Stall"),
     PROACTIVE("Proactive");
+    //JDK 17
+    PREVENTATIVE("G1 Preventive Collection")
  */

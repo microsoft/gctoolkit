@@ -24,7 +24,7 @@ public interface UnifiedGenerationalPatterns extends UnifiedPatterns {
     //[0.170s][info ][gc,heap      ] GC(1) ParNew: 19356K->1696K(19648K)
     //[0.170s][info ][gc,heap      ] GC(1) CMS: 130K->1179K(43712K)
     GCParseRule GENERATIONAL_MEMORY_SUMMARY = new GCParseRule("GENERATIONAL_MEMORY_SUMMARY", GENERATIONAL_MEMORY_POOL + ": " + BEFORE_AFTER_CONFIGURED);
-    GCParseRule GENERATIONAL_MEMORY_SUMMARY_EXTENDED = new GCParseRule("GENERATIONAL_MEMORY_SUMMARY_EXTENDED", GENERATIONAL_MEMORY_POOL + ": " + BEFORE_AFTER);
+    GCParseRule GENERATIONAL_MEMORY_SUMMARY_EXTENDED = new GCParseRule("GENERATIONAL_MEMORY_SUMMARY_EXTENDED", GENERATIONAL_MEMORY_POOL + ": " + BEFORE_CONFIGURED_AFTER_CONFIGURED);
 
     //[00.170s][info ][gc           ] GC(1222) Pause Young (Allocationx Failure) 19M->2M(61M) 5.221ms
     GCParseRule YOUNG_DETAILS = new GCParseRule("YOUNG_DETAILS", "Pause Young " + GC_CAUSE + BEFORE_AFTER_CONFIGURED_PAUSE);
@@ -53,6 +53,6 @@ public interface UnifiedGenerationalPatterns extends UnifiedPatterns {
     GCParseRule PRE_COMPACT = new GCParseRule("PRE_COMPACT", "Pre Compact " + PAUSE_TIME);
     GCParseRule PARALLEL_PHASE = new GCParseRule("PARALLEL_PHASE", PARALLEL_PHASES + "$");
     GCParseRule PARALLEL_PHASE_SUMMARY = new GCParseRule("PARALLEL_PHASE_SUMMARY", PARALLEL_PHASES + " " + PAUSE_TIME);
-    GCParseRule METASPACE_DETAILED = new GCParseRule("METASPACE", "Metaspace: " + BEFORE_AFTER + " NonClass: " + BEFORE_AFTER + " Class: " + BEFORE_AFTER);
+    GCParseRule METASPACE_DETAILED = new GCParseRule("METASPACE", "Metaspace: " + BEFORE_CONFIGURED_AFTER_CONFIGURED + " NonClass: " + BEFORE_CONFIGURED_AFTER_CONFIGURED + " Class: " + BEFORE_CONFIGURED_AFTER_CONFIGURED);
 
 }

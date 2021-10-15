@@ -44,10 +44,13 @@ public interface UnifiedG1GCPatterns extends UnifiedPatterns {
 
     GCParseRule OTHER = new GCParseRule("OTHER", "Other: " + PAUSE_TIME);
 
-    GCParseRule REGION_SUMMARY = new GCParseRule("REGION_SUMMARY", "(Eden|Survivor|Old|Humongous) regions: " + REGION_MEMORY_BLOCK);
+    GCParseRule REGION_SUMMARY = new GCParseRule("REGION_SUMMARY", "(Eden|Survivor|Old|Humongous|Archive) regions: " + REGION_MEMORY_BLOCK);
     GCParseRule METASPACE = new GCParseRule("METASPACE", "Metaspace: " + BEFORE_AFTER_CONFIGURED);
 
-    //[00.170s][info ][gc           ] GC(1222) Pause Young (Allocationx Failure) 19M->2M(61M) 5.221ms
+    //Metaspace: 10107K(10240K)->10107K(10240K) NonClass: 9227K(9280K)->9227K(9280K) Class: 880K(960K)->880K(960K)
+    GCParseRule META_SPACE_BREAKOUT = new GCParseRule("META_SPACE_BREAKOUT", "Metaspace: " + BEFORE_CONFIGURED_AFTER_CONFIGURED + " NonClass: " + BEFORE_CONFIGURED_AFTER_CONFIGURED + " Class: " + BEFORE_CONFIGURED_AFTER_CONFIGURED);
+
+    //[00.170s][info ][gc           ] GC(1222) Pause Young (Allocation Failure) 19M->2M(61M) 5.221ms
     //[90.452s][info ][gc           ] GC(1459) Pause Young (G1 Evacuation Pause) 574M->4M(953M) 2.065ms
     GCParseRule YOUNG_DETAILS = new GCParseRule("YOUNG_DETAILS", "Pause " + YOUNG_COLLECTION_TYPES + " (\\(" + YOUNG_COLLECTION_SUB_TYPE + "\\) )?" + GC_CAUSE + BEFORE_AFTER_CONFIGURED_PAUSE);
 
@@ -55,11 +58,13 @@ public interface UnifiedG1GCPatterns extends UnifiedPatterns {
 
     GCParseRule HEAP_SIZE = new GCParseRule("HEAP_SIZE", "Minimum heap " + COUNTER + "  Initial heap " + COUNTER + "  Maximum heap " + COUNTER);
 
-    //    [73.082s][info ][gc           ] GC(263) Concurrent Cycle
+    //[73.082s][info ][gc           ] GC(263) Concurrent Cycle
+    //[2.179s][info ][gc          ] GC(9) Concurrent Mark Cycle
     //    .... entire set of concurrent records.
-    //    [73.171s][info ][gc            ] GC(263) Concurrent Cycle 89.437ms
-    GCParseRule CONCURRENT_CYCLE_START = new GCParseRule("CONCURRENT_CYCLE_START", "Concurrent Cycle$");
-    GCParseRule CONCURRENT_CYCLE_END = new GCParseRule("CONCURRENT_CYCLE_END", "Concurrent Cycle " + CONCURRENT_TIME);
+    //[73.171s][info ][gc            ] GC(263) Concurrent Cycle 89.437ms
+    //[2.179s][info ][gc          ] GC(9) Concurrent Mark Cycle 96.518ms
+    GCParseRule CONCURRENT_CYCLE_START = new GCParseRule("CONCURRENT_CYCLE_START", "Concurrent (?:Mark )?Cycle$");
+    GCParseRule CONCURRENT_CYCLE_END = new GCParseRule("CONCURRENT_CYCLE_END", "Concurrent (?:Mark )?Cycle " + CONCURRENT_TIME);
 
     //    [73.082s][info ][gc,marking   ] GC(263) Concurrent Clear Claimed Marks
     //    [73.082s][info ][gc,marking   ] GC(263) Concurrent Clear Claimed Marks 0.018ms
@@ -125,5 +130,87 @@ public interface UnifiedG1GCPatterns extends UnifiedPatterns {
     GCParseRule FULL_PHASE = new GCParseRule("FULL_PHASE", "Phase " + COUNTER + ": " + FULL_PHASES + "( " + PAUSE_TIME + ")?");
     GCParseRule FULL_CLASS_UNLOADING = new GCParseRule("FULL_CLASS_UNLOADING", "Class Unloading " + PAUSE_TIME);
     GCParseRule FULL_STRING_SYMBOL_TABLE = new GCParseRule("FULL_STRING_SYMBOL_TABLE", "Scrub String and Symbol Tables " + PAUSE_TIME);
+
+    //"[156.473s][debug][gc,phases   ] GC(2467)     Concatenate Dirty Card Logs: 0.0ms"
+    GCParseRule CONCATENATE_DIRTY_CARD_LOGS = new GCParseRule("CONCATENATE_DIRTY_CARD_LOGS","Concatenate Dirty Card Logs: " + PAUSE_TIME);
+    //"[156.473s][debug][gc,phases   ] GC(2467)     Region Register: 0.1ms"
+    GCParseRule REGION_REGISTER = new GCParseRule("REGION_REGISTER","Region Register: " + PAUSE_TIME);
+    //"[156.473s][debug][gc,phases   ] GC(2467)     Prepare Heap Roots: 0.0ms"
+    //"[156.473s][info ][gc,phases   ] GC(2467)   Merge Heap Roots: 0.3ms",
+    //"[156.473s][debug][gc,phases   ] GC(2467)     Prepare Merge Heap Roots: 0.0ms"
+    GCParseRule HEAP_ROOTS = new GCParseRule("HEAP_ROOTS","(Prepare|Merge|Prepare Merge) Heap Roots: " + PAUSE_TIME);
+    //"[156.473s][debug][gc,phases   ] GC(2467)     Eager Reclaim (ms):            Min:  0.0, Avg:  0.0, Max:  0.0, Diff:  0.0, Sum:  0.0, Workers: 1"
+    GCParseRule EAGER_RECLAIM  = new GCParseRule("EAGER_RECLAIM","Eager Reclaim \\(ms\\):\\s+" + WORKER_SUMMARY_REAL);
+    //"[156.473s][debug][gc,phases   ] GC(2467)     Remembered Sets (ms):          Min:  0.0, Avg:  0.1, Max:  0.2, Diff:  0.2, Sum:  3.6, Workers: 53"
+    GCParseRule REMEMBERED_SETS = new  GCParseRule("REMEMBERED_SETS","Remembered Sets \\(ms\\):\\s+" + WORKER_SUMMARY_REAL);
+    //"[156.473s][debug][gc,phases   ] GC(2467)       Merged Sparse:                 Min: 0, Avg:  0.0, Max: 0, Diff: 0, Sum: 0, Workers: 53",
+    //"[156.473s][debug][gc,phases   ] GC(2467)       Merged Fine:                   Min: 0, Avg:  0.0, Max: 0, Diff: 0, Sum: 0, Workers: 53",
+    //"[156.473s][debug][gc,phases   ] GC(2467)       Merged Coarse:                 Min: 0, Avg:  0.0, Max: 0, Diff: 0, Sum: 0, Workers: 53"
+    GCParseRule EAGER_RECLAIM_STEP = new GCParseRule("EAGER_RECLAIM_STEP","Merged (Sparse|Fine|Coarse):\\s+" + WORKER_SUMMARY_INT);
+    //"[156.473s][debug][gc,phases   ] GC(2467)       Dirty Cards:                   Min: 0, Avg:  0.0, Max: 0, Diff: 0, Sum: 0, Workers: 53",
+    //"[156.473s][debug][gc,phases   ] GC(2467)       Skipped Cards:                 Min: 0, Avg:  0.0, Max: 0, Diff: 0, Sum: 0, Workers: 53"
+    GCParseRule CARDS = new GCParseRule("CARDS","(Dirty|Skipped) Cards:\\s+" + WORKER_SUMMARY_INT);
+    //"[156.473s][debug][gc,phases   ] GC(2467)     Hot Card Cache (ms):           Min:  0.0, Avg:  0.0, Max:  0.0, Diff:  0.0, Sum:  0.1, Workers: 53"
+    //"[156.473s][debug][gc,phases   ] GC(2467)       Reset Hot Card Cache (ms):     Min:  0.0, Avg:  0.0, Max:  0.0, Diff:  0.0, Sum:  0.0, Workers: 1"
+    GCParseRule HOT_CARD_CACHE = new GCParseRule("HOT_CARD_CACHE","(Reset )?Hot Card Cache \\(ms\\):\\s+" + WORKER_SUMMARY_REAL);
+    //"[156.473s][debug][gc,phases   ] GC(2467)     Log Buffers (ms):              Min:  0.0, Avg:  0.1, Max:  0.2, Diff:  0.2, Sum:  6.9, Workers: 53"
+    GCParseRule LOG_BUFFERS = new GCParseRule("LOG_BUFFERS","Log Buffers \\(ms\\):\\s+" + WORKER_SUMMARY_REAL);
+    //"[156.473s][debug][gc,phases   ] GC(2467)     Scan Heap Roots (ms):          Min:  0.0, Avg:  0.0, Max:  0.1, Diff:  0.1, Sum:  1.8, Workers: 53"
+    GCParseRule SCAN_HEAP_ROOTS = new GCParseRule("SCAN_HEAP_ROOTS","Scan Heap Roots \\(ms\\):\\s+" + WORKER_SUMMARY_REAL);
+
+    //"[156.473s][debug][gc,phases   ] GC(2467)       Scanned Cards:                 Min: 0, Avg: 10.7, Max: 67, Diff: 67, Sum: 569, Workers: 53",
+    //"[156.473s][debug][gc,phases   ] GC(2467)       Scanned Blocks:                Min: 0, Avg:  8.3, Max: 39, Diff: 39, Sum: 440, Workers: 53",
+    GCParseRule SCANS = new GCParseRule("SCANS","Scanned (Cards|Blocks):\\s+" + WORKER_SUMMARY_INT);
+    //"[156.473s][debug][gc,phases   ] GC(2467)       Claimed Chunks:                Min: 0, Avg:  3.4, Max: 10, Diff: 10, Sum: 179, Workers: 53"
+    GCParseRule CLAIMED_CHUNKS = new GCParseRule("CLAIMED_CHUNKS","Claimed Chunks:\\s+" + WORKER_SUMMARY_INT);
+    //"[156.473s][debug][gc,phases   ] GC(2467)     Code Root Scan (ms):           Min:  0.0, Avg:  0.0, Max:  0.0, Diff:  0.0, Sum:  0.0, Workers: 53"
+    GCParseRule CODE_ROOT_SCAN = new GCParseRule("CODE_ROOT_SCAN","Code Root Scan \\(ms\\):\\s+" + WORKER_SUMMARY_REAL);
+    //"[156.473s][debug][gc,phases   ] GC(2467)       StringDedup Requests0 Weak     Min:  0.0, Avg:  0.0, Max:  0.0, Diff:  0.0, Sum:  0.0, Workers: 7",
+    //"[156.473s][debug][gc,phases   ] GC(2467)       StringDedup Requests1 Weak     Min:  0.0, Avg:  0.0, Max:  0.0, Diff:  0.0, Sum:  0.0, Workers: 7"
+    GCParseRule STRING_DEDUP = new GCParseRule("STRING_DEDUP","StringDedup Requests(0|1) Weak\\s+" + WORKER_SUMMARY_REAL);
+    //"[156.473s][debug][gc,phases   ] GC(2467)       Weak JFR Old Object Samples    Min:  0.0, Avg:  0.0, Max:  0.0, Diff:  0.0, Sum:  0.0, Workers: 7"
+    GCParseRule WEAK_JFR_SAMPLES = new GCParseRule("WEAK_JFR_SAMPLES","Weak JFR Old Object Samples\\s+" + WORKER_SUMMARY_REAL);
+
+    //"[156.473s][debug][gc,phases   ] GC(2467)     Post Evacuate Cleanup 2: 1.1ms"
+    //"[156.473s][debug][gc,phases   ] GC(2467)     Post Evacuate Cleanup 1: 0.1ms"
+    GCParseRule POST_EVAC_CLEANUP = new GCParseRule("POST_EVAC_CLEANUP","Post Evacuate Cleanup (1|2): " + PAUSE_TIME);
+    //"[156.473s][debug][gc,phases   ] GC(2467)       Merge Per-Thread State (ms):   Min:  0.1, Avg:  0.1, Max:  0.1, Diff:  0.0, Sum:  0.1, Workers: 1"
+    GCParseRule MERGE_THREAD_STATE = new GCParseRule("MERGE_THREAD_STATE","Merge Per-Thread State \\(ms\\):\\s+" + WORKER_SUMMARY_REAL);
+    //"[156.473s][debug][gc,phases   ] GC(2467)         Copied Bytes                   Min: 0, Avg:  4.1, Max: 32, Diff: 32, Sum: 216, Workers: 53"
+    GCParseRule COPIED_BYTES = new GCParseRule("COPIED_BYTES","Copied Bytes\\s+" + WORKER_SUMMARY_INT);
+    //"[156.473s][debug][gc,phases   ] GC(2467)         LAB Waste                      Min: 0, Avg:  0.0, Max: 0, Diff: 0, Sum: 0, Workers: 53",
+    //"[156.473s][debug][gc,phases   ] GC(2467)         LAB Undo Waste                 Min: 0, Avg:  0.0, Max: 0, Diff: 0, Sum: 0, Workers: 53"
+    GCParseRule LAB = new GCParseRule("LAB","LAB( Undo)? Waste\\s+" + WORKER_SUMMARY_INT);
+    //"[156.473s][debug][gc,phases   ] GC(2467)       Clear Logged Cards (ms):       Min:  0.0, Avg:  0.0, Max:  0.0, Diff:  0.0, Sum:  0.3, Workers: 10"
+    GCParseRule CLEAR_LOGGED_CARDS = new GCParseRule("CLEAR_LOGGED_CARDS","Clear Logged Cards \\(ms\\):\\s+" + WORKER_SUMMARY_REAL);
+
+
+
+    //"[156.473s][debug][gc,phases   ] GC(2467)       Recalculate Used Memory (ms):  Min:  0.0, Avg:  0.0, Max:  0.0, Diff:  0.0, Sum:  0.0, Workers: 1"
+    GCParseRule RECALC_USED_MEM = new GCParseRule("RECALC_USED_MEM","Recalculate Used Memory \\(ms\\):\\s+" + WORKER_SUMMARY_REAL);
+    //"[156.473s][debug][gc,phases   ] GC(2467)       Purge Code Roots (ms):         Min:  0.0, Avg:  0.0, Max:  0.0, Diff:  0.0, Sum:  0.0, Workers: 1"
+    GCParseRule PURGE_CODE_ROOTS = new GCParseRule("PURGE_CODE_ROOTS","Purge Code Roots \\(ms\\):\\s+" + WORKER_SUMMARY_REAL);
+    //"[156.473s][debug][gc,phases   ] GC(2467)       Update Derived Pointers (ms):  Min:  0.0, Avg:  0.0, Max:  0.0, Diff:  0.0, Sum:  0.0, Workers: 1"
+    GCParseRule UPDATE_DERIVED_POINTERS = new GCParseRule("UPDATE_DERIVED_POINTERS","Update Derived Pointers \\(ms\\):\\s+" + WORKER_SUMMARY_REAL);
+    //"[156.473s][debug][gc,phases   ] GC(2467)       Eagerly Reclaim Humongous Objects (ms): Min:  1.1, Avg:  1.1, Max:  1.1, Diff:  0.0, Sum:  1.1, Workers: 1"
+    GCParseRule EAGER_HUMONGOUS_RECLAIM = new GCParseRule("EAGER_HUMONGOUS_RECLAIM","Eagerly Reclaim Humongous Objects \\(ms\\):\\s+" + WORKER_SUMMARY_REAL);
+    //"[156.473s][debug][gc,phases   ] GC(2467)         Humongous Total                Min: 1685, Avg: 1685.0, Max: 1685, Diff: 0, Sum: 1685, Workers: 1",
+    //"[156.473s][debug][gc,phases   ] GC(2467)         Humongous Candidates           Min: 1685, Avg: 1685.0, Max: 1685, Diff: 0, Sum: 1685, Workers: 1",
+    //"[156.474s][debug][gc,phases   ] GC(2467)         Humongous Reclaimed            Min: 390, Avg: 390.0, Max: 390, Diff: 0, Sum: 390, Workers: 1"
+    GCParseRule HUMONGOUS = new GCParseRule("HUMONGOUS","Humongous (Total|Candidates|Reclaimed)\\s+" + WORKER_SUMMARY_INT);
+
+
+    //"[156.474s][debug][gc,phases   ] GC(2467)       Redirty Logged Cards (ms):     Min:  0.0, Avg:  0.0, Max:  0.0, Diff:  0.0, Sum:  1.1, Workers: 53",
+    GCParseRule REDIRTY_CARDS = new GCParseRule("REDIRTY_CARDS","Redirty Logged Cards \\(ms\\):\\s+" + WORKER_SUMMARY_REAL);
+    //"[156.474s][debug][gc,phases   ] GC(2467)         Redirtied Cards:               Min: 0, Avg:  9.1, Max: 130, Diff: 130, Sum: 482, Workers: 53"
+    GCParseRule REDIRTIED_CARDS = new GCParseRule("REDIRTIED_CARDS","Redirtied Cards:\\s+" + WORKER_SUMMARY_INT);
+    //"[156.474s][debug][gc,phases   ] GC(2467)       Free Collection Set (ms):      Min:  0.0, Avg:  0.0, Max:  0.0, Diff:  0.0, Sum:  0.9, Workers: 53"
+    GCParseRule FREE_CSET = new GCParseRule("FREE_CSET","Free Collection Set \\(ms\\):\\s+" + WORKER_SUMMARY_REAL);
+    //"[156.474s][debug][gc,phases   ] GC(2467)     Rebuild Free List: 0.1ms"
+    GCParseRule REBUILD_FREELIST = new GCParseRule("REBUILD_FREELIST","Rebuild Free List: " + PAUSE_TIME);
+    //"[156.474s][debug][gc,phases   ] GC(2467)     Start New Collection Set: 0.0ms"
+    GCParseRule NEW_CSET = new GCParseRule("NEW_CSET","Start New Collection Set: " + PAUSE_TIME);
+    //"[156.474s][debug][gc,phases   ] GC(2467)     Resize TLABs: 0.0ms"
+    GCParseRule RESIZE_TLAB = new GCParseRule("RESIZE_TLAB","Resize TLABs: " + PAUSE_TIME);
 
 }
