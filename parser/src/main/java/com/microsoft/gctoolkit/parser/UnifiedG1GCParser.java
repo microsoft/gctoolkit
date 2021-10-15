@@ -191,6 +191,8 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
         collectionsUnderway.remove(forwardReference.getGcID());
     }
 
+    private void noop(GCLogTrace trace, String line) {}
+
     /*************
      *
      * Data Extraction methods
