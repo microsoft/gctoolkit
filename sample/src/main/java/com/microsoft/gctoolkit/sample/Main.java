@@ -60,16 +60,10 @@ public class Main {
                     summary.forEach((gcType, dataSet) -> {
                         String message = "The XYDataSet for %s contains %s items.\n";
                         System.out.printf(message, gcType, dataSet.size());
-                        switch(gcType) {
-                            case InitialMark:
-                                initialMarkCount = dataSet.size();;
-                                break;
-                            case Remark:
-                                remarkCount = dataSet.size();
-                                break;
-                            case DefNew:
-                                defNewCount = dataSet.size();
-                                break;
+                        switch (gcType) {
+                            case InitialMark -> initialMarkCount = dataSet.size();
+                            case Remark -> remarkCount = dataSet.size();
+                            case DefNew -> defNewCount = dataSet.size();
                         }
                     });
                 });

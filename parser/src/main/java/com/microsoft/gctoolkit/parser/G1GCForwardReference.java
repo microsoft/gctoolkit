@@ -2,34 +2,11 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.parser;
 
-import com.microsoft.gctoolkit.event.GCCause;
-import com.microsoft.gctoolkit.event.GarbageCollectionTypes;
-import com.microsoft.gctoolkit.event.MemoryPoolSummary;
-import com.microsoft.gctoolkit.event.ReferenceGCSummary;
-import com.microsoft.gctoolkit.event.SurvivorMemoryPoolSummary;
-import com.microsoft.gctoolkit.event.UnifiedCountSummary;
-import com.microsoft.gctoolkit.event.UnifiedStatisticalSummary;
-import com.microsoft.gctoolkit.event.g1gc.ConcurrentCleanupForNextMark;
-import com.microsoft.gctoolkit.event.g1gc.ConcurrentClearClaimedMarks;
-import com.microsoft.gctoolkit.event.g1gc.ConcurrentCompleteCleanup;
-import com.microsoft.gctoolkit.event.g1gc.ConcurrentCreateLiveData;
-import com.microsoft.gctoolkit.event.g1gc.ConcurrentScanRootRegion;
-import com.microsoft.gctoolkit.event.g1gc.G1Cleanup;
-import com.microsoft.gctoolkit.event.g1gc.G1ConcurrentMark;
-import com.microsoft.gctoolkit.event.g1gc.G1ConcurrentRebuildRememberedSets;
-import com.microsoft.gctoolkit.event.g1gc.G1FullGC;
-import com.microsoft.gctoolkit.event.g1gc.G1FullGCNES;
-import com.microsoft.gctoolkit.event.g1gc.G1GCConcurrentEvent;
-import com.microsoft.gctoolkit.event.g1gc.G1GCPauseEvent;
-import com.microsoft.gctoolkit.event.g1gc.G1Mixed;
-import com.microsoft.gctoolkit.event.g1gc.G1Remark;
-import com.microsoft.gctoolkit.event.g1gc.G1SystemGC;
-import com.microsoft.gctoolkit.event.g1gc.G1Young;
-import com.microsoft.gctoolkit.event.g1gc.G1YoungInitialMark;
+import com.microsoft.gctoolkit.event.*;
+import com.microsoft.gctoolkit.event.g1gc.*;
 import com.microsoft.gctoolkit.parser.jvm.Decorators;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
@@ -617,25 +594,19 @@ public class G1GCForwardReference extends ForwardReference {
     }
 
     public G1GCConcurrentEvent buildConcurrentEvent() {
-        switch (getConcurrentPhase()) {
-            case ConcurrentClearClaimedMarks:
-                return new ConcurrentClearClaimedMarks(getStartTime(), getDuration());
-            case ConcurrentScanRootRegions:
-                return new ConcurrentScanRootRegion(getStartTime(), getDuration());
-            case Concurrent_Mark:
-                return buildConcurrentMark();
-            case ConcurrentCompleteCleanup:
-                return new ConcurrentCompleteCleanup(getStartTime(), getDuration());
-            case ConcurrentCreateLiveData:
-                return new ConcurrentCreateLiveData(getStartTime(), getDuration());
-            case ConcurrentCleanupForNextMark:
-                return new ConcurrentCleanupForNextMark(getStartTime(), getDuration());
-            case G1ConcurrentRebuildRememberedSets:
-                return new G1ConcurrentRebuildRememberedSets(getStartTime(), getDuration());
-            default:
+        return switch (getConcurrentPhase()) {
+            case ConcurrentClearClaimedMarks -> new ConcurrentClearClaimedMarks(getStartTime(), getDuration());
+            case ConcurrentScanRootRegions -> new ConcurrentScanRootRegion(getStartTime(), getDuration());
+            case Concurrent_Mark -> buildConcurrentMark();
+            case ConcurrentCompleteCleanup -> new ConcurrentCompleteCleanup(getStartTime(), getDuration());
+            case ConcurrentCreateLiveData -> new ConcurrentCreateLiveData(getStartTime(), getDuration());
+            case ConcurrentCleanupForNextMark -> new ConcurrentCleanupForNextMark(getStartTime(), getDuration());
+            case G1ConcurrentRebuildRememberedSets -> new G1ConcurrentRebuildRememberedSets(getStartTime(), getDuration());
+            default -> {
                 LOGGER.warning("Unrecognized Concurrent Event " + getConcurrentPhase());
-        }
-        return null;
+                yield null;
+            }
+        };
     }
 
     /**
@@ -647,29 +618,29 @@ public class G1GCForwardReference extends ForwardReference {
             LOGGER.warning("GC Event is undefined (null)");
             return null;
         }
-        switch (this.gcType) {
-            case Young:
-                return buildYoung();
-            case Initial_Mark:
-                return buildInitialMark();
-            case Mixed:
-                return buildMixed();
-            case G1GCFull:
-                return buildFull();
-            case Concurrent_Cycle:
-                switch (pausePhaseDuringConcurrentCycle) {
-                    case G1GCRemark:
-                        return buildRemark();
-                    case G1GCCleanup:
-                        return buildCleanup();
-                    default:
-                        LOGGER.warning("Unrecognized Concurrent Pause Event " + getConcurrentPhase());
-                }
-                return null;
-            default:
+
+        return switch (this.gcType) {
+            case Young -> buildYoung();
+            case Initial_Mark -> buildInitialMark();
+            case Mixed -> buildMixed();
+            case G1GCFull -> buildFull();
+            case Concurrent_Cycle -> buildConcurrentCycle();
+            default -> {
                 LOGGER.warning("Unrecognized Event " + gcType);
-                return null;
-        }
+                yield null;
+            }
+        };
+    }
+
+    private G1RealPause buildConcurrentCycle() {
+        return switch (pausePhaseDuringConcurrentCycle) {
+            case G1GCRemark -> buildRemark();
+            case G1GCCleanup -> buildCleanup();
+            default -> {
+                LOGGER.warning("Unrecognized Concurrent Pause Event " + getConcurrentPhase());
+                yield null;
+            }
+        };
     }
 
     private G1Young buildYoung(G1Young collection) {

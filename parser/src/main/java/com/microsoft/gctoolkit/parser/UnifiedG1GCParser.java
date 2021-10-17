@@ -14,11 +14,7 @@ import com.microsoft.gctoolkit.parser.jvm.LoggingDiary;
 import com.microsoft.gctoolkit.parser.unified.UnifiedG1GCPatterns;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
 
-import java.util.AbstractMap;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Queue;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
 import java.util.logging.Level;
@@ -268,30 +264,23 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
     }
 
     private void g1Collection(GCLogTrace trace, String line) {
-        GarbageCollectionTypes gcType;
         String gcSubtype = trace.getGroup(3);
-        if (gcSubtype == null)
-            gcType = fromLabel(trace.getGroup(1));
-        else {
-            switch (gcSubtype) {
-                default:
-                    LOGGER.warning("GC Type not recognized: " + line);
-                case "Prepare Mixed":
-                case "Normal":
-                    gcType = fromLabel(trace.getGroup(1));
-                    break;
-                case "Mixed":
-                    gcType = fromLabel(trace.getGroup(3));
-                    break;
-                case "Concurrent End":
-                case "Concurrent Start":
-                    gcType = GarbageCollectionTypes.Initial_Mark;
-                    break;
-            }
-        }
+        var gcType = gcSubtype == null ? fromLabel(trace.getGroup(1)) : fromSubType(trace, line, gcSubtype);
         forwardReference.setGcType(gcType);
         forwardReference.setGCCause(trace.gcCause(1));
         forwardReference.setStartTime(getClock());
+    }
+
+    private GarbageCollectionTypes fromSubType(GCLogTrace trace, String line, String gcSubtype) {
+        return switch (gcSubtype) {
+            case "Prepare Mixed", "Normal" -> fromLabel(trace.getGroup(1));
+            case "Mixed"-> fromLabel(trace.getGroup(3));
+            case "Concurrent End","Concurrent Start" -> GarbageCollectionTypes.Initial_Mark;
+            default -> {
+                LOGGER.warning("GC Type not recognized: " + line);
+                yield null;
+            }
+        };
     }
 
     private void workSummary(GCLogTrace trace, String line) {
@@ -300,23 +289,12 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
 
     private void references(GCLogTrace trace, String line) {
         switch (trace.getGroup(1)) {
-            case "SoftReference":
-                forwardReference.setSoftReferenceProcessingDuation(trace.getDurationInSeconds());
-                break;
-            case "WeakReference":
-                forwardReference.setWeakReferenceProcessingDuration(trace.getDurationInSeconds());
-                break;
-            case "FinalReference":
-                forwardReference.setFinalReferenceProcessingDuration(trace.getDurationInSeconds());
-                break;
-            case "PhantomReference":
-                forwardReference.setPhantomReferenceProcessingDuration(trace.getDurationInSeconds());
-                break;
-            case "JNI Weak Reference":
-                forwardReference.setJniWeakReferenceProcessingDuration(trace.getDurationInSeconds());
-                break;
-            default:
-                trace.notYetImplemented();
+            case "SoftReference" -> forwardReference.setSoftReferenceProcessingDuation(trace.getDurationInSeconds());
+            case "WeakReference" -> forwardReference.setWeakReferenceProcessingDuration(trace.getDurationInSeconds());
+            case "FinalReference" -> forwardReference.setFinalReferenceProcessingDuration(trace.getDurationInSeconds());
+            case "PhantomReference" -> forwardReference.setPhantomReferenceProcessingDuration(trace.getDurationInSeconds());
+            case "JNI Weak Reference" -> forwardReference.setJniWeakReferenceProcessingDuration(trace.getDurationInSeconds());
+            default -> trace.notYetImplemented();
         }
     }
 
@@ -376,46 +354,40 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
 
     public void parallelCount(GCLogTrace trace, String line) {
         switch (trace.getGroup(1)) {
-            case "Processed Buffers":
-                forwardReference.setProcessedBuffersSummary(trace.countSummary());
-                break;
-            case "Termination Attempts":
-                forwardReference.setTerminationAttempts(trace.countSummary());
-                break;
-            default:
-                trace.notYetImplemented();
+            case "Processed Buffers" -> forwardReference.setProcessedBuffersSummary(trace.countSummary());
+            case "Termination Attempts" -> forwardReference.setTerminationAttempts(trace.countSummary());
+            default -> trace.notYetImplemented();
         }
     }
 
     public void regionSummary(GCLogTrace trace, String line) {
         RegionSummary summary = trace.regionSummary();
         switch (trace.getGroup(1)) {
-            case "Eden":
+            case "Eden" -> {
                 forwardReference.setEdenOccupancyBeforeCollection(summary.getBefore() * regionSize * 1024);
                 forwardReference.setEdenOccupancyAfterCollection(summary.getAfter() * regionSize * 1024);
                 forwardReference.setEdenSizeBeforeCollection(summary.getBefore() * regionSize * 1024);
                 forwardReference.setEdenSizeAfterCollection(summary.getAssigned() * regionSize * 1024);
-                break;
-            case "Survivor":
+            }
+            case "Survivor" -> {
                 forwardReference.setSurvivorOccupancyBeforeCollection(summary.getBefore() * regionSize * 1024);
                 forwardReference.setSurvivorOccupancyAfterCollection(summary.getAfter() * regionSize * 1024);
                 forwardReference.setSurvivorSizeBeforeCollection(summary.getBefore() * regionSize * 1024);
                 forwardReference.setSurvivorSizeAfterCollection(summary.getAssigned() * regionSize * 1024);
-                break;
-            case "Old":
+            }
+            case "Old" -> {
                 forwardReference.setOldOccupancyBeforeCollection(summary.getBefore() * regionSize * 1024);
                 forwardReference.setOldOccupancyAfterCollection(summary.getAfter() * regionSize * 1024);
                 forwardReference.setOldSizeBeforeCollection(summary.getBefore() * regionSize * 1024);
                 forwardReference.setOldSizeAfterCollection(summary.getAfter() * regionSize * 1024);
-                break;
-            case "Humongous":
+            }
+            case "Humongous" -> {
                 forwardReference.setHumongousOccupancyBeforeCollection(summary.getBefore() * regionSize * 1024);
                 forwardReference.setHumongousOccupancyAfterCollection(summary.getAfter() * regionSize * 1024);
                 forwardReference.setHumongousSizeBeforeCollection(summary.getBefore() * regionSize * 1024);
                 forwardReference.setHumongousSizeAfterCollection(summary.getAfter() * regionSize * 1024);
-                break;
-            default:
-                notYetImplemented(trace, line);
+            }
+            default -> notYetImplemented(trace, line);
         }
     }
 
@@ -476,15 +448,9 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
 
     private void concurrentMarkInternalPhaseDuration(GCLogTrace trace, String line) {
         switch (trace.getGroup(1)) {
-            case "Mark From Roots":
-                forwardReference.setMarkFromRootsDuration(trace.getDurationInSeconds());
-                break;
-            case "Preclean":
-                forwardReference.setPrecleanDuration(trace.getDurationInSeconds());
-                break;
-            default:
-                LOGGER.warning("unknown Concurrent Mark phase : " + line);
-
+            case "Mark From Roots" -> forwardReference.setMarkFromRootsDuration(trace.getDurationInSeconds());
+            case "Preclean" -> forwardReference.setPrecleanDuration(trace.getDurationInSeconds());
+            default -> LOGGER.warning("unknown Concurrent Mark phase : " + line);
         }
     }
 
@@ -558,10 +524,10 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
     }
 
     private void record(G1GCConcurrentEvent event) {
-        if ( event == null) return;
+        if (event == null) return;
         consumer.record(event);
         concurrentPhaseActive = false;
-        eventQueue.stream().forEach(consumer::record);
+        eventQueue.forEach(consumer::record);
         eventQueue.clear();
     }
 

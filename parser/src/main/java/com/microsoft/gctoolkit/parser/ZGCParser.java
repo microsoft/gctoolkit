@@ -207,24 +207,17 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
     }
 
     private void sizeEntry(GCLogTrace trace, String s) {
-        switch(trace.getGroup(1)) {
-            case "Capacity" :
-                captureAtIndex( trace,0);
-                break;
-            case "Reserve"  :
-                captureAtIndex( trace,1);
-                break;
-            case "Free"     :
-                captureAtIndex( trace,2);
-                break;
-            case "Used"     :
-                forwardReference.setMarkStart(new ZGCMemoryPoolSummary( markStart[0], markStart[1], markStart[2], trace.getLongGroup(2)));
-                forwardReference.setMarkEnd(new ZGCMemoryPoolSummary( markEnd[0], markEnd[1], markEnd[2], trace.getLongGroup(5)));
-                forwardReference.setRelocateStart(new ZGCMemoryPoolSummary( relocateStart[0], relocateStart[1], relocateStart[2], trace.getLongGroup(8)));
-                forwardReference.setRelocateEnd(new ZGCMemoryPoolSummary( relocateEnd[0], relocateEnd[1], relocateEnd[2], trace.getLongGroup(11)));
-                break;
-            default         :
-                LOGGER.warning(trace.getGroup(1) + "not recognized, Heap Occupancy/size is is ignored. Please report this with the GC log");
+        switch (trace.getGroup(1)) {
+            case "Capacity" -> captureAtIndex(trace, 0);
+            case "Reserve" -> captureAtIndex(trace, 1);
+            case "Free" -> captureAtIndex(trace, 2);
+            case "Used" -> {
+                forwardReference.setMarkStart(new ZGCMemoryPoolSummary(markStart[0], markStart[1], markStart[2], trace.getLongGroup(2)));
+                forwardReference.setMarkEnd(new ZGCMemoryPoolSummary(markEnd[0], markEnd[1], markEnd[2], trace.getLongGroup(5)));
+                forwardReference.setRelocateStart(new ZGCMemoryPoolSummary(relocateStart[0], relocateStart[1], relocateStart[2], trace.getLongGroup(8)));
+                forwardReference.setRelocateEnd(new ZGCMemoryPoolSummary(relocateEnd[0], relocateEnd[1], relocateEnd[2], trace.getLongGroup(11)));
+            }
+            default -> LOGGER.warning(trace.getGroup(1) + "not recognized, Heap Occupancy/size is is ignored. Please report this with the GC log");
         }
     }
 

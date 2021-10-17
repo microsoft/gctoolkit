@@ -2,22 +2,11 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.io;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.SequenceInputStream;
-import java.io.UncheckedIOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Vector;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -130,26 +119,27 @@ public class RotatingGCLogFile extends GCLogFile {
             throws IOException {
         //todo: find rolling files....
         if (metadata.isFile() || metadata.isDirectory()) {
-            switch (segments.size()) {
-                case 0:
-                    String[] empty = new String[0];
-                    return Arrays.stream(empty);
-                case 1:
-                    return segments.getFirst().stream();
-                default:
-                    // This code removes elements from the list of segments, so work on a copy.
-                    LinkedList<GarbageCollectionLogFileSegment> copySegments = new LinkedList<>(segments);
-                    Stream<String> allSegments = Stream.concat(copySegments.removeFirst().stream(), copySegments.removeFirst().stream());
-                    while (!copySegments.isEmpty())
-                        allSegments = Stream.concat(allSegments, copySegments.removeFirst().stream());
-                    return allSegments;
-            }
+            return switch (segments.size()) {
+                case 0 -> Arrays.stream(new String[0]);
+                case 1 -> segments.getFirst().stream();
+                default -> allSegments(segments);
+            };
         } else if (metadata.isZip()) {
             return streamZipFile(path);
         } else if (metadata.isGZip()) {
             throw new IOException("Unable to stream GZip files. Please unzip and retry");
         }
         throw new IOException("Unrecognised file type");
+    }
+
+    private static Stream<String> allSegments(LinkedList<GarbageCollectionLogFileSegment> segments) {
+        // This code removes elements from the list of segments, so work on a copy.
+        var copySegments = new LinkedList<>(segments);
+        var allSegments = Stream.concat(copySegments.removeFirst().stream(), copySegments.removeFirst().stream());
+        while (!copySegments.isEmpty()) {
+            allSegments = Stream.concat(allSegments, copySegments.removeFirst().stream());
+        }
+        return allSegments;
     }
 
     private static Stream<String> streamZipFile(Path path) throws IOException {
@@ -262,8 +252,8 @@ public class RotatingGCLogFile extends GCLogFile {
             double delta = GarbageCollectionLogFileSegment.rolloverDelta(orderedSegments[current], orderedSegments[index]);
             if (!Double.isNaN(delta) && 0 <= delta && delta < closestTime) {
                 GarbageCollectionLogFileSegment temp = orderedSegments[current];
-                for(int n=current; n > index+1; --n) {
-                    orderedSegments[n] = orderedSegments[n-1];
+                for (int n = current; n > index + 1; --n) {
+                    orderedSegments[n] = orderedSegments[n - 1];
                 }
                 orderedSegments[current=index+1] = temp;
                 closestTime = delta;

@@ -4,22 +4,14 @@ package com.microsoft.gctoolkit.parser;
 
 import com.microsoft.gctoolkit.event.CPUSummary;
 import com.microsoft.gctoolkit.event.GarbageCollectionTypes;
-import com.microsoft.gctoolkit.event.generational.AbortablePreClean;
-import com.microsoft.gctoolkit.event.generational.CMSConcurrentEvent;
-import com.microsoft.gctoolkit.event.generational.CMSRemark;
 import com.microsoft.gctoolkit.event.generational.ConcurrentMark;
 import com.microsoft.gctoolkit.event.generational.ConcurrentModeFailure;
-import com.microsoft.gctoolkit.event.generational.ConcurrentPreClean;
-import com.microsoft.gctoolkit.event.generational.ConcurrentReset;
-import com.microsoft.gctoolkit.event.generational.ConcurrentSweep;
 import com.microsoft.gctoolkit.event.generational.DefNew;
 import com.microsoft.gctoolkit.event.generational.FullGC;
-import com.microsoft.gctoolkit.event.generational.GenerationalGCPauseEvent;
 import com.microsoft.gctoolkit.event.generational.InitialMark;
-import com.microsoft.gctoolkit.event.generational.PSFullGC;
 import com.microsoft.gctoolkit.event.generational.PSYoungGen;
 import com.microsoft.gctoolkit.event.generational.ParNew;
-import com.microsoft.gctoolkit.event.generational.YoungGC;
+import com.microsoft.gctoolkit.event.generational.*;
 import com.microsoft.gctoolkit.event.jvm.JVMTermination;
 import com.microsoft.gctoolkit.parser.collection.RuleSet;
 import com.microsoft.gctoolkit.parser.jvm.Decorators;
@@ -34,19 +26,7 @@ import java.util.function.BiConsumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static com.microsoft.gctoolkit.event.GarbageCollectionTypes.Abortable_Preclean;
-import static com.microsoft.gctoolkit.event.GarbageCollectionTypes.ConcurrentModeFailure;
-import static com.microsoft.gctoolkit.event.GarbageCollectionTypes.Concurrent_Mark;
-import static com.microsoft.gctoolkit.event.GarbageCollectionTypes.Concurrent_Preclean;
-import static com.microsoft.gctoolkit.event.GarbageCollectionTypes.Concurrent_Reset;
-import static com.microsoft.gctoolkit.event.GarbageCollectionTypes.Concurrent_Sweep;
-import static com.microsoft.gctoolkit.event.GarbageCollectionTypes.DefNew;
-import static com.microsoft.gctoolkit.event.GarbageCollectionTypes.FullGC;
-import static com.microsoft.gctoolkit.event.GarbageCollectionTypes.InitialMark;
-import static com.microsoft.gctoolkit.event.GarbageCollectionTypes.PSFull;
-import static com.microsoft.gctoolkit.event.GarbageCollectionTypes.PSYoungGen;
-import static com.microsoft.gctoolkit.event.GarbageCollectionTypes.ParNew;
-import static com.microsoft.gctoolkit.event.GarbageCollectionTypes.Remark;
+import static com.microsoft.gctoolkit.event.GarbageCollectionTypes.*;
 
 /**
  * TODO No reports or views generated from this data yet.
@@ -123,7 +103,7 @@ public class UnifiedGenerationalParser extends UnifiedGCLogParser implements Uni
                 .map(rule -> new AbstractMap.SimpleEntry<>(rule, rule.parse(line)))
                 .filter(tuple -> tuple.getValue() != null)
                 .findFirst();
-        if (!ruleToApply.isPresent()) {
+        if (ruleToApply.isEmpty()) {
             log(line);
             return;
         }
@@ -172,35 +152,17 @@ public class UnifiedGenerationalParser extends UnifiedGCLogParser implements Uni
 
     private void generationalMemorySummary(GCLogTrace trace, String line) {
         switch (trace.getGroup(1)) {
-            case "ParNew":
-            case "PSYoungGen":
-            case "DefNew":
-                pauseEvent.setYoung(trace.getOccupancyBeforeAfterWithMemoryPoolSizeSummary(2));
-                break;
-            case "CMS":
-            case "ParOldGen":
-            case "Tenured":
-                pauseEvent.setTenured(trace.getOccupancyBeforeAfterWithMemoryPoolSizeSummary(2));
-                break;
-            default:
-                trace.notYetImplemented();
+            case "ParNew", "PSYoungGen", "DefNew" -> pauseEvent.setYoung(trace.getOccupancyBeforeAfterWithMemoryPoolSizeSummary(2));
+            case "CMS", "ParOldGen", "Tenured" -> pauseEvent.setTenured(trace.getOccupancyBeforeAfterWithMemoryPoolSizeSummary(2));
+            default -> trace.notYetImplemented();
         }
     }
 
     private void extendedGenerationalMemorySummary(GCLogTrace trace, String line) {
         switch (trace.getGroup(1)) {
-            case "ParNew":
-            case "PSYoungGen":
-            case "DefNew":
-                pauseEvent.setYoung(trace.getEnlargedMemoryPoolRecord(2));
-                break;
-            case "CMS":
-            case "ParOldGen":
-            case "Tenured":
-                pauseEvent.setTenured(trace.getEnlargedMemoryPoolRecord(2));
-                break;
-            default:
-                trace.notYetImplemented();
+            case "ParNew", "PSYoungGen", "DefNew" -> pauseEvent.setYoung(trace.getEnlargedMemoryPoolRecord(2));
+            case "CMS", "ParOldGen", "Tenured" -> pauseEvent.setTenured(trace.getEnlargedMemoryPoolRecord(2));
+            default -> trace.notYetImplemented();
         }
     }
 
@@ -400,46 +362,27 @@ public class UnifiedGenerationalParser extends UnifiedGCLogParser implements Uni
         map |= (values.getHeap() != null) ? 1 : 0;
         map |= (values.getYoung() != null) ? 2 : 0;
         map |= (values.getTenured() != null) ? 4 : 0;
+
         switch (map) {
-            default:
-            case 0:  // none, error
-            case 2: // young
-            case 4: // tenured
-                break;
-            case 1: // heap
-                event.add(values.getHeap());
-                break;
-            case 3: // young, heap
-                event.add(values.getYoung(), values.getHeap());
-                break;
-            case 5: // tenured, heap
-                event.add(values.getHeap().minus(values.getTenured()), values.getTenured(), values.getHeap());
-                break;
-            case 6: // tenured, young
-                event.add(values.getYoung(), values.getTenured(), values.getYoung().add(values.getTenured()));
-                break;
-            case 7: // tenured, young, heap
-                event.add(values.getYoung(), values.getTenured(), values.getHeap());
+            case 0, 2, 4 -> {
+                // do nothing
+            } //0 - none, error, 2 - young, 4 -  tenured
+            case 1 -> event.add(values.getHeap());// heap
+            case 3 -> event.add(values.getYoung(), values.getHeap());// young, heap
+            case 5 -> event.add(values.getHeap().minus(values.getTenured()), values.getTenured(), values.getHeap());// tenured, heap
+            case 6 -> event.add(values.getYoung(), values.getTenured(), values.getYoung().add(values.getTenured()));// tenured, young
+            case 7 -> event.add(values.getYoung(), values.getTenured(), values.getHeap());// tenured, young, heap
         }
     }
 
     private GenerationalGCPauseEvent buildYoungEvent(GenerationalForwardReference forwardReference) {
         GenerationalGCPauseEvent youngCollection = null;
         switch (forwardReference.getGarbageCollectionType()) {
-            case DefNew:
-                youngCollection = new DefNew(forwardReference.getStartTime(), forwardReference.getGCCause(), forwardReference.getDuration());
-                break;
-            case ParNew:
-                youngCollection = new ParNew(forwardReference.getStartTime(), forwardReference.getGCCause(), forwardReference.getDuration());
-                break;
-            case Young:
-                youngCollection = new YoungGC(forwardReference.getStartTime(), forwardReference.getGCCause(), forwardReference.getDuration());
-                break;
-            case PSYoungGen:
-                youngCollection = new PSYoungGen(forwardReference.getStartTime(), forwardReference.getGCCause(), forwardReference.getDuration());
-                break;
-            default:
-                LOGGER.warning(forwardReference.getGarbageCollectionType() + " not recognized");
+            case DefNew -> youngCollection = new DefNew(forwardReference.getStartTime(), forwardReference.getGCCause(), forwardReference.getDuration());
+            case ParNew -> youngCollection = new ParNew(forwardReference.getStartTime(), forwardReference.getGCCause(), forwardReference.getDuration());
+            case Young -> youngCollection = new YoungGC(forwardReference.getStartTime(), forwardReference.getGCCause(), forwardReference.getDuration());
+            case PSYoungGen -> youngCollection = new PSYoungGen(forwardReference.getStartTime(), forwardReference.getGCCause(), forwardReference.getDuration());
+            default -> LOGGER.warning(forwardReference.getGarbageCollectionType() + " not recognized");
         }
 
         fillOutMemoryPoolData(youngCollection, forwardReference);
@@ -473,16 +416,14 @@ public class UnifiedGenerationalParser extends UnifiedGCLogParser implements Uni
     }
 
     private FullGC buildFullGC(GenerationalForwardReference forwardReference) {
-        switch (forwardReference.getGarbageCollectionType()) {
-            case PSFull:
-                return fillOutFullGC(new PSFullGC(forwardReference.getStartTime(), forwardReference.getGCCause(), forwardReference.getDuration()), forwardReference);
-            case FullGC:
-            case Full:
-                return fillOutFullGC(new FullGC(forwardReference.getStartTime(), forwardReference.getGCCause(), forwardReference.getDuration()), forwardReference);
-            default:
+        return switch (forwardReference.getGarbageCollectionType()) {
+            case PSFull -> fillOutFullGC(new PSFullGC(forwardReference.getStartTime(), forwardReference.getGCCause(), forwardReference.getDuration()), forwardReference);
+            case FullGC, Full -> fillOutFullGC(new FullGC(forwardReference.getStartTime(), forwardReference.getGCCause(), forwardReference.getDuration()), forwardReference);
+            default -> {
                 LOGGER.warning(forwardReference.getGarbageCollectionType() + " is unrecognized");
-        }
-        return null;
+                yield null;
+            }
+        };
     }
 
     private ConcurrentModeFailure buildConcurrentModeFailure(GenerationalForwardReference forwardReference) {
@@ -490,45 +431,34 @@ public class UnifiedGenerationalParser extends UnifiedGCLogParser implements Uni
     }
 
     private GenerationalGCPauseEvent buildPauseEvent(GenerationalForwardReference forwardReference) {
-        switch (forwardReference.getGarbageCollectionType()) {
-            case DefNew:
-            case PSYoungGen:
-            case ParNew:
-            case Young:
-                return buildYoungEvent(forwardReference);
-            case InitialMark:
-                return buildInitialMark(forwardReference);
-            case Remark:
-                return buildRemark(forwardReference);
-            case PSFull: //todo:
-            case FullGC:
-            case Full:
-                return buildFullGC(forwardReference);
-            case ConcurrentModeFailure:
-                return buildConcurrentModeFailure(forwardReference);
-            default:
+        var event = switch (forwardReference.getGarbageCollectionType()) {
+            case DefNew, PSYoungGen, ParNew, Young -> buildYoungEvent(forwardReference);
+            case InitialMark -> buildInitialMark(forwardReference);
+            case Remark -> buildRemark(forwardReference);
+            case PSFull, FullGC, Full -> buildFullGC(forwardReference);
+            case ConcurrentModeFailure -> buildConcurrentModeFailure(forwardReference);
+            default -> {
                 LOGGER.warning(forwardReference.getGarbageCollectionType() + " is unrecognized");
-        }
+                yield null;
+            }
+        };
+
         notYetImplemented();
-        return null;
+        return event;
     }
 
     private CMSConcurrentEvent buildConcurrentPhase(GenerationalForwardReference values) {
-        switch (values.getGarbageCollectionType()) {
-            case Concurrent_Mark:
-                return new ConcurrentMark(values.getStartTime(), values.getDuration(), values.getCPUSummary().getKernel() + values.getCPUSummary().getUser(), values.getCPUSummary().getWallClock());
-            case Concurrent_Preclean:
-                return new ConcurrentPreClean(values.getStartTime(), values.getDuration(), values.getCPUSummary().getKernel() + values.getCPUSummary().getUser(), values.getCPUSummary().getWallClock());
-            case Abortable_Preclean:
-                return new AbortablePreClean(values.getStartTime(), values.getDuration(), values.getCPUSummary().getKernel() + values.getCPUSummary().getUser(), values.getCPUSummary().getWallClock(), false); //todo: if duration is ? 2 minutes, this should be true
-            case Concurrent_Sweep:
-                return new ConcurrentSweep(values.getStartTime(), values.getDuration(), values.getCPUSummary().getKernel() + values.getCPUSummary().getUser(), values.getCPUSummary().getWallClock());
-            case Concurrent_Reset:
-                return new ConcurrentReset(values.getStartTime(), values.getDuration(), values.getCPUSummary().getKernel() + values.getCPUSummary().getUser(), values.getCPUSummary().getWallClock());
-            default:
+        return switch (values.getGarbageCollectionType()) {
+            case Concurrent_Mark -> new ConcurrentMark(values.getStartTime(), values.getDuration(), values.getCPUSummary().getKernel() + values.getCPUSummary().getUser(), values.getCPUSummary().getWallClock());
+            case Concurrent_Preclean -> new ConcurrentPreClean(values.getStartTime(), values.getDuration(), values.getCPUSummary().getKernel() + values.getCPUSummary().getUser(), values.getCPUSummary().getWallClock());
+            case Abortable_Preclean -> new AbortablePreClean(values.getStartTime(), values.getDuration(), values.getCPUSummary().getKernel() + values.getCPUSummary().getUser(), values.getCPUSummary().getWallClock(), false); //todo: if duration is ? 2 minutes, this should be true
+            case Concurrent_Sweep -> new ConcurrentSweep(values.getStartTime(), values.getDuration(), values.getCPUSummary().getKernel() + values.getCPUSummary().getUser(), values.getCPUSummary().getWallClock());
+            case Concurrent_Reset -> new ConcurrentReset(values.getStartTime(), values.getDuration(), values.getCPUSummary().getKernel() + values.getCPUSummary().getUser(), values.getCPUSummary().getWallClock());
+            default -> {
                 LOGGER.warning(values.getGarbageCollectionType() + " is unrecognized");
-        }
-        return null;
+                yield null;
+            }
+        };
     }
 
     // diagnostics

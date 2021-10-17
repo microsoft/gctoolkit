@@ -5,18 +5,8 @@ package com.microsoft.gctoolkit.parser.jvm;
 
 import com.microsoft.gctoolkit.event.GCCause;
 import com.microsoft.gctoolkit.event.GCCauses;
+import com.microsoft.gctoolkit.parser.*;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
-import com.microsoft.gctoolkit.parser.CMSPatterns;
-import com.microsoft.gctoolkit.parser.G1GCPatterns;
-import com.microsoft.gctoolkit.parser.G1GCTokens;
-import com.microsoft.gctoolkit.parser.GCLogTrace;
-import com.microsoft.gctoolkit.parser.GCParseRule;
-import com.microsoft.gctoolkit.parser.JVMPatterns;
-import com.microsoft.gctoolkit.parser.ParallelPatterns;
-import com.microsoft.gctoolkit.parser.PreUnifiedTokens;
-import com.microsoft.gctoolkit.parser.SerialPatterns;
-import com.microsoft.gctoolkit.parser.SimplePatterns;
-import com.microsoft.gctoolkit.parser.TenuredPatterns;
 
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -748,87 +738,42 @@ public class PreUnifiedJVMConfiguration implements SimplePatterns, CMSPatterns, 
             CommandLineFlag supportedFlag = CommandLineFlag.fromString(flag);
             if (supportedFlag != null) {
                 switch (supportedFlag) {
-                    case PrintGCApplicationStoppedTime:
-                        getDiary().setState(SupportedFlags.APPLICATION_STOPPED_TIME, flagTurnedOn);
-                        break;
-
-                    case PrintGCApplicationConcurrentTime:
-                        getDiary().setState(SupportedFlags.APPLICATION_CONCURRENT_TIME, flagTurnedOn);
-                        break;
-
-                    case PrintGCTimeStamps:
-                        break;
-
-                    case PrintGCDetails:
+                    case PrintGCApplicationStoppedTime -> getDiary().setState(SupportedFlags.APPLICATION_STOPPED_TIME, flagTurnedOn);
+                    case PrintGCApplicationConcurrentTime -> getDiary().setState(SupportedFlags.APPLICATION_CONCURRENT_TIME, flagTurnedOn);
+                    case PrintGCTimeStamps -> {
+                        //do nothing
+                    }
+                    case PrintGCDetails -> {
                         getDiary().setState(SupportedFlags.GC_DETAILS, flagTurnedOn);
                         if (flagTurnedOn && (getDiary().isJDK80() || getDiary().isUnifiedLogging()))
                             getDiary().setTrue(SupportedFlags.GC_CAUSE);
-                        break;
-
-                    case PrintGCCause:
-                        getDiary().setState(SupportedFlags.GC_CAUSE, flagTurnedOn);
-                        break;
-
-                    case PrintTenuringDistribution:
-                        getDiary().setState(SupportedFlags.TENURING_DISTRIBUTION, flagTurnedOn);
-                        break;
-
-                    case PrintAdaptiveSizePolicy:
-                        getDiary().setState(SupportedFlags.ADAPTIVE_SIZING, flagTurnedOn);
-                        break;
-
-                    case PrintReferenceGC:
-                        getDiary().setState(SupportedFlags.PRINT_REFERENCE_GC, flagTurnedOn);
-                        break;
-
-                    case PrintHeapAtGC:
-                        getDiary().setState(SupportedFlags.PRINT_HEAP_AT_GC, flagTurnedOn);
-                        break;
-
-                    case PrintPromotionFailure:
-                        getDiary().setTrue(SupportedFlags.PRINT_PROMOTION_FAILURE);
-
-                    case PrintFLSStatistics:
-                        getDiary().setTrue(SupportedFlags.PRINT_FLS_STATISTICS);
-
-                    default:
-                        //shouldn't be able to get here....
+                    }
+                    case PrintGCCause -> getDiary().setState(SupportedFlags.GC_CAUSE, flagTurnedOn);
+                    case PrintTenuringDistribution -> getDiary().setState(SupportedFlags.TENURING_DISTRIBUTION, flagTurnedOn);
+                    case PrintAdaptiveSizePolicy -> getDiary().setState(SupportedFlags.ADAPTIVE_SIZING, flagTurnedOn);
+                    case PrintReferenceGC -> getDiary().setState(SupportedFlags.PRINT_REFERENCE_GC, flagTurnedOn);
+                    case PrintHeapAtGC -> getDiary().setState(SupportedFlags.PRINT_HEAP_AT_GC, flagTurnedOn);
+                    case PrintPromotionFailure -> getDiary().setTrue(SupportedFlags.PRINT_PROMOTION_FAILURE);
+                    case PrintFLSStatistics -> getDiary().setTrue(SupportedFlags.PRINT_FLS_STATISTICS);
+                    default -> {
+                    }
+                    //shouldn't be able to get here....
                 }
             } else {
 
                 GarbageCollectorFlag gcFlag = GarbageCollectorFlag.fromString(flag);
                 if (gcFlag != null) {
                     switch (gcFlag) {
-                        case UseSerialGC:
-                            setGCFlags |= (flagTurnedOn) ? 0x1 : 0x100;
-                            break;
-
-                        case UseParallelGC:
-                            setGCFlags |= (flagTurnedOn) ? 0x2 : 0x200;
-                            break;
-
-                        case UseParallelOldGC:
-                            setGCFlags |= (flagTurnedOn) ? 0x4 : 0x400;
-                            break;
-
-                        case UseParNewGC:
-                            setGCFlags |= (flagTurnedOn) ? 0x8 : 0x800;
-                            break;
-
-                        case UseConcMarkSweepGC:
-                            setGCFlags |= (flagTurnedOn) ? 0x10 : 0x1000;
-                            break;
-
-                        case CMSIncrementialMode:
-                            setGCFlags |= (flagTurnedOn) ? 0x20 : 0;
-                            break;
-
-                        case UseG1GC:
-                            setGCFlags |= (flagTurnedOn) ? 0x40 : 0x4000;
-                            break;
-
-                        default:
-                            // shouldn't be able to get here!!!
+                        case UseSerialGC -> setGCFlags |= (flagTurnedOn) ? 0x1 : 0x100;
+                        case UseParallelGC -> setGCFlags |= (flagTurnedOn) ? 0x2 : 0x200;
+                        case UseParallelOldGC -> setGCFlags |= (flagTurnedOn) ? 0x4 : 0x400;
+                        case UseParNewGC -> setGCFlags |= (flagTurnedOn) ? 0x8 : 0x800;
+                        case UseConcMarkSweepGC -> setGCFlags |= (flagTurnedOn) ? 0x10 : 0x1000;
+                        case CMSIncrementialMode -> setGCFlags |= (flagTurnedOn) ? 0x20 : 0;
+                        case UseG1GC -> setGCFlags |= (flagTurnedOn) ? 0x40 : 0x4000;
+                        default -> {
+                        }
+                        // shouldn't be able to get here!!!
                     }
                 }
             }
@@ -867,7 +812,7 @@ public class PreUnifiedJVMConfiguration implements SimplePatterns, CMSPatterns, 
         Matcher matcher = VERSION.matcher(versionString);
         if (matcher.find()) {
             switch (matcher.group(2).charAt(0)) {
-                case '7':
+                case '7' -> {
                     getDiary().setTrue(SupportedFlags.JDK70);
                     getDiary().setFalse(SupportedFlags.JDK80);
                     if (matcher.group(3) == null)
@@ -881,15 +826,14 @@ public class PreUnifiedJVMConfiguration implements SimplePatterns, CMSPatterns, 
                     } catch (NumberFormatException nfe) {
                         getDiary().setTrue(SupportedFlags.PRE_JDK70_40);
                     }
-                    break;
-                case '8':
+                }
+                case '8' -> {
                     getDiary().setFalse(SupportedFlags.JDK70, SupportedFlags.PRE_JDK70_40);
                     getDiary().setTrue(SupportedFlags.JDK80, SupportedFlags.GC_CAUSE); // doesn't matter so much but may only be true for later versions of 8
-                    break;
-                case '9':
-                    getDiary().setFalse(SupportedFlags.JDK70, SupportedFlags.PRE_JDK70_40, SupportedFlags.JDK80);
-                    break;
-                default:
+                }
+                case '9' -> getDiary().setFalse(SupportedFlags.JDK70, SupportedFlags.PRE_JDK70_40, SupportedFlags.JDK80);
+                default -> {
+                }
             }
         }
     }
@@ -933,80 +877,51 @@ public class PreUnifiedJVMConfiguration implements SimplePatterns, CMSPatterns, 
         switch (setGCFlags) {
 
             // PSYoung/PSOldGen
-            case 0:
-            case 2:
-            case 4:
-            case 6:
-            case 256:
-            case 258:
-            case 260:
-            case 518:
-            case 2050:
-            case 4354:
-            case 6146:
-            case 16384:
+            case 0, 2, 4, 6, 256, 258, 260, 518, 2050, 4354, 6146, 16384 -> {
                 getDiary().setTrue(SupportedFlags.PARALLELGC, SupportedFlags.PARALLELOLDGC);
                 getDiary().setFalse(SupportedFlags.DEFNEW, SupportedFlags.PARNEW, SupportedFlags.CMS, SupportedFlags.ICMS, SupportedFlags.SERIAL, SupportedFlags.G1GC, SupportedFlags.RSET_STATS, SupportedFlags.CMS_DEBUG_LEVEL_1);
-                break;
-
-            case 1024: // parallel/serial
-            case 1026:
+            } // parallel/serial
+            case 1024, 1026 -> {
                 getDiary().setTrue(SupportedFlags.PARALLELGC);
                 getDiary().setFalse(SupportedFlags.DEFNEW, SupportedFlags.PARNEW, SupportedFlags.CMS, SupportedFlags.ICMS, SupportedFlags.PARALLELOLDGC, SupportedFlags.SERIAL, SupportedFlags.G1GC, SupportedFlags.RSET_STATS, SupportedFlags.CMS_DEBUG_LEVEL_1);
-                break;
-
-            case 1: // DefNew/Serial
+            }
+            case 1 -> { // DefNew/Serial
                 getDiary().setTrue(SupportedFlags.DEFNEW, SupportedFlags.SERIAL);
                 getDiary().setFalse(SupportedFlags.PARNEW, SupportedFlags.CMS, SupportedFlags.ICMS, SupportedFlags.PARALLELGC, SupportedFlags.PARALLELOLDGC, SupportedFlags.G1GC, SupportedFlags.RSET_STATS, SupportedFlags.CMS_DEBUG_LEVEL_1);
-                break;
-
-            case 8: //ParNew/Serial Deprecated
-            case 4101:
+            } //ParNew/Serial Deprecated
+            case 8, 4101 -> {
                 getDiary().setTrue(SupportedFlags.PARNEW, SupportedFlags.SERIAL);
                 getDiary().setFalse(SupportedFlags.DEFNEW, SupportedFlags.CMS, SupportedFlags.ICMS, SupportedFlags.PARALLELGC, SupportedFlags.PARALLELOLDGC, SupportedFlags.G1GC, SupportedFlags.RSET_STATS, SupportedFlags.CMS_DEBUG_LEVEL_1);
-                break;
-
-            case 16: //ParNew/CMS
-            case 24:
-            case 272:
+            } //ParNew/CMS
+            case 16, 24, 272 -> {
                 getDiary().setTrue(SupportedFlags.PARNEW, SupportedFlags.CMS);
                 getDiary().setFalse(SupportedFlags.DEFNEW, SupportedFlags.ICMS, SupportedFlags.PARALLELGC, SupportedFlags.PARALLELOLDGC, SupportedFlags.SERIAL, SupportedFlags.G1GC, SupportedFlags.RSET_STATS);
-                break;
-
-            case 2064: //DefNew/CMS Deprecated
+            }
+            case 2064 -> { //DefNew/CMS Deprecated
                 getDiary().setTrue(SupportedFlags.DEFNEW, SupportedFlags.CMS);
                 getDiary().setFalse(SupportedFlags.PARNEW, SupportedFlags.ICMS, SupportedFlags.PARALLELGC, SupportedFlags.PARALLELOLDGC, SupportedFlags.SERIAL, SupportedFlags.G1GC, SupportedFlags.RSET_STATS);
-                break;
-
-            case 48: //ParNew/iCMS
-            case 56:
+            } //ParNew/iCMS
+            case 48, 56 -> {
                 getDiary().setTrue(SupportedFlags.PARNEW, SupportedFlags.CMS, SupportedFlags.ICMS);
                 getDiary().setFalse(SupportedFlags.DEFNEW, SupportedFlags.PARALLELGC, SupportedFlags.PARALLELOLDGC, SupportedFlags.SERIAL, SupportedFlags.G1GC, SupportedFlags.RSET_STATS);
-                break;
-
-            case 2096: //DefNew/iCMS
+            }
+            case 2096 -> { //DefNew/iCMS
                 getDiary().setTrue(SupportedFlags.DEFNEW, SupportedFlags.CMS, SupportedFlags.ICMS);
                 getDiary().setFalse(SupportedFlags.PARNEW, SupportedFlags.PARALLELGC, SupportedFlags.PARALLELOLDGC, SupportedFlags.SERIAL, SupportedFlags.G1GC, SupportedFlags.RSET_STATS);
-                break;
-
-            case 6208:
-            case 64: //G1GC
+            }
+            case 6208, 64 -> { //G1GC
                 getDiary().setTrue(SupportedFlags.G1GC);
                 getDiary().setFalse(SupportedFlags.DEFNEW, SupportedFlags.PARNEW, SupportedFlags.CMS, SupportedFlags.ICMS, SupportedFlags.PARALLELGC, SupportedFlags.PARALLELOLDGC, SupportedFlags.SERIAL, SupportedFlags.CMS_DEBUG_LEVEL_1);
-                break;
-
-            case 4096:
+            }
+            case 4096 -> {
                 getDiary().setTrue(SupportedFlags.PARALLELGC, SupportedFlags.PARALLELOLDGC);
                 getDiary().setFalse(SupportedFlags.DEFNEW, SupportedFlags.PARNEW, SupportedFlags.CMS, SupportedFlags.ICMS, SupportedFlags.G1GC, SupportedFlags.RSET_STATS, SupportedFlags.SERIAL, SupportedFlags.CMS_DEBUG_LEVEL_1);
-                break;
-
-            case 4160:
+            }
+            case 4160 -> {
                 getDiary().setTrue(SupportedFlags.G1GC);
                 getDiary().setFalse(SupportedFlags.PARALLELGC, SupportedFlags.PARALLELOLDGC, SupportedFlags.DEFNEW, SupportedFlags.PARNEW, SupportedFlags.CMS, SupportedFlags.ICMS, SupportedFlags.SERIAL, SupportedFlags.CMS_DEBUG_LEVEL_1);
-                break;
-
-            default:
-                LOGGER.severe("Illegal internal state: GCToolKit was unable to properly identify this log. Results will be corrupted.");
+            }
+            default -> LOGGER.severe("Illegal internal state: GCToolKit was unable to properly identify this log. Results will be corrupted.");
         }
     }
 
