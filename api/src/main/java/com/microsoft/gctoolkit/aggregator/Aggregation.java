@@ -41,7 +41,7 @@ import com.microsoft.gctoolkit.jvm.JavaVirtualMachine;
  * other view (some other Aggregation) of the data might not want or need.
  *
  * <pre><code>
- * {@literal @}Collates(FullGCAggregator)
+ * {@literal @}Collates(FullGCAggregator.class)
  * public interface FullGCAggregation extends Aggregation {
  *      void recordFullGC(DateTimeStamp timeStamp, GCCause cause, double pauseTime);
  * }

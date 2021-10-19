@@ -20,7 +20,7 @@ public interface UnifiedPatterns extends UnifiedLoggingTokens {
 
     GCParseRule UNIFIED_META_DATA = new GCParseRule("UNIFIED_META_DATA", UNIFIED_META_RECORD);
 
-    GCParseRule END_OF_FILE = new GCParseRule("END_OF_FILE", GCLogParser.END_OF_DATA_SENTINAL);
+    GCParseRule END_OF_FILE = new GCParseRule("END_OF_FILE", GCLogParser.END_OF_DATA_SENTINEL);
     GCParseRule JVM_EXIT = new GCParseRule("JVM_EXIT", "Heap$");
 
 }

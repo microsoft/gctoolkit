@@ -103,7 +103,7 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
         parseRules.put(FULL_CLASS_UNLOADING, this::fullClassUnloading);
         parseRules.put(FULL_STRING_SYMBOL_TABLE, this::fullStringSymbolTable);
         parseRules.put(JVM_EXIT, this::jvmExit);
-        parseRules.put(new GCParseRule("END_OF_DATA_SENTINAL", END_OF_DATA_SENTINAL), this::endOfFile);
+        parseRules.put(new GCParseRule("END_OF_DATA_SENTINEL", END_OF_DATA_SENTINEL), this::endOfFile);
         // New rules to process, currently noop'ed
         parseRules.put(CONCATENATE_DIRTY_CARD_LOGS, this::noop);
         parseRules.put(REGION_REGISTER, this::noop);

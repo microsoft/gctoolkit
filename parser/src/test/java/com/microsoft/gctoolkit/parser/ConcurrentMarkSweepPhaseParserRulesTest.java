@@ -6,6 +6,8 @@ import org.junit.jupiter.api.Test;
 
 import java.util.logging.Logger;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ConcurrentMarkSweepPhaseParserRulesTest implements CMSPatterns {
@@ -18,7 +20,7 @@ public class ConcurrentMarkSweepPhaseParserRulesTest implements CMSPatterns {
             for (int j = 0; j < lines.length; j++) {
                 GCLogTrace trace = rules[i].parse(lines[j]);
                 if (trace != null) {
-                    assertTrue(i == j, i + " captured " + j);
+                    assertEquals(i, j, i + " captured " + j);
                 } else {
                     assertTrue(i != j, i + " captured " + j);
                 }
@@ -43,7 +45,7 @@ public class ConcurrentMarkSweepPhaseParserRulesTest implements CMSPatterns {
     private void evaluate(GCParseRule rule, String string, boolean dump) {
 
         GCLogTrace trace = rule.parse(string);
-        assertTrue(trace != null);
+        assertNotNull(trace);
         if (dump) {
             LOGGER.fine("matches groups " + trace.groupCount());
             for (int i = 0; i <= trace.groupCount(); i++) {

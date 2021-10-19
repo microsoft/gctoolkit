@@ -52,7 +52,7 @@ public class UnifiedJVMEventParser extends UnifiedGCLogParser implements JVMPatt
 
             else if ((trace = UNIFIED_LOGGING_APPLICATION_TIME.parse(line)) != null) {
                 consumer.record(new ApplicationConcurrentTime(getClock(), trace.getDoubleGroup(1)));
-            } else if (line.equals(END_OF_DATA_SENTINAL) || (JVM_EXIT.parse(line) != null)) {
+            } else if (line.equals(END_OF_DATA_SENTINEL) || (JVM_EXIT.parse(line) != null)) {
                 consumer.record(new JVMTermination(getClock()));
             } else if (getClock().getTimeStamp() > timeStamp.getTimeStamp()) {
                 if (isGCPause(line)) gcPause = true;

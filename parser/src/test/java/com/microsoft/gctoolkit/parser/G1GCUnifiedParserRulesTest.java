@@ -10,6 +10,7 @@ import java.util.logging.Logger;
 
 import static com.microsoft.gctoolkit.parser.CommonTestHelper.captureTest;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class G1GCUnifiedParserRulesTest implements UnifiedG1GCPatterns {
@@ -72,7 +73,7 @@ public class G1GCUnifiedParserRulesTest implements UnifiedG1GCPatterns {
     private void evaluate(GCParseRule rule, String string, boolean dump) {
 
         GCLogTrace trace = rule.parse(string);
-        assertTrue(trace != null);
+        assertNotNull(trace);
         if (dump) {
             LOGGER.fine("matches groups " + trace.groupCount());
             for (int i = 0; i <= trace.groupCount(); i++) {

@@ -226,7 +226,7 @@ public class PreUnifiedG1GCParser extends PreUnifiedGCLogParser implements G1GCP
         parseRules.put(CSET_FINISH, this::notYetDefined);
         parseRules.put(CSET_ADDING, this::notYetDefined);
 
-        parseRules.put(new GCParseRule("END_OF_DATA_SENTINAL", END_OF_DATA_SENTINAL), this::endOfFile);
+        parseRules.put(new GCParseRule("END_OF_DATA_SENTINEL", END_OF_DATA_SENTINEL), this::endOfFile);
     }
 
     public PreUnifiedG1GCParser(LoggingDiary diary, JVMEventConsumer consumer) {

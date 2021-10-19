@@ -6,6 +6,8 @@ import org.junit.jupiter.api.Test;
 
 import java.util.logging.Logger;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class G1GCParserRulesTest implements G1GCPatterns {
@@ -18,9 +20,9 @@ public class G1GCParserRulesTest implements G1GCPatterns {
             for (int j = 0; j < lines.length; j++) {
                 int captured = CommonTestHelper.captureTest(rules[i], lines[j]);
                 if (i == j) {
-                    assertTrue(captured == lines[j].length, i + " failed to captured it's lines");
+                    assertEquals(captured, lines[j].length, i + " failed to captured it's lines");
                 } else {
-                    assertTrue(captured == 0, i + " captured " + j);
+                    assertEquals(0, captured, i + " captured " + j);
                 }
             }
 
@@ -30,14 +32,14 @@ public class G1GCParserRulesTest implements G1GCPatterns {
     //@Test
     public void testSingeRule() {
         int index = 35;
-        assertTrue(CommonTestHelper.captureTest(rules[index], lines[index]) == 1);
+        assertEquals(1, CommonTestHelper.captureTest(rules[index], lines[index]));
     }
 
 
     private void evaluate(GCParseRule rule, String string, boolean dump) {
 
         GCLogTrace trace = rule.parse(string);
-        assertTrue(trace != null);
+        assertNotNull(trace);
         if (dump) {
             LOGGER.fine("matches groups " + trace.groupCount());
             for (int i = 0; i <= trace.groupCount(); i++) {

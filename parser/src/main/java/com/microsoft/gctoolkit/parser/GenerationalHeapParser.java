@@ -261,7 +261,7 @@ public class GenerationalHeapParser extends PreUnifiedGCLogParser implements Sim
         parseRules.put(SPLIT_PARNEW_PROMOTION_FAILED_IN_CMS_PHASE, this::parNewPromotionFailedInConcurrentMarkSweepPhase);
         parseRules.put(FULL_SPLIT_BY_CONCURRENT_PHASE, this::fullSplitByConcurrentPhase);
         parseRules.put(CMF_LARGE_BLOCK, this::concurrentModeFailureSplitByLargeBlock);
-        parseRules.put(new GCParseRule("END_OF_DATA_SENTINAL", END_OF_DATA_SENTINAL), this::endOfFile);
+        parseRules.put(new GCParseRule("END_OF_DATA_SENTINEL", END_OF_DATA_SENTINEL), this::endOfFile);
     }
 
     public GenerationalHeapParser(LoggingDiary diary, JVMEventConsumer consumer) {

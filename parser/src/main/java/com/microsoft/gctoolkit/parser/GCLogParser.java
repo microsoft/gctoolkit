@@ -18,7 +18,7 @@ import java.util.logging.Logger;
 public abstract class GCLogParser implements SharedPatterns {
 
     private static final Logger LOGGER = Logger.getLogger(GCLogParser.class.getName());
-    public static final String END_OF_DATA_SENTINAL = GCLogFile.END_OF_DATA_SENTINAL;
+    public static final String END_OF_DATA_SENTINEL = GCLogFile.END_OF_DATA_SENTINEL;
 
     public static final GCParseRule GCID_COUNTER = new GCParseRule("GCID_COUNTER", " GC\\((\\d+)\\) ");
     protected final JVMEventConsumer consumer;
@@ -62,7 +62,7 @@ public abstract class GCLogParser implements SharedPatterns {
     }
 
     public void receive(String trace) {
-        if (!trace.equals(END_OF_DATA_SENTINAL))
+        if (!trace.equals(END_OF_DATA_SENTINEL))
             advanceClock(trace);
         process(trace);
     }

@@ -8,7 +8,7 @@ import com.microsoft.gctoolkit.parser.GCLogParser;
 
 import java.util.Arrays;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ParserTest {
 
@@ -33,9 +33,9 @@ public class ParserTest {
      * @param sizeAfterCollection
      */
     protected void assertMemoryPoolValues(MemoryPoolSummary summary, long occupancyAtStartOfCollection, long sizeAtStartOfCollection, long occupancyAfterCollection, long sizeAfterCollection) {
-        assertTrue(summary.getOccupancyBeforeCollection() == occupancyAtStartOfCollection);
-        assertTrue(summary.getSizeBeforeCollection() == sizeAtStartOfCollection);
-        assertTrue(summary.getOccupancyAfterCollection() == occupancyAfterCollection);
-        assertTrue(summary.getSizeAfterCollection() == sizeAfterCollection);
+        assertEquals(summary.getOccupancyBeforeCollection(), occupancyAtStartOfCollection);
+        assertEquals(summary.getSizeBeforeCollection(), sizeAtStartOfCollection);
+        assertEquals(summary.getOccupancyAfterCollection(), occupancyAfterCollection);
+        assertEquals(summary.getSizeAfterCollection(), sizeAfterCollection);
     }
 }

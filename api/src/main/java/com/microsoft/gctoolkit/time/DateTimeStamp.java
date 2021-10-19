@@ -5,11 +5,12 @@ package com.microsoft.gctoolkit.time;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
+
 import java.util.Comparator;
 import java.util.Locale;
 import java.util.Objects;
 
-import static java.util.Comparator.comparing;
+import static java.util.Comparator.comparingDouble;
 import static java.util.Comparator.nullsLast;
 
 
@@ -288,12 +289,11 @@ public class DateTimeStamp implements Comparable<DateTimeStamp> {
     }
 
     private static Comparator<DateTimeStamp> compareDateTimeStamp(DateTimeStamp o1, DateTimeStamp o2) {
-        if (o1.getDateTime() == null || o2.getDateTime() == null) {
-            //if any of value is null then check timestamp
-            return comparing(DateTimeStamp::getTimeStamp);
-        } else {
-            // means both values for date time are present, then compare datetime and timestamp.
-            return comparing(DateTimeStamp::getDateTime).thenComparing(DateTimeStamp::getTimeStamp);
-        }
+        return comparingDouble(DateTimeStamp::getTimeStamp)
+                .thenComparing(DateTimeStamp::getDateTime,
+                        (dtsA, dtsB) -> {
+                            if (dtsA == null || dtsB == null) return 0;
+                            else return dtsA.compareTo(dtsB);
+                        });
     }
 }

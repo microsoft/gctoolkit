@@ -45,7 +45,7 @@ public class UnifiedSurvivorMemoryPoolParser extends UnifiedGCLogParser implemen
         } else if ((trace = AGE_RECORD.parse(entry)) != null) {
             forwardReference.add(trace.getIntegerGroup(1), trace.getLongGroup(2));
             ageDataCollected = true;
-        } else if (entry.equals(END_OF_DATA_SENTINAL) || (JVM_EXIT.parse(entry) != null)) {
+        } else if (entry.equals(END_OF_DATA_SENTINEL) || (JVM_EXIT.parse(entry) != null)) {
             if (forwardReference != null)
                 consumer.record(forwardReference);
             consumer.record(new JVMTermination(getClock()));

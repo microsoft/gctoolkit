@@ -21,11 +21,12 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 public class GenerationalParserTest extends ParserTest {
 
-    private static final String END_OF_DATA_SENTINAL = GCLogFile.END_OF_DATA_SENTINAL;
+    private static final String END_OF_DATA_SENTINEL = GCLogFile.END_OF_DATA_SENTINEL;
 
     private GenerationalHeapParser parser;
     private ArrayList<JVMEvent> collection;
@@ -42,7 +43,7 @@ public class GenerationalParserTest extends ParserTest {
 
         String[] lines = {
                 "2019-10-22T23:41:21.852+0000: 21.912: [GC (GCLocker Initiated GC) 2019-10-22T23:41:21.853+0000: 21.912: [DefNew2019-10-22T23:41:21.914+0000: 21.974: [SoftReference, 0 refs, 0.0000842 secs]2019-10-22T23:41:21.914+0000: 21.974: [WeakReference, 76 refs, 0.0000513 secs]2019-10-22T23:41:21.914+0000: 21.974: [FinalReference, 91635 refs, 0.0396861 secs]2019-10-22T23:41:21.954+0000: 22.014: [PhantomReference, 0 refs, 3 refs, 0.0000444 secs]2019-10-22T23:41:21.954+0000: 22.014: [JNI Weak Reference, 0.0000281 secs]: 419520K->19563K(471936K), 0.1019514 secs] 502104K->102148K(2044800K), 0.1020469 secs] [Times: user=0.09 sys=0.01, real=0.10 secs]",
-                END_OF_DATA_SENTINAL
+                END_OF_DATA_SENTINEL
         };
 
         feedParser(parser, lines);
@@ -73,7 +74,7 @@ public class GenerationalParserTest extends ParserTest {
                 "- age   1:      41544 bytes,      41544 total",
                 "        - age   2:    1134064 bytes,    1175608 total",
                 ": 18264K->1199K(18624K), 0.0042402 secs] 23578K->6513K(81280K), 0.0043376 secs] [Times: user=0.00 sys=0.00, real=0.00 secs]",
-                END_OF_DATA_SENTINAL
+                END_OF_DATA_SENTINEL
         };
 
         feedParser(parser, lines);
@@ -82,19 +83,19 @@ public class GenerationalParserTest extends ParserTest {
         assertMemoryPoolValues(parNew.getHeap(), 16000, 81280, 1725, 81280);
         assertMemoryPoolValues(parNew.getYoung(), 16000, 18624, 1725, 18624);
         assertMemoryPoolValues(parNew.getTenured(), 0, 81280 - 18624, 0, 81280 - 18624);
-        assertTrue(parNew.getDuration() == 0.0167922);
+        assertEquals(0.0167922, parNew.getDuration());
 
         SystemGC full = (SystemGC) collection.get(1);
         assertMemoryPoolValues(full.getHeap(), 4654, 81280, 1602, 81280);
         assertMemoryPoolValues(full.getYoung(), 4654, 81280 - 62656, 0, 81280 - 62656);
         assertMemoryPoolValues(full.getTenured(), 0, 81280 - 18624, 1602, 62656);
-        assertTrue(full.getDuration() == 0.0712086);
+        assertEquals(0.0712086, full.getDuration());
 
         parNew = (ParNew) collection.get(2);
-        assertTrue(parNew.getHeap().getSizeAfterCollection() == 81280);
+        assertEquals(81280, parNew.getHeap().getSizeAfterCollection());
 
         parNew = (ParNew) collection.get(3);
-        assertTrue(parNew.getHeap().getSizeAfterCollection() == 81280);
+        assertEquals(81280, parNew.getHeap().getSizeAfterCollection());
     }
 
     @Test
@@ -114,7 +115,7 @@ public class GenerationalParserTest extends ParserTest {
                 "- age   4:         40 bytes,    1423744 total",
                 ": 17194K->17392K(18624K), 0.0023005 secs]28.440: [CMS28.440: [CMS-concurrent-abortable-preclean: 0.032/0.813 secs] [Times: user=1.30 sys=0.06, real=0.81 secs]",
                 " (concurrent mode failure): 62354K->8302K(64768K), 0.0931888 secs] 79477K->8302K(83392K), [CMS Perm : 10698K->10698K(21248K)], 0.0956950 secs] [Times: user=0.09 sys=0.00, real=0.09 secs]",
-                END_OF_DATA_SENTINAL
+                END_OF_DATA_SENTINEL
         };
 
 
@@ -132,21 +133,21 @@ public class GenerationalParserTest extends ParserTest {
                 "Desired survivor size 119013376 bytes, new threshold 1 (max 15)",
                 "[PSYoungGen: 232960K->116224K(232960K)] 610571K->581588K(819712K), 0.0485326 secs] [Times: user=0.18 sys=0.14, real=0.05 secs] ",
                 "1.154: [Full GC (Ergonomics) [PSYoungGen: 116224K->0K(232960K)] [ParOldGen: 465364K->194938K(575488K)] 581588K->194938K(808448K), [Metaspace: 4211K->4211K(1056768K)], 0.0449697 secs] [Times: user=0.29 sys=0.00, real=0.04 secs] ",
-                END_OF_DATA_SENTINAL
+                END_OF_DATA_SENTINEL
         };
 
         feedParser(parser, lines);
 
         PSYoungGen psYoungGen = (PSYoungGen) collection.get(0);
-        assertTrue(psYoungGen.getGCCause() == GCCause.ALLOCATION_FAILURE);
-        assertTrue(psYoungGen.getDuration() == 0.0485326);
+        assertSame(psYoungGen.getGCCause(), GCCause.ALLOCATION_FAILURE);
+        assertEquals(0.0485326, psYoungGen.getDuration());
         assertMemoryPoolValues(psYoungGen.getHeap(), 610571, 819712, 581588, 819712);
         assertMemoryPoolValues(psYoungGen.getTenured(), 610571 - 232960, 819712 - 232960, 581588 - 116224, 819712 - 232960);
         assertMemoryPoolValues(psYoungGen.getYoung(), 232960, 232960, 116224, 232960);
 
         FullGC fullGC = (FullGC) collection.get(1);
-        assertTrue(fullGC.getGCCause() == GCCause.ADAPTIVE_SIZE_POLICY);
-        assertTrue(fullGC.getDuration() == 0.0449697);
+        assertSame(fullGC.getGCCause(), GCCause.ADAPTIVE_SIZE_POLICY);
+        assertEquals(0.0449697, fullGC.getDuration());
         // todo: value of heap size before collection is 808448 should be 819712.
         // Parser is not tracking previous size and since we're not doing anything with it at the moment...
         assertMemoryPoolValues(fullGC.getHeap(), 581588, 808448, 194938, 808448);
@@ -170,24 +171,24 @@ public class GenerationalParserTest extends ParserTest {
                 "41.411: [CMS-concurrent-sweep: 0.001/0.001 secs] [Times: user=0.01 sys=0.00, real=0.00 secs]",
                 "41.411: [CMS-concurrent-reset-start]",
                 "41.416: [CMS-concurrent-reset: 0.005/0.005 secs] [Times: user=0.02 sys=0.00, real=0.01 secs]",
-                END_OF_DATA_SENTINAL
+                END_OF_DATA_SENTINEL
         };
 
         feedParser(parser, lines);
 
         ParNew parNew = (ParNew) collection.get(0);
-        assertTrue(parNew.getGCCause() == GCCause.GC_LOCKER);
+        assertSame(parNew.getGCCause(), GCCause.GC_LOCKER);
         assertMemoryPoolValues(parNew.getHeap(), 35230, 354944, 38078, 354944);
         assertMemoryPoolValues(parNew.getYoung(), 32671, 349568, 35386, 349568);
         assertMemoryPoolValues(parNew.getTenured(), 35230 - 32671, 354944 - 349568, 38078 - 35386, 354944 - 349568);
-        assertTrue(parNew.getDuration() == 0.0082790);
+        assertEquals(0.0082790, parNew.getDuration());
 
         InitialMark initialMark = (InitialMark) collection.get(1);
-        assertTrue(initialMark.getGCCause() == GCCause.CMS_INITIAL_MARK);
+        assertSame(initialMark.getGCCause(), GCCause.CMS_INITIAL_MARK);
 
         CMSRemark cmsRemark = (CMSRemark) collection.get(2);
-        assertTrue(cmsRemark.getGCCause() == GCCause.CMS_FINAL_REMARK);
-        assertTrue(cmsRemark.getDuration() == 0.0699640);
+        assertSame(cmsRemark.getGCCause(), GCCause.CMS_FINAL_REMARK);
+        assertEquals(0.0699640, cmsRemark.getDuration());
     }
 
     @Test
@@ -206,7 +207,7 @@ public class GenerationalParserTest extends ParserTest {
                 "2011-08-25T08:11:16.818+0100: 8458.295: [CMS-concurrent-sweep: 1.183/1.186 secs] [Times: user=1.71 sys=0.08, real=1.18 secs]",
                 "2011-08-25T08:11:16.819+0100: 8458.295: [CMS-concurrent-reset-start]",
                 "2011-08-25T08:11:16.828+0100: 8458.304: [CMS-concurrent-reset: 0.009/0.009 secs] [Times: user=0.01 sys=0.00, real=0.01 secs]",
-                END_OF_DATA_SENTINAL
+                END_OF_DATA_SENTINEL
         };
 
         feedParser(parser, lines);
@@ -215,12 +216,12 @@ public class GenerationalParserTest extends ParserTest {
         assertMemoryPoolValues(parNew.getHeap(), 1856305, 1965056, 851287, 1965056);
         assertMemoryPoolValues(parNew.getYoung(), 1143174, 1188864, 132096, 1188864);
         assertMemoryPoolValues(parNew.getTenured(), 1856305 - 1143174, 1965056 - 1188864, 851287 - 132096, 1965056 - 1188864);
-        assertTrue(parNew.getDuration() == 0.1554100);
+        assertEquals(0.1554100, parNew.getDuration());
 
         InitialMark initialMark = (InitialMark) collection.get(1);
-        assertTrue(initialMark.getDuration() == 0.1976100);
+        assertEquals(0.1976100, initialMark.getDuration());
 
         CMSRemark cmsRemark = (CMSRemark) collection.get(2);
-        assertTrue(cmsRemark.getDuration() == 0.6306470);
+        assertEquals(0.6306470, cmsRemark.getDuration());
     }
 }

@@ -35,7 +35,7 @@ public class SurvivorMemoryPoolParser extends PreUnifiedGCLogParser implements T
             forwardReference = new SurvivorRecord(getClock(), trace.getLongGroup(1), trace.getIntegerGroup(2), trace.getIntegerGroup(3));
         } else if ((trace = TENURING_AGE_BREAKDOWN.parse(entry)) != null) {
             forwardReference.add(trace.getIntegerGroup(1), trace.getLongGroup(2));
-        } else if (entry.equals(END_OF_DATA_SENTINAL) || (JVM_EXIT.parse(entry) != null)) {
+        } else if (entry.equals(END_OF_DATA_SENTINEL) || (JVM_EXIT.parse(entry) != null)) {
             if (forwardReference != null)
                 consumer.record(forwardReference);
             consumer.record(new JVMTermination(getClock()));

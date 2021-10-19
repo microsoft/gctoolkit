@@ -27,7 +27,7 @@ public class GarbageCollectionEventSourceTest {
     private static final Logger LOG = Logger.getLogger(GarbageCollectionEventSourceTest.class.getName());
 
     private static final String TEST_CHANNEL = "TEST";
-    private static final String END_OF_DATA_SENTINAL = GCLogFile.END_OF_DATA_SENTINAL;
+    private static final String END_OF_DATA_SENTINEL = GCLogFile.END_OF_DATA_SENTINEL;
 
     private GCLogFile loadLogFile(Path path, boolean rotating) {
         return rotating ? new RotatingGCLogFile(path) : new SingleGCLogFile(path);
@@ -123,7 +123,7 @@ public class GarbageCollectionEventSourceTest {
         public void start() {
             vertx.eventBus().consumer(TEST_CHANNEL, message -> {
                 eventCount++;
-                if (message.body().toString().equals(END_OF_DATA_SENTINAL))
+                if (message.body().toString().equals(END_OF_DATA_SENTINEL))
                     eof.countDown();
             });
         }
