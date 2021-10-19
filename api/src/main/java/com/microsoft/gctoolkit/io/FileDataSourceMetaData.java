@@ -71,8 +71,8 @@ public class FileDataSourceMetaData {
 
     private int countNumberOfEntries() {
         long count = -1;
-        try {
-            count = new ZipFile(path.toFile()).stream().filter(zipEntry -> !zipEntry.isDirectory()).count();
+        try (var zipfile = new ZipFile(path.toFile())) {
+            count = zipfile.stream().filter(zipEntry -> !zipEntry.isDirectory()).count();
         } catch (IOException ioe) {
             LOG.warning(ioe.getMessage());
         }
