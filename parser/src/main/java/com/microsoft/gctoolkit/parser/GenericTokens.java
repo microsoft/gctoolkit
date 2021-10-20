@@ -79,7 +79,7 @@ public interface GenericTokens {
     String CHURN = "(" + INTEGER + ") " + UNITS + "B/s";
     String OCCUPANCY_CONFIGURED = MEMORY_SIZE + "\\(" + MEMORY_SIZE + "\\)";
     String OCCUPANCY_CONFIGURED_PAUSE = OCCUPANCY_CONFIGURED + ", " + PAUSE_TIME;
-    String BEFORE_AFTER = OCCUPANCY_CONFIGURED + "->" + OCCUPANCY_CONFIGURED;
+    String BEFORE_CONFIGURED_AFTER_CONFIGURED = OCCUPANCY_CONFIGURED + "->" + OCCUPANCY_CONFIGURED;
     String BEFORE_AFTER_CONFIGURED = MEMORY_SIZE + "->" + MEMORY_SIZE + "\\(" + MEMORY_SIZE + "\\)";
     String BEFORE_AFTER_CONFIGURED_PAUSE = BEFORE_AFTER_CONFIGURED + ",? ?" + PAUSE_TIME;   //todo: ",? ?" is a hack but anything else will destabilize all rule harvesting
 

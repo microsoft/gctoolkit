@@ -2,12 +2,12 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.parser;
 
-import com.microsoft.gctoolkit.event.CPUSummary;
-import com.microsoft.gctoolkit.event.GarbageCollectionTypes;
-import com.microsoft.gctoolkit.event.RegionSummary;
+import com.microsoft.gctoolkit.event.*;
 import com.microsoft.gctoolkit.event.g1gc.G1GCConcurrentEvent;
 import com.microsoft.gctoolkit.event.g1gc.G1GCPauseEvent;
+import com.microsoft.gctoolkit.event.jvm.ClassspaceSummary;
 import com.microsoft.gctoolkit.event.jvm.JVMTermination;
+import com.microsoft.gctoolkit.event.jvm.MetaspaceRecord;
 import com.microsoft.gctoolkit.parser.collection.RuleSet;
 import com.microsoft.gctoolkit.parser.jvm.Decorators;
 import com.microsoft.gctoolkit.parser.jvm.LoggingDiary;
@@ -76,6 +76,7 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
         parseRules.put(REGION_SUMMARY, this::regionSummary);
         parseRules.put(UNIFIED_META_DATA, this::unifiedMetaData);
         parseRules.put(YOUNG_DETAILS, this::youngDetails);
+        parseRules.put(META_SPACE_BREAKOUT, this::metaNonClassClassSpace);
         parseRules.put(HEAP_REGION_SIZE, this::heapRegionSize);
         parseRules.put(HEAP_SIZE, this::heapSize);
         parseRules.put(G1_TAG, this::ignore);
@@ -103,6 +104,42 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
         parseRules.put(FULL_STRING_SYMBOL_TABLE, this::fullStringSymbolTable);
         parseRules.put(JVM_EXIT, this::jvmExit);
         parseRules.put(new GCParseRule("END_OF_DATA_SENTINEL", END_OF_DATA_SENTINEL), this::endOfFile);
+        // New rules to process, currently noop'ed
+        parseRules.put(CONCATENATE_DIRTY_CARD_LOGS, this::noop);
+        parseRules.put(REGION_REGISTER, this::noop);
+        parseRules.put(HEAP_ROOTS, this::noop);
+        parseRules.put(EAGER_RECLAIM, this::noop);
+        parseRules.put(REMEMBERED_SETS, this::noop);
+        parseRules.put(EAGER_RECLAIM_STEP, this::noop);
+        parseRules.put(CARDS, this::noop);
+        parseRules.put(HOT_CARD_CACHE, this::noop);
+        parseRules.put(LOG_BUFFERS, this::noop);
+        parseRules.put(SCAN_HEAP_ROOTS, this::noop);
+
+        parseRules.put(SCANS, this::noop);
+        parseRules.put(CLAIMED_CHUNKS, this::noop);
+        parseRules.put(CODE_ROOT_SCAN, this::noop);
+        parseRules.put(STRING_DEDUP, this::noop);
+        parseRules.put(WEAK_JFR_SAMPLES, this::noop);
+
+        parseRules.put(POST_EVAC_CLEANUP, this::noop);
+        parseRules.put(MERGE_THREAD_STATE, this::noop);
+        parseRules.put(COPIED_BYTES, this::noop);
+        parseRules.put(LAB, this::noop);
+        parseRules.put(CLEAR_LOGGED_CARDS, this::noop);
+
+        parseRules.put(RECALC_USED_MEM, this::noop);
+        parseRules.put(PURGE_CODE_ROOTS, this::noop);
+        parseRules.put(UPDATE_DERIVED_POINTERS, this::noop);
+        parseRules.put(EAGER_HUMONGOUS_RECLAIM, this::noop);
+        parseRules.put(HUMONGOUS, this::noop);
+
+        parseRules.put(REDIRTY_CARDS, this::noop);
+        parseRules.put(REDIRTIED_CARDS, this::noop);
+        parseRules.put(FREE_CSET, this::noop);
+        parseRules.put(REBUILD_FREELIST, this::noop);
+        parseRules.put(NEW_CSET, this::noop);
+        parseRules.put(RESIZE_TLAB, this::noop);
     }
 
     public UnifiedG1GCParser(LoggingDiary diary, JVMEventConsumer consumer) {
@@ -115,8 +152,8 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
 
     @Override
     protected void process(String line) {
-        if (ignoreFrequentlySeenButUnwantedLines(line)) return;
-        parse(line);
+        if (! ignoreFrequentlySeenButUnwantedLines(line))
+            parse(line);
     }
 
     private void parse(String line) {
@@ -153,6 +190,8 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
     private void removeForwardReference(G1GCForwardReference forwardReference) {
         collectionsUnderway.remove(forwardReference.getGcID());
     }
+
+    private void noop(GCLogTrace trace, String line) {}
 
     /*************
      *
@@ -387,6 +426,12 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
         }
     }
 
+    /**
+     * The trace indicates number of active regions before and after the collection. This is then used to provide an
+     * extremely course estimate of the amount of live data.
+     * @param trace
+     * @param line
+     */
     public void regionSummary(GCLogTrace trace, String line) {
         RegionSummary summary = trace.regionSummary();
         switch (trace.getGroup(1)) {
@@ -414,6 +459,12 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
                 forwardReference.setHumongousSizeBeforeCollection(summary.getBefore() * regionSize * 1024);
                 forwardReference.setHumongousSizeAfterCollection(summary.getAfter() * regionSize * 1024);
                 break;
+            case "Archive":
+                forwardReference.setArchiveOccupancyBeforeCollection(summary.getBefore() * regionSize * 1024);
+                forwardReference.setArchiveOccupancyAfterCollection(summary.getAfter() * regionSize * 1024);
+                forwardReference.setArchiveSizeBeforeCollection(summary.getBefore() * regionSize * 1024);
+                forwardReference.setArchiveSizeAfterCollection(summary.getAfter() * regionSize * 1024);
+                break;
             default:
                 notYetImplemented(trace, line);
         }
@@ -431,6 +482,22 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
         forwardReference.setHeapOccupancyAfterCollection(trace.getMemoryInKBytes(7));
         forwardReference.setHeapSizeAfterCollection(trace.getMemoryInKBytes(9));
         forwardReference.setDuration(trace.getDurationInSeconds());
+    }
+
+    /**
+     * Record contains Metaspace broken out to class and non-class space. Since
+     * Metaspace = class space + non-class space, we can ignore the non-class space information (for now)
+     * The space size before the collection can be determined by inspecting the previous record (ignore for now)
+     */
+    public void metaNonClassClassSpace(GCLogTrace trace, String line) {
+        MemoryPoolSummary metaspace = trace.getEnlargedMetaSpaceRecord(1);
+        forwardReference.setMetaspaceOccupancyBeforeCollection(metaspace.getOccupancyBeforeCollection());
+        forwardReference.setMetaspaceOccupancyAfterCollection(metaspace.getOccupancyAfterCollection());
+        forwardReference.setMetaspaceSizeAfterCollection(metaspace.getSizeAfterCollection());
+        MemoryPoolSummary classSpace = trace.getEnlargedMetaSpaceRecord(17);
+        forwardReference.setClassspaceOccupancyBeforeCollection(classSpace.getOccupancyBeforeCollection());
+        forwardReference.setClassspaceCommittedAfterCollection(classSpace.getOccupancyAfterCollection());
+        forwardReference.setClassspaceSizeAfterCollection(classSpace.getSizeAfterCollection());
     }
 
     //Concurrent Mark
@@ -585,6 +652,16 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
     private boolean ignoreFrequentlySeenButUnwantedLines(String line) {
         if (line.contains("Desired survivor size")) return true;
         if (line.contains("Age table with threshold")) return true;
+        if (line.contains("safepoint")) return true;
+        if (line.contains(") Skipped phase ")) return true;
+        if (line.contains(" Total                          Min: ")) return true;
+        if (line.contains(" Dead                           Min: ")) return true;
+        if (line.contains(" VM Weak                        Min")) return true;
+        if (line.contains(" ObjectSynchronizer Weak        Min:")) return true;
+        if (line.contains(" JVMTI Tag Weak OopStorage      Min:")) return true;
+        if (line.contains(" StringTable Weak               Min:")) return true;
+        if (line.contains(" ResolvedMethodTable Weak       Min:")) return true;
+        if (line.contains(" JNI Weak                       Min:")) return true;
         return line.contains(" - age ");
     }
 
@@ -599,13 +676,13 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
     }
 
     private void log(String line) {
-        if (line.contains("Desired survivor size")) return;
-        if (line.contains("Age table with threshold")) return;
-        if (line.contains("- age")) return;
+        if ( ! ignoreFrequentlySeenButUnwantedLines(line)) {
 
-        if (debugging)
-            LOGGER.fine("Missed: " + line);
-
-        LOGGER.log(Level.FINE, "Missed: {0}", line);
+            if (debugging)
+                LOGGER.fine("Missed: " + line);
+            //if (line.contains("Reference Processing"))
+            System.out.println(line);
+            LOGGER.log(Level.FINE, "Missed: {0}", line);
+        }
     }
 }
