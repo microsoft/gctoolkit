@@ -428,9 +428,9 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
 
     /**
      * The trace indicates number of active regions before and after the collection. This is then used to provide an
-     * extremely course estimate of the amount of live data.
-     * @param trace
-     * @param line
+     * extremely coarse estimate of the amount of live data.
+     * @param trace A chunk of GC log that we are attempting to match to a known GC log pattern
+     * @param line The log line corresponding to the trace
      */
     public void regionSummary(GCLogTrace trace, String line) {
         RegionSummary summary = trace.regionSummary();
@@ -488,6 +488,8 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
      * Record contains Metaspace broken out to class and non-class space. Since
      * Metaspace = class space + non-class space, we can ignore the non-class space information (for now)
      * The space size before the collection can be determined by inspecting the previous record (ignore for now)
+     * @param trace A chunk of GC log that we are attempting to match to a known GC log pattern
+     * @param line The log line corresponding to the trace
      */
     public void metaNonClassClassSpace(GCLogTrace trace, String line) {
         MemoryPoolSummary metaspace = trace.getEnlargedMetaSpaceRecord(1);
