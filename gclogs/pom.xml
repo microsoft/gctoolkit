@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.microsoft.gctoolkit</groupId>
         <artifactId>gctoolkit</artifactId>
-        <version>2.0.4-SNAPSHOT</version>
+        <version>2.0.4</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -60,19 +60,11 @@
                         </goals>
                         <configuration>
                             <target>
-                                <property 
-                                    name="testdata-package" 
-                                    value="gctoolkit-testdata-${gctoolkit-testdata-version}.zip" />
+                                <property name="testdata-package" value="gctoolkit-testdata-${gctoolkit-testdata-version}.zip" />
 
-                                <get 
-                                    skipexisting="true" 
-                                    src="https://github.com/microsoft/gctoolkit-testdata/releases/download/${gctoolkit-testdata-version}/${testdata-package}" 
-                                    dest="${maven-parent.basedir}" />
+                                <get skipexisting="true" src="https://github.com/microsoft/gctoolkit-testdata/releases/download/${gctoolkit-testdata-version}/${testdata-package}" dest="${maven-parent.basedir}" />
 
-                                <unzip 
-                                    src="${maven-parent.basedir}/${testdata-package}" 
-                                    dest="${maven-parent.basedir}" 
-                                    overwrite="false" />
+                                <unzip src="${maven-parent.basedir}/${testdata-package}" dest="${maven-parent.basedir}" overwrite="false" />
                             </target>
                         </configuration>
                     </execution>
