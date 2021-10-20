@@ -41,14 +41,14 @@ import com.microsoft.gctoolkit.time.DateTimeStamp;
  *     }
  *
  *     public double getPauseTimeRatio() {
- *         return getRuntimeDuration() > 0.0 ? totalPauseTime / getRuntimeDuration() : 0.0;
+ *         return getRuntimeDuration() {@literal >} 0.0 ? totalPauseTime / getRuntimeDuration() : 0.0;
  *     }
  *
  *     {@literal @}Override
  *     public boolean hasWarning() { return false; }
  *
  *     {@literal @}Override
- *     public boolean isEmpty() { return getRuntimeDuration() <= 0.0; }
+ *     public boolean isEmpty() { return getRuntimeDuration() {@literal <}= 0.0; }
  * }
  * </code></pre>
 
