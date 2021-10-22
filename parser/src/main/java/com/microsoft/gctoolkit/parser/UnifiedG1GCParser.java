@@ -168,6 +168,10 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
 
         try {
             setForwardReference(line);
+            if ( getClock().getTimeStamp() == 2.108d)
+                System.out.println("here");
+            if ( forwardReference.getGcID() == 9)
+                System.out.println(ruleToApply.get().getKey().getName());
             parseRules.get(ruleToApply.get().getKey()).accept(ruleToApply.get().getValue(), line);
         } catch (Throwable t) {
             LOGGER.throwing(this.getName(), "process", t);
@@ -338,7 +342,13 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
     }
 
     private void references(GCLogTrace trace, String line) {
-        switch (trace.getGroup(1)) {
+        /**
+         * todo: capture preclean phases
+         * Not recording preclean phases for the moment. If the preclean capture groups is not null, then
+         * it's a preclean phase so noop it.
+         */
+        if ( trace.getGroup(1) != null) return;
+        switch (trace.getGroup(2)) {
             case "SoftReference":
                 forwardReference.setSoftReferenceProcessingDuation(trace.getDurationInSeconds());
                 break;

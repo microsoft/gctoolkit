@@ -36,6 +36,8 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.microsoft.gctoolkit.parser.unified.UnifiedG1GCPatterns.WEAK_PROCESSING;
+
 /**
  * Time of GC
  * GCType
@@ -261,6 +263,9 @@ public class GenerationalHeapParser extends PreUnifiedGCLogParser implements Sim
         parseRules.put(SPLIT_PARNEW_PROMOTION_FAILED_IN_CMS_PHASE, this::parNewPromotionFailedInConcurrentMarkSweepPhase);
         parseRules.put(FULL_SPLIT_BY_CONCURRENT_PHASE, this::fullSplitByConcurrentPhase);
         parseRules.put(CMF_LARGE_BLOCK, this::concurrentModeFailureSplitByLargeBlock);
+        parseRules.put(WEAK_PROCESSING, this::noop);
+
+
         parseRules.put(new GCParseRule("END_OF_DATA_SENTINEL", END_OF_DATA_SENTINEL), this::endOfFile);
     }
 

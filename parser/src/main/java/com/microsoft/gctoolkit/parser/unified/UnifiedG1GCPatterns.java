@@ -60,6 +60,8 @@ public interface UnifiedG1GCPatterns extends UnifiedPatterns {
 
     //[73.082s][info ][gc           ] GC(263) Concurrent Cycle
     //[2.179s][info ][gc          ] GC(9) Concurrent Mark Cycle
+    //"[155.787s][info ][gc          ] GC(2457) Concurrent Undo Cycle",
+    //[156.051s][info ][gc,marking  ] GC(2463) Concurrent Mark
     //    .... entire set of concurrent records.
     //[73.171s][info ][gc            ] GC(263) Concurrent Cycle 89.437ms
     //[2.179s][info ][gc          ] GC(9) Concurrent Mark Cycle 96.518ms
@@ -167,7 +169,7 @@ public interface UnifiedG1GCPatterns extends UnifiedPatterns {
     GCParseRule CODE_ROOT_SCAN = new GCParseRule("CODE_ROOT_SCAN","Code Root Scan \\(ms\\):\\s+" + WORKER_SUMMARY_REAL);
     //"[156.473s][debug][gc,phases   ] GC(2467)       StringDedup Requests0 Weak     Min:  0.0, Avg:  0.0, Max:  0.0, Diff:  0.0, Sum:  0.0, Workers: 7",
     //"[156.473s][debug][gc,phases   ] GC(2467)       StringDedup Requests1 Weak     Min:  0.0, Avg:  0.0, Max:  0.0, Diff:  0.0, Sum:  0.0, Workers: 7"
-    GCParseRule STRING_DEDUP = new GCParseRule("STRING_DEDUP","StringDedup Requests(0|1) Weak\\s+" + WORKER_SUMMARY_REAL);
+    GCParseRule STRING_DEDUP = new GCParseRule("STRING_DEDUP","StringDedup (?:Requests(0|1)|Table) Weak\\s+" + WORKER_SUMMARY_REAL);
     //"[156.473s][debug][gc,phases   ] GC(2467)       Weak JFR Old Object Samples    Min:  0.0, Avg:  0.0, Max:  0.0, Diff:  0.0, Sum:  0.0, Workers: 7"
     GCParseRule WEAK_JFR_SAMPLES = new GCParseRule("WEAK_JFR_SAMPLES","Weak JFR Old Object Samples\\s+" + WORKER_SUMMARY_REAL);
 
@@ -212,5 +214,6 @@ public interface UnifiedG1GCPatterns extends UnifiedPatterns {
     GCParseRule NEW_CSET = new GCParseRule("NEW_CSET","Start New Collection Set: " + PAUSE_TIME);
     //"[156.474s][debug][gc,phases   ] GC(2467)     Resize TLABs: 0.0ms"
     GCParseRule RESIZE_TLAB = new GCParseRule("RESIZE_TLAB","Resize TLABs: " + PAUSE_TIME);
+    GCParseRule WEAK_PROCESSING = new GCParseRule( "WEAK_PROCESSING","Weak Processing(?::)? " + PAUSE_TIME);
 
 }
