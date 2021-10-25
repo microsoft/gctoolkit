@@ -10,6 +10,7 @@ import com.microsoft.gctoolkit.time.DateTimeStamp;
 public class ShenandoahCycle extends GCEvent {
 
     private ERGO ergonomics;
+
     public ShenandoahCycle(DateTimeStamp timeStamp, GarbageCollectionTypes gcType, GCCause cause, double duration) {
         super(timeStamp, gcType, cause, duration);
     }
@@ -26,8 +27,22 @@ public class ShenandoahCycle extends GCEvent {
         super(timeStamp, gcType, duration);
     }
 
+    /**
+     * @deprecated use setErgonomics(...) instead
+     */
     public void addErgonomics(int free, int maxFree, int humongous, double fragExternal, double fragInternal, int reserve, int maxReserve) {
-        this.ergonomics = new ERGO( free, maxFree, humongous, fragExternal, fragInternal, reserve, maxReserve);
+        setErgonomics(free, maxFree, humongous, fragExternal, fragInternal, reserve, maxReserve);
+    }
+
+    public void setErgonomics(int free, int maxFree, int humongous, double fragExternal, double fragInternal, int reserve, int maxReserve) {
+        this.ergonomics = new ERGO(free, maxFree, humongous, fragExternal, fragInternal, reserve, maxReserve);
+    }
+
+    /**
+     * @return the ergonomics
+     */
+    ERGO getErgonomics() {
+        return ergonomics;
     }
 
     enum Phases {
@@ -43,12 +58,13 @@ public class ShenandoahCycle extends GCEvent {
         Phases phase;
         int activeWorkerThreadCount,totalWorkerThreadCount;
 
-        //Pacer for (Evacuation). Used CSet: 1368M, Free: 5744M, Non-Taxable: 574M, Alloc Tax Rate: 1.1x
-              //  duration
+        // Pacer for (Evacuation). Used CSet: 1368M, Free: 5744M, Non-Taxable: 574M, Alloc Tax Rate: 1.1x
+        // duration
 
     }
 
     class ERGO {
+
         private final int free;
         private final int maxFree;
         private final int humongous;
