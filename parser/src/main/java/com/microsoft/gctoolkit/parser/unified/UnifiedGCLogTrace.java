@@ -7,21 +7,21 @@ import java.util.regex.Matcher;
 
 public class UnifiedGCLogTrace {
 
-    private Matcher matcher;
+    private final Matcher matcher;
 
-    public UnifiedGCLogTrace(Matcher matcher) {
+    public UnifiedGCLogTrace(final Matcher matcher) {
         this.matcher = matcher;
     }
 
-    public String get(int index) {
+    public String get(final int index) {
         return matcher.group(index);
     }
 
-    public int getInteger(int index) {
+    public int getInteger(final int index) {
         return 0;
     }
 
-    public double getDouble(int index) {
+    public double getDouble(final int index) {
         return 0.0d;
     }
 }
