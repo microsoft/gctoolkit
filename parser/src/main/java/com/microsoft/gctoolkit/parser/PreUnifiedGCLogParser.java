@@ -38,13 +38,11 @@ public abstract class PreUnifiedGCLogParser extends GCLogParser {
     // todo: mixes aggregator with parsing. premature optimization...
     MemoryPoolSummary getTotalOccupancyBeforeAfterWithTotalHeapPoolSizeSummary(GCLogTrace trace, int offset) {
         MemoryPoolSummary summary = trace.getOccupancyBeforeAfterWithMemoryPoolSizeSummary(offset);
-        setHeapSize(summary.getSizeAfterCollection());
         return summary;
     }
 
     MemoryPoolSummary getTotalOccupancyWithTotalHeapSizeSummary(GCLogTrace trace, int offset) {
         MemoryPoolSummary summary = trace.getOccupancyWithMemoryPoolSizeSummary(offset);
-        setHeapSize(summary.getSizeAfterCollection());
         return summary;
     }
 
