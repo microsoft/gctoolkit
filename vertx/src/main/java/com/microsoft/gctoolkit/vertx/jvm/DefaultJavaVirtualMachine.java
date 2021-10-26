@@ -108,7 +108,6 @@ public class DefaultJavaVirtualMachine implements JavaVirtualMachine {
     }
 
     // Invoked reflectively from GCToolKit
-    @SuppressWarnings("unchecked")
     public void analyze(Set<Class<? extends Aggregation>> registeredAggregations, DataSource<?> dataSource) {
 
         try {

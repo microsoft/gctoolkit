@@ -29,7 +29,6 @@ import com.microsoft.gctoolkit.event.g1gc.G1YoungInitialMark;
 import com.microsoft.gctoolkit.parser.jvm.Decorators;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
@@ -83,6 +82,10 @@ public class G1GCForwardReference extends ForwardReference {
 
     public static void setMaxHeapSize(long maxHeapSize) {
         G1GCForwardReference.maxHeapSize = maxHeapSize;
+    }
+
+    public static long getMaxHeapSize() {
+        return maxHeapSize;
     }
 
     public void setGcType(GarbageCollectionTypes garbageCollectionType) {

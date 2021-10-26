@@ -3,7 +3,6 @@
 package com.microsoft.gctoolkit.parser.diary;
 
 import com.microsoft.gctoolkit.parser.TestLogFile;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 public class ZGCLogDiaryTest extends LogDiaryTest {

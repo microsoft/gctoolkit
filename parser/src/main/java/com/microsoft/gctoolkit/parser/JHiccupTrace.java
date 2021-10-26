@@ -2,7 +2,6 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.parser;
 
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -11,16 +10,14 @@ import java.util.regex.Pattern;
  */
 public class JHiccupTrace {
 
-    private static final Logger LOGGER = Logger.getLogger(JHiccupTrace.class.getName());
-
     //0.124,1.004,2.408,HIST
     private static final String TIME = "(\\d+(?:,|.)\\d+)";
     public static final Pattern JHICCUP_LOG_ENTRY = Pattern.compile(TIME + "," + TIME + "," + TIME + ",HIST");
     private static final String US_FORMAT_SEPARATOR = ".";
     private static final String EUROPEAN_FORMAT_SEPARATOR = ",";
 
-    // TODO Why -1.0d as the default?
-    private static final double DEFAULT_TIMESTAMP = -1.0d;
+    // TODO #150 Why -1.0d as the default?
+    // private static final double DEFAULT_TIMESTAMP = -1.0d;
 
     private final Matcher trace;
 

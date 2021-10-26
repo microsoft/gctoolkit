@@ -9,11 +9,8 @@ import io.vertx.core.AbstractVerticle;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.logging.Logger;
 
 public class JVMEventSource extends AbstractVerticle {
-
-    private static final Logger LOGGER = Logger.getLogger(JVMEventSource.class.getName());
 
     private final String publicationChannel;
 

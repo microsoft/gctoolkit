@@ -117,10 +117,9 @@ public class PreUnifiedJVMConfiguration implements SimplePatterns, CMSPatterns, 
         diary.setFalse(SupportedFlags.UNIFIED_LOGGING, SupportedFlags.ZGC, SupportedFlags.SHENANDOAH);
     }
 
-
     @Override
     public String getCommandLine() {
-        // TODO
+        // TODO #149 Extract command line from PreUnifiedJVMConfiguration log file
         return "";
     }
 
@@ -259,7 +258,7 @@ public class PreUnifiedJVMConfiguration implements SimplePatterns, CMSPatterns, 
     private boolean simpleFullGCDetected = false;
     private boolean simpleCMSCycleDetected = false;
 
-    //TODO: PSYoung -> PSOldGen, DefNew->PSOldGen, so maybe we need to break up Parallel for generational collections
+    //TODO: #148 PSYoung -> PSOldGen, DefNew->PSOldGen, so maybe we need to break up Parallel for generational collections
     private void collector(String line) {
 
         GCLogTrace trace;

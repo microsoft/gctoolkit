@@ -2,8 +2,6 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.parser.jvm;
 
-
-import java.util.HashMap;
 import java.util.Map;
 
 public enum JVMFlags {

@@ -1,7 +1,5 @@
 package com.microsoft.gctoolkit.parser;
 
-import com.microsoft.gctoolkit.parser.GCParseRule;
-
 import java.util.Arrays;
 import java.util.Objects;
 

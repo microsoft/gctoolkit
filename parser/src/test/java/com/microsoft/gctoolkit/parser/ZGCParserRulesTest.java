@@ -43,7 +43,7 @@ public class ZGCParserRulesTest implements ZGCPatterns {
         int captureCount = 0;
         for (String line : lines) {
             GCLogTrace trace = rule.parse(line);
-            if (rule.parse(line) != null) {
+            if (trace != null) {
                 captureCount++;
             }
         }

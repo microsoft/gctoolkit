@@ -77,8 +77,8 @@ public abstract class RuntimeAggregation  implements Aggregation {
         double eventDuration = !Double.isNaN(duration) ? duration : 0d;
 
         DateTimeStamp now = eventTime != null
-                ? eventTime.add(duration)
-                : timeOfLastEvent.add(duration);
+                ? eventTime.add(eventDuration)
+                : timeOfLastEvent.add(eventDuration);
 
         if (now.after(timeOfLastEvent)) {
             timeOfLastEvent = now;

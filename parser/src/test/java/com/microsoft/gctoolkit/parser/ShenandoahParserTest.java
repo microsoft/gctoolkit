@@ -6,7 +6,6 @@ import com.microsoft.gctoolkit.event.shenandoah.ShenandoahCycle;
 import com.microsoft.gctoolkit.event.zgc.OccupancySummary;
 import com.microsoft.gctoolkit.event.zgc.ReclaimSummary;
 import com.microsoft.gctoolkit.event.zgc.ZGCMemoryPoolSummary;
-import com.microsoft.gctoolkit.parser.ShenandoahParser;
 import com.microsoft.gctoolkit.parser.jvm.LoggingDiary;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
