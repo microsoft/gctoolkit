@@ -9,19 +9,19 @@ public class UnifiedGCLogTrace {
 
     private final Matcher matcher;
 
-    public UnifiedGCLogTrace(final Matcher matcher) {
+    public UnifiedGCLogTrace(Matcher matcher) {
         this.matcher = matcher;
     }
 
-    public String get(final int index) {
+    public String get(int index) {
         return matcher.group(index);
     }
 
-    public int getInteger(final int index) {
+    public int getInteger(int index) {
         return 0;
     }
 
-    public double getDouble(final int index) {
+    public double getDouble(int index) {
         return 0.0d;
     }
 }
