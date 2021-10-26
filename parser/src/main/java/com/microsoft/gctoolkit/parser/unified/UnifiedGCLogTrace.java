@@ -9,7 +9,7 @@ public class UnifiedGCLogTrace {
 
     private Matcher matcher;
 
-    public UnifiedGCLogTrace() {
+    public UnifiedGCLogTrace(Matcher matcher) {
         this.matcher = matcher;
     }
 
