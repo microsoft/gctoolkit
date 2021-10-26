@@ -532,6 +532,12 @@ public class GenerationalHeapParser extends PreUnifiedGCLogParser implements Sim
 
     private void flsLargeBlock(GCLogTrace trace, String line) {
     }
+    
+    // Do not remove. This method is used as a development aid when adding a new parse rule.
+    // For example, parseRules.put(MY_NEW_PARSE_RULE, this::noop);
+    // It is then possible to set a breakpoint in this method to examine the details of the GCLogTrace.
+    private void noop(GCLogTrace trace, String line) {
+    }
 
     //46.435: [GC 46.435: [ParNew: 19136K->19136K(19136K), 0.0000274 secs]46.435: [CMS46.458: [CMS-concurrent-sweep: 0.060/0.117 secs] [Times: user=0.21 sys=0.01, real=0.12 secs]
     //public static final ParseRule PARNEW_CONCURRENT_MODE_END = new ParseRule (GC_PREFIX + PARNEW_BLOCK + TIMESTAMP + "\\[CMS" + CMS_PHASE_END + "(?: " + CPU_BREAKDOWN + ")?$");
