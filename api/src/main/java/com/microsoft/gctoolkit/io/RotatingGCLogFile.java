@@ -152,10 +152,12 @@ public class RotatingGCLogFile extends GCLogFile {
         throw new IOException("Unrecognised file type");
     }
 
+    @SuppressWarnings("resource")
     private static Stream<String> streamZipFile(Path path) throws IOException {
         ZipFile zipFile = new ZipFile(path.toFile());
         List<ZipEntry> entries = zipFile.stream().filter(entry -> !entry.isDirectory()).collect(Collectors.toList());
         Vector<InputStream> streams = new Vector<>();
+
         try {
             entries
                     .stream()
@@ -171,7 +173,9 @@ public class RotatingGCLogFile extends GCLogFile {
         } catch (UncheckedIOException uioe) {
             throw uioe.getCause();
         }
+
         SequenceInputStream sequenceInputStream = new SequenceInputStream(streams.elements());
+        
         return new BufferedReader(new InputStreamReader(sequenceInputStream)).lines();
     }
 
