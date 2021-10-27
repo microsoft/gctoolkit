@@ -30,6 +30,7 @@ public class ShenandoahCycle extends GCEvent {
     /**
      * @deprecated use setErgonomics(...) instead
      */
+    @Deprecated
     public void addErgonomics(int free, int maxFree, int humongous, double fragExternal, double fragInternal, int reserve, int maxReserve) {
         setErgonomics(free, maxFree, humongous, fragExternal, fragInternal, reserve, maxReserve);
     }
