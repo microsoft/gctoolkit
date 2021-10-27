@@ -60,4 +60,12 @@ public class ForwardReference {
     public void add(CPUSummary cpuSummary) {
         this.cpuSummary = cpuSummary;
     }
+
+    /**
+     * @return the decorators
+     */
+    Decorators getDecorators() {
+        return decorators;
+    }
+
 }
