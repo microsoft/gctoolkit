@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import java.util.logging.Logger;
 
 import static com.microsoft.gctoolkit.parser.CommonTestHelper.captureTest;
+import static com.microsoft.gctoolkit.parser.unified.UnifiedG1GCPatterns.STRING_DEDUP;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -138,7 +139,7 @@ public class G1GCUnifiedParserRulesTest implements UnifiedG1GCPatterns {
             MERGE_THREAD_STATE,
             COPIED_BYTES,
             LAB,
-            CLEAR_LOGGED_CARDS,
+            CLEAR_LOGGED_CARDS,           // 55
             RECALC_USED_MEM,
             PURGE_CODE_ROOTS,
             UPDATE_DERIVED_POINTERS,
@@ -446,6 +447,7 @@ public class G1GCUnifiedParserRulesTest implements UnifiedG1GCPatterns {
                     "[2.179s][info ][gc          ] GC(9) Concurrent Mark Cycle 96.518ms",
                     "[156.068s][info ][gc,marking  ] GC(2463) Concurrent Mark 16.895ms"
             }
+
             //[156.067s][debug][gc,phases   ] GC(2463) Weak Processing 0.189ms
             //[156.067s][debug][gc,phases   ] GC(2463) ClassLoaderData 0.002ms
             //[156.067s][debug][gc,phases   ] GC(2463) Trigger cleanups 0.000ms

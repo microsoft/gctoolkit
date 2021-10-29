@@ -60,6 +60,7 @@ public interface UnifiedG1GCPatterns extends UnifiedPatterns {
 
     //[73.082s][info ][gc           ] GC(263) Concurrent Cycle
     //[2.179s][info ][gc          ] GC(9) Concurrent Mark Cycle
+//<<<<<<< HEAD
     //"[155.787s][info ][gc          ] GC(2457) Concurrent Undo Cycle",
     //[156.051s][info ][gc,marking  ] GC(2463) Concurrent Mark
     //    .... entire set of concurrent records.
@@ -69,6 +70,13 @@ public interface UnifiedG1GCPatterns extends UnifiedPatterns {
     //"[73.171s][info ][gc            ] GC(263) Concurrent Cycle 89.437ms",
     //"[155.836s][info ][gc          ] GC(2457) Concurrent Undo Cycle 49.351ms",
     GCParseRule CONCURRENT_CYCLE_END = new GCParseRule("CONCURRENT_CYCLE_END", "Concurrent(?: Undo)? Cycle " + CONCURRENT_TIME);
+//=======
+//    //    .... entire set of concurrent records.
+//    //[73.171s][info ][gc            ] GC(263) Concurrent Cycle 89.437ms
+//    //[2.179s][info ][gc          ] GC(9) Concurrent Mark Cycle 96.518ms
+//    GCParseRule CONCURRENT_CYCLE_START = new GCParseRule("CONCURRENT_CYCLE_START", "Concurrent (?:Mark )?Cycle$");
+//    GCParseRule CONCURRENT_CYCLE_END = new GCParseRule("CONCURRENT_CYCLE_END", "Concurrent (?:Mark )?Cycle " + CONCURRENT_TIME);
+//>>>>>>> fee9cb46bbd0c936df10e051c0b0cf4c545d1a72
 
     //    [73.082s][info ][gc,marking   ] GC(263) Concurrent Clear Claimed Marks
     //    [73.082s][info ][gc,marking   ] GC(263) Concurrent Clear Claimed Marks 0.018ms
@@ -178,6 +186,7 @@ public interface UnifiedG1GCPatterns extends UnifiedPatterns {
     //"[156.473s][debug][gc,phases   ] GC(2467)       StringDedup Requests0 Weak     Min:  0.0, Avg:  0.0, Max:  0.0, Diff:  0.0, Sum:  0.0, Workers: 7",
     //"[156.473s][debug][gc,phases   ] GC(2467)       StringDedup Requests1 Weak     Min:  0.0, Avg:  0.0, Max:  0.0, Diff:  0.0, Sum:  0.0, Workers: 7"
     GCParseRule STRING_DEDUP = new GCParseRule("STRING_DEDUP","StringDedup (?:Requests(0|1)|Table) Weak\\s+" + WORKER_SUMMARY_REAL);
+    //GCParseRule STRING_DEDUP = new GCParseRule("STRING_DEDUP","StringDedup Requests(0|1) Weak\\s+" + WORKER_SUMMARY_REAL);
     //"[156.473s][debug][gc,phases   ] GC(2467)       Weak JFR Old Object Samples    Min:  0.0, Avg:  0.0, Max:  0.0, Diff:  0.0, Sum:  0.0, Workers: 7"
     GCParseRule WEAK_JFR_SAMPLES = new GCParseRule("WEAK_JFR_SAMPLES","Weak JFR Old Object Samples\\s+" + WORKER_SUMMARY_REAL);
 
