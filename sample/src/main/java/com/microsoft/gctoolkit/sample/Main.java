@@ -1,18 +1,14 @@
 package com.microsoft.gctoolkit.sample;
 
 import com.microsoft.gctoolkit.GCToolKit;
-import com.microsoft.gctoolkit.event.GarbageCollectionTypes;
 import com.microsoft.gctoolkit.io.GCLogFile;
 import com.microsoft.gctoolkit.io.SingleGCLogFile;
 import com.microsoft.gctoolkit.jvm.JavaVirtualMachine;
 import com.microsoft.gctoolkit.sample.aggregation.HeapOccupancyAfterCollectionSummary;
-import com.microsoft.gctoolkit.sample.aggregation.PauseTimeAggregation;
 import com.microsoft.gctoolkit.sample.aggregation.PauseTimeSummary;
-import com.microsoft.gctoolkit.sample.collections.XYDataSet;
 
 import java.nio.file.Path;
 import java.nio.file.Files;
-import java.util.Optional;
 
 public class Main {
 
@@ -27,7 +23,7 @@ public class Main {
         if (Files.notExists(Path.of(gcLogFile))) {
             throw new IllegalArgumentException(String.format("File %s not found.", gcLogFile));
         }
-
+       
         Main main = new Main();
         main.analyze(gcLogFile);
     }

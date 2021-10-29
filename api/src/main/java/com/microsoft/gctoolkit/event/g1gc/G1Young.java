@@ -131,6 +131,10 @@ public class G1Young extends G1RealPause {
         return this.stringDedupingDuration;
     }
 
+    public int getStringDeduppingWorkers() {
+        return this.stringDeduppingWorkers;
+    }
+
     public StatisticalSummary getQueueFixupStatistics() {
         return this.queueFixupStatistics;
     }
