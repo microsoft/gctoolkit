@@ -65,8 +65,10 @@ public interface UnifiedG1GCPatterns extends UnifiedPatterns {
     //    .... entire set of concurrent records.
     //[73.171s][info ][gc            ] GC(263) Concurrent Cycle 89.437ms
     //[2.179s][info ][gc          ] GC(9) Concurrent Mark Cycle 96.518ms
-    GCParseRule CONCURRENT_CYCLE_START = new GCParseRule("CONCURRENT_CYCLE_START", "Concurrent (?:Mark )?Cycle$");
-    GCParseRule CONCURRENT_CYCLE_END = new GCParseRule("CONCURRENT_CYCLE_END", "Concurrent (?:Mark )?Cycle " + CONCURRENT_TIME);
+    GCParseRule CONCURRENT_CYCLE_START = new GCParseRule("CONCURRENT_CYCLE_START", "Concurrent(?: Mark| Undo)?(?: Cycle)?$");
+    //"[73.171s][info ][gc            ] GC(263) Concurrent Cycle 89.437ms",
+    //"[155.836s][info ][gc          ] GC(2457) Concurrent Undo Cycle 49.351ms",
+    GCParseRule CONCURRENT_CYCLE_END = new GCParseRule("CONCURRENT_CYCLE_END", "Concurrent(?: Undo)? Cycle " + CONCURRENT_TIME);
 
     //    [73.082s][info ][gc,marking   ] GC(263) Concurrent Clear Claimed Marks
     //    [73.082s][info ][gc,marking   ] GC(263) Concurrent Clear Claimed Marks 0.018ms
@@ -89,6 +91,9 @@ public interface UnifiedG1GCPatterns extends UnifiedPatterns {
     GCParseRule CONCURRENT_MARK_WORKERS = new GCParseRule("CONCURRENT_MARK_WORKERS", "Using " + COUNTER + " workers of " + COUNTER + " for marking");
     GCParseRule CONCURRENT_MARK_ABORTED = new GCParseRule("Concurrent Mark Abort", "Concurrent Mark Abort");
     GCParseRule CONCURRENT_MARK_END = new GCParseRule("CONCURRENT_MARK_END", "Concurrent (Mark) \\(.+\\) " + CONCURRENT_TIME);
+    //    [2.179s][info ][gc          ] GC(9) Concurrent Mark Cycle 96.518ms
+    //    [156.068s][info ][gc,marking  ] GC(2463) Concurrent Mark 16.895ms
+    GCParseRule CONCURRENT_MARK_CYCLE = new GCParseRule( "CONCURRENT_MARK_CYCLE", "Concurrent Mark (?:Cycle )?" + PAUSE_TIME);
 
     //    [73.139s][info ][gc,start     ] GC(263) Pause Remark
     //    [73.139s][debug][gc,phases    ] GC(263) Finalize Marking 0.251ms
@@ -105,7 +110,7 @@ public interface UnifiedG1GCPatterns extends UnifiedPatterns {
     //    [73.160s][info ][gc            ] GC(263) Pause Remark 211M->211M(256M) 21.685ms
     //    [73.160s][info ][gc,cpu        ] GC(263) User=0.03s Sys=0.00s Real=0.02s
     GCParseRule PAUSE_REMARK_START = new GCParseRule("PAUSE_REMARK_START", "Pause Remark$");
-    GCParseRule FINIALIZE_MARKING = new GCParseRule("FINIALIZE_MARKING", "Finalize Marking " + PAUSE_TIME);
+    GCParseRule FINALIZE_MARKING = new GCParseRule("FINIALIZE_MARKING", "Finalize Marking " + PAUSE_TIME);
     GCParseRule SYSTEM_DICTIONARY_UNLOADING = new GCParseRule("SYSTEM_DICTIONARY_UNLOADING", "System Dictionary Unloading " + PAUSE_TIME);
     GCParseRule STRING_SYMBOL_TABLE = new GCParseRule("STRING_SYMBOL_TABLE", "Cleaned string and symbol table, strings: " + COUNTER + " processed, " + COUNTER + " removed, symbols: " + COUNTER + " processed, " + COUNTER + " removed");
     GCParseRule PARALLEL_UNLOADING = new GCParseRule("PARALLEL_UNLOADING", "Parallel Unloading " + PAUSE_TIME);
@@ -116,9 +121,12 @@ public interface UnifiedG1GCPatterns extends UnifiedPatterns {
     //    [73.168s][info ][gc,marking    ] GC(263) Concurrent Create Live Data 8.089ms
     //
     //    [73.169s][info ][gc,start      ] GC(263) Pause Cleanup
+    //    [11.049s][debug][gc,phases     ] GC(63) Update Remembered Set Tracking After Rebuild 0.007ms
+    //    [11.049s][debug][gc,phases     ] GC(63) Finalize Concurrent Mark Cleanup 0.049ms
     //    [73.169s][info ][gc            ] GC(263) Pause Cleanup 223M->213M(256M) 0.271ms
     //    [73.169s][info ][gc,cpu        ] GC(263) User=0.00s Sys=0.00s Real=0.00s
     GCParseRule CLEANUP_START = new GCParseRule("CLEANUP_START", "Pause Cleanup$");
+    GCParseRule CLEANUP__FINALIZE_CONC_MARK = new GCParseRule("", "Finalize Concurrent Mark Cleanup " + PAUSE_TIME );
     GCParseRule CLEANUP_END = new GCParseRule("CLEANUP_END", "Pause Cleanup " + BEFORE_AFTER_CONFIGURED_PAUSE);
 
     //    [73.169s][info ][gc,marking    ] GC(263) Concurrent Complete Cleanup

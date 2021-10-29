@@ -101,7 +101,7 @@ public class G1GCUnifiedParserRulesTest implements UnifiedG1GCPatterns {
             CONCURRENT_MARK_WORKERS,       // 15
             CONCURRENT_MARK_END,
             PAUSE_REMARK_START,
-            FINIALIZE_MARKING,
+            FINALIZE_MARKING,
             SYSTEM_DICTIONARY_UNLOADING,
             STRING_SYMBOL_TABLE,           // 20
             PARALLEL_UNLOADING,
@@ -150,7 +150,9 @@ public class G1GCUnifiedParserRulesTest implements UnifiedG1GCPatterns {
             REBUILD_FREELIST,
             NEW_CSET,
             RESIZE_TLAB,
-            WEAK_PROCESSING
+            WEAK_PROCESSING,
+            CLEANUP__FINALIZE_CONC_MARK,
+            CONCURRENT_MARK_CYCLE
     };
 
     /*
@@ -233,10 +235,7 @@ public class G1GCUnifiedParserRulesTest implements UnifiedG1GCPatterns {
             },
             {   // 12
                     "[73.171s][info ][gc            ] GC(263) Concurrent Cycle 89.437ms",
-                    "[2.179s][info ][gc          ] GC(9) Concurrent Mark Cycle 96.518ms",
                     "[155.836s][info ][gc          ] GC(2457) Concurrent Undo Cycle 49.351ms",
-                    "[156.068s][info ][gc,marking  ] GC(2463) Concurrent Mark 16.895ms",
-                    "[156.079s][debug][gc,phases   ] GC(2463) Finalize Concurrent Mark Cleanup 0.154ms"
             },
             {   // 13
                     "[73.082s][info ][gc,marking   ] GC(263) Concurrent Clear Claimed Marks 0.018ms",
@@ -440,6 +439,13 @@ public class G1GCUnifiedParserRulesTest implements UnifiedG1GCPatterns {
                     "[156.169s][debug][gc,phases   ] GC(2464)     Weak Processing: 0.0ms",
                     "[156.067s][debug][gc,phases   ] GC(2463) Weak Processing 0.189ms"
             },
+            {   // 68
+                    "[156.079s][debug][gc,phases   ] GC(2463) Finalize Concurrent Mark Cleanup 0.154ms"
+            },
+            {   // 69
+                    "[2.179s][info ][gc          ] GC(9) Concurrent Mark Cycle 96.518ms",
+                    "[156.068s][info ][gc,marking  ] GC(2463) Concurrent Mark 16.895ms"
+            }
             //[156.067s][debug][gc,phases   ] GC(2463) Weak Processing 0.189ms
             //[156.067s][debug][gc,phases   ] GC(2463) ClassLoaderData 0.002ms
             //[156.067s][debug][gc,phases   ] GC(2463) Trigger cleanups 0.000ms

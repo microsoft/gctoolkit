@@ -774,7 +774,7 @@ public class G1GCForwardReference extends ForwardReference {
     }
 
     public String toString() {
-        return gcType + ":" + getGCCause() + ":" + getDuration();
+        return getStartTime().toString() + " : " + gcType + " : " + getGCCause() + " : " + getDuration();
     }
 
     public boolean setArchiveOccupancyBeforeCollection(int value) {
