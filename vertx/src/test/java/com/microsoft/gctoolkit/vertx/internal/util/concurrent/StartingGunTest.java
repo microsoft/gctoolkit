@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class StartingGunTest {
 
-  private static final int PAUSE = 300;
+  private static final int PAUSE = 3000;
 
   @Test
   public void testStartingGunNoInterruptions() throws InterruptedException {
