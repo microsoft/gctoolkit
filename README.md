@@ -24,7 +24,9 @@ In order to use this library you'll need to add its dependencies to your project
 
 ### Maven Coordinates
 
-The GCToolKit artifacts are in [Maven Central](https://mvnrepository.com/artifact/com.microsoft.gctoolkit). You'll then need to add the `api`, `parser` and `vertx` modules to your project in the `dependencyManagement` and/or `dependencies` section as you see fit.
+[![Maven Central](https://img.shields.io/maven-central/v/com.microsoft.gctoolkit/gctoolkit-parser.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22com.microsoft.gctoolkit%22%20AND%20a:%22gctoolkit-api%22)
+
+The GCToolKit artifacts are in [Maven Central](https://search.maven.org/search?q=g:com.microsoft.gctoolkit). You'll then need to add the `api`, `parser` and `vertx` modules to your project in the `dependencyManagement` and/or `dependencies` section as you see fit.
 
 ```xml
 <dependencies>
