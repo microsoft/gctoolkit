@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class StartingGunTest {
 
-  private static final int PAUSE = 300;
+  private static final int PAUSE = 3000;
 
   @Test
   public void testStartingGunNoInterruptions() throws InterruptedException {
@@ -105,8 +105,7 @@ public class StartingGunTest {
     allThreadsDead(threads);
   }
 
-  private void allThreadsDead(Thread[] threads)
-      throws InterruptedException {
+  private void allThreadsDead(Thread[] threads) throws InterruptedException {
     for (Thread thread : threads) {
       thread.join(PAUSE);
       assertFalse(thread.isAlive());

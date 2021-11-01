@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import java.util.logging.Logger;
 
 import static com.microsoft.gctoolkit.parser.CommonTestHelper.captureTest;
+import static com.microsoft.gctoolkit.parser.unified.UnifiedG1GCPatterns.STRING_DEDUP;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -101,7 +102,7 @@ public class G1GCUnifiedParserRulesTest implements UnifiedG1GCPatterns {
             CONCURRENT_MARK_WORKERS,       // 15
             CONCURRENT_MARK_END,
             PAUSE_REMARK_START,
-            FINIALIZE_MARKING,
+            FINALIZE_MARKING,
             SYSTEM_DICTIONARY_UNLOADING,
             STRING_SYMBOL_TABLE,           // 20
             PARALLEL_UNLOADING,
@@ -128,17 +129,17 @@ public class G1GCUnifiedParserRulesTest implements UnifiedG1GCPatterns {
             CARDS,
             HOT_CARD_CACHE,
             LOG_BUFFERS,
-            SCAN_HEAP_ROOTS,
+            SCAN_HEAP_ROOTS,              // 45
             SCANS,
             CLAIMED_CHUNKS,
             CODE_ROOT_SCAN,
             STRING_DEDUP,
-            WEAK_JFR_SAMPLES,
+            WEAK_JFR_SAMPLES,             // 50
             POST_EVAC_CLEANUP,
             MERGE_THREAD_STATE,
             COPIED_BYTES,
             LAB,
-            CLEAR_LOGGED_CARDS,
+            CLEAR_LOGGED_CARDS,           // 55
             RECALC_USED_MEM,
             PURGE_CODE_ROOTS,
             UPDATE_DERIVED_POINTERS,
@@ -149,7 +150,10 @@ public class G1GCUnifiedParserRulesTest implements UnifiedG1GCPatterns {
             FREE_CSET,
             REBUILD_FREELIST,
             NEW_CSET,
-            RESIZE_TLAB
+            RESIZE_TLAB,
+            WEAK_PROCESSING,
+            CLEANUP__FINALIZE_CONC_MARK,
+            CONCURRENT_MARK_CYCLE
     };
 
     /*
@@ -179,7 +183,11 @@ public class G1GCUnifiedParserRulesTest implements UnifiedG1GCPatterns {
                     "[2018-03-09T11:14:05.001-0100][12.276s][debug][gc,ref       ] GC(0) WeakReference 0.051ms",
                     "[2018-03-09T11:14:05.001-0100][12.276s][debug][gc,ref       ] GC(0) FinalReference 0.183ms",
                     "[2018-03-09T11:14:05.001-0100][12.276s][debug][gc,ref       ] GC(0) PhantomReference 0.016ms",
-                    "[2018-03-09T11:14:05.001-0100][12.276s][debug][gc,ref       ] GC(0) JNI Weak Reference 0.049ms"
+                    "[2018-03-09T11:14:05.001-0100][12.276s][debug][gc,ref       ] GC(0) JNI Weak Reference 0.049ms",
+                    "[156.064s][debug][gc,ref      ] GC(2463) Preclean SoftReferences 0.063ms",
+                    "[156.064s][debug][gc,ref      ] GC(2463) Preclean WeakReferences 0.118ms",
+                    "[156.064s][debug][gc,ref      ] GC(2463) Preclean FinalReferences 0.055ms",
+                    "[156.064s][debug][gc,ref      ] GC(2463) Preclean PhantomReferences 0.052ms"
             },
             {   //  3
                     "[2018-03-09T11:14:05.001-0100][12.276s][debug][gc,ref       ] GC(0) Ref Counts: Soft: 0 Weak: 511 Final: 1079 Phantom: 227"
@@ -215,7 +223,9 @@ public class G1GCUnifiedParserRulesTest implements UnifiedG1GCPatterns {
             },
             {   // 10
                     "[73.082s][info ][gc           ] GC(263) Concurrent Cycle",
-                    "[2.179s][info ][gc          ] GC(9) Concurrent Mark Cycle"
+                    "[2.179s][info ][gc          ] GC(9) Concurrent Mark Cycle",
+                    "[155.787s][info ][gc          ] GC(2457) Concurrent Undo Cycle",
+                    "[156.051s][info ][gc,marking  ] GC(2463) Concurrent Mark"
             },
             {   // 11
                     "[73.082s][info ][gc,marking   ] GC(263) Concurrent Clear Claimed Marks",
@@ -226,7 +236,7 @@ public class G1GCUnifiedParserRulesTest implements UnifiedG1GCPatterns {
             },
             {   // 12
                     "[73.171s][info ][gc            ] GC(263) Concurrent Cycle 89.437ms",
-                    "[2.179s][info ][gc          ] GC(9) Concurrent Mark Cycle 96.518ms"
+                    "[155.836s][info ][gc          ] GC(2457) Concurrent Undo Cycle 49.351ms",
             },
             {   // 13
                     "[73.082s][info ][gc,marking   ] GC(263) Concurrent Clear Claimed Marks 0.018ms",
@@ -368,7 +378,8 @@ public class G1GCUnifiedParserRulesTest implements UnifiedG1GCPatterns {
             },
             {   // 49
                     "[156.473s][debug][gc,phases   ] GC(2467)       StringDedup Requests0 Weak     Min:  0.0, Avg:  0.0, Max:  0.0, Diff:  0.0, Sum:  0.0, Workers: 7",
-                    "[156.473s][debug][gc,phases   ] GC(2467)       StringDedup Requests1 Weak     Min:  0.0, Avg:  0.0, Max:  0.0, Diff:  0.0, Sum:  0.0, Workers: 7"
+                    "[156.473s][debug][gc,phases   ] GC(2467)       StringDedup Requests1 Weak     Min:  0.0, Avg:  0.0, Max:  0.0, Diff:  0.0, Sum:  0.0, Workers: 7",
+                    "[155.889s][debug][gc,phases   ] GC(2458)       StringDedup Table Weak         Min:  0.0, Avg:  0.0, Max:  0.0, Diff:  0.0, Sum:  0.0, Workers: 7"
             },
             {   // 50
                     "[156.473s][debug][gc,phases   ] GC(2467)       Weak JFR Old Object Samples    Min:  0.0, Avg:  0.0, Max:  0.0, Diff:  0.0, Sum:  0.0, Workers: 7"
@@ -395,35 +406,59 @@ public class G1GCUnifiedParserRulesTest implements UnifiedG1GCPatterns {
             {   // 57
                     "[156.473s][debug][gc,phases   ] GC(2467)       Purge Code Roots (ms):         Min:  0.0, Avg:  0.0, Max:  0.0, Diff:  0.0, Sum:  0.0, Workers: 1"
             },
-            {
+            {   // 58
                     "[156.473s][debug][gc,phases   ] GC(2467)       Update Derived Pointers (ms):  Min:  0.0, Avg:  0.0, Max:  0.0, Diff:  0.0, Sum:  0.0, Workers: 1"
             },
-            {
+            {   // 59
                     "[156.473s][debug][gc,phases   ] GC(2467)       Eagerly Reclaim Humongous Objects (ms): Min:  1.1, Avg:  1.1, Max:  1.1, Diff:  0.0, Sum:  1.1, Workers: 1"
             },
-            {
+            {   // 60
                     "[156.473s][debug][gc,phases   ] GC(2467)         Humongous Total                Min: 1685, Avg: 1685.0, Max: 1685, Diff: 0, Sum: 1685, Workers: 1",
                     "[156.473s][debug][gc,phases   ] GC(2467)         Humongous Candidates           Min: 1685, Avg: 1685.0, Max: 1685, Diff: 0, Sum: 1685, Workers: 1",
                     "[156.474s][debug][gc,phases   ] GC(2467)         Humongous Reclaimed            Min: 390, Avg: 390.0, Max: 390, Diff: 0, Sum: 390, Workers: 1"
             },
-            {
+            {   // 61
                     "[156.474s][debug][gc,phases   ] GC(2467)       Redirty Logged Cards (ms):     Min:  0.0, Avg:  0.0, Max:  0.0, Diff:  0.0, Sum:  1.1, Workers: 53"
             },
-            {
+            {   // 62
                     "[156.474s][debug][gc,phases   ] GC(2467)         Redirtied Cards:               Min: 0, Avg:  9.1, Max: 130, Diff: 130, Sum: 482, Workers: 53"
             },
-            {
+            {   // 63
                     "[156.474s][debug][gc,phases   ] GC(2467)       Free Collection Set (ms):      Min:  0.0, Avg:  0.0, Max:  0.0, Diff:  0.0, Sum:  0.9, Workers: 53"
             },
-            {
+            {   // 64
                     "[156.474s][debug][gc,phases   ] GC(2467)     Rebuild Free List: 0.1ms"
             },
-            {
+            {   // 65
                     "[156.474s][debug][gc,phases   ] GC(2467)     Start New Collection Set: 0.0ms"
             },
-            {
+            {   // 66
                     "[156.474s][debug][gc,phases   ] GC(2467)     Resize TLABs: 0.0ms"
+            },
+            {   // 67
+                    "[155.889s][debug][gc,phases   ] GC(2458)     Weak Processing: 0.0ms",
+                    "[156.169s][debug][gc,phases   ] GC(2464)     Weak Processing: 0.0ms",
+                    "[156.067s][debug][gc,phases   ] GC(2463) Weak Processing 0.189ms"
+            },
+            {   // 68
+                    "[156.079s][debug][gc,phases   ] GC(2463) Finalize Concurrent Mark Cleanup 0.154ms"
+            },
+            {   // 69
+                    "[2.179s][info ][gc          ] GC(9) Concurrent Mark Cycle 96.518ms",
+                    "[156.068s][info ][gc,marking  ] GC(2463) Concurrent Mark 16.895ms"
             }
+
+            //[156.067s][debug][gc,phases   ] GC(2463) Weak Processing 0.189ms
+            //[156.067s][debug][gc,phases   ] GC(2463) ClassLoaderData 0.002ms
+            //[156.067s][debug][gc,phases   ] GC(2463) Trigger cleanups 0.000ms
+            //[156.067s][debug][gc,phases   ] GC(2463) Flush Task Caches 0.206ms
+            //[156.068s][debug][gc,phases   ] GC(2463) Update Remembered Set Tracking Before Rebuild 0.118ms
+            //[156.068s][debug][gc,phases   ] GC(2463) Reclaim Empty Regions 0.175ms
+            //[156.068s][debug][gc,phases   ] GC(2463) Purge Metaspace 0.001ms
+            //[156.068s][debug][gc,phases   ] GC(2463) Report Object Count 0.000ms
+            //[156.079s][debug][gc,phases   ] GC(2463) Update Remembered Set Tracking After Rebuild 0.107ms
+            //[156.079s][debug][gc,phases   ] GC(2463) Finalize Concurrent Mark Cleanup 0.154ms
+            //[156.169s][debug][gc,phases   ] GC(2464)     Weak Processing: 0.0ms
     };
 
     private String[] decoratorLines = {

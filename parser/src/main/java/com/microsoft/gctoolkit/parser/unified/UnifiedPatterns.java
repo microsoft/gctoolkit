@@ -15,7 +15,7 @@ public interface UnifiedPatterns extends UnifiedLoggingTokens {
     String WORKER_TASK = "(for evacuation|to rebuild remembered set)";
     GCParseRule WORKER_SUMMARY = new GCParseRule("WORKER_SUMMARY", "Using " + COUNTER + " workers of " + COUNTER + " " + WORKER_TASK);
 
-    GCParseRule REFERENCES = new GCParseRule("REFERENCES", "(SoftReference|WeakReference|FinalReference|PhantomReference|JNI Weak Reference) " + PAUSE_TIME);
+    GCParseRule REFERENCES = new GCParseRule("REFERENCES", "(Preclean )?(SoftReference|WeakReference|FinalReference|PhantomReference|JNI Weak Reference)(:?s)? " + PAUSE_TIME);
     GCParseRule REFERENCE_COUNTS = new GCParseRule("REFERENCE_COUNTS", "Ref Counts: Soft: " + COUNTER + " Weak: " + COUNTER + " Final: " + COUNTER + " Phantom: " + COUNTER);
 
     GCParseRule UNIFIED_META_DATA = new GCParseRule("UNIFIED_META_DATA", UNIFIED_META_RECORD);
