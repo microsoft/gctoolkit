@@ -61,7 +61,7 @@ public class StartingGunTest {
     thread.start();
 
     sg.awaitUninterruptibly();
-    assertTrue(testingThread.interrupted());
+    assertTrue(Thread.interrupted());
     thread.join(); // wait for that thread to finish
   }
 
