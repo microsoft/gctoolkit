@@ -61,7 +61,7 @@ public class StartingGunTest {
     thread.start();
 
     sg.awaitUninterruptibly();
-    assertTrue(testingThread.isInterrupted());
+    assertTrue(testingThread.interrupted());
     thread.join(); // wait for that thread to finish
   }
 
@@ -105,8 +105,7 @@ public class StartingGunTest {
     allThreadsDead(threads);
   }
 
-  private void allThreadsDead(Thread[] threads)
-      throws InterruptedException {
+  private void allThreadsDead(Thread[] threads) throws InterruptedException {
     for (Thread thread : threads) {
       thread.join(PAUSE);
       assertFalse(thread.isAlive());
