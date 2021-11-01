@@ -60,9 +60,7 @@ Meet other developers working with GCToolKit, ask questions, and participate in 
 
 ### Example
 
-See [sample/README](./sample/README.md)
-
----
+See the sample project: [sample/README](./sample/README.md)
 
 ## Contributing
 
