@@ -19,7 +19,7 @@ if you wish to contribute to GCToolKit we would kindly ask that you submit an is
  
 ## Build
 
-The build uses the Maven wrapper (`mvnw`) to help ensure reproducible builds and so we don't force you to change your system Maven install.
+The build requires JDK 11, and uses the Maven wrapper (`mvnw`) to help ensure reproducible builds and so we don't force you to change your system Maven install. If you prefer to build with your local Maven installation, make sure the version matches the one in the project's [.mvn/wrapper/maven-wrapper.properties](https://github.com/microsoft/gctoolkit/blob/main/.mvn/wrapper/maven-wrapper.properties) file.
 
 * `mvnw clean` - remove build artifacts
 * `mvnw compile` - compile the source code
