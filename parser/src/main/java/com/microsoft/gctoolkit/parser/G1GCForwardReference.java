@@ -773,8 +773,13 @@ public class G1GCForwardReference extends ForwardReference {
         fullGCInternalPhases.put(fullGCInternalPhase, duration);
     }
 
+    /**
+     * Not that this value will be printed but having toString() defined is useful for debugging. The issue is
+     * null values for gctype and gcCause will cause IDE debuggers to NPE. Capture and set to null.
+     * @return String rep of this forward reference.
+     */
     public String toString() {
-        return getStartTime().toString() + " : " + gcType + " : " + getGCCause() + " : " + getDuration();
+        return getStartTime().toString() + " : " + ((gcType == null) ? "null" : gcType.toString()) + " : " + ((getGCCause() == null) ? "null" : getGCCause().toString()) + " : " + getDuration();
     }
 
     public boolean setArchiveOccupancyBeforeCollection(int value) {
