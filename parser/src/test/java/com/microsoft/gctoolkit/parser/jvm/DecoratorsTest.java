@@ -2,7 +2,6 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.parser.jvm;
 
-import com.microsoft.gctoolkit.parser.jvm.Decorators;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

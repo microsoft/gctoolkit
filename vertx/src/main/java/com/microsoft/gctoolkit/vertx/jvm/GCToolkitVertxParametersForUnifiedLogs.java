@@ -17,11 +17,8 @@ import com.microsoft.gctoolkit.vertx.aggregator.AggregatorVerticle;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.logging.Logger;
 
 /* package scope */ class GCToolkitVertxParametersForUnifiedLogs extends GCToolkitVertxParameters {
-
-    private static final Logger LOGGER = Logger.getLogger(GCToolkitVertxParametersForUnifiedLogs.class.getName());
 
     private final Set<LogFileParser> logFileParsers;
     private final Set<AggregatorVerticle> aggregatorVerticles;

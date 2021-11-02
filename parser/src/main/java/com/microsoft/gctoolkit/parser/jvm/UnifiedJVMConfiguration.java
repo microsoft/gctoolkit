@@ -2,7 +2,6 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.parser.jvm;
 
-import com.microsoft.gctoolkit.event.GCCause;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
 import com.microsoft.gctoolkit.parser.unified.ShenandoahPatterns;
 import com.microsoft.gctoolkit.parser.unified.UnifiedG1GCPatterns;
@@ -11,13 +10,10 @@ import com.microsoft.gctoolkit.parser.unified.UnifiedLoggingLevel;
 import com.microsoft.gctoolkit.parser.unified.ZGCPatterns;
 
 import java.util.TreeSet;
-import java.util.logging.Logger;
 
 import static com.microsoft.gctoolkit.parser.jvm.SupportedFlags.*;
 
 public class UnifiedJVMConfiguration implements ShenandoahPatterns, ZGCPatterns, UnifiedG1GCPatterns, UnifiedGenerationalPatterns, JVMConfiguration {
-
-    private static final Logger LOGGER = Logger.getLogger(UnifiedJVMConfiguration.class.getName());
 
     private static final int CYCLES_TO_EXAMINE_BEFORE_GIVING_UP = 10;
     private static final int CYCLES_TO_EXAMINE_FOR_SAFEPOINT = 2;
@@ -40,9 +36,9 @@ public class UnifiedJVMConfiguration implements ShenandoahPatterns, ZGCPatterns,
         return diary;
     }
 
-    //todo: @Override
+    @Override
     public String getCommandLine() {
-        // TODO
+        // TODO #147 extract command line from the log file
         return "";
     }
 

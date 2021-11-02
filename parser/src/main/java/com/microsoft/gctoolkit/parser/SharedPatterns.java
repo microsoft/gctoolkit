@@ -3,8 +3,7 @@
 package com.microsoft.gctoolkit.parser;
 
 /**
- * TODO There needs to be a clearer separation of what is a Token vs
- * what is a SharedPattern
+ * TODO: #157 There needs to be a clearer separation of what is a Token vs what is a SharedPattern
  * <p>
  * Shared generational rules
  */

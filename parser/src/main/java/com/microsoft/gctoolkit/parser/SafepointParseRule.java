@@ -4,7 +4,6 @@ package com.microsoft.gctoolkit.parser;
 
 import com.microsoft.gctoolkit.parser.vmops.SafepointTrace;
 
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -31,7 +30,7 @@ public class SafepointParseRule {
     }
 
     /**
-     * TODO This painful pattern of returning a null which gets checked by
+     * TODO #155 This painful pattern of returning a null which gets checked by
      * the caller could be replaced by use of Optional
      *
      * @param trace The trace to match against the pattern

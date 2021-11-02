@@ -3,8 +3,6 @@ package com.microsoft.gctoolkit.sample;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
 
-import com.microsoft.gctoolkit.sample.Main;
-
 public class TestMain {
 
     @Test

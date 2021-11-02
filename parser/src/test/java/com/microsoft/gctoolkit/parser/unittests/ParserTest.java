@@ -21,15 +21,12 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
 public abstract class ParserTest {
-
-    private static final Logger LOGGER = Logger.getLogger(ParserTest.class.getName());
 
     /**
      * A mapping of GC event types to an index. This supports the counting of events. The tests will compare the

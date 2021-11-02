@@ -66,6 +66,8 @@ public class Main {
                             case DefNew:
                                 defNewCount = dataSet.size();
                                 break;
+                            default:
+                                break;
                         }
                     });
                 });

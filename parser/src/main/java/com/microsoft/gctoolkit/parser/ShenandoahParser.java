@@ -31,7 +31,6 @@ public class ShenandoahParser extends UnifiedGCLogParser implements ShenandoahPa
     private static final Logger LOGGER = Logger.getLogger(ShenandoahParser.class.getName());
 
     private final boolean debugging = Boolean.getBoolean("microsoft.debug");
-    private final boolean develop = Boolean.getBoolean("microsoft.develop");
 
     private final MRUQueue<GCParseRule, BiConsumer<GCLogTrace, String>> parseRules;
 
@@ -72,8 +71,8 @@ public class ShenandoahParser extends UnifiedGCLogParser implements ShenandoahPa
         log(line);
     }
 
-    // TODO populate with lines that should be ignored
-    private final boolean inPrintHeapAtGC = false;
+    // TODO #156 populate with lines that should be ignored
+    // private final boolean inPrintHeapAtGC = false;
 
     private boolean ignoreFrequentButUnwantedEntries(String line) {
         return false;

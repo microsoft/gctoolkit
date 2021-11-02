@@ -74,7 +74,7 @@ public class JVMEventParser extends PreUnifiedGCLogParser implements JVMPatterns
             } else if ((trace = TLAB_TOTALS.parse(line)) != null) {
                 extractTLABSummary(trace);
             } else if (line.equals(END_OF_DATA_SENTINEL)) {
-                //todo:  else if (line.equals(END_OF_DATA_SENTINEL)|| (JVM_EXIT.parse(line) != null)) {
+                // TODO: #154  else if (line.equals(END_OF_DATA_SENTINEL)|| (JVM_EXIT.parse(line) != null)) {
                 // if we see "^heap" then we're at the end of the log
                 // at issue is if logs have been concatenated then we're not at the end and we
                 // shouldn't release the
@@ -94,6 +94,7 @@ public class JVMEventParser extends PreUnifiedGCLogParser implements JVMPatterns
         trace.notYetImplemented();
     }
 
+    @SuppressWarnings("unused")
     private void extractTLAB(GCLogTrace trace, int offset) {
         String gcThreadId = trace.getGroup(1 + offset);
         int id = trace.getIntegerGroup(2 + offset);

@@ -27,7 +27,6 @@ import java.util.logging.Logger;
     abstract String mailBox();
 
     // routine to find what this Aggregator Aggregates.
-    @SuppressWarnings("unchecked")
     private static void aggregatorAggregates(Class<?> clazz, Set<EventSource> eventSources) {
 
         if (clazz == null || clazz == Aggregator.class) {
@@ -50,7 +49,6 @@ import java.util.logging.Logger;
 
     }
 
-    @SuppressWarnings("unchecked")
     private static Class<? extends Aggregator<?>> getAggregatorClassFromCollatesAnnotation(Class<?> clazz) {
 
         if (clazz == null) {
