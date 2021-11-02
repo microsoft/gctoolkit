@@ -35,7 +35,7 @@ public interface UnifiedLoggingCMSPatterns extends UnifiedLoggingTokens {
 [0.170s][info ][gc,cpu       ] GC(1) User=0.02s Sys=0.00s Real=0.00s
      */
 
-    UnifiedGCLogTrace PARNEW_START = new UnifiedGCLogTrace();
+    // UnifiedGCLogTrace PARNEW_START = new UnifiedGCLogTrace();
 
 
 }

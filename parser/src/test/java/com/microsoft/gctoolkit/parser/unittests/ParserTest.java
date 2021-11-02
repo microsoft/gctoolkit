@@ -4,6 +4,7 @@ package com.microsoft.gctoolkit.parser.unittests;
 
 import com.microsoft.gctoolkit.event.GCEvent;
 import com.microsoft.gctoolkit.event.GarbageCollectionTypes;
+import com.microsoft.gctoolkit.event.g1gc.G1GCConcurrentEvent;
 import com.microsoft.gctoolkit.event.g1gc.G1GCPauseEvent;
 import com.microsoft.gctoolkit.event.jvm.JVMEvent;
 import com.microsoft.gctoolkit.event.jvm.JVMTermination;
@@ -27,6 +28,12 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 public abstract class ParserTest {
 
+    private static final Logger LOGGER = Logger.getLogger(ParserTest.class.getName());
+
+    /**
+     * A mapping of GC event types to an index. This supports the counting of events. The tests will compare the
+     * expected counts against the counts that are captured here.
+     */
     private final Map<GarbageCollectionTypes, Integer> collectorNameMapping = Map.ofEntries(
             Map.entry(GarbageCollectionTypes.Young, 0),
             Map.entry(GarbageCollectionTypes.DefNew, 1),
@@ -51,7 +58,14 @@ public abstract class ParserTest {
             Map.entry(GarbageCollectionTypes.G1GCConcurrentCleanup, 8),
             Map.entry(GarbageCollectionTypes.G1GCCleanup, 9),
             Map.entry(GarbageCollectionTypes.G1ConcurrentMarkResetForOverflow, 11),
-            Map.entry(GarbageCollectionTypes.ConcurrentRootRegionScan, 12)
+            Map.entry(GarbageCollectionTypes.ConcurrentRootRegionScan, 12),
+            Map.entry(GarbageCollectionTypes.ConcurrentClearClaimedMarks, 13),
+            Map.entry(GarbageCollectionTypes.ConcurrentScanRootRegions, 14),
+            Map.entry(GarbageCollectionTypes.Concurrent_Mark, 15),
+            Map.entry(GarbageCollectionTypes.ConcurrentCompleteCleanup, 16),
+            Map.entry(GarbageCollectionTypes.ConcurrentCreateLiveData, 17),
+            Map.entry(GarbageCollectionTypes.ConcurrentCleanupForNextMark, 18),
+            Map.entry(GarbageCollectionTypes.G1ConcurrentRebuildRememberedSets, 19)
     );
 
     private List<GarbageCollectionTypes> findGarbageCollector(final int index) {
@@ -142,9 +156,12 @@ public abstract class ParserTest {
         return testResults;
     }
 
+    /**
+     * Setups an array of counts that is indexed by the type of GC event.
+     */
     class TestResults implements JVMEventConsumer {
 
-        private final int[] counts = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+        private final int[] counts = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 , 0, 0, 0, 0, 0};
         private int metaSpaceRecordCount = 0;
 
         public int getCount(int index) {
@@ -163,6 +180,10 @@ public abstract class ParserTest {
             return metaSpaceRecordCount;
         }
 
+        /**
+         * Counts by the type of the incoming event.
+         * @param event
+         */
         @Override
         public void record(JVMEvent event) {
             if (!(event instanceof JVMTermination)) {
@@ -176,70 +197,4 @@ public abstract class ParserTest {
             }
         }
     }
-
-//    class TestResults extends AbstractVerticle {
-
-    //private CountDownLatch latch = new CountDownLatch(1);
-    //private CountDownLatch deployedLatch = new CountDownLatch(1);
-//        private int[] counts = { 0 , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-//        private int metaSpaceRecordCount = 0;
-//
-//        public int getCount( int index) {
-//            return counts[index];
-//        }
-//
-//        public int numberOfDifferentPhases() {
-//            int count = 0;
-//            for ( int i = 0; i < counts.length; i++)
-//                if ( counts[i] > 0)
-//                    count++;
-//            return count;
-//        }
-//
-//        public int getMetaSpaceRecordCount() {
-//            return metaSpaceRecordCount;
-//        }
-//
-//        public boolean record(JVMEvent event) {
-//            if (event instanceof JVMTermination) {
-//                latch.countDown();
-//            } else {
-//                GCEvent gcEvent = (GCEvent) event;
-//                int index = collectorNameMapping.get(gcEvent.getGarbageCollectionType());
-//                counts[index] = counts[index] + 1;
-//                if ( event instanceof G1GCPauseEvent) {
-//                    if ( ((G1GCPauseEvent)event).getPermOrMetaspace() != null)
-//                        metaSpaceRecordCount++;
-//                }
-//            }
-//        }
-
-//        public void start() {
-//            try {
-//                vertx.eventBus().consumer("ParserTest", (Handler<Message<JVMEvent>>) message -> {
-//                    record(message.body());
-//                });
-//                deployedLatch.countDown();
-//            } catch (Throwable t) {
-//                fail( "Processing events failed: " + t.getMessage());
-//            }
-//        }
-
-//        public void awaitDeployment() {
-//            try {
-//                deployedLatch.await();
-//            } catch (InterruptedException ie) {
-//                fail("block on deployment latch interrupted");
-//            }
-//        }
-
-
-//        public void awaitJVMTermination() {
-//            try {
-//                latch.await();
-//            } catch (InterruptedException e) {
-//                fail("block on latch interrupted: " + e.getMessage());
-//            }
-//        }
-//    }
 }

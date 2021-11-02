@@ -75,23 +75,14 @@ public abstract class GCLogParser implements SharedPatterns {
         return diary.isPrintGCDetails();
     }
 
-    //todo: remove heapSize as it's not used
-    private long heapSize;
-
-    void setHeapSize(long heapSize) {
-        this.heapSize = heapSize;
-    }
-
     // todo: mixes aggregator with parsing. premature optimization...
     MemoryPoolSummary getTotalOccupancyBeforeAfterWithTotalHeapPoolSizeSummary(GCLogTrace trace, int offset) {
         MemoryPoolSummary summary = trace.getOccupancyBeforeAfterWithMemoryPoolSizeSummary(offset);
-        setHeapSize(summary.getSizeAfterCollection());
         return summary;
     }
 
     MemoryPoolSummary getTotalOccupancyWithTotalHeapSizeSummary(GCLogTrace trace, int offset) {
         MemoryPoolSummary summary = trace.getOccupancyWithMemoryPoolSizeSummary(offset);
-        setHeapSize(summary.getSizeAfterCollection());
         return summary;
     }
 

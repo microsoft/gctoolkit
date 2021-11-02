@@ -22,7 +22,6 @@ import com.microsoft.gctoolkit.event.generational.SystemGC;
 import com.microsoft.gctoolkit.event.generational.YoungGC;
 import com.microsoft.gctoolkit.event.jvm.JVMEvent;
 import com.microsoft.gctoolkit.event.jvm.JVMTermination;
-import com.microsoft.gctoolkit.event.jvm.PermGenSummary;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
 import com.microsoft.gctoolkit.parser.collection.MRUQueue;
 import com.microsoft.gctoolkit.parser.jvm.LoggingDiary;
@@ -35,6 +34,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static com.microsoft.gctoolkit.parser.unified.UnifiedG1GCPatterns.WEAK_PROCESSING;
 
 /**
  * Time of GC
@@ -72,7 +73,6 @@ public class GenerationalHeapParser extends PreUnifiedGCLogParser implements Sim
     private long averageBlockSizeForwardReference;
     private int treeHeightForwardReference;
     private final boolean debugging = Boolean.getBoolean("microsoft.debug");
-    private final boolean develop = Boolean.getBoolean("microsoft.develop");
 
     //Expect Remark
     private boolean expectRemark = false;
@@ -261,6 +261,9 @@ public class GenerationalHeapParser extends PreUnifiedGCLogParser implements Sim
         parseRules.put(SPLIT_PARNEW_PROMOTION_FAILED_IN_CMS_PHASE, this::parNewPromotionFailedInConcurrentMarkSweepPhase);
         parseRules.put(FULL_SPLIT_BY_CONCURRENT_PHASE, this::fullSplitByConcurrentPhase);
         parseRules.put(CMF_LARGE_BLOCK, this::concurrentModeFailureSplitByLargeBlock);
+        parseRules.put(WEAK_PROCESSING, this::noop);
+
+
         parseRules.put(new GCParseRule("END_OF_DATA_SENTINEL", END_OF_DATA_SENTINEL), this::endOfFile);
     }
 
@@ -296,8 +299,8 @@ public class GenerationalHeapParser extends PreUnifiedGCLogParser implements Sim
         log(line);
     }
 
-    // TODO populate with lines that should be ignored
-    private boolean inPrintHeapAtGC = false;
+    // TODO #151 populate with lines that should be ignored
+    // private boolean inPrintHeapAtGC = false;
 
     private boolean ignoreFrequentButUnwantedEntries(String line) {
 
@@ -327,11 +330,11 @@ public class GenerationalHeapParser extends PreUnifiedGCLogParser implements Sim
 
 //         if ( deriveConfiguration.hasPrintHeapAtGC()) {
         if (line.startsWith("{Heap before")) {
-            inPrintHeapAtGC = true;
+            // inPrintHeapAtGC = true;
             return true;
         }
         if (line.equals("}")) {
-            inPrintHeapAtGC = false;
+            // inPrintHeapAtGC = false;
             return true;
         }
 
@@ -348,7 +351,7 @@ public class GenerationalHeapParser extends PreUnifiedGCLogParser implements Sim
         if (line.contains("[0xffff") && line.endsWith("000)")) ;
 //             }
 
-        // TODO remove when we start collecting this information
+        // TODO #152 remove when we start collecting this information
         if (line.startsWith("Finished ")) return true;
 //         }
 
@@ -534,7 +537,10 @@ public class GenerationalHeapParser extends PreUnifiedGCLogParser implements Sim
 
     private void flsLargeBlock(GCLogTrace trace, String line) {
     }
-
+    
+    // Do not remove. This method is used as a development aid when adding a new parse rule.
+    // For example, parseRules.put(MY_NEW_PARSE_RULE, this::noop);
+    // It is then possible to set a breakpoint in this method to examine the details of the GCLogTrace.
     private void noop(GCLogTrace trace, String line) {
     }
 
@@ -560,7 +566,6 @@ public class GenerationalHeapParser extends PreUnifiedGCLogParser implements Sim
     public void parNewToConcurrentModeFailure(GCLogTrace trace, String line) {
         ConcurrentModeFailure collection = new ConcurrentModeFailure(getClock(), trace.gcCause(), trace.getDoubleGroup(trace.groupCount()));
         collection.add(trace.getOccupancyBeforeAfterWithMemoryPoolSizeSummary(6), trace.getOccupancyBeforeAfterWithMemoryPoolSizeSummary(15), getTotalOccupancyBeforeAfterWithTotalHeapPoolSizeSummary(trace, 22));
-        setHeapSize(collection.getHeap().getSizeAfterCollection());
         collection.addPermOrMetaSpaceRecord(extractPermOrMetaspaceRecord(line));
         collection.add(extractCPUSummary(line));
         record(collection);
@@ -1233,7 +1238,6 @@ public class GenerationalHeapParser extends PreUnifiedGCLogParser implements Sim
             ParNew collection = new ParNew(scavengeTimeStamp, gcCauseForwardReference, trace.getDoubleGroup(trace.groupCount()));
             collection.add(trace.getOccupancyBeforeAfterWithMemoryPoolSizeSummary(1), getTotalOccupancyBeforeAfterWithTotalHeapPoolSizeSummary(trace, 8));
             collection.recordDutyCycle(trace.getIntegerGroup(14));
-            setHeapSize(collection.getHeap().getSizeAfterCollection());
             collection.add(extractCPUSummary(line));
             record(collection);
         } else if (GarbageCollectionTypes.ParNewPromotionFailed == garbageCollectionTypeForwardReference) {
@@ -1375,7 +1379,6 @@ public class GenerationalHeapParser extends PreUnifiedGCLogParser implements Sim
             collection = new PSFullGC(getClock(), cause, trace.getDoubleGroup(trace.groupCount()));
         }
         collection.add(trace.getOccupancyBeforeAfterWithMemoryPoolSizeSummary(5), trace.getOccupancyBeforeAfterWithMemoryPoolSizeSummary(11), getTotalOccupancyBeforeAfterWithTotalHeapPoolSizeSummary(trace, 17));
-        setHeapSize(collection.getHeap().getSizeAfterCollection());
         collection.addPermOrMetaSpaceRecord(extractPermOrMetaspaceRecord(line));
         collection.add(extractCPUSummary(line));
         record(collection);
@@ -1456,7 +1459,7 @@ public class GenerationalHeapParser extends PreUnifiedGCLogParser implements Sim
         extractPermOrMetaspaceRecord(line);
     }
 
-    // TODO: Concurrent mode failures not yet implemented
+    // TODO: #153 Concurrent mode failures not yet implemented
     //4.327: [FUll GC 4.328: [ParNew: 196768K->180907K(471872K), 0.1321291 secs]4.460: [CMS (concurrent mode failure): 473195K->376198K(1048576K), 5.1817732 secs] 668966K->376198K(1520448K), [CMS Perm : 13108K->27169K(13172K)], 5.3146647 secs]
     //8.828: [Full GC 8.828: [CMS (concurrent mode failure): 630985K->795001K(6470068K), 0.0895496 secs] 810101K->790051K(8300392K), [CMS Perm : 10696K->10696K(21248K)], 0.0896445 secs]
 
@@ -1482,7 +1485,6 @@ public class GenerationalHeapParser extends PreUnifiedGCLogParser implements Sim
             collection = new PSFullGC(getClock(), cause, trace.getDoubleGroup(trace.groupCount()));
         }
         collection.add(trace.getOccupancyBeforeAfterWithMemoryPoolSizeSummary(5), trace.getOccupancyBeforeAfterWithMemoryPoolSizeSummary(11), getTotalOccupancyBeforeAfterWithTotalHeapPoolSizeSummary(trace, 17));
-        setHeapSize(collection.getHeap().getSizeAfterCollection());
         collection.addPermOrMetaSpaceRecord(extractPermOrMetaspaceRecord(line));
         collection.add(extractCPUSummary(line));
         record(collection);
@@ -1721,7 +1723,6 @@ public class GenerationalHeapParser extends PreUnifiedGCLogParser implements Sim
     public void psDetailsWithTenuring(GCLogTrace trace, String line) {
         PSYoungGen collection = new PSYoungGen(scavengeTimeStamp, gcCauseForwardReference, trace.getDoubleGroup(trace.groupCount()));
         collection.add(trace.getOccupancyBeforeAfterWithMemoryPoolSizeSummary(2), getTotalOccupancyBeforeAfterWithTotalHeapPoolSizeSummary(trace, 8));
-        setHeapSize(collection.getHeap().getSizeAfterCollection());
         if (referenceGCForwardReference != null)
             collection.add(referenceGCForwardReference);
         collection.add(extractCPUSummary(line));
@@ -1733,7 +1734,6 @@ public class GenerationalHeapParser extends PreUnifiedGCLogParser implements Sim
     public void psFailure(GCLogTrace trace, String line) {
         PSYoungGen collection = new PSYoungGen(getClock(), GCCause.PROMOTION_FAILED, trace.getDoubleGroup(trace.groupCount()));
         collection.add(trace.getOccupancyBeforeAfterWithMemoryPoolSizeSummary(5), getTotalOccupancyBeforeAfterWithTotalHeapPoolSizeSummary(trace, 11));
-        setHeapSize(collection.getHeap().getSizeAfterCollection());
     }
 
     public void psYoungAdaptiveSizePolicy(GCLogTrace trace, String line) {
@@ -1753,7 +1753,6 @@ public class GenerationalHeapParser extends PreUnifiedGCLogParser implements Sim
     public void psYoungDetailsFloating(GCLogTrace trace, String line) {
         PSYoungGen collection = new PSYoungGen(scavengeTimeStamp, gcCauseForwardReference, trace.getDoubleGroup(trace.groupCount()));
         collection.add(trace.getOccupancyBeforeAfterWithMemoryPoolSizeSummary(1), getTotalOccupancyBeforeAfterWithTotalHeapPoolSizeSummary(trace, 7));
-        setHeapSize(collection.getHeap().getSizeAfterCollection());
         record(collection);
     }
 
@@ -1987,10 +1986,12 @@ public class GenerationalHeapParser extends PreUnifiedGCLogParser implements Sim
         record(collection);
     }
 
+    /*
     private MemoryPoolSummary extractPermspaceRecord(GCLogTrace trace) {
         int index = (trace.getGroup(2) == null) ? 2 : 4;
         return new PermGenSummary(trace.getLongGroup(index), trace.getLongGroup(4), trace.getLongGroup(6));
     }
+    */
 
     private void log(String line) {
         if (CONCURRENT_PHASE_START.parse(line) != null) return;

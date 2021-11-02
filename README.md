@@ -24,21 +24,9 @@ In order to use this library you'll need to add its dependencies to your project
 
 ### Maven Coordinates
 
-The GCToolKit artifacts are in GitHub Packages. To use the GCToolKit artifacts as dependencies in your project, `github` must be added as a repository in your POM file.
+[![Maven Central](https://img.shields.io/maven-central/v/com.microsoft.gctoolkit/gctoolkit-parser.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22com.microsoft.gctoolkit%22%20AND%20a:%22gctoolkit-api%22)
 
-```xml
-<repositories>
-    ...
-    <repository>
-        <id>github</id>
-        <name>GCToolKit packages</name>
-        <url>https://maven.pkg.github.com/microsoft/*</url>
-    </repository>
-    ...
-</repositories>
-```
-
-You'll then need to add the `api`, `parser` and `vertx` modules to your project in the `dependencyManagement` and/or `dependencies` section as you see fit.
+The GCToolKit artifacts are in [Maven Central](https://search.maven.org/search?q=g:com.microsoft.gctoolkit). You'll then need to add the `api`, `parser` and `vertx` modules to your project in the `dependencyManagement` and/or `dependencies` section as you see fit.
 
 ```xml
 <dependencies>
@@ -47,19 +35,19 @@ You'll then need to add the `api`, `parser` and `vertx` modules to your project 
     <dependency>
         <groupId>com.microsoft.gctoolkit</groupId>
         <artifactId>api</artifactId>
-        <version>2.0.1</version>
+        <version>2.0.4</version>
     </dependency>
     
     <dependency>
         <groupId>com.microsoft.gctoolkit</groupId>
         <artifactId>parser</artifactId>
-        <version>2.0.1</version>
+        <version>2.0.4</version>
     </dependency>
     
     <dependency>
         <groupId>com.microsoft.gctoolkit</groupId>
         <artifactId>vertx</artifactId>
-        <version>2.0.1</version>
+        <version>2.0.4</version>
     </dependency>
 
     ...
@@ -72,21 +60,19 @@ Meet other developers working with GCToolKit, ask questions, and participate in 
 
 ### Example
 
-See [sample/README](./sample/README.md)
+See the sample project: [sample/README](./sample/README.md)
 
----
+## Contributing
 
-## Test Coverage Report
+See [CONTRIBUTING](CONTRIBUTING.md) for full details including more options for building and testing the project.
+
+### Test Coverage Report
 
 **Core API Coverage** </br>![Coverage](.github/badges/jacoco-api-coverage.svg)
 
 **Core :: Parser</br>**![Coverage::Core::Parser](.github/badges/jacoco-parser-coverage.svg)
 
 **Core :: Vertx**</br>![Coverage::Core::Parser](.github/badges/jacoco-vertx-coverage.svg)
-
-## Contributing
-
-See [CONTRIBUTING](CONTRIBUTING.md) for full details including more options for building and testing the project.
 
 ## License
 

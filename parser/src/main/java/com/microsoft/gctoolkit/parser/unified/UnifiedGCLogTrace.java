@@ -7,9 +7,9 @@ import java.util.regex.Matcher;
 
 public class UnifiedGCLogTrace {
 
-    private Matcher matcher;
+    private final Matcher matcher;
 
-    public UnifiedGCLogTrace() {
+    public UnifiedGCLogTrace(Matcher matcher) {
         this.matcher = matcher;
     }
 

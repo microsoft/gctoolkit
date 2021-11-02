@@ -59,19 +59,19 @@ public interface UnifiedG1GCPatterns extends UnifiedPatterns {
     GCParseRule HEAP_SIZE = new GCParseRule("HEAP_SIZE", "Minimum heap " + COUNTER + "  Initial heap " + COUNTER + "  Maximum heap " + COUNTER);
 
     //[73.082s][info ][gc           ] GC(263) Concurrent Cycle
-    //[2.179s][info ][gc          ] GC(9) Concurrent Mark Cycle
-    //    .... entire set of concurrent records.
+    GCParseRule CONCURRENT_CYCLE_START = new GCParseRule("CONCURRENT_CYCLE_START", "Concurrent Cycle$");
     //[73.171s][info ][gc            ] GC(263) Concurrent Cycle 89.437ms
-    //[2.179s][info ][gc          ] GC(9) Concurrent Mark Cycle 96.518ms
-    GCParseRule CONCURRENT_CYCLE_START = new GCParseRule("CONCURRENT_CYCLE_START", "Concurrent (?:Mark )?Cycle$");
-    GCParseRule CONCURRENT_CYCLE_END = new GCParseRule("CONCURRENT_CYCLE_END", "Concurrent (?:Mark )?Cycle " + CONCURRENT_TIME);
+    GCParseRule CONCURRENT_CYCLE_END = new GCParseRule("CONCURRENT_CYCLE_END", "Concurrent Cycle " + CONCURRENT_TIME);
 
     //    [73.082s][info ][gc,marking   ] GC(263) Concurrent Clear Claimed Marks
     //    [73.082s][info ][gc,marking   ] GC(263) Concurrent Clear Claimed Marks 0.018ms
     //
+    //    [155.787s][info ][gc          ] GC(2457) Concurrent Undo Cycle
+    //    [155.836s][info ][gc          ] GC(2457) Concurrent Undo Cycle 49.351ms
+    //
     //    [73.082s][info ][gc,marking   ] GC(263) Concurrent Scan Root Regions
     //    [73.084s][info ][gc,marking   ] GC(263) Concurrent Scan Root Regions 2.325ms
-    String CONCURRENT_PHASES = "(Clear Claimed Marks|Scan Root Regions|Rebuild Remembered Sets|Create Live Data|Complete Cleanup|Cleanup for Next Mark)";
+    String CONCURRENT_PHASES = "(Mark(?: Cycle)?|Undo Cycle|Clear Claimed Marks|Scan Root Regions|Rebuild Remembered Sets|Create Live Data|Complete Cleanup|Cleanup for Next Mark)";
     GCParseRule CONCURRENT_PHASE = new GCParseRule("CONCURRENT_PHASE", "Concurrent " + CONCURRENT_PHASES + "$");
     GCParseRule CONCURRENT_PHASE_DURATION = new GCParseRule("CONCURRENT_PHASE_DURATION", "Concurrent " + CONCURRENT_PHASES + " " + CONCURRENT_TIME);
 
@@ -103,7 +103,7 @@ public interface UnifiedG1GCPatterns extends UnifiedPatterns {
     //    [73.160s][info ][gc            ] GC(263) Pause Remark 211M->211M(256M) 21.685ms
     //    [73.160s][info ][gc,cpu        ] GC(263) User=0.03s Sys=0.00s Real=0.02s
     GCParseRule PAUSE_REMARK_START = new GCParseRule("PAUSE_REMARK_START", "Pause Remark$");
-    GCParseRule FINIALIZE_MARKING = new GCParseRule("FINIALIZE_MARKING", "Finalize Marking " + PAUSE_TIME);
+    GCParseRule FINALIZE_MARKING = new GCParseRule("FINIALIZE_MARKING", "Finalize Marking " + PAUSE_TIME);
     GCParseRule SYSTEM_DICTIONARY_UNLOADING = new GCParseRule("SYSTEM_DICTIONARY_UNLOADING", "System Dictionary Unloading " + PAUSE_TIME);
     GCParseRule STRING_SYMBOL_TABLE = new GCParseRule("STRING_SYMBOL_TABLE", "Cleaned string and symbol table, strings: " + COUNTER + " processed, " + COUNTER + " removed, symbols: " + COUNTER + " processed, " + COUNTER + " removed");
     GCParseRule PARALLEL_UNLOADING = new GCParseRule("PARALLEL_UNLOADING", "Parallel Unloading " + PAUSE_TIME);
@@ -114,9 +114,12 @@ public interface UnifiedG1GCPatterns extends UnifiedPatterns {
     //    [73.168s][info ][gc,marking    ] GC(263) Concurrent Create Live Data 8.089ms
     //
     //    [73.169s][info ][gc,start      ] GC(263) Pause Cleanup
+    //    [11.049s][debug][gc,phases     ] GC(63) Update Remembered Set Tracking After Rebuild 0.007ms
+    //    [11.049s][debug][gc,phases     ] GC(63) Finalize Concurrent Mark Cleanup 0.049ms
     //    [73.169s][info ][gc            ] GC(263) Pause Cleanup 223M->213M(256M) 0.271ms
     //    [73.169s][info ][gc,cpu        ] GC(263) User=0.00s Sys=0.00s Real=0.00s
     GCParseRule CLEANUP_START = new GCParseRule("CLEANUP_START", "Pause Cleanup$");
+    GCParseRule CLEANUP__FINALIZE_CONC_MARK = new GCParseRule("", "Finalize Concurrent Mark Cleanup " + PAUSE_TIME );
     GCParseRule CLEANUP_END = new GCParseRule("CLEANUP_END", "Pause Cleanup " + BEFORE_AFTER_CONFIGURED_PAUSE);
 
     //    [73.169s][info ][gc,marking    ] GC(263) Concurrent Complete Cleanup
@@ -167,7 +170,8 @@ public interface UnifiedG1GCPatterns extends UnifiedPatterns {
     GCParseRule CODE_ROOT_SCAN = new GCParseRule("CODE_ROOT_SCAN","Code Root Scan \\(ms\\):\\s+" + WORKER_SUMMARY_REAL);
     //"[156.473s][debug][gc,phases   ] GC(2467)       StringDedup Requests0 Weak     Min:  0.0, Avg:  0.0, Max:  0.0, Diff:  0.0, Sum:  0.0, Workers: 7",
     //"[156.473s][debug][gc,phases   ] GC(2467)       StringDedup Requests1 Weak     Min:  0.0, Avg:  0.0, Max:  0.0, Diff:  0.0, Sum:  0.0, Workers: 7"
-    GCParseRule STRING_DEDUP = new GCParseRule("STRING_DEDUP","StringDedup Requests(0|1) Weak\\s+" + WORKER_SUMMARY_REAL);
+    GCParseRule STRING_DEDUP = new GCParseRule("STRING_DEDUP","StringDedup (?:Requests(0|1)|Table) Weak\\s+" + WORKER_SUMMARY_REAL);
+    //GCParseRule STRING_DEDUP = new GCParseRule("STRING_DEDUP","StringDedup Requests(0|1) Weak\\s+" + WORKER_SUMMARY_REAL);
     //"[156.473s][debug][gc,phases   ] GC(2467)       Weak JFR Old Object Samples    Min:  0.0, Avg:  0.0, Max:  0.0, Diff:  0.0, Sum:  0.0, Workers: 7"
     GCParseRule WEAK_JFR_SAMPLES = new GCParseRule("WEAK_JFR_SAMPLES","Weak JFR Old Object Samples\\s+" + WORKER_SUMMARY_REAL);
 
@@ -212,5 +216,6 @@ public interface UnifiedG1GCPatterns extends UnifiedPatterns {
     GCParseRule NEW_CSET = new GCParseRule("NEW_CSET","Start New Collection Set: " + PAUSE_TIME);
     //"[156.474s][debug][gc,phases   ] GC(2467)     Resize TLABs: 0.0ms"
     GCParseRule RESIZE_TLAB = new GCParseRule("RESIZE_TLAB","Resize TLABs: " + PAUSE_TIME);
+    GCParseRule WEAK_PROCESSING = new GCParseRule( "WEAK_PROCESSING","Weak Processing(?::)? " + PAUSE_TIME);
 
 }

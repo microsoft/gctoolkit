@@ -51,9 +51,13 @@ public class PreUnifiedG1GCParser extends PreUnifiedGCLogParser implements G1GCP
     private boolean debugging = Boolean.getBoolean("microsoft.debug");
 
     //values show up at the end of GC log file from a normally terminated JVM
+    @SuppressWarnings("unused")
     private long heapTotal, heapUsed;
+    @SuppressWarnings("unused")
     private long regionSize;
+    @SuppressWarnings("unused")
     private long metaSpaceUsed, metaCapacity, metaCommitted, metaReserved;
+    @SuppressWarnings("unused")
     private long classSpaceUsed, classSpaceCapacity, classSpaceCommitted, classSpaceReserved;
 
     private final G1GCPauseEvent trap = new G1Trap();
@@ -1077,15 +1081,14 @@ public class PreUnifiedG1GCParser extends PreUnifiedGCLogParser implements G1GCP
 
     /***********************************/
 
+    @SuppressWarnings("unused")
     private void g1Pre17040Summary(GCLogTrace trace, String line) {
-
         MemoryPoolSummary edenSummary = extractPoolSummary(trace, 1);
         MemoryPoolSummary heap = extractPoolSummary(trace, 13);
         SurvivorMemoryPoolSummary survivor = extractSurvivorPoolSummary(trace, 9);
         forwardReference.addMemorySummary(edenSummary, survivor, heap);
         record(forwardReference);
     }
-
 
     /*************************/
     /* Support Methods       */
