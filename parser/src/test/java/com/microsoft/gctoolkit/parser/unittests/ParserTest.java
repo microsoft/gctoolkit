@@ -28,8 +28,6 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 public abstract class ParserTest {
 
-    private static final Logger LOGGER = Logger.getLogger(ParserTest.class.getName());
-
     /**
      * A mapping of GC event types to an index. This supports the counting of events. The tests will compare the
      * expected counts against the counts that are captured here.
