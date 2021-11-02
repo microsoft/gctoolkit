@@ -60,9 +60,8 @@ public interface UnifiedG1GCPatterns extends UnifiedPatterns {
 
     //[73.082s][info ][gc           ] GC(263) Concurrent Cycle
     GCParseRule CONCURRENT_CYCLE_START = new GCParseRule("CONCURRENT_CYCLE_START", "Concurrent Cycle$");
-    //"[73.171s][info ][gc            ] GC(263) Concurrent Cycle 89.437ms",
+    //[73.171s][info ][gc            ] GC(263) Concurrent Cycle 89.437ms
     GCParseRule CONCURRENT_CYCLE_END = new GCParseRule("CONCURRENT_CYCLE_END", "Concurrent Cycle " + CONCURRENT_TIME);
-
 
     //    [73.082s][info ][gc,marking   ] GC(263) Concurrent Clear Claimed Marks
     //    [73.082s][info ][gc,marking   ] GC(263) Concurrent Clear Claimed Marks 0.018ms

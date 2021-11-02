@@ -139,7 +139,6 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
         parseRules.put(REBUILD_FREELIST, this::noop);
         parseRules.put(NEW_CSET, this::noop);
         parseRules.put(RESIZE_TLAB, this::noop);
-
     }
 
     public UnifiedG1GCParser(LoggingDiary diary, JVMEventConsumer consumer) {

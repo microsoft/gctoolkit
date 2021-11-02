@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import java.util.logging.Logger;
 
 import static com.microsoft.gctoolkit.parser.CommonTestHelper.captureTest;
+import static com.microsoft.gctoolkit.parser.unified.UnifiedG1GCPatterns.STRING_DEDUP;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
