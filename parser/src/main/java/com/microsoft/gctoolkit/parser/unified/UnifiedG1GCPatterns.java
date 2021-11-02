@@ -59,31 +59,19 @@ public interface UnifiedG1GCPatterns extends UnifiedPatterns {
     GCParseRule HEAP_SIZE = new GCParseRule("HEAP_SIZE", "Minimum heap " + COUNTER + "  Initial heap " + COUNTER + "  Maximum heap " + COUNTER);
 
     //[73.082s][info ][gc           ] GC(263) Concurrent Cycle
-    //[2.179s][info ][gc          ] GC(9) Concurrent Mark Cycle
-//<<<<<<< HEAD
-    //"[155.787s][info ][gc          ] GC(2457) Concurrent Undo Cycle",
-    //[156.051s][info ][gc,marking  ] GC(2463) Concurrent Mark
-    //    .... entire set of concurrent records.
+    GCParseRule CONCURRENT_CYCLE_START = new GCParseRule("CONCURRENT_CYCLE_START", "Concurrent Cycle$");
     //[73.171s][info ][gc            ] GC(263) Concurrent Cycle 89.437ms
-    //[2.179s][info ][gc          ] GC(9) Concurrent Mark Cycle 96.518ms
-    GCParseRule CONCURRENT_CYCLE_START = new GCParseRule("CONCURRENT_CYCLE_START", "Concurrent(?: Mark| Undo)?(?: Cycle)?$");
-    //"[73.171s][info ][gc            ] GC(263) Concurrent Cycle 89.437ms",
-    //"[155.836s][info ][gc          ] GC(2457) Concurrent Undo Cycle 49.351ms",
-    GCParseRule CONCURRENT_CYCLE_END = new GCParseRule("CONCURRENT_CYCLE_END", "Concurrent(?: Undo)? Cycle " + CONCURRENT_TIME);
-//=======
-//    //    .... entire set of concurrent records.
-//    //[73.171s][info ][gc            ] GC(263) Concurrent Cycle 89.437ms
-//    //[2.179s][info ][gc          ] GC(9) Concurrent Mark Cycle 96.518ms
-//    GCParseRule CONCURRENT_CYCLE_START = new GCParseRule("CONCURRENT_CYCLE_START", "Concurrent (?:Mark )?Cycle$");
-//    GCParseRule CONCURRENT_CYCLE_END = new GCParseRule("CONCURRENT_CYCLE_END", "Concurrent (?:Mark )?Cycle " + CONCURRENT_TIME);
-//>>>>>>> fee9cb46bbd0c936df10e051c0b0cf4c545d1a72
+    GCParseRule CONCURRENT_CYCLE_END = new GCParseRule("CONCURRENT_CYCLE_END", "Concurrent Cycle " + CONCURRENT_TIME);
 
     //    [73.082s][info ][gc,marking   ] GC(263) Concurrent Clear Claimed Marks
     //    [73.082s][info ][gc,marking   ] GC(263) Concurrent Clear Claimed Marks 0.018ms
     //
+    //    [155.787s][info ][gc          ] GC(2457) Concurrent Undo Cycle
+    //    [155.836s][info ][gc          ] GC(2457) Concurrent Undo Cycle 49.351ms
+    //
     //    [73.082s][info ][gc,marking   ] GC(263) Concurrent Scan Root Regions
     //    [73.084s][info ][gc,marking   ] GC(263) Concurrent Scan Root Regions 2.325ms
-    String CONCURRENT_PHASES = "(Clear Claimed Marks|Scan Root Regions|Rebuild Remembered Sets|Create Live Data|Complete Cleanup|Cleanup for Next Mark)";
+    String CONCURRENT_PHASES = "(Mark(?: Cycle)?|Undo Cycle|Clear Claimed Marks|Scan Root Regions|Rebuild Remembered Sets|Create Live Data|Complete Cleanup|Cleanup for Next Mark)";
     GCParseRule CONCURRENT_PHASE = new GCParseRule("CONCURRENT_PHASE", "Concurrent " + CONCURRENT_PHASES + "$");
     GCParseRule CONCURRENT_PHASE_DURATION = new GCParseRule("CONCURRENT_PHASE_DURATION", "Concurrent " + CONCURRENT_PHASES + " " + CONCURRENT_TIME);
 
@@ -99,9 +87,6 @@ public interface UnifiedG1GCPatterns extends UnifiedPatterns {
     GCParseRule CONCURRENT_MARK_WORKERS = new GCParseRule("CONCURRENT_MARK_WORKERS", "Using " + COUNTER + " workers of " + COUNTER + " for marking");
     GCParseRule CONCURRENT_MARK_ABORTED = new GCParseRule("Concurrent Mark Abort", "Concurrent Mark Abort");
     GCParseRule CONCURRENT_MARK_END = new GCParseRule("CONCURRENT_MARK_END", "Concurrent (Mark) \\(.+\\) " + CONCURRENT_TIME);
-    //    [2.179s][info ][gc          ] GC(9) Concurrent Mark Cycle 96.518ms
-    //    [156.068s][info ][gc,marking  ] GC(2463) Concurrent Mark 16.895ms
-    GCParseRule CONCURRENT_MARK_CYCLE = new GCParseRule( "CONCURRENT_MARK_CYCLE", "Concurrent Mark (?:Cycle )?" + PAUSE_TIME);
 
     //    [73.139s][info ][gc,start     ] GC(263) Pause Remark
     //    [73.139s][debug][gc,phases    ] GC(263) Finalize Marking 0.251ms
