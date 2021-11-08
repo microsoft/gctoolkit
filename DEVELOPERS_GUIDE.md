@@ -11,6 +11,8 @@ The purpose of this document is to provide a brief description of each of these 
 ![GCToolkit Design](images/gctoolkit_design.png)
 Fig 1. GCToolKit Component Map
 
+<todo: Link to javadoc?>
+
 ### Vert.x Message Bus and Verticles
 
 GCToolkit contains 2 different configurations of a Vert.x event bus. The first configuration supports the publishing of log lines. The second supports the publishing of GCEvent objects. GCEvent objects which will be covered in an upcoming section of this document.
