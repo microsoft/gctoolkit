@@ -57,7 +57,7 @@ public abstract class GCLogFile extends FileDataSource<String> {
      * @return {@code true} if the file uses the unified log format.
      * @throws IOException Thrown from reading the stream.
      */
-    /* package */ static boolean isUnifiedLogging(Stream<String> stream) throws IOException {
+    /* package */ static boolean isUnified(Stream<String> stream) throws IOException {
         return firstNLines(stream, SHOULD_HAVE_SEEN_A_UNIFIED_DECORATOR_BY_THIS_LINE_IN_THE_LOG)
                 .map(LINE_STARTS_WITH_DECORATOR::matcher)
                 .anyMatch(Matcher::find);

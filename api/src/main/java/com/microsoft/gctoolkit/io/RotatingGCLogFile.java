@@ -36,7 +36,7 @@ public class RotatingGCLogFile extends GCLogFile {
 
     private static final Logger LOGGER = Logger.getLogger(RotatingGCLogFile.class.getName());
 
-    private static boolean isUnifiedLogging(Path path) {
+    private static boolean isUnified(Path path) {
         try {
             FileDataSourceMetaData metadata = new FileDataSourceMetaData(path);
 
@@ -47,14 +47,14 @@ public class RotatingGCLogFile extends GCLogFile {
             } else {
                 segments = findGCLogSegments(path);
             }
-            return isUnifiedLogging(path, segments);
+            return isUnified(path, segments);
         } catch (IOException e) {
             LOGGER.log(Level.WARNING, "cannot determine whether " + path + " is a unified log format");
             return false;
         }
     }
 
-    private static boolean isUnifiedLogging(Path path, List<GarbageCollectionLogFileSegment> segments) {
+    private static boolean isUnified(Path path, List<GarbageCollectionLogFileSegment> segments) {
         // TODO: if isUnifiedLogging is false, assert that the file is pre-unified.
         //       if file is neither unified nor pre-unified, then we're dealing with
         //       something we can't handle.
@@ -62,7 +62,7 @@ public class RotatingGCLogFile extends GCLogFile {
                 .map(GarbageCollectionLogFileSegment::stream)
                 .anyMatch(s -> {
                     try {
-                        return isUnifiedLogging(s);
+                        return isUnified(s);
                     } catch (IOException e) {
                         LOGGER.log(Level.WARNING, "cannot determine whether '" + path + "' is a unified log format");
                         return false;
@@ -76,7 +76,7 @@ public class RotatingGCLogFile extends GCLogFile {
      * @param path the path to a rotating log file, or to a directory containing rotating log files.
      */
     public RotatingGCLogFile(Path path) {
-        super(path, isUnifiedLogging(path));
+        super(path, isUnified(path));
 
         if (getMetaData().isZip() || getMetaData().isGZip()) {
             //TODO: add code to ensure correct order to stream files in zip and gzip files
@@ -100,7 +100,7 @@ public class RotatingGCLogFile extends GCLogFile {
      * @param segments The log file segments.
      */
     public RotatingGCLogFile(Path parentDirectory, List<GarbageCollectionLogFileSegment> segments) {
-        super(parentDirectory, isUnifiedLogging(parentDirectory, segments));
+        super(parentDirectory, isUnified(parentDirectory, segments));
         this.orderedGarbageCollectionLogFiles = orderSegments(segments);
     }
 

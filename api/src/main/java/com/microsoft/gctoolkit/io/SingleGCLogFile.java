@@ -23,11 +23,11 @@ public class SingleGCLogFile extends GCLogFile {
 
     private static final Logger LOGGER = Logger.getLogger(SingleGCLogFile.class.getName());
 
-    private static boolean isUnifiedLogging(Path path) {
+    private static boolean isUnified(Path path) {
         try {
             FileDataSourceMetaData metadata = new FileDataSourceMetaData(path);
             Stream<String> stream = SingleGCLogFile.stream(path, metadata);
-            boolean isUnifiedLogging = isUnifiedLogging(stream);
+            boolean isUnifiedLogging = isUnified(stream);
             // TODO: if isUnifiedLogging is false, assert that the file is pre-unified.
             //       if file is neither unified nor pre-unified, then we're dealing with
             //       something we can't handle.
@@ -43,7 +43,7 @@ public class SingleGCLogFile extends GCLogFile {
      * @param path The path to the log file.
      */
     public SingleGCLogFile(Path path) {
-        super(path, SingleGCLogFile.isUnifiedLogging(path));
+        super(path, SingleGCLogFile.isUnified(path));
     }
 
     @Override

@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test;
 import java.util.logging.Logger;
 
 import static com.microsoft.gctoolkit.parser.CommonTestHelper.captureTest;
-import static com.microsoft.gctoolkit.parser.unified.UnifiedG1GCPatterns.STRING_DEDUP;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -144,12 +143,12 @@ public class G1GCUnifiedParserRulesTest implements UnifiedG1GCPatterns {
             PURGE_CODE_ROOTS,
             UPDATE_DERIVED_POINTERS,
             EAGER_HUMONGOUS_RECLAIM,
-            HUMONGOUS,
+            HUMONGOUS,                    // 60
             REDIRTY_CARDS,
             REDIRTIED_CARDS,
             FREE_CSET,
             REBUILD_FREELIST,
-            NEW_CSET,
+            NEW_CSET,                     // 65
             RESIZE_TLAB,
             WEAK_PROCESSING,
             CLEANUP__FINALIZE_CONC_MARK
@@ -438,14 +437,13 @@ public class G1GCUnifiedParserRulesTest implements UnifiedG1GCPatterns {
             },
             {   // 67
                     "[155.889s][debug][gc,phases   ] GC(2458)     Weak Processing: 0.0ms",
-                    "[156.169s][debug][gc,phases   ] GC(2464)     Weak Processing: 0.0ms",
                     "[156.067s][debug][gc,phases   ] GC(2463) Weak Processing 0.189ms"
             },
             {   // 68
                     "[156.079s][debug][gc,phases   ] GC(2463) Finalize Concurrent Mark Cleanup 0.154ms"
             }
 
-            //[156.067s][debug][gc,phases   ] GC(2463) Weak Processing 0.189ms
+            // Remaining lines which may not need to be parsed...
             //[156.067s][debug][gc,phases   ] GC(2463) ClassLoaderData 0.002ms
             //[156.067s][debug][gc,phases   ] GC(2463) Trigger cleanups 0.000ms
             //[156.067s][debug][gc,phases   ] GC(2463) Flush Task Caches 0.206ms
@@ -455,7 +453,6 @@ public class G1GCUnifiedParserRulesTest implements UnifiedG1GCPatterns {
             //[156.068s][debug][gc,phases   ] GC(2463) Report Object Count 0.000ms
             //[156.079s][debug][gc,phases   ] GC(2463) Update Remembered Set Tracking After Rebuild 0.107ms
             //[156.079s][debug][gc,phases   ] GC(2463) Finalize Concurrent Mark Cleanup 0.154ms
-            //[156.169s][debug][gc,phases   ] GC(2464)     Weak Processing: 0.0ms
     };
 
     private String[] decoratorLines = {
