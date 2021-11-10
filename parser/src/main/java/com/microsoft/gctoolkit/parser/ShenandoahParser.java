@@ -5,7 +5,7 @@ package com.microsoft.gctoolkit.parser;
 import com.microsoft.gctoolkit.event.jvm.JVMEvent;
 import com.microsoft.gctoolkit.event.jvm.JVMTermination;
 import com.microsoft.gctoolkit.parser.collection.MRUQueue;
-import com.microsoft.gctoolkit.parser.jvm.LoggingDiary;
+import com.microsoft.gctoolkit.jvm.LoggingDiary;
 import com.microsoft.gctoolkit.parser.unified.ShenandoahPatterns;
 
 import java.util.AbstractMap;

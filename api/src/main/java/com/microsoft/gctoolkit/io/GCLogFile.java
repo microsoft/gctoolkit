@@ -2,6 +2,8 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.io;
 
+import com.microsoft.gctoolkit.jvm.LoggingDiary;
+
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Objects;
@@ -37,6 +39,15 @@ public abstract class GCLogFile extends FileDataSource<String> {
      * @return {@code true} if the log file is in unified logging format.
      */
     public boolean isUnifiedFormat() { return unifiedFormat; }
+
+    /**
+     *
+     * @return
+     */
+
+    public LoggingDiary diary() {
+        return new LoggingDiary();
+    }
 
     @Override
     public final String endOfData() {

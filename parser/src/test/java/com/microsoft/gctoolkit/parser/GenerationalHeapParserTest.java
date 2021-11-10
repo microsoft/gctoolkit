@@ -3,8 +3,7 @@
 package com.microsoft.gctoolkit.parser;
 
 import com.microsoft.gctoolkit.event.generational.FullGC;
-import com.microsoft.gctoolkit.parser.GenerationalHeapParser;
-import com.microsoft.gctoolkit.parser.jvm.LoggingDiary;
+import com.microsoft.gctoolkit.jvm.LoggingDiary;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

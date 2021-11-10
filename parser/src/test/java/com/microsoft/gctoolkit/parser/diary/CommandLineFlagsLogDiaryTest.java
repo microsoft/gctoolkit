@@ -3,7 +3,7 @@
 package com.microsoft.gctoolkit.parser.diary;
 
 import com.microsoft.gctoolkit.parser.jvm.JVMConfiguration;
-import com.microsoft.gctoolkit.parser.jvm.LoggingDiary;
+import com.microsoft.gctoolkit.jvm.LoggingDiary;
 import com.microsoft.gctoolkit.parser.jvm.PreUnifiedJVMConfiguration;
 import org.junit.jupiter.api.Test;
 

@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.parser.jvm;
 
+import com.microsoft.gctoolkit.jvm.LoggingDiary;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
 
 public interface JVMConfiguration {

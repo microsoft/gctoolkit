@@ -5,6 +5,8 @@ package com.microsoft.gctoolkit.parser.jvm;
 
 import com.microsoft.gctoolkit.event.GCCause;
 import com.microsoft.gctoolkit.event.GCCauses;
+import com.microsoft.gctoolkit.jvm.LoggingDiary;
+import com.microsoft.gctoolkit.jvm.SupportedFlags;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
 import com.microsoft.gctoolkit.parser.CMSPatterns;
 import com.microsoft.gctoolkit.parser.G1GCPatterns;

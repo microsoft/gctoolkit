@@ -11,7 +11,7 @@ import com.microsoft.gctoolkit.parser.JVMEventParser;
 import com.microsoft.gctoolkit.parser.PreUnifiedG1GCParser;
 import com.microsoft.gctoolkit.parser.SurvivorMemoryPoolParser;
 import com.microsoft.gctoolkit.parser.jvm.JVMConfiguration;
-import com.microsoft.gctoolkit.parser.jvm.LoggingDiary;
+import com.microsoft.gctoolkit.jvm.LoggingDiary;
 import com.microsoft.gctoolkit.vertx.GCToolkitVertx;
 import com.microsoft.gctoolkit.vertx.aggregator.AggregatorVerticle;
 

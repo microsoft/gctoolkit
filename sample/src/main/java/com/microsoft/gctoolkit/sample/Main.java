@@ -4,6 +4,7 @@ import com.microsoft.gctoolkit.GCToolKit;
 import com.microsoft.gctoolkit.io.GCLogFile;
 import com.microsoft.gctoolkit.io.SingleGCLogFile;
 import com.microsoft.gctoolkit.jvm.JavaVirtualMachine;
+import com.microsoft.gctoolkit.jvm.LoggingDiary;
 import com.microsoft.gctoolkit.sample.aggregation.HeapOccupancyAfterCollectionSummary;
 import com.microsoft.gctoolkit.sample.aggregation.PauseTimeSummary;
 
@@ -35,6 +36,7 @@ public class Main {
          * The log files can be either in text, zip, or gzip format.
          */
         GCLogFile logFile = new SingleGCLogFile(Path.of(gcLogFile));
+        LoggingDiary diary = logFile.diary();
         GCToolKit gcToolKit = new GCToolKit();
 
         /**

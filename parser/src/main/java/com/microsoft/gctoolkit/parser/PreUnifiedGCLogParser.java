@@ -6,7 +6,7 @@ import com.microsoft.gctoolkit.event.CPUSummary;
 import com.microsoft.gctoolkit.event.MemoryPoolSummary;
 import com.microsoft.gctoolkit.event.generational.CMSRemark;
 import com.microsoft.gctoolkit.event.jvm.PermGenSummary;
-import com.microsoft.gctoolkit.parser.jvm.LoggingDiary;
+import com.microsoft.gctoolkit.jvm.LoggingDiary;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;

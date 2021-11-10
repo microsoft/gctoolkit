@@ -2,6 +2,8 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.parser.jvm;
 
+import com.microsoft.gctoolkit.jvm.LoggingDiary;
+import com.microsoft.gctoolkit.jvm.SupportedFlags;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
 import com.microsoft.gctoolkit.parser.unified.ShenandoahPatterns;
 import com.microsoft.gctoolkit.parser.unified.UnifiedG1GCPatterns;
@@ -11,7 +13,7 @@ import com.microsoft.gctoolkit.parser.unified.ZGCPatterns;
 
 import java.util.TreeSet;
 
-import static com.microsoft.gctoolkit.parser.jvm.SupportedFlags.*;
+import static com.microsoft.gctoolkit.jvm.SupportedFlags.*;
 
 public class UnifiedJVMConfiguration implements ShenandoahPatterns, ZGCPatterns, UnifiedG1GCPatterns, UnifiedGenerationalPatterns, JVMConfiguration {
 

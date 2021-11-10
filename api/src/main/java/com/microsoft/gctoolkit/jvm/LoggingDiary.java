@@ -1,6 +1,6 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
-package com.microsoft.gctoolkit.parser.jvm;
+package com.microsoft.gctoolkit.jvm;
 
 import com.microsoft.gctoolkit.parser.datatype.TripleState;
 

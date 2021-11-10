@@ -11,9 +11,6 @@ module com.microsoft.gctoolkit.parser {
     exports com.microsoft.gctoolkit.parser to
             com.microsoft.gctoolkit.vertx;
 
-    exports com.microsoft.gctoolkit.parser.datatype to
-            com.microsoft.gctoolkit.vertx;
-
     exports com.microsoft.gctoolkit.parser.io to
             com.microsoft.gctoolkit.vertx;
 
