@@ -23,7 +23,7 @@ import com.microsoft.gctoolkit.event.generational.YoungGC;
 import com.microsoft.gctoolkit.event.jvm.JVMTermination;
 import com.microsoft.gctoolkit.parser.collection.RuleSet;
 import com.microsoft.gctoolkit.parser.jvm.Decorators;
-import com.microsoft.gctoolkit.jvm.LoggingDiary;
+import com.microsoft.gctoolkit.jvm.Diary;
 import com.microsoft.gctoolkit.parser.unified.UnifiedGenerationalPatterns;
 
 import java.util.AbstractMap;
@@ -106,7 +106,7 @@ public class UnifiedGenerationalParser extends UnifiedGCLogParser implements Uni
             "Reset", Concurrent_Reset
     );
 
-    public UnifiedGenerationalParser(LoggingDiary diary, JVMEventConsumer consumer) {
+    public UnifiedGenerationalParser(Diary diary, JVMEventConsumer consumer) {
         super(diary, consumer);
     }
 

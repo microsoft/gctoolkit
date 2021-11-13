@@ -3,7 +3,7 @@
 package com.microsoft.gctoolkit.parser;
 
 import com.microsoft.gctoolkit.event.generational.FullGC;
-import com.microsoft.gctoolkit.jvm.LoggingDiary;
+import com.microsoft.gctoolkit.jvm.Diary;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -37,7 +37,7 @@ public class GenerationalHeapParserTest {
                 "2019-11-14T23:50:31.806+0000: 91335.938: Total time for which application threads were stopped: 4.0762194 seconds, Stopping threads took: 0.0000522 seconds\n";
 
         AtomicBoolean eventCreated = new AtomicBoolean(false);
-        GenerationalHeapParser parser = new GenerationalHeapParser(new LoggingDiary(), event -> {
+        GenerationalHeapParser parser = new GenerationalHeapParser(new Diary(), event -> {
             Assertions.assertTrue(event instanceof FullGC);
             FullGC fgc = (FullGC) event;
             Assertions.assertEquals(1.9094806d, fgc.getDuration());

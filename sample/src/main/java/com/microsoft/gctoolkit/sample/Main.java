@@ -4,16 +4,17 @@ import com.microsoft.gctoolkit.GCToolKit;
 import com.microsoft.gctoolkit.io.GCLogFile;
 import com.microsoft.gctoolkit.io.SingleGCLogFile;
 import com.microsoft.gctoolkit.jvm.JavaVirtualMachine;
-import com.microsoft.gctoolkit.jvm.LoggingDiary;
+import com.microsoft.gctoolkit.jvm.Diary;
 import com.microsoft.gctoolkit.sample.aggregation.HeapOccupancyAfterCollectionSummary;
 import com.microsoft.gctoolkit.sample.aggregation.PauseTimeSummary;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Files;
 
 public class Main {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         String userInput = args.length > 0 ? args[0] : "";
         String gcLogFile = System.getProperty("gcLogFile", userInput);
 
@@ -29,14 +30,13 @@ public class Main {
         main.analyze(gcLogFile);
     }
 
-    public void analyze(String gcLogFile) {
+    public void analyze(String gcLogFile) throws IOException {
         /**
          * GC log files can come in  one of two types: single or series of rolling logs.
          * In this sample, we load a single log file.
          * The log files can be either in text, zip, or gzip format.
          */
         GCLogFile logFile = new SingleGCLogFile(Path.of(gcLogFile));
-        LoggingDiary diary = logFile.diary();
         GCToolKit gcToolKit = new GCToolKit();
 
         /**

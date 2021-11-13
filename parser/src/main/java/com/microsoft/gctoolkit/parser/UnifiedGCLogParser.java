@@ -4,7 +4,7 @@ package com.microsoft.gctoolkit.parser;
 
 import com.microsoft.gctoolkit.time.DateTimeStamp;
 import com.microsoft.gctoolkit.parser.jvm.Decorators;
-import com.microsoft.gctoolkit.jvm.LoggingDiary;
+import com.microsoft.gctoolkit.jvm.Diary;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -14,7 +14,7 @@ abstract class UnifiedGCLogParser extends GCLogParser {
     private static final Logger LOGGER = Logger.getLogger(UnifiedGCLogParser.class.getName());
     private static final boolean DEBUG = Boolean.getBoolean("microsoft.debug");
 
-    UnifiedGCLogParser(LoggingDiary diary, JVMEventConsumer consumer) {
+    UnifiedGCLogParser(Diary diary, JVMEventConsumer consumer) {
         super(diary, consumer);
     }
 

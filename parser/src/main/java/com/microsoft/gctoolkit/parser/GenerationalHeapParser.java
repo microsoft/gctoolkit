@@ -24,7 +24,7 @@ import com.microsoft.gctoolkit.event.jvm.JVMEvent;
 import com.microsoft.gctoolkit.event.jvm.JVMTermination;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
 import com.microsoft.gctoolkit.parser.collection.MRUQueue;
-import com.microsoft.gctoolkit.jvm.LoggingDiary;
+import com.microsoft.gctoolkit.jvm.Diary;
 
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -267,7 +267,7 @@ public class GenerationalHeapParser extends PreUnifiedGCLogParser implements Sim
         parseRules.put(new GCParseRule("END_OF_DATA_SENTINEL", END_OF_DATA_SENTINEL), this::endOfFile);
     }
 
-    public GenerationalHeapParser(LoggingDiary diary, JVMEventConsumer consumer) {
+    public GenerationalHeapParser(Diary diary, JVMEventConsumer consumer) {
         super(diary, consumer);
     }
 

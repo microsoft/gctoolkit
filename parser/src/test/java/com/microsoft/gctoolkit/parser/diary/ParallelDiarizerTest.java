@@ -4,7 +4,7 @@ package com.microsoft.gctoolkit.parser.diary;
 
 import org.junit.jupiter.api.Test;
 
-public class ParallelJVMConfigurationTest extends LogDiaryTest {
+public class ParallelDiarizerTest extends LogDiaryTest {
 
     @Test
     public void testForDetails() {

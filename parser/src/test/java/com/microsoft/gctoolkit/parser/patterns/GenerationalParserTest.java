@@ -15,7 +15,7 @@ import com.microsoft.gctoolkit.event.generational.SystemGC;
 import com.microsoft.gctoolkit.event.jvm.JVMEvent;
 import com.microsoft.gctoolkit.io.GCLogFile;
 import com.microsoft.gctoolkit.parser.GenerationalHeapParser;
-import com.microsoft.gctoolkit.parser.jvm.PreUnifiedJVMConfiguration;
+import com.microsoft.gctoolkit.parser.jvm.PreUnifiedDiarizer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -35,7 +35,7 @@ public class GenerationalParserTest extends ParserTest {
     public void setUp() {
         collection = new ArrayList<>();
 
-        parser = new GenerationalHeapParser(new PreUnifiedJVMConfiguration().getDiary(), event -> collection.add(event));
+        parser = new GenerationalHeapParser(new PreUnifiedDiarizer().getDiary(), event -> collection.add(event));
     }
 
     @Test

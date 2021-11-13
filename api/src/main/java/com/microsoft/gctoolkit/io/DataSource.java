@@ -2,6 +2,8 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.io;
 
+import com.microsoft.gctoolkit.jvm.Diary;
+
 import java.io.IOException;
 import java.util.stream.Stream;
 

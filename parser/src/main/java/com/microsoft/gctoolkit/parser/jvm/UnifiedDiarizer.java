@@ -2,7 +2,8 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.parser.jvm;
 
-import com.microsoft.gctoolkit.jvm.LoggingDiary;
+import com.microsoft.gctoolkit.jvm.Diarizer;
+import com.microsoft.gctoolkit.jvm.Diary;
 import com.microsoft.gctoolkit.jvm.SupportedFlags;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
 import com.microsoft.gctoolkit.parser.unified.ShenandoahPatterns;
@@ -14,28 +15,42 @@ import com.microsoft.gctoolkit.parser.unified.ZGCPatterns;
 import java.util.TreeSet;
 
 import static com.microsoft.gctoolkit.jvm.SupportedFlags.*;
+import static com.microsoft.gctoolkit.jvm.SupportedFlags.GC_CAUSE;
+import static com.microsoft.gctoolkit.parser.unified.ShenandoahPatterns.SHENANDOAH_TAG;
+import static com.microsoft.gctoolkit.parser.unified.UnifiedG1GCPatterns.G1_COLLECTION;
+import static com.microsoft.gctoolkit.parser.unified.UnifiedG1GCPatterns.G1_TAG;
+import static com.microsoft.gctoolkit.parser.unified.UnifiedGenerationalPatterns.*;
+import static com.microsoft.gctoolkit.parser.unified.UnifiedPatterns.CPU_BREAKOUT;
+import static com.microsoft.gctoolkit.parser.unified.ZGCPatterns.CYCLE_START;
+import static com.microsoft.gctoolkit.parser.unified.ZGCPatterns.ZGC_TAG;
 
-public class UnifiedJVMConfiguration implements ShenandoahPatterns, ZGCPatterns, UnifiedG1GCPatterns, UnifiedGenerationalPatterns, JVMConfiguration {
+//ShenandoahPatterns, ZGCPatterns, UnifiedG1GCPatterns, UnifiedGenerationalPatterns,
+public class UnifiedDiarizer implements Diarizer {
 
     private static final int CYCLES_TO_EXAMINE_BEFORE_GIVING_UP = 10;
     private static final int CYCLES_TO_EXAMINE_FOR_SAFEPOINT = 2;
 
     private int lineCount = MAXIMUM_LINES_TO_EXAMINE;
 
-    private final LoggingDiary diary;
+    private final Diary diary;
     private final TreeSet<String> tagsAndLevels = new TreeSet<>();
     private DateTimeStamp startTime = null;
     private int stopTheWorldEvents = 0;
 
     {
-        diary = new LoggingDiary();
+        diary = new Diary();
         diary.setTrue(UNIFIED_LOGGING);
         diary.setFalse(ICMS, PRE_JDK70_40, JDK70, PRE_JDK70_40, JDK80, MAX_TENURING_THRESHOLD_VIOLATION);
 
     }
 
-    public LoggingDiary getDiary() {
+    public Diary getDiary() {
         return diary;
+    }
+
+    @Override
+    public boolean isUnified() {
+        return true;
     }
 
     @Override
@@ -68,18 +83,20 @@ public class UnifiedJVMConfiguration implements ShenandoahPatterns, ZGCPatterns,
 
     @Override
     public boolean diarize(String line) {
-        if (!line.startsWith("["))
-            return false;
-        lineCount--;
-        extractDecorators(line);
-        if (!getDiary().isCollectorKnown())
-            discoverCollector(line);
-        if (!getDiary().isDetailsKnown())
-            discoverDetails(line);
-        if (!getDiary().isJVMEventsKnown())
-            discoverJVMEvents(line);
-        if ((CPU_BREAKOUT.parse(line) != null) || line.contains("gc,start"))
-            stopTheWorldEvents++;
+        if ( ! this.completed()) {
+            if (!line.startsWith("["))
+                return false;
+            lineCount--;
+            extractDecorators(line);
+            if (!getDiary().isCollectorKnown())
+                discoverCollector(line);
+            if (!getDiary().isDetailsKnown())
+                discoverDetails(line);
+            if (!getDiary().isJVMEventsKnown())
+                discoverJVMEvents(line);
+            if ((CPU_BREAKOUT.parse(line) != null) || line.contains("gc,start"))
+                stopTheWorldEvents++;
+        }
         return this.completed();
     }
 
@@ -114,7 +131,7 @@ public class UnifiedJVMConfiguration implements ShenandoahPatterns, ZGCPatterns,
                 else if (decorators.tagsContain("tlab"))
                     getDiary().setTrue(TLAB_DATA);
                 else if (decorators.tagsContain("gc,start") && line.contains("Garbage Collection ("))
-                    getDiary().setTrue(SupportedFlags.GC_CAUSE);
+                    getDiary().setTrue(GC_CAUSE);
                 else if (decorators.tagsContain("gc,heap")) {
                     if (line.contains("Heap before GC"))
                         getDiary().setTrue(PRINT_HEAP_AT_GC);
@@ -129,7 +146,7 @@ public class UnifiedJVMConfiguration implements ShenandoahPatterns, ZGCPatterns,
                 else if (decorators.tagsContain("gc,ergo"))
                     getDiary().setTrue(ADAPTIVE_SIZING);
                 else if (decorators.tagsContain("gc") && line.contains("Trigger"))
-                    getDiary().setTrue(SupportedFlags.GC_CAUSE);
+                    getDiary().setTrue(GC_CAUSE);
             }
         }
     }
@@ -156,24 +173,23 @@ public class UnifiedJVMConfiguration implements ShenandoahPatterns, ZGCPatterns,
         Parallel - x
         Serial - x
      */
-
     private void discoverCollector(String line) {
 
         if ( ZGC_TAG.parse(line) != null || CYCLE_START.parse(line) != null) {
             getDiary().setTrue(ZGC);
-            getDiary().setFalse(DEFNEW, SERIAL, PARALLELGC, PARALLELOLDGC, PARNEW, CMS, ICMS, G1GC, RSET_STATS, SHENANDOAH, CMS_DEBUG_LEVEL_1, PRE_JDK70_40, JDK70, JDK80, TENURING_DISTRIBUTION, MAX_TENURING_THRESHOLD_VIOLATION, PRINT_PROMOTION_FAILURE, PRINT_FLS_STATISTICS);
+            getDiary().setFalse(DEFNEW, SERIAL, PARALLELGC, PARALLELOLDGC, PARNEW, CMS, ICMS, G1GC, RSET_STATS, SHENANDOAH, CMS_DEBUG_LEVEL_1, PRE_JDK70_40, JDK70, JDK80, TENURING_DISTRIBUTION, MAX_TENURING_THRESHOLD_VIOLATION, TLAB_DATA, PRINT_PROMOTION_FAILURE, PRINT_FLS_STATISTICS);
             return;
         }
 
         if ( SHENANDOAH_TAG.parse(line) != null) {
             getDiary().setTrue(SHENANDOAH);
-            getDiary().setFalse(DEFNEW, SERIAL, PARALLELGC, PARALLELOLDGC, PARNEW, CMS, ICMS, G1GC, RSET_STATS, ZGC, CMS_DEBUG_LEVEL_1, PRE_JDK70_40, JDK70, JDK80, TENURING_DISTRIBUTION, MAX_TENURING_THRESHOLD_VIOLATION, PRINT_PROMOTION_FAILURE, PRINT_FLS_STATISTICS, PRINT_HEAP_AT_GC);
+            getDiary().setFalse(DEFNEW, SERIAL, PARALLELGC, PARALLELOLDGC, PARNEW, CMS, ICMS, G1GC, RSET_STATS, ZGC, CMS_DEBUG_LEVEL_1, PRE_JDK70_40, JDK70, JDK80, TENURING_DISTRIBUTION, MAX_TENURING_THRESHOLD_VIOLATION, TLAB_DATA, PRINT_PROMOTION_FAILURE, PRINT_FLS_STATISTICS, PRINT_HEAP_AT_GC);
             return;
         }
 
         if (G1_TAG.parse(line) != null || line.contains("G1 Evacuation Pause") || (line.contains("Humongous regions: "))) {
             getDiary().setTrue(G1GC);
-            getDiary().setFalse(DEFNEW, SERIAL, PARALLELGC, PARALLELOLDGC, PARNEW, CMS, ICMS, ZGC, SHENANDOAH, CMS_DEBUG_LEVEL_1, PRE_JDK70_40, JDK70, JDK80, PRINT_FLS_STATISTICS);
+            getDiary().setFalse(DEFNEW, SERIAL, PARALLELGC, PARALLELOLDGC, PARNEW, CMS, ICMS, ZGC, SHENANDOAH, CMS_DEBUG_LEVEL_1, PRE_JDK70_40, JDK70, JDK80, TLAB_DATA, PRINT_PROMOTION_FAILURE, PRINT_FLS_STATISTICS);
             return;
         }
 
@@ -188,13 +204,13 @@ public class UnifiedJVMConfiguration implements ShenandoahPatterns, ZGCPatterns,
         if (PARALLEL_TAG.parse(line) != null ||
                 line.contains("ParOldGen") ||
                 line.contains("PSYoungGen")) {
-            getDiary().setTrue(PARALLELGC, PARALLELOLDGC, SupportedFlags.GC_CAUSE);
+            getDiary().setTrue(PARALLELGC, PARALLELOLDGC, GC_CAUSE);
             getDiary().setFalse(DEFNEW, SERIAL, PARNEW, CMS, ICMS, CMS_DEBUG_LEVEL_1, G1GC, ZGC, SHENANDOAH, PRE_JDK70_40, JDK70, JDK80, RSET_STATS);
             return;
         }
 
         if (SERIAL_TAG.parse(line) != null || line.contains("DefNew")) {
-            getDiary().setTrue(DEFNEW, SERIAL, SupportedFlags.GC_CAUSE);
+            getDiary().setTrue(DEFNEW, SERIAL, GC_CAUSE);
             getDiary().setFalse(PARALLELGC, PARALLELOLDGC, PARNEW, CMS, ICMS, CMS_DEBUG_LEVEL_1, G1GC, ZGC, SHENANDOAH, PRE_JDK70_40, JDK70, JDK80, RSET_STATS);
             return;
         }
@@ -206,12 +222,17 @@ public class UnifiedJVMConfiguration implements ShenandoahPatterns, ZGCPatterns,
      */
     private void discoverDetails(String line) {
 
-        if (stopTheWorldEvents > CYCLES_TO_EXAMINE_BEFORE_GIVING_UP)
-            getDiary().setFalse(ADAPTIVE_SIZING, TLAB_DATA, PRINT_REFERENCE_GC, PRINT_PROMOTION_FAILURE, PRINT_FLS_STATISTICS, PRINT_HEAP_AT_GC);
-
-        if (CYCLE_START.parse(line) != null) {
-            getDiary().setTrue(SupportedFlags.GC_CAUSE);
+        //todo: RSET_STATS for G1 not looked for...
+        if (G1_COLLECTION.parse(line) != null) {
+            getDiary().setTrue(GC_CAUSE);
         }
+
+        else if (CYCLE_START.parse(line) != null) {
+            getDiary().setTrue(GC_CAUSE);
+        }
+
+        if (stopTheWorldEvents > CYCLES_TO_EXAMINE_BEFORE_GIVING_UP)
+            getDiary().setFalse(ADAPTIVE_SIZING, GC_CAUSE, TLAB_DATA, PRINT_REFERENCE_GC, PRINT_PROMOTION_FAILURE, PRINT_FLS_STATISTICS, RSET_STATS, PRINT_HEAP_AT_GC);
     }
 
     private void discoverJVMEvents(String line) {

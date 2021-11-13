@@ -6,10 +6,10 @@ import com.microsoft.gctoolkit.parser.TestLogFile;
 import com.microsoft.gctoolkit.io.GCLogFile;
 import com.microsoft.gctoolkit.io.SingleGCLogFile;
 import com.microsoft.gctoolkit.jvm.SupportedFlags;
-import com.microsoft.gctoolkit.parser.jvm.JVMConfiguration;
-import com.microsoft.gctoolkit.jvm.LoggingDiary;
-import com.microsoft.gctoolkit.parser.jvm.PreUnifiedJVMConfiguration;
-import com.microsoft.gctoolkit.parser.jvm.UnifiedJVMConfiguration;
+import com.microsoft.gctoolkit.jvm.Diarizer;
+import com.microsoft.gctoolkit.jvm.Diary;
+import com.microsoft.gctoolkit.parser.jvm.PreUnifiedDiarizer;
+import com.microsoft.gctoolkit.parser.jvm.UnifiedDiarizer;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,11 +19,11 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 abstract class LogDiaryTest {
 
-    protected JVMConfiguration getJVMConfiguration(GCLogFile gcLogFile) throws IOException {
+    protected Diarizer getJVMConfiguration(GCLogFile gcLogFile) throws IOException {
 
-        final JVMConfiguration jvmConfiguration = gcLogFile.isUnifiedFormat()
-                ? new UnifiedJVMConfiguration()
-                : new PreUnifiedJVMConfiguration();
+        final Diarizer jvmConfiguration = gcLogFile.isUnified()
+                ? new UnifiedDiarizer()
+                : new PreUnifiedDiarizer();
 
         gcLogFile.stream().
                 filter(Objects::nonNull).
@@ -50,7 +50,7 @@ abstract class LogDiaryTest {
     }
 
     void testWith(File file, String name, boolean[] expectedDiaryResults, int[] expectedDetailsUnKnown, int[] expectedDetailsKnown) {
-        JVMConfiguration jvmConfiguration = null;
+        Diarizer jvmConfiguration = null;
         try {
             GCLogFile gcLogFile = new SingleGCLogFile(file.toPath());
             jvmConfiguration = getJVMConfiguration(gcLogFile);
@@ -70,8 +70,8 @@ abstract class LogDiaryTest {
      * What the deriveConfiguration should look like. Unknown == false so there is a separate test to determine
      * if something is truly false when it should be false
      */
-    void interrogateDiary(JVMConfiguration jvmConfiguration, String name, boolean[] expected) {
-        LoggingDiary diary = jvmConfiguration.getDiary();
+    void interrogateDiary(Diarizer jvmConfiguration, String name, boolean[] expected) {
+        Diary diary = jvmConfiguration.getDiary();
         performCheck(name, diary.isApplicationStoppedTime(), expected[SupportedFlags.APPLICATION_STOPPED_TIME.ordinal()]);
         performCheck(name, diary.isApplicationRunningTime(), expected[SupportedFlags.APPLICATION_CONCURRENT_TIME.ordinal()]);
         performCheck(name, diary.isDefNew(), expected[SupportedFlags.DEFNEW.ordinal()]);
@@ -102,8 +102,8 @@ abstract class LogDiaryTest {
     /**
      * Things we shouldn't know
      */
-    void lookForUnknowns(JVMConfiguration jvmConfiguration, String name, int[] unknowns) {
-        LoggingDiary diary = jvmConfiguration.getDiary();
+    void lookForUnknowns(Diarizer jvmConfiguration, String name, int[] unknowns) {
+        Diary diary = jvmConfiguration.getDiary();
         for (int unknown : unknowns) {
             if (unknown != -1)
                 switch (unknown) {
@@ -200,8 +200,8 @@ abstract class LogDiaryTest {
      * IOWs, if the primary test passes, this is a secondary to cover cases where the value should be false and
      * not unknown.
      */
-    void lookForKnowns(JVMConfiguration jvmConfiguration, String name, int[] knowns) {
-        LoggingDiary diary = jvmConfiguration.getDiary();
+    void lookForKnowns(Diarizer jvmConfiguration, String name, int[] knowns) {
+        Diary diary = jvmConfiguration.getDiary();
         for (int known : knowns) {
             if (known != -1)
                 switch (known) {

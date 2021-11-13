@@ -1,11 +1,11 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
-package com.microsoft.gctoolkit.parser.jvm;
+package com.microsoft.gctoolkit.jvm;
 
-import com.microsoft.gctoolkit.jvm.LoggingDiary;
+import com.microsoft.gctoolkit.jvm.Diary;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
 
-public interface JVMConfiguration {
+public interface Diarizer {
 
     int MAXIMUM_LINES_TO_EXAMINE = 10_000;
 
@@ -15,7 +15,9 @@ public interface JVMConfiguration {
 
     int getMaxTenuringThreshold();
 
-    LoggingDiary getDiary();
+    boolean isUnified();
+
+    Diary getDiary();
 
     boolean hasJVMEvents();
 

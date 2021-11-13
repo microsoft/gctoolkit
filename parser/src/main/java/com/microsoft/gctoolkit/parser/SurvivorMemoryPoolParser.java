@@ -4,7 +4,7 @@ package com.microsoft.gctoolkit.parser;
 
 import com.microsoft.gctoolkit.event.jvm.JVMTermination;
 import com.microsoft.gctoolkit.event.jvm.SurvivorRecord;
-import com.microsoft.gctoolkit.jvm.LoggingDiary;
+import com.microsoft.gctoolkit.jvm.Diary;
 
 import static com.microsoft.gctoolkit.parser.unified.UnifiedPatterns.JVM_EXIT;
 
@@ -12,7 +12,7 @@ public class SurvivorMemoryPoolParser extends PreUnifiedGCLogParser implements T
 
     private SurvivorRecord forwardReference = null;
 
-    public SurvivorMemoryPoolParser(LoggingDiary diary, JVMEventConsumer consumer) {
+    public SurvivorMemoryPoolParser(Diary diary, JVMEventConsumer consumer) {
         super(diary, consumer);
     }
 

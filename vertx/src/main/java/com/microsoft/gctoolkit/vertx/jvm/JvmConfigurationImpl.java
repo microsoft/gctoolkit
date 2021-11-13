@@ -2,62 +2,102 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.vertx.jvm;
 
-import com.microsoft.gctoolkit.parser.jvm.JVMConfiguration;
+import com.microsoft.gctoolkit.jvm.Diary;
+import com.microsoft.gctoolkit.time.DateTimeStamp;
 
 /* package scope */ class JvmConfigurationImpl implements com.microsoft.gctoolkit.jvm.JvmConfiguration {
 
-    private final JVMConfiguration jvmConfiguration;
+    private final Diary diary;
     /* package scope */
-    JvmConfigurationImpl(JVMConfiguration jvmConfiguration) {
-        this.jvmConfiguration = jvmConfiguration;
+    JvmConfigurationImpl(Diary diary) {
+        this.diary = diary;
     }
 
     @Override
     public boolean isPrintGCDetails() {
-        return jvmConfiguration.getDiary().isPrintGCDetails();
+        return diary.isPrintGCDetails();
     }
 
     @Override
     public boolean isPrintTenuringDistribution() {
-        return jvmConfiguration.getDiary().isTenuringDistribution();
+        return diary.isTenuringDistribution();
     }
 
     @Override
     public boolean hasSafepointEvents() {
-        return jvmConfiguration.getDiary().isApplicationStoppedTime()
-                || jvmConfiguration.getDiary().isApplicationRunningTime();
+        return diary.isApplicationStoppedTime() || diary.isApplicationRunningTime();
     }
 
     @Override
     public boolean hasMaxTenuringThresholdViolation() {
-        return jvmConfiguration.getDiary().isMaxTenuringThresholdViolation();
+        return diary.isMaxTenuringThresholdViolation();
     }
 
     @Override
     public int getMaxTenuringThreshold() {
-        return jvmConfiguration.getMaxTenuringThreshold();
+        return 0; //diary.getMaxTenuringThreshold(); todo: add in command line values.
     }
 
     @Override
     public boolean isPreJDK17040() {
-        return jvmConfiguration.getDiary().isPre70_40();
+        return diary.isPre70_40();
     }
 
     @Override
     public boolean isJDK70() {
-        return jvmConfiguration.getDiary().isJDK70();
+        return diary.isJDK70();
     }
 
     @Override
     public boolean isJDK80() {
-        return jvmConfiguration.getDiary().isJDK80();
+        return diary.isJDK80();
     }
 
     @Override
     public boolean containsGCCause() {
-        return jvmConfiguration.getDiary().isGCCause();
+        return diary.isGCCause();
     }
 
     @Override
-    public boolean isJDKVersionKnown() { return jvmConfiguration.getDiary().isVersionKnown(); }
+    public String getCommandLine() {
+        return null;
+    }
+
+    @Override
+    public DateTimeStamp getTimeOfFirstEvent() {
+        return null;
+    }
+
+    @Override
+    public boolean isUnified() {
+        return false;
+    }
+
+    @Override
+    public Diary getDiary() {
+        return null;
+    }
+
+    @Override
+    public boolean hasJVMEvents() {
+        return false;
+    }
+
+    @Override
+    public boolean completed() {
+        return false;
+    }
+
+    @Override
+    public void fillInKnowns() {
+
+    }
+
+    @Override
+    public boolean diarize(String line) {
+        return false;
+    }
+
+    @Override
+    public boolean isJDKVersionKnown() { return diary.isVersionKnown(); }
 }

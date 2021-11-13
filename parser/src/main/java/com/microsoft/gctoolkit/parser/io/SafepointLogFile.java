@@ -5,6 +5,7 @@ package com.microsoft.gctoolkit.parser.io;
 import com.microsoft.gctoolkit.io.DataSource;
 import com.microsoft.gctoolkit.io.FileDataSourceMetaData;
 import com.microsoft.gctoolkit.io.GCLogFile;
+import com.microsoft.gctoolkit.jvm.Diary;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -26,6 +27,14 @@ public class SafepointLogFile implements DataSource<String> {
     public SafepointLogFile(Path path) {
         this.path = path;
         this.metadata = new FileDataSourceMetaData(path);
+    }
+
+    /**
+     * todo: for the moment this diary is empty.
+     * @return a diary
+     */
+    public Diary diary() {
+        return new Diary();
     }
 
     @Override

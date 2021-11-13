@@ -42,4 +42,5 @@ module com.microsoft.gctoolkit.api {
 
     uses com.microsoft.gctoolkit.aggregator.Aggregation;
     uses com.microsoft.gctoolkit.jvm.JavaVirtualMachine;
+    uses com.microsoft.gctoolkit.jvm.Diarizer;
 }

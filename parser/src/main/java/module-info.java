@@ -15,11 +15,15 @@ module com.microsoft.gctoolkit.parser {
             com.microsoft.gctoolkit.vertx;
 
     exports com.microsoft.gctoolkit.parser.jvm to
-            com.microsoft.gctoolkit.vertx;
+            com.microsoft.gctoolkit.vertx, com.microsoft.gctoolkit.api;
 
     exports com.microsoft.gctoolkit.parser.unified to
             com.microsoft.gctoolkit.vertx;
 
     exports com.microsoft.gctoolkit.parser.vmops to
             com.microsoft.gctoolkit.vertx;
+
+    provides com.microsoft.gctoolkit.jvm.Diarizer with
+            com.microsoft.gctoolkit.parser.jvm.PreUnifiedDiarizer,
+            com.microsoft.gctoolkit.parser.jvm.UnifiedDiarizer;
 }

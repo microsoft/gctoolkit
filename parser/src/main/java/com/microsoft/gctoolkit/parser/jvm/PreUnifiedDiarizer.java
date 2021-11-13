@@ -5,7 +5,8 @@ package com.microsoft.gctoolkit.parser.jvm;
 
 import com.microsoft.gctoolkit.event.GCCause;
 import com.microsoft.gctoolkit.event.GCCauses;
-import com.microsoft.gctoolkit.jvm.LoggingDiary;
+import com.microsoft.gctoolkit.jvm.Diarizer;
+import com.microsoft.gctoolkit.jvm.Diary;
 import com.microsoft.gctoolkit.jvm.SupportedFlags;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
 import com.microsoft.gctoolkit.parser.CMSPatterns;
@@ -23,6 +24,10 @@ import com.microsoft.gctoolkit.parser.TenuredPatterns;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static com.microsoft.gctoolkit.parser.CMSPatterns.FLS_HEADER;
+import static com.microsoft.gctoolkit.parser.SharedPatterns.MEMORY_SUMMARY_RULE;
+import static com.microsoft.gctoolkit.parser.SharedPatterns.META_SPACE_RECORD;
 
 /**
  * Class to answer 3 questions about the GC log;
@@ -83,9 +88,10 @@ import java.util.regex.Pattern;
  * - DefNew
  */
 
-public class PreUnifiedJVMConfiguration implements SimplePatterns, CMSPatterns, ParallelPatterns, G1GCPatterns, JVMConfiguration {
+//SimplePatterns, CMSPatterns, ParallelPatterns, G1GCPatterns,
+public class PreUnifiedDiarizer implements Diarizer {
 
-    private static final Logger LOGGER = Logger.getLogger(PreUnifiedJVMConfiguration.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(PreUnifiedDiarizer.class.getName());
 
     private int lineCount = MAXIMUM_LINES_TO_EXAMINE;
 
@@ -97,11 +103,16 @@ public class PreUnifiedJVMConfiguration implements SimplePatterns, CMSPatterns, 
     private static final Pattern excludeG1Ergonomics = Pattern.compile("^\\d+(\\.|,)\\d+: \\[G1Ergonomics");
 
 
-    private final LoggingDiary diary;
+    private final Diary diary;
 
     @Override
-    public LoggingDiary getDiary() {
+    public Diary getDiary() {
         return diary;
+    }
+
+    @Override
+    public boolean isUnified() {
+        return false;
     }
 
     private boolean firstCMSCycle = false;
@@ -115,7 +126,7 @@ public class PreUnifiedJVMConfiguration implements SimplePatterns, CMSPatterns, 
     private DateTimeStamp timeOfFirstEvent = null;
 
     {
-        diary = new LoggingDiary();
+        diary = new Diary();
         diary.setFalse(SupportedFlags.UNIFIED_LOGGING, SupportedFlags.ZGC, SupportedFlags.SHENANDOAH);
     }
 

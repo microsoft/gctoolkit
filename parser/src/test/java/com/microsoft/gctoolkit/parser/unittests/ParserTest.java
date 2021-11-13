@@ -4,7 +4,6 @@ package com.microsoft.gctoolkit.parser.unittests;
 
 import com.microsoft.gctoolkit.event.GCEvent;
 import com.microsoft.gctoolkit.event.GarbageCollectionTypes;
-import com.microsoft.gctoolkit.event.g1gc.G1GCConcurrentEvent;
 import com.microsoft.gctoolkit.event.g1gc.G1GCPauseEvent;
 import com.microsoft.gctoolkit.event.jvm.JVMEvent;
 import com.microsoft.gctoolkit.event.jvm.JVMTermination;
@@ -12,9 +11,9 @@ import com.microsoft.gctoolkit.io.GCLogFile;
 import com.microsoft.gctoolkit.io.RotatingGCLogFile;
 import com.microsoft.gctoolkit.io.SingleGCLogFile;
 import com.microsoft.gctoolkit.parser.*;
-import com.microsoft.gctoolkit.parser.jvm.JVMConfiguration;
-import com.microsoft.gctoolkit.parser.jvm.PreUnifiedJVMConfiguration;
-import com.microsoft.gctoolkit.parser.jvm.UnifiedJVMConfiguration;
+import com.microsoft.gctoolkit.jvm.Diarizer;
+import com.microsoft.gctoolkit.parser.jvm.PreUnifiedDiarizer;
+import com.microsoft.gctoolkit.parser.jvm.UnifiedDiarizer;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -87,11 +86,11 @@ public abstract class ParserTest {
         return rotating ? new RotatingGCLogFile(path) : new SingleGCLogFile(path);
     }
     
-    private JVMConfiguration getJVMConfiguration(GCLogFile gcLogFile) {
+    private Diarizer getJVMConfiguration(GCLogFile gcLogFile) {
         try {
-            final JVMConfiguration jvmConfiguration = gcLogFile.isUnifiedFormat()
-                    ? new UnifiedJVMConfiguration()
-                    : new PreUnifiedJVMConfiguration();
+            final Diarizer jvmConfiguration = gcLogFile.isUnified()
+                    ? new UnifiedDiarizer()
+                    : new PreUnifiedDiarizer();
 
             gcLogFile.stream().
                     filter(Objects::nonNull).
@@ -112,7 +111,7 @@ public abstract class ParserTest {
     TestResults testGenerationalRotatingLogFile(Path path) throws IOException {
         TestResults testResults = new TestResults();
         GCLogFile logfile = loadLogFile(path, true);
-        JVMConfiguration jvmConfiguration = getJVMConfiguration(logfile);
+        Diarizer jvmConfiguration = getJVMConfiguration(logfile);
         GenerationalHeapParser generationalHeapParser = new GenerationalHeapParser(jvmConfiguration.getDiary(), testResults);
         logfile.stream().map(String::trim).forEach(generationalHeapParser::receive);
         return testResults;
@@ -121,7 +120,7 @@ public abstract class ParserTest {
     TestResults testGenerationalSingleLogFile(Path path) throws IOException {
         TestResults testResults = new TestResults();
         GCLogFile logfile = loadLogFile(path, false);
-        JVMConfiguration jvmConfiguration = getJVMConfiguration(logfile);
+        Diarizer jvmConfiguration = getJVMConfiguration(logfile);
         GCLogParser generationalHeapParser = (jvmConfiguration.getDiary().isUnifiedLogging()) ? new UnifiedGenerationalParser(jvmConfiguration.getDiary(), testResults) : new GenerationalHeapParser(jvmConfiguration.getDiary(), testResults);
         logfile.stream().map(String::trim).forEach(generationalHeapParser::receive);
         return testResults;
@@ -130,7 +129,7 @@ public abstract class ParserTest {
     TestResults testUnifiedG1GCSingleFile(Path path) throws IOException {
         TestResults testResults = new TestResults();
         SingleGCLogFile logfile = new SingleGCLogFile(path);
-        UnifiedJVMConfiguration unifiedJVMConfiguration = new UnifiedJVMConfiguration();
+        UnifiedDiarizer unifiedJVMConfiguration = new UnifiedDiarizer();
         UnifiedG1GCParser parser = new UnifiedG1GCParser(unifiedJVMConfiguration.getDiary(), testResults);
         logfile.stream().map(String::trim).forEach(parser::receive);
         return testResults;
@@ -139,7 +138,7 @@ public abstract class ParserTest {
     TestResults testRegionalRotatingLogFile(Path path) throws IOException {
         TestResults testResults = new TestResults();
         GCLogFile logfile = loadLogFile(path, true);
-        JVMConfiguration jvmConfiguration = getJVMConfiguration(logfile);
+        Diarizer jvmConfiguration = getJVMConfiguration(logfile);
         PreUnifiedG1GCParser parser = new PreUnifiedG1GCParser(jvmConfiguration.getDiary(), testResults);
         logfile.stream().map(String::trim).forEach(parser::receive);
         return testResults;
@@ -148,7 +147,7 @@ public abstract class ParserTest {
     TestResults testRegionalSingleLogFile(Path path) throws IOException {
         TestResults testResults = new TestResults();
         GCLogFile logfile = loadLogFile(path, false);
-        JVMConfiguration jvmConfiguration = getJVMConfiguration(logfile);
+        Diarizer jvmConfiguration = getJVMConfiguration(logfile);
         PreUnifiedG1GCParser parser = new PreUnifiedG1GCParser(jvmConfiguration.getDiary(), testResults);
         logfile.stream().map(String::trim).forEach(parser::receive);
         return testResults;

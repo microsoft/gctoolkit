@@ -2,9 +2,9 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.parser.diary;
 
-import com.microsoft.gctoolkit.parser.jvm.JVMConfiguration;
-import com.microsoft.gctoolkit.jvm.LoggingDiary;
-import com.microsoft.gctoolkit.parser.jvm.PreUnifiedJVMConfiguration;
+import com.microsoft.gctoolkit.jvm.Diarizer;
+import com.microsoft.gctoolkit.jvm.Diary;
+import com.microsoft.gctoolkit.parser.jvm.PreUnifiedDiarizer;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -30,10 +30,10 @@ public class CommandLineFlagsLogDiaryTest {
 
     @Test
     public void testForCMSDefNewDetails() {
-        JVMConfiguration jvmConfiguration = new PreUnifiedJVMConfiguration();
+        Diarizer jvmConfiguration = new PreUnifiedDiarizer();
         jvmConfiguration.diarize(gcLogFileHeader[0][0]);
         jvmConfiguration.diarize(gcLogFileHeader[0][3]);
-        LoggingDiary diary = jvmConfiguration.getDiary();
+        Diary diary = jvmConfiguration.getDiary();
         assertTrue(diary.isJDK80());
         assertTrue(diary.isGCCause());
         assertTrue(diary.isAdaptiveSizing());
@@ -64,10 +64,10 @@ public class CommandLineFlagsLogDiaryTest {
 
     @Test
     public void testForParallelDetails() {
-        JVMConfiguration jvmConfiguration = new PreUnifiedJVMConfiguration();
+        Diarizer jvmConfiguration = new PreUnifiedDiarizer();
         jvmConfiguration.diarize(gcLogFileHeader[1][0]);
         jvmConfiguration.diarize(gcLogFileHeader[1][3]);
-        LoggingDiary diary = jvmConfiguration.getDiary();
+        Diary diary = jvmConfiguration.getDiary();
         assertTrue(diary.isJDK80());
         assertTrue(diary.isGCCause());
         assertTrue(diary.isAdaptiveSizing());

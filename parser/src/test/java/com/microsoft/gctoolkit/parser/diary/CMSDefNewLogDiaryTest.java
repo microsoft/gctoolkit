@@ -3,7 +3,7 @@
 package com.microsoft.gctoolkit.parser.diary;
 
 import com.microsoft.gctoolkit.io.SingleGCLogFile;
-import com.microsoft.gctoolkit.parser.jvm.JVMConfiguration;
+import com.microsoft.gctoolkit.jvm.Diarizer;
 import com.microsoft.gctoolkit.parser.TestLogFile;
 import org.junit.jupiter.api.Test;
 
@@ -16,7 +16,7 @@ public class CMSDefNewLogDiaryTest extends LogDiaryTest {
         int i = 0;
         for (String name : cmsDefNewDetails) {
             TestLogFile logFile = new TestLogFile(name);
-            JVMConfiguration diary = null;
+            Diarizer diary = null;
             try {
                 diary = getJVMConfiguration(new SingleGCLogFile(logFile.getFile().toPath()));
             } catch (Exception e) {

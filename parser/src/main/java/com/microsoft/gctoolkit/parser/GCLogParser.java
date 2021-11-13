@@ -9,7 +9,7 @@ import com.microsoft.gctoolkit.event.jvm.MetaspaceRecord;
 import com.microsoft.gctoolkit.event.jvm.PermGenSummary;
 import com.microsoft.gctoolkit.io.GCLogFile;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
-import com.microsoft.gctoolkit.jvm.LoggingDiary;
+import com.microsoft.gctoolkit.jvm.Diary;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -22,11 +22,11 @@ public abstract class GCLogParser implements SharedPatterns {
 
     public static final GCParseRule GCID_COUNTER = new GCParseRule("GCID_COUNTER", " GC\\((\\d+)\\) ");
     protected final JVMEventConsumer consumer;
-    protected LoggingDiary diary;
+    protected Diary diary;
     private DateTimeStamp clock = new DateTimeStamp(0.0d);
 
 
-    public GCLogParser(LoggingDiary diary, JVMEventConsumer consumer) {
+    public GCLogParser(Diary diary, JVMEventConsumer consumer) {
         this.diary = diary;
         this.consumer = consumer;
     }

@@ -18,8 +18,8 @@ import com.microsoft.gctoolkit.event.generational.PSYoungGen;
 import com.microsoft.gctoolkit.event.generational.ParNew;
 import com.microsoft.gctoolkit.event.jvm.JVMEvent;
 import com.microsoft.gctoolkit.parser.UnifiedGenerationalParser;
-import com.microsoft.gctoolkit.parser.jvm.UnifiedJVMConfiguration;
-import com.microsoft.gctoolkit.jvm.LoggingDiary;
+import com.microsoft.gctoolkit.parser.jvm.UnifiedDiarizer;
+import com.microsoft.gctoolkit.jvm.Diary;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -33,8 +33,8 @@ public class UnifiedGenerationalEventsTest extends ParserTest {
 
     private ArrayList<JVMEvent> jvmEvents;
 
-    private LoggingDiary getDiary(String[] input) {
-        UnifiedJVMConfiguration configuration = new UnifiedJVMConfiguration();
+    private Diary getDiary(String[] input) {
+        UnifiedDiarizer configuration = new UnifiedDiarizer();
         Arrays.stream(input).forEach(configuration::diarize);
         return configuration.getDiary();
     }

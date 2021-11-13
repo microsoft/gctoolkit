@@ -2,6 +2,8 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.jvm;
 
+import com.microsoft.gctoolkit.time.DateTimeStamp;
+
 /**
  * The configuration of the Java Virtual Machine, calculated from the GC log analysis.
  */
@@ -74,5 +76,23 @@ public interface JvmConfiguration {
      * @return {@code true} if the JVM is configured to print GC cause.
      */
     boolean containsGCCause();
+
+    int MAXIMUM_LINES_TO_EXAMINE = 10_000;
+
+    String getCommandLine();
+
+    DateTimeStamp getTimeOfFirstEvent();
+
+    boolean isUnified();
+
+    Diary getDiary();
+
+    boolean hasJVMEvents();
+
+    boolean completed();
+
+    void fillInKnowns();
+
+    boolean diarize(String line);
 
 }

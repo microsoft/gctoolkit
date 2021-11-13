@@ -42,11 +42,11 @@ import java.util.Arrays;
     PRINT_FLS_STATISTICS                        // 27
  */
 
-public class LoggingDiary {
+public class Diary {
 
     private final TripleState[] states;
 
-    public LoggingDiary() {
+    public Diary() {
         states = new TripleState[SupportedFlags.values().length];
         for (int i = 0; i < states.length; i++) states[i] = TripleState.UNKNOWN;
     }

@@ -5,7 +5,7 @@ package com.microsoft.gctoolkit.parser.diary;
 import com.microsoft.gctoolkit.parser.TestLogFile;
 import org.junit.jupiter.api.Test;
 
-public class G1JVMConfigurationTest extends LogDiaryTest {
+public class G1DiarizerTest extends LogDiaryTest {
 
 
     // Details

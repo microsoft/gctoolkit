@@ -7,7 +7,7 @@ import com.microsoft.gctoolkit.event.jvm.ApplicationStoppedTime;
 import com.microsoft.gctoolkit.event.jvm.JVMEvent;
 import com.microsoft.gctoolkit.event.jvm.JVMTermination;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
-import com.microsoft.gctoolkit.jvm.LoggingDiary;
+import com.microsoft.gctoolkit.jvm.Diary;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -23,7 +23,7 @@ public class JVMEventParser extends PreUnifiedGCLogParser implements JVMPatterns
     private boolean lastEventWasGC = false;
     private double gcPauseTime = GCPAUSE_TIME_NOT_SET;
 
-    public JVMEventParser(LoggingDiary diary, JVMEventConsumer consumer) {
+    public JVMEventParser(Diary diary, JVMEventConsumer consumer) {
         super(diary, consumer);
     }
 

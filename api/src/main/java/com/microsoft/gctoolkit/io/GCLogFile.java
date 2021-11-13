@@ -2,14 +2,17 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.io;
 
-import com.microsoft.gctoolkit.jvm.LoggingDiary;
+import com.microsoft.gctoolkit.jvm.Diary;
+import com.microsoft.gctoolkit.jvm.Diarizer;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Objects;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
+
+import static java.util.ServiceLoader.*;
 
 
 /**
@@ -22,6 +25,7 @@ public abstract class GCLogFile extends FileDataSource<String> {
      */
     public static final String END_OF_DATA_SENTINEL = "END_OF_DATA_SENTINEL";
 
+    private Diary diary;
     private final boolean unifiedFormat;
 
     /**
@@ -38,15 +42,38 @@ public abstract class GCLogFile extends FileDataSource<String> {
      * Returns {@code true} if this GCLogFile is written in unified logging (JEP 158) format.
      * @return {@code true} if the log file is in unified logging format.
      */
-    public boolean isUnifiedFormat() { return unifiedFormat; }
+    public boolean isUnified() { return unifiedFormat; }
+
+    private Diarizer findProvider() {
+        Optional<Diarizer> provider = load(Diarizer.class)
+                .stream()
+                .map(Provider::get)
+                .filter(p -> p.isUnified() == isUnified())
+                .findFirst();
+        return ( provider.isPresent()) ? provider.get() : null;
+    }
 
     /**
      *
      * @return
      */
 
-    public LoggingDiary diary() {
-        return new LoggingDiary();
+    public Diary diary() throws IOException {
+        if ( diary == null) {
+            Diarizer configuration = findProvider();
+            if ( configuration == null) {
+                throw new ServiceConfigurationError("Unable to find a suitable provider to create a diary");
+            }
+            stream().
+                    filter(Objects::nonNull).
+                    map(String::trim).
+                    filter(s -> s.length() > 0).
+                    map(configuration::diarize).
+                    filter(completed -> completed).
+                    findFirst();
+            this.diary = configuration.getDiary();
+        }
+        return diary;
     }
 
     @Override

@@ -6,7 +6,7 @@ import com.microsoft.gctoolkit.event.shenandoah.ShenandoahCycle;
 import com.microsoft.gctoolkit.event.zgc.OccupancySummary;
 import com.microsoft.gctoolkit.event.zgc.ReclaimSummary;
 import com.microsoft.gctoolkit.event.zgc.ZGCMemoryPoolSummary;
-import com.microsoft.gctoolkit.jvm.LoggingDiary;
+import com.microsoft.gctoolkit.jvm.Diary;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -68,7 +68,7 @@ public class ShenandoahParserTest {
         };
 
         AtomicBoolean eventCreated = new AtomicBoolean(false);
-        ShenandoahParser parser = new ShenandoahParser(new LoggingDiary(), event -> {
+        ShenandoahParser parser = new ShenandoahParser(new Diary(), event -> {
             try {
                 ShenandoahCycle sc = (ShenandoahCycle) event;
                 Assertions.assertEquals(toInt(0.038d,1000), toInt(sc.getDuration(),1000));

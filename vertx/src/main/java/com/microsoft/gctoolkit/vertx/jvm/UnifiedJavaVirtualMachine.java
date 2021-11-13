@@ -5,13 +5,13 @@ package com.microsoft.gctoolkit.vertx.jvm;
 import com.microsoft.gctoolkit.aggregator.Aggregation;
 import com.microsoft.gctoolkit.io.DataSource;
 import com.microsoft.gctoolkit.io.GCLogFile;
+import com.microsoft.gctoolkit.jvm.Diary;
 import com.microsoft.gctoolkit.jvm.JavaVirtualMachine;
 import com.microsoft.gctoolkit.jvm.JvmConfiguration;
+import com.microsoft.gctoolkit.jvm.Diarizer;
+import com.microsoft.gctoolkit.parser.jvm.UnifiedDiarizer;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
 import com.microsoft.gctoolkit.vertx.GCToolkitVertx;
-import com.microsoft.gctoolkit.parser.jvm.JVMConfiguration;
-import com.microsoft.gctoolkit.parser.jvm.PreUnifiedJVMConfiguration;
-import com.microsoft.gctoolkit.parser.jvm.UnifiedJVMConfiguration;
 
 import java.io.IOException;
 import java.util.Map;
@@ -27,15 +27,14 @@ import java.util.logging.Logger;
  * lines to the parser(s) and post events to the aggregators. This implementation
  * is here in the vertx module so that the api and parser modules can exist without
  * having to import io.vertx. In the api module, the class GCToolKit uses the classloader
- * to load DefaultJavaVirtualMachine.
+ * to load UnifiedJavaVirtualMachine.
  */
-public class DefaultJavaVirtualMachine implements JavaVirtualMachine {
+public class UnifiedJavaVirtualMachine extends AbstractJavaVirtualMachine implements JavaVirtualMachine {
 
-    private static final Logger LOGGER = Logger.getLogger(DefaultJavaVirtualMachine.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(UnifiedJavaVirtualMachine.class.getName());
 
     private static final double LOG_FRAGMENT_THRESHOLD = 18000;
-
-    private JVMConfiguration jvmConfigurationFromParser;
+    private Diary diary;
     private JvmConfiguration jvmConfigurationForCoreApi;
     private DateTimeStamp timeOfLastEvent;
     private final Map<Class<? extends Aggregation>, Aggregation> aggregatedData =
@@ -43,42 +42,42 @@ public class DefaultJavaVirtualMachine implements JavaVirtualMachine {
 
     @Override
     public boolean isG1GC() {
-        return jvmConfigurationFromParser.getDiary().isG1GC();
+        return diary.isG1GC();
     }
 
     @Override
     public boolean isZGC() {
-        return jvmConfigurationFromParser.getDiary().isZGC();
+        return diary.isZGC();
     }
 
     @Override
     public boolean isShenandoah() {
-        return jvmConfigurationFromParser.getDiary().isShenandoah();
+        return diary.isShenandoah();
     }
 
     @Override
     public boolean isParallel() {
-        return jvmConfigurationFromParser.getDiary().isParNew();
+        return diary.isParNew();
     }
 
     @Override
     public boolean isSerial() {
-        return jvmConfigurationFromParser.getDiary().isSerialFull();
+        return diary.isSerialFull();
     }
 
     @Override
     public boolean isCMS() {
-        return jvmConfigurationFromParser.getDiary().isCMS();
+        return diary.isCMS();
     }
 
     @Override
     public String getCommandLine() {
-        return jvmConfigurationFromParser.getCommandLine();
+        return null; //diary.getCommandLine();
     }
 
     @Override
     public DateTimeStamp getTimeOfFirstEvent() {
-        return jvmConfigurationFromParser.getTimeOfFirstEvent();
+        return new DateTimeStamp(0.0d); //diary.getTimeOfFirstEvent();
     }
 
     @Override
@@ -112,24 +111,9 @@ public class DefaultJavaVirtualMachine implements JavaVirtualMachine {
 
         try {
             final GCLogFile gcLogFile = (GCLogFile) dataSource;
+            this.diary = gcLogFile.diary();
 
-            this.jvmConfigurationFromParser = gcLogFile.isUnifiedFormat()
-                    ? new UnifiedJVMConfiguration()
-                    : new PreUnifiedJVMConfiguration();
-
-            gcLogFile.stream().
-                    filter(Objects::nonNull).
-                    map(String::trim).
-                    filter(s -> s.length() > 0).
-                    map(this.jvmConfigurationFromParser::diarize).
-                    filter(completed -> completed).
-                    findFirst();
-
-            this.jvmConfigurationFromParser.fillInKnowns();
-
-            GCToolkitVertxParameters GCToolkitVertxParameters = gcLogFile.isUnifiedFormat()
-                    ? new GCToolkitVertxParametersForUnifiedLogs(registeredAggregations, this.jvmConfigurationFromParser)
-                    : new GCToolkitVertxParametersForPreUnifiedLogs(registeredAggregations, this.jvmConfigurationFromParser);
+            GCToolkitVertxParameters GCToolkitVertxParameters = new GCToolkitVertxParametersForUnifiedLogs(registeredAggregations, this.diary);
 
             this.timeOfLastEvent = GCToolkitVertx.aggregateDataSource(
                     dataSource,
@@ -146,7 +130,7 @@ public class DefaultJavaVirtualMachine implements JavaVirtualMachine {
                     });
 
 
-            this.jvmConfigurationForCoreApi = new JvmConfigurationImpl(jvmConfigurationFromParser);
+            this.jvmConfigurationForCoreApi = new JvmConfigurationImpl(diary);
 
 
         } catch (IOException | ClassCastException e ) {
