@@ -16,6 +16,7 @@ module com.microsoft.gctoolkit.sample {
             com.microsoft.gctoolkit.vertx;
 
     provides com.microsoft.gctoolkit.aggregator.Aggregation with
-            com.microsoft.gctoolkit.sample.aggregation.HeapOccupancyAfterCollectionSummary,
-            com.microsoft.gctoolkit.sample.aggregation.PauseTimeSummary;
+             com.microsoft.gctoolkit.sample.aggregation.HeapOccupancyAfterCollectionSummary,
+             com.microsoft.gctoolkit.sample.aggregation.PauseTimeSummary,
+             com.microsoft.gctoolkit.sample.aggregation.CollectionCycleCountsSummary;
 }

@@ -4,13 +4,14 @@ import com.microsoft.gctoolkit.GCToolKit;
 import com.microsoft.gctoolkit.io.GCLogFile;
 import com.microsoft.gctoolkit.io.SingleGCLogFile;
 import com.microsoft.gctoolkit.jvm.JavaVirtualMachine;
-import com.microsoft.gctoolkit.jvm.Diary;
+import com.microsoft.gctoolkit.sample.aggregation.CollectionCycleCountsSummary;
 import com.microsoft.gctoolkit.sample.aggregation.HeapOccupancyAfterCollectionSummary;
 import com.microsoft.gctoolkit.sample.aggregation.PauseTimeSummary;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Files;
+import java.util.Optional;
 
 public class Main {
 
@@ -52,28 +53,17 @@ public class Main {
         JavaVirtualMachine machine = gcToolKit.analyze(logFile);
 
         // Retrieves the Aggregation for HeapOccupancyAfterCollectionSummary. This is a time-series aggregation.
+        String message = "The XYDataSet for %s contains %s items.\n";
         machine.getAggregation(HeapOccupancyAfterCollectionSummary.class)
                 .map(HeapOccupancyAfterCollectionSummary::get)
                 .ifPresent(summary -> {
                     summary.forEach((gcType, dataSet) -> {
-                        String message = "The XYDataSet for %s contains %s items.\n";
                         System.out.printf(message, gcType, dataSet.size());
-                        switch(gcType) {
-                            case InitialMark:
-                                initialMarkCount = dataSet.size();;
-                                break;
-                            case Remark:
-                                remarkCount = dataSet.size();
-                                break;
-                            case DefNew:
-                                defNewCount = dataSet.size();
-                                break;
-                            default:
-                                break;
-                        }
                     });
                 });
 
+        Optional<CollectionCycleCountsSummary> summary = machine.getAggregation(CollectionCycleCountsSummary.class);
+        summary.ifPresent(s -> s.printOn(System.out));
         // Retrieves the Aggregation for PauseTimeSummary. This is a com.microsoft.gctoolkit.sample.aggregation.RuntimeAggregation.
         machine.getAggregation(PauseTimeSummary.class).ifPresent(pauseTimeSummary -> {
             System.out.printf("Total pause time  : %.4f\n", pauseTimeSummary.getTotalPauseTime());

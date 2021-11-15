@@ -78,6 +78,7 @@ public class GCToolKit {
                 .map(ServiceLoader.Provider::get)
                 .map(Aggregation::getClass)
                 .forEach(registeredAggregations::add);
+        registeredAggregations.forEach(a -> System.out.println(a.toString()));
     }
 
     /**

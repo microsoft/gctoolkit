@@ -9,23 +9,7 @@ import com.microsoft.gctoolkit.event.ReferenceGCSummary;
 import com.microsoft.gctoolkit.event.SurvivorMemoryPoolSummary;
 import com.microsoft.gctoolkit.event.UnifiedCountSummary;
 import com.microsoft.gctoolkit.event.UnifiedStatisticalSummary;
-import com.microsoft.gctoolkit.event.g1gc.ConcurrentCleanupForNextMark;
-import com.microsoft.gctoolkit.event.g1gc.ConcurrentClearClaimedMarks;
-import com.microsoft.gctoolkit.event.g1gc.ConcurrentCompleteCleanup;
-import com.microsoft.gctoolkit.event.g1gc.ConcurrentCreateLiveData;
-import com.microsoft.gctoolkit.event.g1gc.ConcurrentScanRootRegion;
-import com.microsoft.gctoolkit.event.g1gc.G1Cleanup;
-import com.microsoft.gctoolkit.event.g1gc.G1ConcurrentMark;
-import com.microsoft.gctoolkit.event.g1gc.G1ConcurrentRebuildRememberedSets;
-import com.microsoft.gctoolkit.event.g1gc.G1FullGC;
-import com.microsoft.gctoolkit.event.g1gc.G1FullGCNES;
-import com.microsoft.gctoolkit.event.g1gc.G1GCConcurrentEvent;
-import com.microsoft.gctoolkit.event.g1gc.G1GCPauseEvent;
-import com.microsoft.gctoolkit.event.g1gc.G1Mixed;
-import com.microsoft.gctoolkit.event.g1gc.G1Remark;
-import com.microsoft.gctoolkit.event.g1gc.G1SystemGC;
-import com.microsoft.gctoolkit.event.g1gc.G1Young;
-import com.microsoft.gctoolkit.event.g1gc.G1YoungInitialMark;
+import com.microsoft.gctoolkit.event.g1gc.*;
 import com.microsoft.gctoolkit.parser.jvm.Decorators;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
 
@@ -43,6 +27,7 @@ public class G1GCForwardReference extends ForwardReference {
     private static long minHeapSize;
     private static long initialHeapSize;
     private static long maxHeapSize;
+    private DateTimeStamp concurrentCycleStartTime;
 
     public static void setHeapRegionSize(int sizeInMegaBytes) {
         heapRegionSize = sizeInMegaBytes;
@@ -93,6 +78,10 @@ public class G1GCForwardReference extends ForwardReference {
             throw new IllegalArgumentException("attempting to redefine GC Type from" + this.gcType + " to " + garbageCollectionType);
         }
         gcType = garbageCollectionType;
+    }
+
+    public GarbageCollectionTypes getGcType() {
+        return gcType;
     }
 
     private GarbageCollectionTypes concurrentPhase;
@@ -625,7 +614,7 @@ public class G1GCForwardReference extends ForwardReference {
         this.parallelUnloadingDuration = duration;
     }
 
-    public G1GCConcurrentEvent buildConcurrentEvent() {
+    public G1GCConcurrentEvent buildConcurrentPhaseEvent() {
         switch (getConcurrentPhase()) {
             case ConcurrentClearClaimedMarks:
                 return new ConcurrentClearClaimedMarks(getStartTime(), getDuration());
@@ -645,6 +634,10 @@ public class G1GCForwardReference extends ForwardReference {
                 LOGGER.warning("Unrecognized Concurrent Event " + getConcurrentPhase());
         }
         return null;
+    }
+
+    G1GCConcurrentEvent buildConcurrentUndoCycleEvent() {
+        return new G1ConcurrentUndoCycle(getConcurrentCycleStartTime(), getDuration());
     }
 
     /**
@@ -675,6 +668,8 @@ public class G1GCForwardReference extends ForwardReference {
                         LOGGER.warning("Unrecognized (mostly) Concurrent Cycle Pause Event " + getConcurrentPhase());
                 }
                 return null;
+            case G1GCConcurrentUndoCycle:
+                System.out.println("now here");
             default:
                 LOGGER.warning("Unrecognized Event " + gcType);
                 return null;
@@ -799,5 +794,13 @@ public class G1GCForwardReference extends ForwardReference {
 
     public boolean setArchiveSizeAfterCollection(int value) {
         return setMemoryPoolMeasurement(ARCHIVE_SIZE_AFTER_COLLECTION, value);
+    }
+
+    public void setConcurrentCycleStartTime(DateTimeStamp clock) {
+        this.concurrentCycleStartTime = clock;
+    }
+
+    public DateTimeStamp getConcurrentCycleStartTime() {
+        return concurrentCycleStartTime;
     }
 }

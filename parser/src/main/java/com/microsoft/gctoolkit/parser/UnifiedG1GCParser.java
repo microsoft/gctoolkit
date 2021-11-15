@@ -3,7 +3,9 @@
 package com.microsoft.gctoolkit.parser;
 
 import com.microsoft.gctoolkit.event.*;
+import com.microsoft.gctoolkit.event.g1gc.G1ConcurrentUndoCycle;
 import com.microsoft.gctoolkit.event.g1gc.G1GCConcurrentEvent;
+import com.microsoft.gctoolkit.event.g1gc.G1GCEvent;
 import com.microsoft.gctoolkit.event.g1gc.G1GCPauseEvent;
 import com.microsoft.gctoolkit.event.jvm.JVMTermination;
 import com.microsoft.gctoolkit.parser.collection.RuleSet;
@@ -81,6 +83,8 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
 
         parseRules.put(CONCURRENT_CYCLE_START, this::concurrentCycleStart);
         parseRules.put(CONCURRENT_CYCLE_END, this::concurrentCycleEnd);
+        parseRules.put(CONCURRENT_UNDO_CYCLE_START, this::concurrentUndoCycleStart);
+        parseRules.put(CONCURRENT_UNDO_CYCLE_END, this::concurrentUndoCycleEnd);
         parseRules.put(CONCURRENT_PHASE, this::concurrentPhase);
         parseRules.put(CONCURRENT_PHASE_DURATION, this::concurrentPhaseDuration);
         parseRules.put(CONCURRENT_MARK_PHASE, this::concurrentMarkInternalPhases);
@@ -200,7 +204,10 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
     private void cpuBreakout(GCLogTrace trace, String line) {
         CPUSummary cpuSummary = new CPUSummary(trace.getDoubleGroup(1), trace.getDoubleGroup(2), trace.getDoubleGroup(3));
         forwardReference.setCPUSummary(cpuSummary);
-        record(forwardReference.buildEvent());
+        if (! forwardReference.isConcurrentCycle())
+            record(forwardReference.buildEvent());
+        else
+            recordPausePhaseInConcurrentCycle(forwardReference.buildEvent());
     }
 
     // todo: need to drain the queues before terminating...
@@ -512,10 +519,24 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
      */
 
     private void concurrentCycleStart(GCLogTrace trace, String line) {
+        forwardReference.setConcurrentCycleStartTime(getClock());
         forwardReference.setGcType(GarbageCollectionTypes.Concurrent_Cycle);
     }
 
     private void concurrentCycleEnd(GCLogTrace trace, String line) {
+        removeForwardReference(forwardReference);
+    }
+
+    //todo: ????? this is a different type of concurrent cycle
+    private void concurrentUndoCycleStart(GCLogTrace trace, String line) {
+        forwardReference.setConcurrentCycleStartTime(getClock());
+        forwardReference.setGcType(GarbageCollectionTypes.G1GCConcurrentUndoCycle);
+    }
+
+    private void concurrentUndoCycleEnd(GCLogTrace trace, String line) {
+        forwardReference.setDuration(trace.getDurationInSeconds());
+        recordUndoCycle((G1ConcurrentUndoCycle) forwardReference.buildConcurrentPhaseEvent());
+        //record(forwardReference.buildConcurrentUndoCycleEvent());
         removeForwardReference(forwardReference);
     }
 
@@ -527,12 +548,12 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
 
     private void concurrentMarkEnd(GCLogTrace trace, String line) {
         forwardReference.setDuration(trace.getDurationInSeconds());
-        record(forwardReference.buildConcurrentEvent());
+        record(forwardReference.buildConcurrentPhaseEvent());
     }
 
     private void concurrentPhaseDuration(GCLogTrace trace, String line) {
         forwardReference.setDuration(trace.getDurationInSeconds());
-        record(forwardReference.buildConcurrentEvent());
+        record(forwardReference.buildConcurrentPhaseEvent());
     }
 
     /**
@@ -563,7 +584,7 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
 
     private void concurrentMarkAborted(GCLogTrace trace, String line) {
         forwardReference.abortConcurrentMark();
-        record(forwardReference.buildConcurrentEvent());
+        record(forwardReference.buildConcurrentPhaseEvent());
     }
 
     private void remarkStart(GCLogTrace trace, String line) {
@@ -629,17 +650,45 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
     /**
      * publishes a concurrent phase of a concurrent cycle. After the event has been published, all other events
      * that occurred during the concurrent event will be published.
+     * The exception is the Concurrent Undo cycle which causes all concurrent phases to be queued until the
+     * undo cycle ends.
      * @param event
      */
     private void record(G1GCConcurrentEvent event) {
         if ( event == null) return;
-        consumer.record(event);
+
+        if ( forwardReference.getGcType() != GarbageCollectionTypes.G1GCConcurrentUndoCycle) {
+            consumer.record(event);
+            concurrentPhaseActive = false;
+            eventQueue.stream().forEach(consumer::record);
+            eventQueue.clear();
+        } else {
+            eventQueue.add(event);
+        }
+    }
+
+    private void recordUndoCycle(G1ConcurrentUndoCycle cycle) {
         concurrentPhaseActive = false;
         eventQueue.stream().forEach(consumer::record);
         eventQueue.clear();
+        consumer.record(cycle);
     }
 
-    private final Queue<G1GCPauseEvent> eventQueue = new LinkedList<>();
+    /**
+     * Remark pause phase is in the middle of a concurrent mark. Since the concurrent mark started first,
+     * the remark pause will be reported when the concurrent mark finishes.
+     * The pause for cleanup will be published as it's occurs outside of a concurrent phase.
+     * @param event
+     */
+    private void recordPausePhaseInConcurrentCycle(G1GCPauseEvent event) {
+        if ( concurrentPhaseActive)
+            eventQueue.add(event);
+        else {
+            consumer.record(event);
+        }
+    }
+
+    private final Queue<G1GCEvent> eventQueue = new LinkedList<>();
 
     /**
      * Events are published in the start time order. If a concurrent cycle has started and it's in a concurrent
