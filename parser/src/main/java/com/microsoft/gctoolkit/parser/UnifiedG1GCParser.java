@@ -49,6 +49,7 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
     private DateTimeStamp jvmTerminationEventTime = new DateTimeStamp(-1.0d);
 
     private G1GCForwardReference forwardReference;
+    private boolean concurrentCycleActive = false;
     private boolean concurrentPhaseActive = false;
 
     private final RuleSet<GCParseRule, BiConsumer<GCLogTrace, String>> parseRules;
@@ -160,6 +161,8 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
     }
 
     private void parse(String line) {
+        if ( getClock().getTimeStamp() == 2.067)
+            System.out.println("here");
         Optional<AbstractMap.SimpleEntry<GCParseRule, GCLogTrace>> ruleToApply = parseRules.keys().stream()
                 .map(rule -> new AbstractMap.SimpleEntry<>(rule, rule.parse(line)))
                 .filter(tuple -> tuple.getValue() != null)
@@ -535,7 +538,7 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
 
     private void concurrentUndoCycleEnd(GCLogTrace trace, String line) {
         forwardReference.setDuration(trace.getDurationInSeconds());
-        recordUndoCycle((G1ConcurrentUndoCycle) forwardReference.buildConcurrentPhaseEvent());
+        recordUndoCycle((G1ConcurrentUndoCycle) forwardReference.buildConcurrentUndoCycleEvent());
         //record(forwardReference.buildConcurrentUndoCycleEvent());
         removeForwardReference(forwardReference);
     }
@@ -669,9 +672,9 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
 
     private void recordUndoCycle(G1ConcurrentUndoCycle cycle) {
         concurrentPhaseActive = false;
+        consumer.record(cycle);
         eventQueue.stream().forEach(consumer::record);
         eventQueue.clear();
-        consumer.record(cycle);
     }
 
     /**

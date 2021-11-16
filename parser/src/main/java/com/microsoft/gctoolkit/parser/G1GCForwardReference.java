@@ -39,6 +39,7 @@ public class G1GCForwardReference extends ForwardReference {
 
     private GarbageCollectionTypes pausePhaseDuringConcurrentCycle = null;
     private GarbageCollectionTypes gcType = null;
+    private GarbageCollectionTypes concurrentPhase;
 
     public G1GCForwardReference(Decorators decorators, int gcID) {
         super(decorators, gcID);
@@ -83,8 +84,6 @@ public class G1GCForwardReference extends ForwardReference {
     public GarbageCollectionTypes getGcType() {
         return gcType;
     }
-
-    private GarbageCollectionTypes concurrentPhase;
 
     public void setConcurrentPhase(GarbageCollectionTypes phase) {
         this.concurrentPhase = phase;
