@@ -25,6 +25,7 @@ public class SingleGCLogFile extends GCLogFile {
 
     private static boolean isUnified(Path path) {
         try {
+            System.out.println(System.getProperty("user.dir"));
             FileDataSourceMetaData metadata = new FileDataSourceMetaData(path);
             Stream<String> stream = SingleGCLogFile.stream(path, metadata);
             boolean isUnifiedLogging = isUnified(stream);

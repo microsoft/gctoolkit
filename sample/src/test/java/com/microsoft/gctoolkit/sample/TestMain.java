@@ -9,10 +9,11 @@ import java.io.IOException;
 
 public class TestMain {
 
-    @Test
+    //@Test
     public void testMain() {
         try {
-            String gcLogFile = "gclogs/unified/g1gc/G1-80-16gbps2.log.0";
+            String gcLogFile = System.getProperty("gcLogFile");
+            System.out.println("===================>" + gcLogFile + "<===================");
 
             Main main = new Main();
             main.analyze(gcLogFile);

@@ -51,13 +51,13 @@ public class G1GCUnifiedParserRulesTest implements UnifiedG1GCPatterns {
 
     //@Test
     public void testSingeRuleCapture() {
-        int index = 66;
+        int index = 10;
         assertEquals(lines[index].length, captureTest(rules[index], lines[index]), "Miss for " + rules[index].getName());
     }
 
     //@Test
     public void testSingleRuleMisses() {
-        int index = 66;
+        int index = 10;
         for (int i = 0; i < rules.length; i++)
             if ( index != i)
                 assertEquals(0, captureTest(rules[index], lines[i]), rules[index].getName() + " hits on lines for " + rules[i].getName());
@@ -151,7 +151,9 @@ public class G1GCUnifiedParserRulesTest implements UnifiedG1GCPatterns {
             NEW_CSET,                     // 65
             RESIZE_TLAB,
             WEAK_PROCESSING,
-            CLEANUP__FINALIZE_CONC_MARK
+            CLEANUP__FINALIZE_CONC_MARK,
+            CONCURRENT_UNDO_CYCLE_START,
+            CONCURRENT_UNDO_CYCLE_END     // 70
     };
 
     /*
@@ -221,10 +223,9 @@ public class G1GCUnifiedParserRulesTest implements UnifiedG1GCPatterns {
             },
             {   // 10
                     "[73.082s][info ][gc           ] GC(263) Concurrent Cycle",
+                    "[2.179s][info ][gc          ] GC(9) Concurrent Mark Cycle"
             },
             {   // 11
-                    "[2.179s][info ][gc          ] GC(9) Concurrent Mark Cycle",
-                    "[155.787s][info ][gc          ] GC(2457) Concurrent Undo Cycle",
                     "[156.051s][info ][gc,marking  ] GC(2463) Concurrent Mark",
                     "[73.082s][info ][gc,marking   ] GC(263) Concurrent Clear Claimed Marks",
                     "[73.082s][info ][gc,marking   ] GC(263) Concurrent Scan Root Regions",
@@ -234,11 +235,10 @@ public class G1GCUnifiedParserRulesTest implements UnifiedG1GCPatterns {
             },
             {   // 12
                     "[73.171s][info ][gc            ] GC(263) Concurrent Cycle 89.437ms",
+                    "[2.179s][info ][gc          ] GC(9) Concurrent Mark Cycle 96.518ms"
             },
             {   // 13
-                    "[2.179s][info ][gc          ] GC(9) Concurrent Mark Cycle 96.518ms",
                     "[156.068s][info ][gc,marking  ] GC(2463) Concurrent Mark 16.895ms",
-                    "[155.836s][info ][gc          ] GC(2457) Concurrent Undo Cycle 49.351ms",
                     "[73.082s][info ][gc,marking   ] GC(263) Concurrent Clear Claimed Marks 0.018ms",
                     "[73.084s][info ][gc,marking   ] GC(263) Concurrent Scan Root Regions 2.325ms",
                     "[73.168s][info ][gc,marking    ] GC(263) Concurrent Create Live Data 8.089ms",
@@ -441,6 +441,12 @@ public class G1GCUnifiedParserRulesTest implements UnifiedG1GCPatterns {
             },
             {   // 68
                     "[156.079s][debug][gc,phases   ] GC(2463) Finalize Concurrent Mark Cleanup 0.154ms"
+            },
+            {   // 69
+                    "[155.787s][info ][gc          ] GC(2457) Concurrent Undo Cycle",
+            },
+            {   // 70
+                    "[155.836s][info ][gc          ] GC(2457) Concurrent Undo Cycle 49.351ms",
             }
 
             // Remaining lines which may not need to be parsed...
