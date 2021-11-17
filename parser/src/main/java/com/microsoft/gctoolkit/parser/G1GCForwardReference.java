@@ -670,7 +670,7 @@ public class G1GCForwardReference extends ForwardReference {
             case G1GCConcurrentUndoCycle:
                 // gctype is likely incorrectly set in the forward reference. The plan is to specialize the forward
                 // references thus allowing this event to be built here rather than in a specialized method.
-                break;
+                return null;
             default:
                 LOGGER.warning("Unrecognized Event " + gcType);
                 return null;
