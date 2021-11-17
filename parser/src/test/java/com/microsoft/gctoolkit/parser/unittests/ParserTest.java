@@ -10,8 +10,13 @@ import com.microsoft.gctoolkit.event.jvm.JVMTermination;
 import com.microsoft.gctoolkit.io.GCLogFile;
 import com.microsoft.gctoolkit.io.RotatingGCLogFile;
 import com.microsoft.gctoolkit.io.SingleGCLogFile;
-import com.microsoft.gctoolkit.parser.*;
 import com.microsoft.gctoolkit.jvm.Diarizer;
+import com.microsoft.gctoolkit.parser.GCLogParser;
+import com.microsoft.gctoolkit.parser.GenerationalHeapParser;
+import com.microsoft.gctoolkit.parser.JVMEventConsumer;
+import com.microsoft.gctoolkit.parser.PreUnifiedG1GCParser;
+import com.microsoft.gctoolkit.parser.UnifiedG1GCParser;
+import com.microsoft.gctoolkit.parser.UnifiedGenerationalParser;
 import com.microsoft.gctoolkit.parser.jvm.PreUnifiedDiarizer;
 import com.microsoft.gctoolkit.parser.jvm.UnifiedDiarizer;
 

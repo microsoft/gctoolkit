@@ -8,14 +8,11 @@ import com.microsoft.gctoolkit.io.GCLogFile;
 import com.microsoft.gctoolkit.jvm.Diary;
 import com.microsoft.gctoolkit.jvm.JavaVirtualMachine;
 import com.microsoft.gctoolkit.jvm.JvmConfiguration;
-import com.microsoft.gctoolkit.jvm.Diarizer;
-import com.microsoft.gctoolkit.parser.jvm.UnifiedDiarizer;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
 import com.microsoft.gctoolkit.vertx.GCToolkitVertx;
 
 import java.io.IOException;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;

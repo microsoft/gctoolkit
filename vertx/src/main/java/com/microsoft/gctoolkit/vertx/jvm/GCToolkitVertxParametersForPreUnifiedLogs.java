@@ -5,13 +5,12 @@ package com.microsoft.gctoolkit.vertx.jvm;
 import com.microsoft.gctoolkit.aggregator.Aggregation;
 import com.microsoft.gctoolkit.aggregator.Aggregator;
 import com.microsoft.gctoolkit.aggregator.EventSource;
+import com.microsoft.gctoolkit.jvm.Diary;
 import com.microsoft.gctoolkit.parser.CMSTenuredPoolParser;
 import com.microsoft.gctoolkit.parser.GenerationalHeapParser;
 import com.microsoft.gctoolkit.parser.JVMEventParser;
 import com.microsoft.gctoolkit.parser.PreUnifiedG1GCParser;
 import com.microsoft.gctoolkit.parser.SurvivorMemoryPoolParser;
-import com.microsoft.gctoolkit.jvm.Diarizer;
-import com.microsoft.gctoolkit.jvm.Diary;
 import com.microsoft.gctoolkit.vertx.GCToolkitVertx;
 import com.microsoft.gctoolkit.vertx.aggregator.AggregatorVerticle;
 

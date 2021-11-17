@@ -1,7 +1,7 @@
 package com.microsoft.gctoolkit.sample.aggregation;
 
-import com.microsoft.gctoolkit.aggregator.Aggregator;
 import com.microsoft.gctoolkit.aggregator.Aggregates;
+import com.microsoft.gctoolkit.aggregator.Aggregator;
 import com.microsoft.gctoolkit.aggregator.EventSource;
 import com.microsoft.gctoolkit.event.g1gc.G1GCPauseEvent;
 import com.microsoft.gctoolkit.event.generational.GenerationalGCPauseEvent;

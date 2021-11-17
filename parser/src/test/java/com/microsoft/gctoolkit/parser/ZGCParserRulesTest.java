@@ -2,15 +2,13 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.parser;
 
-import com.microsoft.gctoolkit.parser.unified.ZGCPatterns;
 import com.microsoft.gctoolkit.parser.jvm.Decorators;
+import com.microsoft.gctoolkit.parser.unified.ZGCPatterns;
 import org.junit.jupiter.api.Test;
 
 import java.util.logging.Logger;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ZGCParserRulesTest implements ZGCPatterns {
 

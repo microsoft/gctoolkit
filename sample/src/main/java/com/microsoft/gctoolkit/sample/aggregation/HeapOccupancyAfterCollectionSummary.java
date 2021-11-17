@@ -1,8 +1,8 @@
 package com.microsoft.gctoolkit.sample.aggregation;
 
 import com.microsoft.gctoolkit.aggregator.Collates;
-import com.microsoft.gctoolkit.sample.collections.XYDataSet;
 import com.microsoft.gctoolkit.event.GarbageCollectionTypes;
+import com.microsoft.gctoolkit.sample.collections.XYDataSet;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
 
 import java.util.Map;

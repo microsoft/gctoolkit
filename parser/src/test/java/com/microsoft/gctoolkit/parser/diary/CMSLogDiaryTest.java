@@ -2,9 +2,9 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.parser.diary;
 
-import com.microsoft.gctoolkit.parser.TestLogFile;
 import com.microsoft.gctoolkit.io.SingleGCLogFile;
 import com.microsoft.gctoolkit.jvm.Diarizer;
+import com.microsoft.gctoolkit.parser.TestLogFile;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;

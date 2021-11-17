@@ -2,16 +2,14 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.parser;
 
-import com.microsoft.gctoolkit.parser.unified.UnifiedG1GCPatterns;
 import com.microsoft.gctoolkit.parser.jvm.Decorators;
+import com.microsoft.gctoolkit.parser.unified.UnifiedG1GCPatterns;
 import org.junit.jupiter.api.Test;
 
 import java.util.logging.Logger;
 
 import static com.microsoft.gctoolkit.parser.CommonTestHelper.captureTest;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class G1GCUnifiedParserRulesTest implements UnifiedG1GCPatterns {
 

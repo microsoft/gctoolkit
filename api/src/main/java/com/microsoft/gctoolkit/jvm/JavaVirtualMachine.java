@@ -3,10 +3,10 @@
 package com.microsoft.gctoolkit.jvm;
 
 
+import com.microsoft.gctoolkit.GCToolKit;
 import com.microsoft.gctoolkit.aggregator.Aggregation;
 import com.microsoft.gctoolkit.io.DataSource;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
-import com.microsoft.gctoolkit.GCToolKit;
 
 import java.util.Optional;
 

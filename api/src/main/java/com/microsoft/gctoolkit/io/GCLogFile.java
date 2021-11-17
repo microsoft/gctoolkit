@@ -2,17 +2,19 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.io;
 
-import com.microsoft.gctoolkit.jvm.Diary;
 import com.microsoft.gctoolkit.jvm.Diarizer;
+import com.microsoft.gctoolkit.jvm.Diary;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.Objects;
+import java.util.ServiceConfigurationError;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
-import static java.util.ServiceLoader.*;
+import static java.util.ServiceLoader.Provider;
+import static java.util.ServiceLoader.load;
 
 
 /**
@@ -44,13 +46,13 @@ public abstract class GCLogFile extends FileDataSource<String> {
      */
     public boolean isUnified() { return unifiedFormat; }
 
-    private Diarizer findProvider() {
-        Optional<Diarizer> provider = load(Diarizer.class)
+    private Diarizer diarizer() {
+        return load(Diarizer.class)
                 .stream()
                 .map(Provider::get)
                 .filter(p -> p.isUnified() == isUnified())
-                .findFirst();
-        return ( provider.isPresent()) ? provider.get() : null;
+                .findFirst()
+                .orElseThrow(() -> new ServiceConfigurationError("Unable to find a suitable provider to create a diary"));
     }
 
     /**
@@ -60,18 +62,15 @@ public abstract class GCLogFile extends FileDataSource<String> {
 
     public Diary diary() throws IOException {
         if ( diary == null) {
-            Diarizer configuration = findProvider();
-            if ( configuration == null) {
-                throw new ServiceConfigurationError("Unable to find a suitable provider to create a diary");
-            }
-            stream().
-                    filter(Objects::nonNull).
-                    map(String::trim).
-                    filter(s -> s.length() > 0).
-                    map(configuration::diarize).
-                    filter(completed -> completed).
-                    findFirst();
-            this.diary = configuration.getDiary();
+            Diarizer diarizer = diarizer();
+            stream()
+                    .filter(Objects::nonNull)
+                    .map(String::trim)
+                    .filter(s -> s.length() > 0)
+                    .map(diarizer::diarize)
+                    .filter(completed -> completed)
+                    .findFirst();
+            this.diary = diarizer.getDiary();
         }
         return diary;
     }
@@ -102,10 +101,10 @@ public abstract class GCLogFile extends FileDataSource<String> {
     }
 
     private static Stream<String> firstNLines(Stream<String> stream, int limit) {
-        return stream.
-                filter(Objects::nonNull).
-                map(String::trim).
-                filter(s -> s.length() > 0).
-                limit(limit);
+        return stream
+                .filter(Objects::nonNull)
+                .map(String::trim)
+                .filter(s -> s.length() > 0)
+                .limit(limit);
     }
 }

@@ -12,8 +12,8 @@ import com.microsoft.gctoolkit.event.generational.ConcurrentReset;
 import com.microsoft.gctoolkit.event.generational.ConcurrentSweep;
 import com.microsoft.gctoolkit.event.generational.InitialMark;
 import com.microsoft.gctoolkit.event.jvm.JVMTermination;
-import com.microsoft.gctoolkit.time.DateTimeStamp;
 import com.microsoft.gctoolkit.jvm.Diary;
+import com.microsoft.gctoolkit.time.DateTimeStamp;
 
 import java.util.logging.Logger;
 

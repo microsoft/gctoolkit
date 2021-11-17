@@ -7,8 +7,8 @@ import com.microsoft.gctoolkit.io.DataSource;
 import com.microsoft.gctoolkit.io.GCLogFile;
 import com.microsoft.gctoolkit.io.RotatingGCLogFile;
 import com.microsoft.gctoolkit.io.SingleGCLogFile;
-import com.microsoft.gctoolkit.jvm.JavaVirtualMachine;
 import com.microsoft.gctoolkit.jvm.Diary;
+import com.microsoft.gctoolkit.jvm.JavaVirtualMachine;
 
 import java.io.IOException;
 import java.lang.reflect.Constructor;

@@ -4,18 +4,13 @@ package com.microsoft.gctoolkit.parser.jvm;
 
 import com.microsoft.gctoolkit.jvm.Diarizer;
 import com.microsoft.gctoolkit.jvm.Diary;
-import com.microsoft.gctoolkit.jvm.SupportedFlags;
-import com.microsoft.gctoolkit.time.DateTimeStamp;
-import com.microsoft.gctoolkit.parser.unified.ShenandoahPatterns;
-import com.microsoft.gctoolkit.parser.unified.UnifiedG1GCPatterns;
-import com.microsoft.gctoolkit.parser.unified.UnifiedGenerationalPatterns;
 import com.microsoft.gctoolkit.parser.unified.UnifiedLoggingLevel;
-import com.microsoft.gctoolkit.parser.unified.ZGCPatterns;
+import com.microsoft.gctoolkit.time.DateTimeStamp;
 
 import java.util.TreeSet;
 
-import static com.microsoft.gctoolkit.jvm.SupportedFlags.*;
 import static com.microsoft.gctoolkit.jvm.SupportedFlags.GC_CAUSE;
+import static com.microsoft.gctoolkit.jvm.SupportedFlags.*;
 import static com.microsoft.gctoolkit.parser.unified.ShenandoahPatterns.SHENANDOAH_TAG;
 import static com.microsoft.gctoolkit.parser.unified.UnifiedG1GCPatterns.G1_COLLECTION;
 import static com.microsoft.gctoolkit.parser.unified.UnifiedG1GCPatterns.G1_TAG;

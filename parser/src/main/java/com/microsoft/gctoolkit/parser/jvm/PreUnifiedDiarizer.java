@@ -8,7 +8,6 @@ import com.microsoft.gctoolkit.event.GCCauses;
 import com.microsoft.gctoolkit.jvm.Diarizer;
 import com.microsoft.gctoolkit.jvm.Diary;
 import com.microsoft.gctoolkit.jvm.SupportedFlags;
-import com.microsoft.gctoolkit.time.DateTimeStamp;
 import com.microsoft.gctoolkit.parser.CMSPatterns;
 import com.microsoft.gctoolkit.parser.G1GCPatterns;
 import com.microsoft.gctoolkit.parser.G1GCTokens;
@@ -20,6 +19,7 @@ import com.microsoft.gctoolkit.parser.PreUnifiedTokens;
 import com.microsoft.gctoolkit.parser.SerialPatterns;
 import com.microsoft.gctoolkit.parser.SimplePatterns;
 import com.microsoft.gctoolkit.parser.TenuredPatterns;
+import com.microsoft.gctoolkit.time.DateTimeStamp;
 
 import java.util.logging.Logger;
 import java.util.regex.Matcher;

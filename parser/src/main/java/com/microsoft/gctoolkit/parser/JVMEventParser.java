@@ -6,8 +6,8 @@ import com.microsoft.gctoolkit.event.jvm.ApplicationConcurrentTime;
 import com.microsoft.gctoolkit.event.jvm.ApplicationStoppedTime;
 import com.microsoft.gctoolkit.event.jvm.JVMEvent;
 import com.microsoft.gctoolkit.event.jvm.JVMTermination;
-import com.microsoft.gctoolkit.time.DateTimeStamp;
 import com.microsoft.gctoolkit.jvm.Diary;
+import com.microsoft.gctoolkit.time.DateTimeStamp;
 
 import java.util.ArrayList;
 import java.util.Collection;

@@ -5,13 +5,13 @@ package com.microsoft.gctoolkit.vertx.jvm;
 import com.microsoft.gctoolkit.aggregator.Aggregation;
 import com.microsoft.gctoolkit.io.DataSource;
 import com.microsoft.gctoolkit.io.GCLogFile;
+import com.microsoft.gctoolkit.jvm.Diarizer;
 import com.microsoft.gctoolkit.jvm.JavaVirtualMachine;
 import com.microsoft.gctoolkit.jvm.JvmConfiguration;
-import com.microsoft.gctoolkit.time.DateTimeStamp;
-import com.microsoft.gctoolkit.vertx.GCToolkitVertx;
-import com.microsoft.gctoolkit.jvm.Diarizer;
 import com.microsoft.gctoolkit.parser.jvm.PreUnifiedDiarizer;
 import com.microsoft.gctoolkit.parser.jvm.UnifiedDiarizer;
+import com.microsoft.gctoolkit.time.DateTimeStamp;
+import com.microsoft.gctoolkit.vertx.GCToolkitVertx;
 
 import java.io.IOException;
 import java.util.Map;

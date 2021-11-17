@@ -4,8 +4,8 @@ package com.microsoft.gctoolkit.parser;
 
 import com.microsoft.gctoolkit.event.CPUSummary;
 import com.microsoft.gctoolkit.event.GCCause;
-import com.microsoft.gctoolkit.time.DateTimeStamp;
 import com.microsoft.gctoolkit.parser.jvm.Decorators;
+import com.microsoft.gctoolkit.time.DateTimeStamp;
 
 public class ForwardReference {
 

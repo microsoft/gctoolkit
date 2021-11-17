@@ -17,9 +17,9 @@ import com.microsoft.gctoolkit.event.generational.PSFullGC;
 import com.microsoft.gctoolkit.event.generational.PSYoungGen;
 import com.microsoft.gctoolkit.event.generational.ParNew;
 import com.microsoft.gctoolkit.event.jvm.JVMEvent;
+import com.microsoft.gctoolkit.jvm.Diary;
 import com.microsoft.gctoolkit.parser.UnifiedGenerationalParser;
 import com.microsoft.gctoolkit.parser.jvm.UnifiedDiarizer;
-import com.microsoft.gctoolkit.jvm.Diary;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

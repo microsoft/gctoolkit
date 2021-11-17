@@ -2,7 +2,6 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.jvm;
 
-import com.microsoft.gctoolkit.jvm.Diary;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
 
 public interface Diarizer {

@@ -4,8 +4,8 @@ package com.microsoft.gctoolkit.parser;
 
 import com.microsoft.gctoolkit.event.jvm.JVMTermination;
 import com.microsoft.gctoolkit.event.jvm.SurvivorRecord;
-import com.microsoft.gctoolkit.parser.jvm.Decorators;
 import com.microsoft.gctoolkit.jvm.Diary;
+import com.microsoft.gctoolkit.parser.jvm.Decorators;
 
 import static com.microsoft.gctoolkit.parser.unified.UnifiedPatterns.CPU_BREAKOUT;
 import static com.microsoft.gctoolkit.parser.unified.UnifiedPatterns.JVM_EXIT;

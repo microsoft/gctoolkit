@@ -2,15 +2,18 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.parser;
 
-import com.microsoft.gctoolkit.event.*;
+import com.microsoft.gctoolkit.event.CPUSummary;
+import com.microsoft.gctoolkit.event.GarbageCollectionTypes;
+import com.microsoft.gctoolkit.event.MemoryPoolSummary;
+import com.microsoft.gctoolkit.event.RegionSummary;
 import com.microsoft.gctoolkit.event.g1gc.G1ConcurrentUndoCycle;
 import com.microsoft.gctoolkit.event.g1gc.G1GCConcurrentEvent;
 import com.microsoft.gctoolkit.event.g1gc.G1GCEvent;
 import com.microsoft.gctoolkit.event.g1gc.G1GCPauseEvent;
 import com.microsoft.gctoolkit.event.jvm.JVMTermination;
+import com.microsoft.gctoolkit.jvm.Diary;
 import com.microsoft.gctoolkit.parser.collection.RuleSet;
 import com.microsoft.gctoolkit.parser.jvm.Decorators;
-import com.microsoft.gctoolkit.jvm.Diary;
 import com.microsoft.gctoolkit.parser.unified.UnifiedG1GCPatterns;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
 

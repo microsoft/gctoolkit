@@ -4,7 +4,6 @@ package com.microsoft.gctoolkit.parser;
 
 import java.io.File;
 import java.util.Arrays;
-import java.util.Optional;
 
 /**
  * Abstract the log files location and provide some parsing of the file name scheme.

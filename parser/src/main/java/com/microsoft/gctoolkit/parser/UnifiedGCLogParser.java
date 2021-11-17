@@ -2,9 +2,9 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.parser;
 
-import com.microsoft.gctoolkit.time.DateTimeStamp;
-import com.microsoft.gctoolkit.parser.jvm.Decorators;
 import com.microsoft.gctoolkit.jvm.Diary;
+import com.microsoft.gctoolkit.parser.jvm.Decorators;
+import com.microsoft.gctoolkit.time.DateTimeStamp;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
