@@ -13,7 +13,6 @@ public class TestMain {
     public void testMain() {
         try {
             String gcLogFile = System.getProperty("gcLogFile");
-            System.out.println("===================>" + gcLogFile + "<===================");
 
             Main main = new Main();
             main.analyze(gcLogFile);

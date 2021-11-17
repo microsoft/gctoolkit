@@ -78,7 +78,9 @@ public class GCToolKit {
                 .map(ServiceLoader.Provider::get)
                 .map(Aggregation::getClass)
                 .forEach(registeredAggregations::add);
-        registeredAggregations.forEach(a -> System.out.println(a.toString()));
+        //Useful for debugging
+        if ( LOGGER.getLevel().equals(Level.FINER))
+            registeredAggregations.forEach(a -> LOGGER.log(Level.FINER, "Registered " + a.toString()));
     }
 
     /**
