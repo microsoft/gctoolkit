@@ -23,7 +23,7 @@ import java.util.stream.Stream;
  * The {@link RotatingGCLogFile#RotatingGCLogFile(Path, List)} constructor allows the user to
  * provide a list of discrete {@code GarbageCollectionLogFileSegement}s for a {@code RotatingGCLogFile}.
  */
-public class GarbageCollectionLogFileSegment {
+public class GCLogFileZipSegment implements LogFileSegment {
 
     private static final String ROTATING_LOG_SUFFIX = ".*\\.(\\d+)(\\.current)?$";
     private static final Pattern ROTATING_LOG_PATTERN = Pattern.compile(ROTATING_LOG_SUFFIX);
@@ -60,7 +60,7 @@ public class GarbageCollectionLogFileSegment {
      * @param path The path to the file.
      * @see #segmentIndex
      */
-    public GarbageCollectionLogFileSegment(Path path) {
+    public GCLogFileZipSegment(Path path) {
         this.path = path;
 
         String filename = path.getFileName().toString();
@@ -81,6 +81,16 @@ public class GarbageCollectionLogFileSegment {
      */
     public Path getPath() {
         return path;
+    }
+
+    @Override
+    public double getStartTime() {
+        return 0;
+    }
+
+    @Override
+    public double getEndTime() {
+        return 0;
     }
 
     /**
@@ -138,7 +148,7 @@ public class GarbageCollectionLogFileSegment {
      * @param otherSegment The log file segment being compared to this.
      * @return {@code true} if this segment is a rollover from the other segment.
      */
-    public boolean isContiguousWith(GarbageCollectionLogFileSegment otherSegment) {
+    public boolean isContiguousWith(GCLogFileZipSegment otherSegment) {
         // Compare by calendar date, if possible.
         double delta = rolloverDelta(this, otherSegment);
         if (Double.isNaN(delta)) {
@@ -149,7 +159,7 @@ public class GarbageCollectionLogFileSegment {
     }
 
     // calculate the delta between the start of newSegment and the end of oldSegment.
-    /* package scope for testing */ static double rolloverDelta(GarbageCollectionLogFileSegment newSegment, GarbageCollectionLogFileSegment oldSegment) {
+    /* package scope for testing */ static double rolloverDelta(GCLogFileZipSegment newSegment, GCLogFileZipSegment oldSegment) {
         DateTimeStamp startAge;
         DateTimeStamp endAge;
         try {
@@ -230,18 +240,18 @@ public class GarbageCollectionLogFileSegment {
 
     private static DateTimeStamp scanForTimeOfLogStart(Path path) throws IOException {
         return Files.lines(path)
-                .map(GarbageCollectionLogFileSegment::matcher)
+                .map(GCLogFileZipSegment::matcher)
                 .filter(Matcher::find)
                 .findFirst()
-                .map(GarbageCollectionLogFileSegment::calculateDateTimeStamp)
+                .map(GCLogFileZipSegment::calculateDateTimeStamp)
                 .orElse(null);
     }
 
     private static DateTimeStamp scanForTimeOfLogEnd(Path path) throws IOException {
         return tail(path,100).stream()
-                .map(GarbageCollectionLogFileSegment::matcher)
+                .map(GCLogFileZipSegment::matcher)
                 .filter(Matcher::find)
-                .map(GarbageCollectionLogFileSegment::calculateDateTimeStamp)
+                .map(GCLogFileZipSegment::calculateDateTimeStamp)
                 .max(Comparator.comparing(dateTimeStamp -> dateTimeStamp != null ? dateTimeStamp.getTimeStamp() : 0))
                 .orElse(null);
     }

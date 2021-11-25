@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 import java.util.zip.GZIPInputStream;
@@ -23,27 +22,23 @@ public class SingleGCLogFile extends GCLogFile {
 
     private static final Logger LOGGER = Logger.getLogger(SingleGCLogFile.class.getName());
 
-    private static boolean isUnified(Path path) {
-        try {
-            FileDataSourceMetaData metadata = new FileDataSourceMetaData(path);
-            Stream<String> stream = SingleGCLogFile.stream(path, metadata);
-            boolean isUnifiedLogging = isUnified(stream);
-            // TODO: if isUnifiedLogging is false, assert that the file is pre-unified.
-            //       if file is neither unified nor pre-unified, then we're dealing with
-            //       something we can't handle.
-            return isUnifiedLogging;
-        } catch (IOException e) {
-            LOGGER.log(Level.WARNING, "cannot determine whether " + path + " is a unified log format");
-            return false;
-        }
-    }
-
     /**
      * Constructor for a single, GC log file.
      * @param path The path to the log file.
      */
+
+    private SingleLogFileMetadata metadata = null;
+
     public SingleGCLogFile(Path path) {
-        super(path, SingleGCLogFile.isUnified(path));
+        super(path);
+    }
+
+    @Override
+    public LogFileMetadata getMetaData() throws IOException {
+        if (metadata == null) {
+            metadata = new SingleLogFileMetadata(path);
+        }
+        return metadata;
     }
 
     @Override
@@ -51,8 +46,8 @@ public class SingleGCLogFile extends GCLogFile {
         return stream(path, getMetaData());
     }
 
-    private static Stream<String> stream(Path path, FileDataSourceMetaData metadata) throws IOException {
-        if (metadata.isFile()) {
+    private Stream<String> stream(Path path, LogFileMetadata metadata) throws IOException {
+        if (metadata.isPlainText()) {
             return Files.lines(path);
         } else if (metadata.isZip()) {
             return streamZipFile(path);

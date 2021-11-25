@@ -36,72 +36,37 @@ public class RotatingGCLogFile extends GCLogFile {
 
     private static final Logger LOGGER = Logger.getLogger(RotatingGCLogFile.class.getName());
 
-    private static boolean isUnified(Path path) {
-        try {
-            FileDataSourceMetaData metadata = new FileDataSourceMetaData(path);
-
-            List<GarbageCollectionLogFileSegment> segments;
-            if (metadata.isZip() || metadata.isGZip()) {
-                //TODO: add code to ensure correct order to stream files in zip and gzip files
-                segments = List.of();
-            } else {
-                segments = findGCLogSegments(path);
-            }
-            return isUnified(path, segments);
-        } catch (IOException e) {
-            LOGGER.log(Level.WARNING, "cannot determine whether " + path + " is a unified log format");
-            return false;
-        }
-    }
-
-    private static boolean isUnified(Path path, List<GarbageCollectionLogFileSegment> segments) {
-        // TODO: if isUnifiedLogging is false, assert that the file is pre-unified.
-        //       if file is neither unified nor pre-unified, then we're dealing with
-        //       something we can't handle.
-        return segments.stream()
-                .map(GarbageCollectionLogFileSegment::stream)
-                .anyMatch(s -> {
-                    try {
-                        return isUnified(s);
-                    } catch (IOException e) {
-                        LOGGER.log(Level.WARNING, "cannot determine whether '" + path + "' is a unified log format");
-                        return false;
-                    }
-                });
-    }
-
     /**
      * Use the given path to find rotating log files. If the path is a file, the file name is used to match
      * other files in the directory. If the path is a directory, all files in the directory are considered.
      * @param path the path to a rotating log file, or to a directory containing rotating log files.
      */
     public RotatingGCLogFile(Path path) {
-        super(path, isUnified(path));
+        super(path);
 
-        if (getMetaData().isZip() || getMetaData().isGZip()) {
-            //TODO: add code to ensure correct order to stream files in zip and gzip files
-            this.orderedGarbageCollectionLogFiles = new LinkedList<>();
-        } else {
-            LinkedList<GarbageCollectionLogFileSegment> orderedSegments = null;
-            try {
-                List<GarbageCollectionLogFileSegment> segments = findGCLogSegments(path);
-                orderedSegments = orderSegments(segments);
-            } catch (IOException e) {
-                LOGGER.log(Level.WARNING, "Cannot find and order GC log file segments for: " + path);
-            } finally {
-                this.orderedGarbageCollectionLogFiles = orderedSegments;
-            }
-        }
+//        if (getMetaData().isZip() || getMetaData().isGZip()) {
+//            //TODO: add code to ensure correct order to stream files in zip and gzip files
+//            this.orderedGarbageCollectionLogFiles = new LinkedList<>();
+//        } else {
+//            LinkedList<GCLogFileSegment> orderedSegments = null;
+//            try {
+//                List<GCLogFileSegment> segments = findGCLogSegments();
+//                orderedSegments = orderSegments(segments);
+//            } catch (IOException e) {
+//                LOGGER.log(Level.WARNING, "Cannot find and order GC log file segments for: " + path);
+//            } finally {
+//                this.orderedGarbageCollectionLogFiles = orderedSegments;
+//            }
+//        }
     }
 
     /**
      * Create a RotatingGCLogFile with the given log file segments.
      * @param parentDirectory The directory that contains the log file segments.
-     * @param segments The log file segments.
      */
-    public RotatingGCLogFile(Path parentDirectory, List<GarbageCollectionLogFileSegment> segments) {
-        super(parentDirectory, isUnified(parentDirectory, segments));
-        this.orderedGarbageCollectionLogFiles = orderSegments(segments);
+    public RotatingGCLogFile(Path parentDirectory, List<GCLogFileSegment> segments) throws IOException {
+        super(parentDirectory); //, new SingleLogFileMetadata(parentDirectory));
+        //this.orderedGarbageCollectionLogFiles = orderSegments(segments);
     }
 
     /**
@@ -116,20 +81,26 @@ public class RotatingGCLogFile extends GCLogFile {
      */
     public static final Pattern ROTATING_LOG_PATTERN = Pattern.compile(ROTATING_LOG_SUFFIX);
 
-    private final LinkedList<GarbageCollectionLogFileSegment> orderedGarbageCollectionLogFiles;
+    //private final LinkedList<GCLogFileSegment> orderedGarbageCollectionLogFiles;
+    private RotatingLogFileMetadata metaData;
+
+    public LogFileMetadata getMetaData() throws IOException {
+        if ( metaData == null)
+            metaData =  new RotatingLogFileMetadata(getPath());
+        return metaData;
+    }
 
     @Override
     public Stream<String> stream() throws IOException {
-        return stream(path, getMetaData(), orderedGarbageCollectionLogFiles);
+        return stream(getMetaData(), null); // orderedGarbageCollectionLogFiles);
     }
 
-    private static Stream<String> stream(
-            Path path,
-            FileDataSourceMetaData metadata,
-            LinkedList<GarbageCollectionLogFileSegment> segments)
+    private Stream<String> stream(
+            LogFileMetadata metadata,
+            LinkedList<GCLogFileSegment> segments)
             throws IOException {
         //todo: find rolling files....
-        if (metadata.isFile() || metadata.isDirectory()) {
+        if (metadata.isPlainText() || metadata.isDirectory()) {
             switch (segments.size()) {
                 case 0:
                     String[] empty = new String[0];
@@ -138,14 +109,14 @@ public class RotatingGCLogFile extends GCLogFile {
                     return segments.getFirst().stream();
                 default:
                     // This code removes elements from the list of segments, so work on a copy.
-                    LinkedList<GarbageCollectionLogFileSegment> copySegments = new LinkedList<>(segments);
+                    LinkedList<GCLogFileSegment> copySegments = new LinkedList<>(segments);
                     Stream<String> allSegments = Stream.concat(copySegments.removeFirst().stream(), copySegments.removeFirst().stream());
                     while (!copySegments.isEmpty())
                         allSegments = Stream.concat(allSegments, copySegments.removeFirst().stream());
                     return allSegments;
             }
         } else if (metadata.isZip()) {
-            return streamZipFile(path);
+            return streamZipFile();
         } else if (metadata.isGZip()) {
             throw new IOException("Unable to stream GZip files. Please unzip and retry");
         }
@@ -153,7 +124,7 @@ public class RotatingGCLogFile extends GCLogFile {
     }
 
     @SuppressWarnings("resource")
-    private static Stream<String> streamZipFile(Path path) throws IOException {
+    private Stream<String> streamZipFile() throws IOException {
         ZipFile zipFile = new ZipFile(path.toFile());
         List<ZipEntry> entries = zipFile.stream().filter(entry -> !entry.isDirectory()).collect(Collectors.toList());
         Vector<InputStream> streams = new Vector<>();
@@ -180,17 +151,17 @@ public class RotatingGCLogFile extends GCLogFile {
     }
 
     /**
-     * The {@link GarbageCollectionLogFileSegment}s in rotating order. Note that only the contiguous
+     * The {@link GCLogFileSegment}s in rotating order. Note that only the contiguous
      * log file segments are included. Therefore, the number of log file segments may be less than
      * the files that match the rotating pattern.
      * @return The log file segments in rotating order.
      */
-    public List<GarbageCollectionLogFileSegment> getOrderedGarbageCollectionLogFiles() {
-        return Collections.unmodifiableList(orderedGarbageCollectionLogFiles);
+    public List<GCLogFileSegment> getOrderedGarbageCollectionLogFiles() {
+        return null; //Collections.unmodifiableList(orderedGarbageCollectionLogFiles);
     }
 
     //assume directory but then allow for a file.
-    private static List<GarbageCollectionLogFileSegment> findGCLogSegments(Path path) throws IOException {
+    private List<GCLogFileSegment> findGCLogSegments() throws IOException {
 
         if (Files.isRegularFile(path)) {
             String filename = path.getFileName().toString();
@@ -208,20 +179,20 @@ public class RotatingGCLogFile extends GCLogFile {
                     filter(Files::isRegularFile).
                     filter(file -> !file.toFile().isHidden()).
                     filter(gcLogFragmentFinder).
-                    map(GarbageCollectionLogFileSegment::new).
+                    map(GCLogFileSegment::new).
                     collect(Collectors.toList());
          } else if (Files.isDirectory(path)) {
             return Files.list(path).
                     filter(Files::isRegularFile).
                     filter(file -> !file.toFile().isHidden()).
-                    map(GarbageCollectionLogFileSegment::new).
+                    map(GCLogFileSegment::new).
                     collect(Collectors.toList());
         }
 
         throw new IllegalArgumentException("path is not a file or directory: " + path);
     }
 
-    private static LinkedList<GarbageCollectionLogFileSegment> orderSegments(List<GarbageCollectionLogFileSegment> gcLogSegments) {
+    private LinkedList<GCLogFileSegment> orderSegments(List<GCLogFileSegment> gcLogSegments) {
 
         // Unified rotation: jdk11/src/hotspot/share/logging/logFileOutput.cpp
         //     Output is always to named file, e.g. 'gc.log' if given -Xlog:gc*:file=gc.log::filecount=5
@@ -243,9 +214,9 @@ public class RotatingGCLogFile extends GCLogFile {
             return new LinkedList<>(gcLogSegments);
         }
 
-        LinkedList<GarbageCollectionLogFileSegment> segments = new LinkedList<>();
-        GarbageCollectionLogFileSegment[] orderedSegments = gcLogSegments.toArray(new GarbageCollectionLogFileSegment[0]);
-        Arrays.sort(orderedSegments, Comparator.comparingInt(GarbageCollectionLogFileSegment::getSegmentIndex));
+        LinkedList<GCLogFileSegment> segments = new LinkedList<>();
+        GCLogFileSegment[] orderedSegments = gcLogSegments.toArray(new GCLogFileSegment[0]);
+        Arrays.sort(orderedSegments, Comparator.comparingInt(GCLogFileSegment::getSegmentIndex));
 
         int current = orderedSegments.length;
         while (0 <= --current) {
@@ -263,9 +234,9 @@ public class RotatingGCLogFile extends GCLogFile {
         double closestTime = Double.MAX_VALUE;
         // Find where current belongs.
         for (int index = current-1; 0 <= index; --index) {
-            double delta = GarbageCollectionLogFileSegment.rolloverDelta(orderedSegments[current], orderedSegments[index]);
+            double delta = GCLogFileSegment.rolloverDelta(orderedSegments[current], orderedSegments[index]);
             if (!Double.isNaN(delta) && 0 <= delta && delta < closestTime) {
-                GarbageCollectionLogFileSegment temp = orderedSegments[current];
+                GCLogFileSegment temp = orderedSegments[current];
                 for(int n=current; n > index+1; --n) {
                     orderedSegments[n] = orderedSegments[n-1];
                 }

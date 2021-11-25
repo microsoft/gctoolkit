@@ -1,5 +1,7 @@
 package com.microsoft.gctoolkit.sample;
 
+import org.junit.jupiter.api.Test;
+
 import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -7,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 public class TestMain {
 
-    //@Test
+    @Test
     public void testMain() {
         try {
             String gcLogFile = System.getProperty("gcLogFile");

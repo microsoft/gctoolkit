@@ -14,7 +14,6 @@ import java.nio.file.Path;
 public abstract class FileDataSource<T> implements DataSource<T> {
 
     protected final Path path;
-    protected final FileDataSourceMetaData metaData;
 
     /**
      * Subclass only.
@@ -22,7 +21,6 @@ public abstract class FileDataSource<T> implements DataSource<T> {
      */
     protected FileDataSource(Path path) {
         this.path = path;
-        this.metaData = new FileDataSourceMetaData(path);
     }
 
     /**
@@ -44,9 +42,7 @@ public abstract class FileDataSource<T> implements DataSource<T> {
      * Return meta data about the file.
      * @return Meta data about the file.
      */
-    public FileDataSourceMetaData getMetaData() {
-        return metaData;
-    }
+    public abstract LogFileMetadata getMetaData() throws IOException;
 
     /**
      * {@inheritDoc}

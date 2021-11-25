@@ -3,7 +3,8 @@
 package com.microsoft.gctoolkit.parser.io;
 
 import com.microsoft.gctoolkit.io.DataSource;
-import com.microsoft.gctoolkit.io.FileDataSourceMetaData;
+import com.microsoft.gctoolkit.io.LogFileMetadata;
+import com.microsoft.gctoolkit.io.SingleLogFileMetadata;
 import com.microsoft.gctoolkit.io.GCLogFile;
 import com.microsoft.gctoolkit.jvm.Diary;
 
@@ -20,13 +21,17 @@ import java.util.zip.ZipInputStream;
 
 public class SafepointLogFile implements DataSource<String> {
 
-    private final FileDataSourceMetaData metadata;
+    private final LogFileMetadata metadata = null;
 
     private final Path path;
 
     public SafepointLogFile(Path path) {
         this.path = path;
-        this.metadata = new FileDataSourceMetaData(path);
+//        try {
+//            this.metadata = new SingleLogFileMetadata(path);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
     }
 
     /**
@@ -45,7 +50,7 @@ public class SafepointLogFile implements DataSource<String> {
     public Path getPath() { return path; }
 
     public Stream<String> stream() throws IOException {
-        if (metadata.isFile()) {
+        if (metadata.isPlainText()) {
             return Files.lines(path);
         } else if (metadata.isZip()) {
             return streamZipFile();

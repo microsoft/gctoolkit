@@ -39,6 +39,8 @@ public class UnifiedDiarizer implements Diarizer {
 
     }
 
+    public UnifiedDiarizer() {}
+
     public Diary getDiary() {
         return diary;
     }

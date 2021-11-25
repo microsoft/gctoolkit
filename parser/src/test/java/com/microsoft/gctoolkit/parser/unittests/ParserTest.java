@@ -87,7 +87,7 @@ public abstract class ParserTest {
 
     }
 
-    private GCLogFile loadLogFile(Path path, boolean rotating) {
+    private GCLogFile loadLogFile(Path path, boolean rotating) throws IOException {
         return rotating ? new RotatingGCLogFile(path) : new SingleGCLogFile(path);
     }
     

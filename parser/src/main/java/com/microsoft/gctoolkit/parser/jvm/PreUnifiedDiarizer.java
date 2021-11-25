@@ -105,6 +105,8 @@ public class PreUnifiedDiarizer implements Diarizer {
 
     private final Diary diary;
 
+    public PreUnifiedDiarizer() {}
+
     @Override
     public Diary getDiary() {
         return diary;

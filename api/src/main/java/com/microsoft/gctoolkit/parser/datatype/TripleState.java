@@ -13,6 +13,14 @@ public enum TripleState {
     FALSE;
 
     /**
+     * Transform boolean to it's corresponding TripleState
+     * @param value boolean
+     * @return
+     */
+    public static TripleState valueOf(boolean value) {
+        return (value) ? TRUE : FALSE;
+    }
+    /**
      * @return {@code true} if {@code this != TripleState.UNKOWN}
      */
 

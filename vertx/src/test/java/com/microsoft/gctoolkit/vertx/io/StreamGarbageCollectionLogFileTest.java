@@ -16,38 +16,58 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 public class StreamGarbageCollectionLogFileTest {
     
-    private GCLogFile loadLogFile(Path path, boolean rotating) {
+    private GCLogFile loadLogFile(Path path, boolean rotating) throws IOException {
         return rotating ? new RotatingGCLogFile(path) : new SingleGCLogFile(path);
     }
     
     @Test
     public void testPlainTextFileLineCount() {
-        Path path = new TestLogFile("streaming/gc.log").getFile().toPath();
-        assertExpectedLineCount(431603, loadLogFile(path, false));
+        try {
+            Path path = new TestLogFile("streaming/gc.log").getFile().toPath();
+            assertExpectedLineCount(431603, loadLogFile(path, false));
+        } catch (IOException ioe) {
+            fail(ioe);
+        }
     }
 
     @Test
     public void testSingleLogInZipLineCount() {
-        Path path = new TestLogFile("gc.log.zip").getFile().toPath();
-        assertExpectedLineCount(431603, loadLogFile(path, false));
+        try {
+            Path path = new TestLogFile("gc.log.zip").getFile().toPath();
+            assertExpectedLineCount(431603, loadLogFile(path, false));
+        } catch (IOException ioe) {
+            fail(ioe);
+        }
     }
 
     @Test
     public void testRotatingLogsLineCount() {
-        Path path = new TestLogFile("rotating.zip").getFile().toPath();
-        assertExpectedLineCount(52029, loadLogFile(path, false));
+        try {
+            Path path = new TestLogFile("rotating.zip").getFile().toPath();
+            assertExpectedLineCount(52029, loadLogFile(path, false));
+        } catch (IOException ioe) {
+            fail(ioe);
+        }
     }
 
     @Test
     public void testZippedDirectoryWithRotatingLogLineCount() {
-        Path path = new TestLogFile("rotating_directory.zip").getFile().toPath();
-        assertExpectedLineCount(52029, loadLogFile(path, false));
+        try {
+            Path path = new TestLogFile("rotating_directory.zip").getFile().toPath();
+            assertExpectedLineCount(52029, loadLogFile(path, false));
+        } catch (IOException ioe) {
+            fail(ioe);
+        }
     }
 
     @Test
     public void testGZipFileLineCount() {
-        Path path = new TestLogFile("gc.log.gz").getFile().toPath();
-        assertExpectedLineCount(18304, loadLogFile(path, false));
+        try {
+            Path path = new TestLogFile("gc.log.gz").getFile().toPath();
+            assertExpectedLineCount(18304, loadLogFile(path, false));
+        } catch (IOException ioe) {
+            fail(ioe);
+        }
     }
 
     /*
@@ -55,8 +75,12 @@ public class StreamGarbageCollectionLogFileTest {
      */
     @Test
     public void testGZipTarFileLineCount() {
-        Path path = new TestLogFile("gc.log.tar.gz").getFile().toPath();
-        assertExpectedLineCount(410055, loadLogFile(path, false));
+        try {
+            Path path = new TestLogFile("gc.log.tar.gz").getFile().toPath();
+            assertExpectedLineCount(410055, loadLogFile(path, false));
+        } catch (IOException ioe) {
+            fail(ioe);
+        }
     }
 
     @Test
@@ -88,20 +112,32 @@ public class StreamGarbageCollectionLogFileTest {
 
     @Test
     public void testSingleLogInZipRotatingLineCount() {
-        Path path = new TestLogFile("gc.log.zip").getFile().toPath();
-        assertExpectedLineCount(431603, loadLogFile(path, true));
+        try {
+            Path path = new TestLogFile("gc.log.zip").getFile().toPath();
+            assertExpectedLineCount(431603, loadLogFile(path, true));
+        } catch (IOException ioe) {
+            fail(ioe);
+        }
     }
 
     @Test
     public void testRotatingLogsRotatingLineCount() {
-        Path path = new TestLogFile("rotating.zip").getFile().toPath();
-        assertExpectedLineCount(72209, loadLogFile(path, true));
+        try {
+            Path path = new TestLogFile("rotating.zip").getFile().toPath();
+            assertExpectedLineCount(72209, loadLogFile(path, true));
+        } catch (IOException ioe) {
+            fail(ioe);
+        }
     }
 
     @Test
     public void testZippedDirectoryWithRotatingLogRotatingLineCount() {
-        Path path = new TestLogFile("rotating_directory.zip").getFile().toPath();
-        assertExpectedLineCount(72210, loadLogFile(path, true));
+        try {
+            Path path = new TestLogFile("rotating_directory.zip").getFile().toPath();
+            assertExpectedLineCount(72210, loadLogFile(path, true));
+        } catch (IOException ioe) {
+            fail(ioe);
+        }
     }
 
     @Test
@@ -128,8 +164,12 @@ public class StreamGarbageCollectionLogFileTest {
 
     @Test
     public void testDirectoryRotating() {
-        Path path = new TestLogFile("rotating_directory").getFile().toPath();
-        assertExpectedLineCount(72209, loadLogFile(path, true));
+        try {
+            Path path = new TestLogFile("rotating_directory").getFile().toPath();
+            assertExpectedLineCount(72209, loadLogFile(path, true));
+        } catch (IOException ioe) {
+            fail(ioe);
+        }
     }
 
     private void assertExpectedLineCount(long expectedCount, GCLogFile directory) {
