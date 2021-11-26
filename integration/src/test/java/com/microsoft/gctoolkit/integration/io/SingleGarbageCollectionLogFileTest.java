@@ -1,7 +1,10 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
-package com.microsoft.gctoolkit.io;
+package com.microsoft.gctoolkit.integration.io;
 
+import com.microsoft.gctoolkit.io.GCLogFileSegment;
+import com.microsoft.gctoolkit.io.LogFileMetadata;
+import com.microsoft.gctoolkit.io.SingleGCLogFile;
 import com.microsoft.gctoolkit.jvm.Diary;
 import org.junit.jupiter.api.Test;
 

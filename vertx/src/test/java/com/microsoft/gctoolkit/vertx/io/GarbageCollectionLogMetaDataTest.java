@@ -2,6 +2,8 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.vertx.io;
 
+import com.microsoft.gctoolkit.io.RotatingGCLogFile;
+import com.microsoft.gctoolkit.io.RotatingLogFileMetadata;
 import com.microsoft.gctoolkit.io.SingleLogFileMetadata;
 import org.junit.jupiter.api.Test;
 
@@ -32,7 +34,7 @@ public class GarbageCollectionLogMetaDataTest {
         try {
             Path path = new TestLogFile("gc.log.zip").getFile().toPath();
             SingleLogFileMetadata metaData = new SingleLogFileMetadata(path);
-            assertEquals(2, metaData.getNumberOfFiles());
+            assertEquals(1, metaData.getNumberOfFiles());
             assertFalse(metaData.isGZip());
             assertTrue(metaData.isZip());
             assertFalse(metaData.isDirectory());
@@ -46,7 +48,7 @@ public class GarbageCollectionLogMetaDataTest {
     public void testRotatingLogs() {
         try {
             Path path = new TestLogFile("rotating.zip").getFile().toPath();
-            SingleLogFileMetadata metaData = new SingleLogFileMetadata(path);
+            RotatingLogFileMetadata metaData = new RotatingLogFileMetadata(path);
             assertEquals(2, metaData.getNumberOfFiles());
             assertFalse(metaData.isGZip());
             assertTrue(metaData.isZip());
@@ -61,7 +63,7 @@ public class GarbageCollectionLogMetaDataTest {
     public void testZippedDirectoryWithRotatingLog() {
         try {
             Path path = new TestLogFile("rotating_directory.zip").getFile().toPath();
-            SingleLogFileMetadata metaData = new SingleLogFileMetadata(path);
+            RotatingLogFileMetadata metaData = new RotatingLogFileMetadata(path);
             assertEquals(5, metaData.getNumberOfFiles());
             assertFalse(metaData.isGZip());
             assertTrue(metaData.isZip());
@@ -109,7 +111,7 @@ public class GarbageCollectionLogMetaDataTest {
     public void testDirectory() {
         try {
             Path path = new TestLogFile("rotating_directory").getFile().toPath();
-            SingleLogFileMetadata metaData = new SingleLogFileMetadata(path);
+            RotatingLogFileMetadata metaData = new RotatingLogFileMetadata(path);
             assertEquals(2, metaData.getNumberOfFiles());
             assertFalse(metaData.isGZip());
             assertFalse(metaData.isZip());

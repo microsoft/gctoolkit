@@ -92,6 +92,7 @@ public class RotatingGCLogFile extends GCLogFile {
 
     @Override
     public Stream<String> stream() throws IOException {
+        //return metaData.logFiles().flatMap(LogFileSegment::stream);x
         return stream(getMetaData(), null); // orderedGarbageCollectionLogFiles);
     }
 

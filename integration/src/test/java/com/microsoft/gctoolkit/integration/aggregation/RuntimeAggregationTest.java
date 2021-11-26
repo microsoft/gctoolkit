@@ -1,9 +1,9 @@
-package com.microsoft.gctoolkit.sample.aggregation;
+package com.microsoft.gctoolkit.integration.aggregation;
 
+import com.microsoft.gctoolkit.sample.aggregation.RuntimeAggregation;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class RuntimeAggregationTest {
 
@@ -29,13 +29,13 @@ public class RuntimeAggregationTest {
         DateTimeStamp last = first.add(duration);
         testRuntimeAggregation.record(null, duration);
         last = last.add(duration);
-        assertEquals(first, testRuntimeAggregation.getTimeOfFirstEvent());
-        assertEquals(last, testRuntimeAggregation.getTimeOfLastEvent());
+        Assertions.assertEquals(first, testRuntimeAggregation.getTimeOfFirstEvent());
+        Assertions.assertEquals(last, testRuntimeAggregation.getTimeOfLastEvent());
         // expect runtime duration to be the time of last event in this case
         // because timeOfLastEvent().minus(timeOfFirstEvent()) does not exceed
         // com.li.censum.aggregations.RuntimeAggregation.LOG_FRAGMENT_THRESHOLD.
         double runtimeDuration = testRuntimeAggregation.getTimeOfLastEvent().getTimeStamp();
-        assertEquals(runtimeDuration, testRuntimeAggregation.getRuntimeDuration());
+        Assertions.assertEquals(runtimeDuration, testRuntimeAggregation.getRuntimeDuration());
 
         final int nTimes = 10;
         for (int n = 0; n < nTimes; n++) {
@@ -46,7 +46,7 @@ public class RuntimeAggregationTest {
         // com.li.censum.aggregations.RuntimeAggregation.LOG_FRAGMENT_THRESHOLD.
         runtimeDuration =
                 testRuntimeAggregation.getTimeOfLastEvent().minus(testRuntimeAggregation.getTimeOfFirstEvent());
-        assertEquals(runtimeDuration, testRuntimeAggregation.getRuntimeDuration());
+        Assertions.assertEquals(runtimeDuration, testRuntimeAggregation.getRuntimeDuration());
     }
 
     @Test
@@ -58,13 +58,13 @@ public class RuntimeAggregationTest {
         DateTimeStamp last = first.add(deltaTime);
         testRuntimeAggregation.record(first, Double.NaN);
         testRuntimeAggregation.record(last, Double.NaN);
-        assertEquals(first, testRuntimeAggregation.getTimeOfFirstEvent());
-        assertEquals(last, testRuntimeAggregation.getTimeOfLastEvent());
+        Assertions.assertEquals(first, testRuntimeAggregation.getTimeOfFirstEvent());
+        Assertions.assertEquals(last, testRuntimeAggregation.getTimeOfLastEvent());
         // expect runtime duration to be the time of last event in this case
         // because timeOfLastEvent().minus(timeOfFirstEvent()) does not exceed
         // com.li.censum.aggregations.RuntimeAggregation.LOG_FRAGMENT_THRESHOLD.
         double runtimeDuration = testRuntimeAggregation.getTimeOfLastEvent().getTimeStamp();
-        assertEquals(runtimeDuration, testRuntimeAggregation.getRuntimeDuration());
+        Assertions.assertEquals(runtimeDuration, testRuntimeAggregation.getRuntimeDuration());
 
         final int nTimes = 10;
         for (int n = 0; n < nTimes; n++) {
@@ -76,7 +76,7 @@ public class RuntimeAggregationTest {
         // com.li.censum.aggregations.RuntimeAggregation.LOG_FRAGMENT_THRESHOLD.
         runtimeDuration =
                 testRuntimeAggregation.getTimeOfLastEvent().minus(testRuntimeAggregation.getTimeOfFirstEvent());
-        assertEquals(runtimeDuration, testRuntimeAggregation.getRuntimeDuration());
+        Assertions.assertEquals(runtimeDuration, testRuntimeAggregation.getRuntimeDuration());
     }
 
     @Test
@@ -91,7 +91,7 @@ public class RuntimeAggregationTest {
             testRuntimeAggregation.record(last, duration);
             last = last.add(deltaTime);
         }
-        assertEquals(first, testRuntimeAggregation.getTimeOfFirstEvent());
+        Assertions.assertEquals(first, testRuntimeAggregation.getTimeOfFirstEvent());
     }
 
     @Test
@@ -107,7 +107,7 @@ public class RuntimeAggregationTest {
             next = next.add(deltaTime);
         }
         DateTimeStamp last = first.add(testRuntimeAggregation.getRuntimeDuration());
-        assertEquals(last, testRuntimeAggregation.getTimeOfLastEvent());
+        Assertions.assertEquals(last, testRuntimeAggregation.getTimeOfLastEvent());
     }
 
     @Test
@@ -124,6 +124,6 @@ public class RuntimeAggregationTest {
         }
         double totalDuration =
                 testRuntimeAggregation.getTimeOfLastEvent().minus(testRuntimeAggregation.getTimeOfFirstEvent());
-        assertEquals(totalDuration, testRuntimeAggregation.getRuntimeDuration());
+        Assertions.assertEquals(totalDuration, testRuntimeAggregation.getRuntimeDuration());
     }
 }

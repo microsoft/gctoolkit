@@ -27,26 +27,26 @@ public class GCLogFileSegment implements LogFileSegment {
 
     private static final String ROTATING_LOG_SUFFIX = ".*\\.(\\d+)(\\.current)?$";
     private static final Pattern ROTATING_LOG_PATTERN = Pattern.compile(ROTATING_LOG_SUFFIX);
-
-    // Generic tokens
+//
+//    // Generic tokens
     private static final String DECIMAL_POINT = "(?:\\.|,)";
     private static final String INTEGER = "\\d+";
     private static final String DATE = "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}[\\+|\\-]\\d{4}";
     private static final String TIME = INTEGER + DECIMAL_POINT + "\\d{3}";
-
-    // Pre-unified tokens
+//
+//    // Pre-unified tokens
     private static final String TIMESTAMP = "(" + TIME + "): ";
     private static final String DATE_STAMP = "(" + DATE + "): ";
     private static final String DATE_TIMESTAMP = "^(?:" + DATE_STAMP + ")?" + TIMESTAMP;
-
-    //  2017-09-07T09:00:12.795+0200: 0.716:
+//
+//    //  2017-09-07T09:00:12.795+0200: 0.716:
     private static final Pattern PREUNIFIED_DATE_TIMESTAMP = Pattern.compile(DATE_TIMESTAMP);
-
-    // Unified Tokens
+//
+//    // Unified Tokens
     private static final String DATE_TAG = "\\[" + DATE + "\\]";
     private static final String UPTIME_TAG = "\\[" + TIME + "s\\]";
-
-    // JEP 158 has ISO-8601 time and uptime in seconds and milliseconds as the first two decorators.
+//
+//    // JEP 158 has ISO-8601 time and uptime in seconds and milliseconds as the first two decorators.
     private static final Pattern UNIFIED_DATE_TIMESTAMP= Pattern.compile("^(" + DATE_TAG + ")?(" + UPTIME_TAG + ")?");
 
     private final Path path;
@@ -58,7 +58,7 @@ public class GCLogFileSegment implements LogFileSegment {
     /**
      * The constructor attempts to extract the segment index from the file name.
      * @param path The path to the file.
-     * @see #segmentIndex
+     * @ see # segmentIndex
      */
     public GCLogFileSegment(Path path) {
         this.path = path;

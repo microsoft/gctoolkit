@@ -60,6 +60,7 @@
         <module>parser</module>
         <module>vertx</module>
         <module>sample</module>
+        <module>integration</module>
     </modules>
 
     <properties>

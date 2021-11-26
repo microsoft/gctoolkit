@@ -7,7 +7,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
+import java.util.stream.Stream;
 import java.util.zip.ZipFile;
 
 /**
@@ -28,7 +30,7 @@ public abstract class LogFileMetadata {
 
     public LogFileMetadata(Path path) throws IOException {
         this.path = path;
-        magic(path);
+        magic();
     }
 
     public Path getPath() {
@@ -46,7 +48,9 @@ public abstract class LogFileMetadata {
         return false;
     }
 
-    void discoverFormat() {
+    public abstract Stream<LogFileSegment> logFiles();
+
+    private void magic() {
         if (getPath().toFile().isDirectory())
             fileFormat = FileFormat.DIRECTORY;
         else if ( magic(GZIP_MAGIC1, GZIP_MAGIC2))
@@ -56,8 +60,6 @@ public abstract class LogFileMetadata {
         else
             fileFormat = FileFormat.PLAINTEXT;
     }
-
-     abstract void magic(Path path) throws IOException;
 
     /**
      * Return the number of files. Useful if the file is a compressed file which may
@@ -71,8 +73,6 @@ public abstract class LogFileMetadata {
      * @return {@code true} if the file is a Zip compressed file.
      */
     public boolean isZip()  {
-        if ( fileFormat == FileFormat.UNKNOWN)
-            discoverFormat();
         return fileFormat == FileFormat.ZIP;
     }
 
@@ -81,8 +81,6 @@ public abstract class LogFileMetadata {
      * @return {@code true} if the file is a GZip compressed file.
      */
     public boolean isGZip() {
-        if ( fileFormat == FileFormat.UNKNOWN)
-            discoverFormat();
         return fileFormat == FileFormat.GZIP;
     }
 
@@ -91,7 +89,7 @@ public abstract class LogFileMetadata {
      * @return {@code true} if the file is a regular file.
      */
     public boolean isPlainText() {
-        return !(isGZip() || isZip() || isDirectory());
+        return fileFormat == FileFormat.PLAINTEXT;
     }
 
     /**
@@ -99,7 +97,7 @@ public abstract class LogFileMetadata {
      * @return {@code true} if the file is a directory.
      */
     public boolean isDirectory() {
-        return path.toFile().isDirectory();
+        return fileFormat == FileFormat.DIRECTORY;
     }
 
     enum FileFormat {

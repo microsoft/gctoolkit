@@ -12,6 +12,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.function.Function;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
@@ -26,35 +27,25 @@ public class RotatingLogFileMetadata extends LogFileMetadata {
 
     private static final Logger LOG = Logger.getLogger(RotatingLogFileMetadata.class.getName());
 
-    private final List<GCLogFileSegment> segments = new ArrayList<>();
+    private List<LogFileSegment> segments;
+    private Function<LogFileSegment, Path> function = logFileSegment -> logFileSegment.getPath();
 
     public RotatingLogFileMetadata(Path path) throws IOException {
         super(path);
     }
 
-    public Stream<Path> logFiles() throws IOException {
-        Function<GCLogFileSegment, Path> function = GCLogFileSegment -> GCLogFileSegment.getPath();
-        return segments.stream().map(function);
+    public Stream<LogFileSegment> logFiles() {
+        return segments.stream();
     }
-
-    void magic(Path path) throws IOException {
-        if (Files.isDirectory(path)) {
-            findSegments(path);
-        } else if (Files.isRegularFile(path)) {
-            discoverFormat();
-            if (isZip() || isGZip()) {
-                segments.add(new GCLogFileSegment(path));
-            } else
-                findSegments(path);
-        } else
-            throw new IOException(path + " is neither a directory or a regular file.");
-    }
-
 
     private void findZIPSegments() {
         try (var zipfile = new ZipFile(getPath().toFile())) {
             Function<ZipEntry,String> mapToName = zipEntry -> zipEntry.getName();
-            List<String> entries = zipfile.stream().filter(zipEntry -> !zipEntry.isDirectory()).map(mapToName).collect(toList());
+            segments = zipfile.stream()
+                    .filter(zipEntry -> !zipEntry.isDirectory())
+                    .map(mapToName)
+                    .map(name -> new GCLogFileZipSegment(getPath(),name))
+                    .collect(toList());
         } catch (IOException ioe) {
             LOG.warning(ioe.getMessage());
         }
@@ -66,40 +57,37 @@ public class RotatingLogFileMetadata extends LogFileMetadata {
      * @return The number of files in the file.
      */
     public int getNumberOfFiles() {
+        if ( this.segments == null)
+            if ( isZip())
+                findZIPSegments();
+            else
+                findSegments();
             return this.segments.size();
     }
 
-    public void findSegments(Path path) throws IOException {
-        if ( path.toFile().isDirectory()) {
-            Files.list(path).map(entry -> new GCLogFileSegment(entry)).forEach(segments::add);
-        } else {
-            String[] bits = path.getFileName().toString().split("\\.");
-            StringBuilder pattern = new StringBuilder(bits[0]).append(".");
-            if (bits[bits.length - 1].matches("\\d+")) {
-                for (int i = 1; i < bits.length - 1; i++)
-                    pattern.append(bits[i]).append(".");
-                pattern.deleteCharAt(pattern.length() - 1);
+    public void findSegments() {
+        try {
+            segments = new ArrayList<>();
+            if (getPath().toFile().isDirectory()) {
+                Files.list(getPath()).map(entry -> new GCLogFileSegment(entry)).forEach(segments::add);
+            } else {
+                String[] bits = getPath().getFileName().toString().split("\\.");
+                StringBuilder pattern = new StringBuilder(bits[0]).append(".");
+                if (bits[bits.length - 1].matches("\\d+")) {
+                    for (int i = 1; i < bits.length - 1; i++)
+                        pattern.append(bits[i]).append(".");
+                    pattern.deleteCharAt(pattern.length() - 1);
+                }
+                String base = pattern.toString();
+                Files.list(getPath().getParent()).filter(file -> file.getFileName().toString().startsWith(base)).map(p -> new GCLogFileSegment(p)).forEach(segments::add);
             }
-            String base = pattern.toString();
-            Files.list(path.getParent()).filter(file -> file.getFileName().toString().startsWith(base)).map(p -> new GCLogFileSegment(p)).forEach(segments::add);
+        } catch (IOException ioe) {
+            LOG.log(Level.WARNING,"Unable to find log segments.", ioe);
         }
         orderSegments();
     }
 
-    private static void findZIPSegments(Path path) {
-        try (var zipfile = new ZipFile(path.toFile())) {
-            Function<ZipEntry,String> mapToName = zipEntry -> zipEntry.getName();
-            zipfile.stream().filter(zipEntry -> !zipEntry.isDirectory()).map(mapToName).forEach(System.out::println);
-            ZipEntry entry = zipfile.getEntry("rollover.log.1");
-            //new File(entry.getName()).toPath();
-            //List<String> entries = zipfile.stream().filter(zipEntry -> !zipEntry.isDirectory()).map(mapToName).collect(toList());
-        } catch (IOException ioe) {
-            System.out.println(ioe.getMessage());;
-            ioe.printStackTrace();
-        }
-    }
-
-    private List<GCLogFileSegment> orderSegments() {
+    private List<LogFileSegment> orderSegments() {
         // Unified rotation: jdk11/src/hotspot/share/logging/logFileOutput.cpp
         //     Output is always to named file, e.g. 'gc.log' if given -Xlog:gc*:file=gc.log::filecount=5
         //     When gc.log is full, archive as gc.log.<_current_file>. Before the of gc.log to gc.log.<_current_file>,
@@ -152,14 +140,4 @@ public class RotatingLogFileMetadata extends LogFileMetadata {
         }
         return null;
     }
-
-    public static void main(String[] args) throws IOException {
-        Path path = new File("../gclogs/rolling/jdk14/rollinglogs/rollover.log").toPath();
-        RotatingLogFileMetadata data = new RotatingLogFileMetadata(path);
-        System.out.println(data.toString());
-        path = new File("../gclogs/rolling/jdk14/rollinglogs/rollover.log.0").toPath();
-        data = new RotatingLogFileMetadata(path);
-        System.out.println(data.toString());
-    }
-
 }

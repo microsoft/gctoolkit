@@ -1,7 +1,9 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
-package com.microsoft.gctoolkit.io;
+package com.microsoft.gctoolkit.integration.io;
 
+import com.microsoft.gctoolkit.io.GCLogFileSegment;
+import com.microsoft.gctoolkit.io.RotatingGCLogFile;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
