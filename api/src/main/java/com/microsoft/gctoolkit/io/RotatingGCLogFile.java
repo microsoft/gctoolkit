@@ -11,6 +11,7 @@ import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
@@ -92,14 +93,17 @@ public class RotatingGCLogFile extends GCLogFile {
 
     @Override
     public Stream<String> stream() throws IOException {
-        //return metaData.logFiles().flatMap(LogFileSegment::stream);x
-        return stream(getMetaData(), null); // orderedGarbageCollectionLogFiles);
+        if ( getMetaData().isDirectory() || getMetaData().isPlainText())
+            return getMetaData().logFiles().flatMap(segment -> segment.stream());
+        else if ( getMetaData().isZip()) {
+            return getMetaData().logFiles().flatMap(segment -> segment.stream());
+                    //.flatMap(segment -> segment.stream());
+            //return new ArrayList<String>().stream();
+        } else // really return an empty stream.
+            return new ArrayList<String>().stream();
     }
 
-    private Stream<String> stream(
-            LogFileMetadata metadata,
-            LinkedList<GCLogFileSegment> segments)
-            throws IOException {
+    private Stream<String> stream(LogFileMetadata metadata, LinkedList<GCLogFileSegment> segments) throws IOException {
         //todo: find rolling files....
         if (metadata.isPlainText() || metadata.isDirectory()) {
             switch (segments.size()) {

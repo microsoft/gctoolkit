@@ -4,7 +4,11 @@ package com.microsoft.gctoolkit.io;
 
 import com.microsoft.gctoolkit.time.DateTimeStamp;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.RandomAccessFile;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -15,6 +19,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 /**
  * A {@link RotatingGCLogFile} is made up of {@code GarbageCollectionLogFileSegment}s. Creating
@@ -102,12 +108,14 @@ public class GCLogFileZipSegment implements LogFileSegment {
      * @return A stream of lines from the file.
      */
     public Stream<String> stream() {
-//        try {
-//            return Files.lines(path);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-        return null;
+        try {
+            ZipFile file = new ZipFile(path.toFile());
+            ZipEntry entry = file.getEntry(this.segmentName);
+            return new BufferedReader(new InputStreamReader(file.getInputStream(entry))).lines();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return new ArrayList<String>().stream();
     }
 
     // Define the maximum time (in milliseconds) between two rotating logs for them to be considered contiguous.

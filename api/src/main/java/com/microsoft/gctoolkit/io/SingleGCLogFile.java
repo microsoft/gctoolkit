@@ -43,16 +43,16 @@ public class SingleGCLogFile extends GCLogFile {
 
     @Override
     public Stream<String> stream() throws IOException {
-        return stream(path, getMetaData());
+        return stream(getMetaData());
     }
 
-    private Stream<String> stream(Path path, LogFileMetadata metadata) throws IOException {
+    private Stream<String> stream(LogFileMetadata metadata) throws IOException {
         if (metadata.isPlainText()) {
-            return Files.lines(path);
+            return Files.lines(metadata.getPath());
         } else if (metadata.isZip()) {
-            return streamZipFile(path);
+            return streamZipFile(metadata.getPath());
         } else if (metadata.isGZip()) {
-            return streamGZipFile(path);
+            return streamGZipFile(metadata.getPath());
         }
         throw new IOException("Unable to read " + path.toString());
     }

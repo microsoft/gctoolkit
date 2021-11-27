@@ -87,11 +87,14 @@ public class GarbageCollectionEventSourceTest {
         }
     }
 
+    /*
+    72209 lines + EOF sentinal.
+     */
     @Test
     public void testZippedDirectoryWithRotatingLogRotatingLineCount() {
         try {
             Path path = new TestLogFile("streaming/rotating_directory.zip").getFile().toPath();
-            assertExpectedLineCountInLog(72211, loadLogFile(path, true));
+            assertExpectedLineCountInLog(72209+1, loadLogFile(path, true));
         } catch (IOException ioe) {
             fail(ioe);
         }

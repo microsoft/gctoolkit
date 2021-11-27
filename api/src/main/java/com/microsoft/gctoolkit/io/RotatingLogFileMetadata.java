@@ -35,6 +35,16 @@ public class RotatingLogFileMetadata extends LogFileMetadata {
     }
 
     public Stream<LogFileSegment> logFiles() {
+        if ( segments == null) {
+            if ( isPlainText() || isDirectory())
+                findSegments();
+            else if ( isZip())
+                findZIPSegments();
+            else {
+                LOG.warning("unknown log file format");
+                segments = new ArrayList<>();
+            }
+        }
         return segments.stream();
     }
 
