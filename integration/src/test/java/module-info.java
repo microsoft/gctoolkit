@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+import com.microsoft.gctoolkit.integration.aggregation.RuntimeAggregationTest;
+
 /*
  Module for the purposes of housing tests that need to be in a module in order to run.
  */
@@ -19,6 +21,6 @@ module com.microsoft.gctoolkit.integration {
             com.microsoft.gctoolkit.vertx;
 
     provides com.microsoft.gctoolkit.aggregator.Aggregation with
-            com.microsoft.gctoolkit.integration.aggregation.RuntimeAggregationTest;
+            RuntimeAggregationTest;
 
 }

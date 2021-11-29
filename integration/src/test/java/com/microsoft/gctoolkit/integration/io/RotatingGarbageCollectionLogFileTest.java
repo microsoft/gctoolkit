@@ -53,7 +53,7 @@ public class RotatingGarbageCollectionLogFileTest {
             }
     };
 
-    //@Test
+    @Test
     public void getOrderedGarbageCollectionLogFiles() {
         for(String[] data : expected) {
             try {
@@ -69,7 +69,7 @@ public class RotatingGarbageCollectionLogFileTest {
         }
     }
 
-    //@Test
+    @Test
     public void testRollingLogOrderUsage() {
         Path path = getPath( "rolling/jdk14/rollinglogs/rollover.log");
         List<String> expected = Arrays.asList(

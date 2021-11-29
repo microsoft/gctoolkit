@@ -64,7 +64,7 @@ public class GarbageCollectionLogMetaDataTest {
         try {
             Path path = new TestLogFile("rotating_directory.zip").getFile().toPath();
             RotatingLogFileMetadata metaData = new RotatingLogFileMetadata(path);
-            assertEquals(5, metaData.getNumberOfFiles());
+            assertEquals(2, metaData.getNumberOfFiles());
             assertFalse(metaData.isGZip());
             assertTrue(metaData.isZip());
             assertFalse(metaData.isDirectory());

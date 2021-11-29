@@ -93,13 +93,9 @@ public class RotatingGCLogFile extends GCLogFile {
 
     @Override
     public Stream<String> stream() throws IOException {
-        if ( getMetaData().isDirectory() || getMetaData().isPlainText())
+        if ( getMetaData().isDirectory() || getMetaData().isPlainText() || getMetaData().isZip())
             return getMetaData().logFiles().flatMap(segment -> segment.stream());
-        else if ( getMetaData().isZip()) {
-            return getMetaData().logFiles().flatMap(segment -> segment.stream());
-                    //.flatMap(segment -> segment.stream());
-            //return new ArrayList<String>().stream();
-        } else // really return an empty stream.
+        else // yes, this is returning an empty stream.
             return new ArrayList<String>().stream();
     }
 

@@ -138,6 +138,7 @@ public class RotatingLogFileMetadata extends LogFileMetadata {
         double closestTime = Double.MAX_VALUE;
         // Find where current belongs.
         for (int index = current - 1; 0 <= index; --index) {
+            //if ( workingList[index].isContiguousWith((workingList[index])
             double delta = GCLogFileSegment.rolloverDelta(workingList[current], workingList[index]);
             if (!Double.isNaN(delta) && 0 <= delta && delta < closestTime) {
                 GCLogFileSegment temp = workingList[current];
