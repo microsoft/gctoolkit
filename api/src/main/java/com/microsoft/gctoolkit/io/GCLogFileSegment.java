@@ -338,14 +338,4 @@ public class GCLogFileSegment implements LogFileSegment {
         }
         return lines;
     }
-
-//    @Override
-//    public int compareTo(GCLogFileSegment o) {
-//        if ( this.current)
-//            return -1;
-//        if ( o.current)
-//            return 1;
-//        else
-//            return o.getSegmentIndex() - this.getSegmentIndex();
-//    }
 }

@@ -70,20 +70,46 @@ public class RotatingLogFileMetadata extends LogFileMetadata {
             return this.segments.size();
     }
 
-    private String getBasePattern() {
+    /**
+     * Root for the pattern for the file currently being written to... has
+     * a .<number> suffix for unified
+     * a .current suffix for pre-unified.
+     *
+     * The possible parameters here along with the actions
+     * 1) directory
+     * 2) the file currently being written to
+     * 3) a file not currently being written to.
+     *
+     * In all cases we want to find the file currently being written to and
+     * use that to reverse engineer the root.
+     *
+     * @return String representing the pattern for the root of the rotating log name
+     */
+    private String getRootPattern() {
 
-        String fileName = getPath().getFileName().toString();
-        String[] bits = fileName.split("\\.");
-
-        if ( "current".equals(bits[bits.length - 1]) || ( bits[bits.length - 1].matches("\\.\\d+$"))) {
-            int index = 0;
-            StringBuilder base = new StringBuilder(bits[index++]);
-            while( ! bits[index].matches("\\.\\d+$")) {
-                base.append(bits[index++]).append(".");
-            }
-            fileName = base.deleteCharAt(base.length() - 1).toString();
+        String[] bits;
+        if ( getPath().toFile().isDirectory()) {
+            bits = segments.stream()
+                    .filter(segment -> ! segment.getPath().toFile().getName().matches(".+\\.\\d+$"))
+                    .findFirst()
+                    .get()
+                    .getPath().toFile().getName().split("\\.");
+        } else {
+            bits = getPath().getFileName().toString().split("\\.");
         }
-        return fileName;
+
+        int baseLength = 0;
+        if ( "current".equals(bits[bits.length - 1]))
+            baseLength = bits.length - 2;
+        else if ( bits[bits.length - 1].matches("\\d+$"))
+            baseLength = bits.length - 1;
+        else
+            baseLength = bits.length;
+
+        StringBuilder base = new StringBuilder(bits[0]);
+        for ( int i = 1; i < baseLength; i++)
+            base.append(".").append(bits[i]);
+        return base.toString();
     }
 
     private void findSegments() {
@@ -94,7 +120,7 @@ public class RotatingLogFileMetadata extends LogFileMetadata {
             }
             else {
                 Files.list(getPath().getParent())
-                        .filter(file -> file.getFileName().toString().startsWith(getBasePattern()))
+                        .filter(file -> file.getFileName().toString().startsWith(getRootPattern()))
                         .map(p -> new GCLogFileSegment(p)).forEach(segments::add);
             }
         } catch (IOException ioe) {
@@ -114,9 +140,9 @@ public class RotatingLogFileMetadata extends LogFileMetadata {
         workingList.addAll(segments);
 
         // Find current
-        String basePattern = getBasePattern();
+        String basePattern = getRootPattern();
         LogFileSegment current = workingList.stream()
-                .filter( segment -> segment.getPath().toFile().getName().equals(basePattern))
+                .filter( segment -> segment.getPath().toFile().getName().equals(basePattern) || segment.getPath().toFile().getName().endsWith(".current"))
                 .findFirst().get();
 
         orderedList.addFirst(current);
