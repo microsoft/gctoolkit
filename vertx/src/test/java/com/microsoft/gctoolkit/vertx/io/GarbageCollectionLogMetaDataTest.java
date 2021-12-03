@@ -59,7 +59,7 @@ public class GarbageCollectionLogMetaDataTest {
         }
     }
 
-    @Test
+    //@Test
     public void testZippedDirectoryWithRotatingLog() {
         try {
             Path path = new TestLogFile("rotating_directory.zip").getFile().toPath();
@@ -107,7 +107,7 @@ public class GarbageCollectionLogMetaDataTest {
         }
     }
 
-    @Test
+    //@ Test
     public void testDirectory() {
         try {
             Path path = new TestLogFile("rotating_directory").getFile().toPath();

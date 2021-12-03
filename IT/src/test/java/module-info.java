@@ -6,7 +6,7 @@ import com.microsoft.gctoolkit.integration.aggregation.RuntimeAggregationTest;
 /*
  Module for the purposes of housing tests that need to be in a module in order to run.
  */
-module com.microsoft.gctoolkit.integration {
+open module com.microsoft.gctoolkit.integration {
 
     requires com.microsoft.gctoolkit.api;
     requires com.microsoft.gctoolkit.parser;

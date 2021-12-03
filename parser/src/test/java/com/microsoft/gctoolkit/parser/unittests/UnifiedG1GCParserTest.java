@@ -2,7 +2,7 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.parser.unittests;
 
-import com.microsoft.gctoolkit.parser.TestLogFile;
+import com.microsoft.gctoolkit.parser.diary.TestLogFile;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;

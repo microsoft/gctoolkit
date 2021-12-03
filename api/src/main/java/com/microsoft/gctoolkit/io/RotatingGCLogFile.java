@@ -44,30 +44,6 @@ public class RotatingGCLogFile extends GCLogFile {
      */
     public RotatingGCLogFile(Path path) {
         super(path);
-
-//        if (getMetaData().isZip() || getMetaData().isGZip()) {
-//            //TODO: add code to ensure correct order to stream files in zip and gzip files
-//            this.orderedGarbageCollectionLogFiles = new LinkedList<>();
-//        } else {
-//            LinkedList<GCLogFileSegment> orderedSegments = null;
-//            try {
-//                List<GCLogFileSegment> segments = findGCLogSegments();
-//                orderedSegments = orderSegments(segments);
-//            } catch (IOException e) {
-//                LOGGER.log(Level.WARNING, "Cannot find and order GC log file segments for: " + path);
-//            } finally {
-//                this.orderedGarbageCollectionLogFiles = orderedSegments;
-//            }
-//        }
-    }
-
-    /**
-     * Create a RotatingGCLogFile with the given log file segments.
-     * @param parentDirectory The directory that contains the log file segments.
-     */
-    public RotatingGCLogFile(Path parentDirectory, List<GCLogFileSegment> segments) throws IOException {
-        super(parentDirectory); //, new SingleLogFileMetadata(parentDirectory));
-        //this.orderedGarbageCollectionLogFiles = orderSegments(segments);
     }
 
     /**
@@ -82,7 +58,6 @@ public class RotatingGCLogFile extends GCLogFile {
      */
     public static final Pattern ROTATING_LOG_PATTERN = Pattern.compile(ROTATING_LOG_SUFFIX);
 
-    //private final LinkedList<GCLogFileSegment> orderedGarbageCollectionLogFiles;
     private RotatingLogFileMetadata metaData;
 
     public LogFileMetadata getMetaData() throws IOException {
@@ -157,108 +132,7 @@ public class RotatingGCLogFile extends GCLogFile {
      * the files that match the rotating pattern.
      * @return The log file segments in rotating order.
      */
-    public List<GCLogFileSegment> getOrderedGarbageCollectionLogFiles() {
-        return null; //Collections.unmodifiableList(orderedGarbageCollectionLogFiles);
-    }
-
-    //assume directory but then allow for a file.
-    private List<GCLogFileSegment> findGCLogSegments() throws IOException {
-
-        if (Files.isRegularFile(path)) {
-            String filename = path.getFileName().toString();
-            Matcher matcher = ROTATING_LOG_PATTERN.matcher(filename);
-            String rotatingLogBaseName;
-            if (matcher.matches()) {
-                String suffix = matcher.group(1);
-                rotatingLogBaseName = filename.substring(0, filename.length()-suffix.length());
-            } else {
-                rotatingLogBaseName = filename;
-            }
-            Pattern rotatingLogBaseNamePattern = Pattern.compile(rotatingLogBaseName + "(?:" + ROTATING_LOG_SUFFIX + ")?");
-            Predicate<Path> gcLogFragmentFinder = file -> rotatingLogBaseNamePattern.matcher(file.getFileName().toString()).matches();
-            return Files.list(Paths.get(path.getParent().toString())).
-                    filter(Files::isRegularFile).
-                    filter(file -> !file.toFile().isHidden()).
-                    filter(gcLogFragmentFinder).
-                    map(GCLogFileSegment::new).
-                    collect(Collectors.toList());
-         } else if (Files.isDirectory(path)) {
-            return Files.list(path).
-                    filter(Files::isRegularFile).
-                    filter(file -> !file.toFile().isHidden()).
-                    map(GCLogFileSegment::new).
-                    collect(Collectors.toList());
-        }
-
-        throw new IllegalArgumentException("path is not a file or directory: " + path);
-    }
-
-    private LinkedList<GCLogFileSegment> orderSegments(List<GCLogFileSegment> gcLogSegments) {
-
-        // Unified rotation: jdk11/src/hotspot/share/logging/logFileOutput.cpp
-        //     Output is always to named file, e.g. 'gc.log' if given -Xlog:gc*:file=gc.log::filecount=5
-        //     When gc.log is full, archive as gc.log.<_current_file>. Before the of gc.log to gc.log.<_current_file>,
-        //     an attempt is made to delete an existing gc.log.<_current_file>
-        //     Increment _current_file. if _current_file == filecount, set _current_file to zero
-        //         - JVM always begins archiving at gc.log.0
-        //         - gc.log is always the current log
-        //         - Once filecount files have been archived, archive begins at zero again
-        //
-        // Pre-unified rotation: jdk8/hotspot/src/share/vm/utilities/ostream.cpp
-        //     rotate file in names extended_filename.0, extended_filename.1, ...,
-        //     extended_filename.<NumberOfGCLogFiles - 1>. Current rotation file name will
-        //     have a form of extended_filename.<i>.current where i is the current rotation
-        //     file number. After it reaches max file size, the file will be saved and renamed
-        //     with .current removed from its tail.
-
-        if (gcLogSegments.size() < 2) {
-            return new LinkedList<>(gcLogSegments);
-        }
-
-        LinkedList<GCLogFileSegment> segments = new LinkedList<>();
-        GCLogFileSegment[] orderedSegments = gcLogSegments.toArray(new GCLogFileSegment[0]);
-        Arrays.sort(orderedSegments, Comparator.comparingInt(GCLogFileSegment::getSegmentIndex));
-
-        int current = orderedSegments.length;
-        while (0 <= --current) {
-            if (orderedSegments[current].isCurrent()) {
-                break;
-            }
-        }
-
-        // if current == -1, then there is no current! What to do?
-        if (current == -1) {
-            Collections.addAll(segments, orderedSegments);
-            return segments;
-        }
-
-        double closestTime = Double.MAX_VALUE;
-        // Find where current belongs.
-        for (int index = current-1; 0 <= index; --index) {
-            double delta = GCLogFileSegment.rolloverDelta(orderedSegments[current], orderedSegments[index]);
-            if (!Double.isNaN(delta) && 0 <= delta && delta < closestTime) {
-                GCLogFileSegment temp = orderedSegments[current];
-                for(int n=current; n > index+1; --n) {
-                    orderedSegments[n] = orderedSegments[n-1];
-                }
-                orderedSegments[current=index+1] = temp;
-                closestTime = delta;
-            }
-        }
-
-        segments.addLast(orderedSegments[current]);
-
-        int index = ((current-1) + orderedSegments.length) % orderedSegments.length;
-        while (index != current) {
-            if (orderedSegments[current].isContiguousWith(orderedSegments[index])) {
-                segments.addFirst(orderedSegments[index]);
-                current = index;
-                index = ((current - 1) + orderedSegments.length) % orderedSegments.length;
-            } else {
-                break;
-            }
-        }
-
-        return segments;
+    public List<LogFileSegment> getOrderedGarbageCollectionLogFiles() throws IOException {
+        return getMetaData().logFiles().collect(Collectors.toList());
     }
 }

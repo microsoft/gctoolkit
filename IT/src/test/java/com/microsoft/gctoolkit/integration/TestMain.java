@@ -8,7 +8,7 @@ import java.io.IOException;
 
 public class TestMain {
 
-    @Test
+    //@Test
     public void testMain() {
         try {
             String gcLogFile = System.getProperty("gcLogFile");

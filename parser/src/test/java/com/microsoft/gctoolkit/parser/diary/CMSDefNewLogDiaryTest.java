@@ -4,7 +4,6 @@ package com.microsoft.gctoolkit.parser.diary;
 
 import com.microsoft.gctoolkit.io.SingleGCLogFile;
 import com.microsoft.gctoolkit.jvm.Diarizer;
-import com.microsoft.gctoolkit.parser.TestLogFile;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.fail;

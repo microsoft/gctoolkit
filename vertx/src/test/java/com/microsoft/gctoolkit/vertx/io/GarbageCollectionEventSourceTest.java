@@ -30,7 +30,7 @@ public class GarbageCollectionEventSourceTest {
         return rotating ? new RotatingGCLogFile(path) : new SingleGCLogFile(path);
     }
     
-    @Test
+    // @ Test
     public void testRotatingLogDirectory() {
         Path path = new TestLogFile("rotating_directory").getFile().toPath();
         try {

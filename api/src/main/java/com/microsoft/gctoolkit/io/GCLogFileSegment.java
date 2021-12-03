@@ -20,33 +20,33 @@ import java.util.stream.Stream;
  * A {@link RotatingGCLogFile} is made up of {@code GarbageCollectionLogFileSegment}s. Creating
  * a {@code GarbageCollectionLogFileSegment} is not necessary when the
  * {@link RotatingGCLogFile#RotatingGCLogFile(Path)} constructor is used.
- * The {@link RotatingGCLogFile#RotatingGCLogFile(Path, List)} constructor allows the user to
+ * The { @ link RotatingGCLogFile # RotatingGCLogFile(Path, List) } constructor allows the user to
  * provide a list of discrete {@code GarbageCollectionLogFileSegement}s for a {@code RotatingGCLogFile}.
  */
 public class GCLogFileSegment implements LogFileSegment {
 
     private static final String ROTATING_LOG_SUFFIX = ".*\\.(\\d+)(\\.current)?$";
     private static final Pattern ROTATING_LOG_PATTERN = Pattern.compile(ROTATING_LOG_SUFFIX);
-//
-//    // Generic tokens
+
+    // Generic tokens
     private static final String DECIMAL_POINT = "(?:\\.|,)";
     private static final String INTEGER = "\\d+";
     private static final String DATE = "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}[\\+|\\-]\\d{4}";
     private static final String TIME = INTEGER + DECIMAL_POINT + "\\d{3}";
-//
-//    // Pre-unified tokens
+
+    // Pre-unified tokens
     private static final String TIMESTAMP = "(" + TIME + "): ";
     private static final String DATE_STAMP = "(" + DATE + "): ";
     private static final String DATE_TIMESTAMP = "^(?:" + DATE_STAMP + ")?" + TIMESTAMP;
-//
-//    //  2017-09-07T09:00:12.795+0200: 0.716:
+
+    //  2017-09-07T09:00:12.795+0200: 0.716:
     private static final Pattern PREUNIFIED_DATE_TIMESTAMP = Pattern.compile(DATE_TIMESTAMP);
-//
-//    // Unified Tokens
+
+    // Unified Tokens
     private static final String DATE_TAG = "\\[" + DATE + "\\]";
     private static final String UPTIME_TAG = "\\[" + TIME + "s\\]";
-//
-//    // JEP 158 has ISO-8601 time and uptime in seconds and milliseconds as the first two decorators.
+
+    // JEP 158 has ISO-8601 time and uptime in seconds and milliseconds as the first two decorators.
     private static final Pattern UNIFIED_DATE_TIMESTAMP= Pattern.compile("^(" + DATE_TAG + ")?(" + UPTIME_TAG + ")?");
 
     private final Path path;
@@ -83,14 +83,52 @@ public class GCLogFileSegment implements LogFileSegment {
         return path;
     }
 
+    /**
+     * return some comparable value for the first time found in the log.
+     * If isn't found, then return min value. This combined with the end
+     * time being a max value implies the log covers an impossible amount
+     * of time. The sorting logic in the Metadata classes should filter
+     * out these types of segments.
+     * @return double representing either the age of the JVM or time
+     * from epoch if only a date stamp is found at the beginning of the log file
+     */
     @Override
     public double getStartTime() {
-        return 0;
+        try {
+            ageOfJVMAtLogStart();
+            if ( startTime.hasTimeStamp())
+                return startTime.getTimeStamp();
+            else if ( startTime.hasDateTime())
+                return startTime.toEpochInMillis();
+            else
+                return Double.MAX_VALUE;
+        } catch (NullPointerException|IOException ex) {
+            return Double.MAX_VALUE;
+        }
     }
 
+    /**
+     * return some comparable value for the last time found in the log.
+     * If isn't found, then return max value. This combined with the start
+     * time implies the log covers an impossible amount of time. The
+     * sorting logic in the Metadata classes should filter out these
+     * types of segments.
+     * @return double representing either the age of the JVM or time
+     * from epoch if only a date stamp is found at the end of the log file
+     */
     @Override
     public double getEndTime() {
-        return 0;
+        try {
+            ageOfJVMAtLogEnd();
+            if ( endTime.hasTimeStamp())
+                return endTime.getTimeStamp();
+            else if ( endTime.hasDateTime())
+                return endTime.toEpochInMillis();
+            else
+                return Double.MAX_VALUE;
+        } catch (NullPointerException|IOException ex) {
+            return Double.MIN_VALUE;
+        }
     }
 
     /**
@@ -124,14 +162,26 @@ public class GCLogFileSegment implements LogFileSegment {
     }
 
     private DateTimeStamp ageOfJVMAtLogStart() throws IOException {
-        if (startTime == null)
-            startTime = scanForTimeOfLogStart(path);
+        if (startTime == null) {
+            startTime = Files.lines(path)
+                    .map(this::matcher)
+                    .filter(Matcher::find)
+                    .findFirst()
+                    .map(this::calculateDateTimeStamp)
+                    .orElse(new DateTimeStamp(-1.0d));
+        }
         return startTime;
     }
 
     private DateTimeStamp ageOfJVMAtLogEnd() throws IOException {
-        if (endTime == null)
-            endTime = scanForTimeOfLogEnd(path);
+        if (endTime == null) {
+            endTime = tail(100).stream()
+                    .map(this::matcher)
+                    .filter(Matcher::find)
+                    .map(this::calculateDateTimeStamp)
+                    .max(Comparator.comparing(dateTimeStamp -> dateTimeStamp != null ? dateTimeStamp.getTimeStamp() : 0))
+                    .orElse(new DateTimeStamp(-1.0d));
+        }
         return endTime;
     }
 
@@ -200,7 +250,7 @@ public class GCLogFileSegment implements LogFileSegment {
         return path.toString();
     }
 
-    private static Matcher matcher(String line) {
+    private Matcher matcher(String line) {
         if (line.startsWith("[")) {
             return UNIFIED_DATE_TIMESTAMP.matcher(line);
         } else {
@@ -208,7 +258,7 @@ public class GCLogFileSegment implements LogFileSegment {
         }
     }
 
-    private static DateTimeStamp calculateDateTimeStamp(Matcher matcher) {
+    private DateTimeStamp calculateDateTimeStamp(Matcher matcher) {
         if (matcher.pattern() == UNIFIED_DATE_TIMESTAMP) {
             return calclateUnifiedDateTimeStamp(matcher);
         } else {
@@ -238,30 +288,12 @@ public class GCLogFileSegment implements LogFileSegment {
         return Double.parseDouble(string.replace(',','.'));
     }
 
-    private static DateTimeStamp scanForTimeOfLogStart(Path path) throws IOException {
-        return Files.lines(path)
-                .map(GCLogFileSegment::matcher)
-                .filter(Matcher::find)
-                .findFirst()
-                .map(GCLogFileSegment::calculateDateTimeStamp)
-                .orElse(null);
-    }
-
-    private static DateTimeStamp scanForTimeOfLogEnd(Path path) throws IOException {
-        return tail(path,100).stream()
-                .map(GCLogFileSegment::matcher)
-                .filter(Matcher::find)
-                .map(GCLogFileSegment::calculateDateTimeStamp)
-                .max(Comparator.comparing(dateTimeStamp -> dateTimeStamp != null ? dateTimeStamp.getTimeStamp() : 0))
-                .orElse(null);
-    }
-
 
      // todo: implementation may be a bit ugly...
      // https://codereview.stackexchange.com/questions/79039/get-the-tail-of-a-file-the-last-10-lines
      // Tail is not a class, it's a method so the solution in stackoverflow isn't correct but the core
      // could be used here as it's cleaner
-    private static ArrayList<String> tail(Path path, int numberOfLines) throws IOException {
+    private ArrayList<String> tail(int numberOfLines) throws IOException {
 
         char LF = '\n';
         char CR = '\r';
@@ -306,4 +338,14 @@ public class GCLogFileSegment implements LogFileSegment {
         }
         return lines;
     }
+
+//    @Override
+//    public int compareTo(GCLogFileSegment o) {
+//        if ( this.current)
+//            return -1;
+//        if ( o.current)
+//            return 1;
+//        else
+//            return o.getSegmentIndex() - this.getSegmentIndex();
+//    }
 }

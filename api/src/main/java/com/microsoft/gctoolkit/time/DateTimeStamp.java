@@ -295,4 +295,19 @@ public class DateTimeStamp implements Comparable<DateTimeStamp> {
                             else return dtsA.compareTo(dtsB);
                         });
     }
+
+    public double toEpochInMillis() {
+        if ( dateTime != null) {
+            return (double)(dateTime.toEpochSecond() * 1000) + (((double)dateTime.getNano()) / 1000000.0d);
+        } // todo: a reasonable response here might be????
+        return -1.0d;
+    }
+
+    public boolean hasTimeStamp() {
+        return ! (timeStamp < 0.0d || Double.isNaN(timeStamp));
+    }
+
+    public boolean hasDateTime() {
+        return dateTime != null;
+    }
 }

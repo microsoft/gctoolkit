@@ -3,6 +3,7 @@
 package com.microsoft.gctoolkit.integration.io;
 
 import com.microsoft.gctoolkit.io.GCLogFileSegment;
+import com.microsoft.gctoolkit.io.LogFileSegment;
 import com.microsoft.gctoolkit.io.RotatingGCLogFile;
 import org.junit.jupiter.api.Test;
 
@@ -57,13 +58,14 @@ public class RotatingGarbageCollectionLogFileTest {
     public void getOrderedGarbageCollectionLogFiles() {
         for(String[] data : expected) {
             try {
-                RotatingGCLogFile garbageCollectionLogFile = createRotatingGarbageCollectionLogFile(data[0]);
-                List<GCLogFileSegment> segments = garbageCollectionLogFile.getOrderedGarbageCollectionLogFiles();
+                TestLogFile logFile = new TestLogFile(data[0]);
+                RotatingGCLogFile garbageCollectionLogFile = new RotatingGCLogFile(logFile.getFile().toPath());
+                List<LogFileSegment> segments = garbageCollectionLogFile.getOrderedGarbageCollectionLogFiles();
                 assertEquals(data.length - 1, segments.size());
                 for (int n = 1; n < data.length; n++) {
                     assertEquals(data[n], segments.get(n - 1).getPath().getFileName().toString());
                 }
-            } catch (IOException e) {
+            } catch (Throwable e) {
                 fail(e);
             }
         }
@@ -71,7 +73,7 @@ public class RotatingGarbageCollectionLogFileTest {
 
     @Test
     public void testRollingLogOrderUsage() {
-        Path path = getPath( "rolling/jdk14/rollinglogs/rollover.log");
+        Path path = new TestLogFile("rolling/jdk14/rollinglogs/rollover.log").getFile().toPath();
         List<String> expected = Arrays.asList(
                 "rollover.log.3", "rollover.log.4", "rollover.log.0", "rollover.log.1", "rollover.log.2", "rollover.log"
         );
@@ -86,40 +88,6 @@ public class RotatingGarbageCollectionLogFileTest {
             assertEquals(expected, actual);
         } catch (Exception badTestData) {
             fail(badTestData);
-        }
-    }
-
-    static RotatingGCLogFile createRotatingGarbageCollectionLogFile(String partialPath) throws IOException {
-        Path path = getPath(partialPath);
-        List<GCLogFileSegment> segments = getSegments(path);
-        return new RotatingGCLogFile(path.getParent(), segments);
-    }
-
-    static final String[] roots = new String[] {
-            "./gclogs/",
-            "../gclogs/",
-            "../../gclogs/"
-    };
-
-    static Path getPath(String filename) {
-        return Arrays.stream(roots)
-                .map(path -> Paths.get(path, filename))
-                .filter(Files::exists)
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException(filename + " not found"));
-    }
-
-    static List<GCLogFileSegment> getSegments(Path path) {
-        Path directory = path.getParent();
-        String filename = path.getFileName().toString();
-        PathMatcher pathMatcher = FileSystems.getDefault().getPathMatcher("glob:"+filename+"*");
-        try (Stream<Path> stream = Files.list(directory)) {
-            return stream.filter(p -> pathMatcher.matches(p.getFileName()))
-                    .map(GCLogFileSegment::new)
-                    .collect(Collectors.toList());
-        } catch (IOException e) {
-            // autoclose...
-            return List.of();
         }
     }
 }

@@ -7,7 +7,6 @@ import com.microsoft.gctoolkit.io.SingleGCLogFile;
 import com.microsoft.gctoolkit.jvm.Diarizer;
 import com.microsoft.gctoolkit.jvm.Diary;
 import com.microsoft.gctoolkit.jvm.SupportedFlags;
-import com.microsoft.gctoolkit.parser.TestLogFile;
 import com.microsoft.gctoolkit.parser.jvm.PreUnifiedDiarizer;
 import com.microsoft.gctoolkit.parser.jvm.UnifiedDiarizer;
 

@@ -29,7 +29,7 @@ public class SingleGarbageCollectionLogFileTest {
     @Test
     public void unifiedLog() {
         for(String log : unifiedLogs) {
-            Path path = getPath(log);
+            Path path = new TestLogFile(log).getFile().toPath();
             SingleGCLogFile gcLogFile = new SingleGCLogFile(path);
             assertEquals(true, gcLogFile.isUnified(), "Expected unified but failed");
             try {
@@ -63,34 +63,6 @@ public class SingleGarbageCollectionLogFileTest {
             } catch (IOException ioe) {
                 fail(ioe);
             }
-        }
-    }
-
-    static final String[] roots = new String[] {
-            "./gclogs/",
-            "../gclogs/",
-            "../../gclogs/"
-    };
-
-    static Path getPath(String filename) {
-        return Arrays.stream(roots)
-                .map(path -> Paths.get(path, filename))
-                .filter(Files::exists)
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException(filename + " not found"));
-    }
-
-    static List<GCLogFileSegment> getSegments(Path path) {
-        Path directory = path.getParent();
-        String filename = path.getFileName().toString();
-        PathMatcher pathMatcher = FileSystems.getDefault().getPathMatcher("glob:"+filename+"*");
-        try (Stream<Path> stream = Files.list(directory)) {
-            return stream.filter(p -> pathMatcher.matches(p.getFileName()))
-                    .map(GCLogFileSegment::new)
-                    .collect(Collectors.toList());
-        } catch (IOException e) {
-            // autoclose...
-            return List.of();
         }
     }
 }
