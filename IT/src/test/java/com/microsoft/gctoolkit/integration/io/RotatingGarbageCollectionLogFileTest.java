@@ -71,12 +71,7 @@ public class RotatingGarbageCollectionLogFileTest {
         }
     }
 
-    @Test
-    public void testRollingLogOrderUsage() {
-        Path path = new TestLogFile("rolling/jdk14/rollinglogs/rollover.log").getFile().toPath();
-        List<String> expected = Arrays.asList(
-                "rollover.log.3", "rollover.log.4", "rollover.log.0", "rollover.log.1", "rollover.log.2", "rollover.log"
-        );
+    private void runRollingLogOrderingTest(Path path, List<String> expectedOrdering, long lineCount) {
         try {
             RotatingGCLogFile rotatingGCLogFile = new RotatingGCLogFile(path);
             List<String> actual =
@@ -85,9 +80,29 @@ public class RotatingGarbageCollectionLogFileTest {
                             .stream()
                             .map(segment -> segment.getPath().getFileName().toString())
                             .collect(Collectors.toList());
-            assertEquals(expected, actual);
+            assertEquals(expectedOrdering, actual);
+            long count = rotatingGCLogFile.stream().count();
+            assertEquals(246732,count,"Unequal line counts");
         } catch (Exception badTestData) {
             fail(badTestData);
         }
+    }
+
+    @Test
+    public void testRollingLogOrderUsage() {
+        Path path = new TestLogFile("rolling/jdk14/rollinglogs/rollover.log").getFile().toPath();
+        List<String> expected = Arrays.asList(
+                "rollover.log.3", "rollover.log.4", "rollover.log.0", "rollover.log.1", "rollover.log.2", "rollover.log"
+        );
+        runRollingLogOrderingTest(path, expected, 246732);
+    }
+
+    @Test
+    public void testRollingInZip() {
+        Path path = new TestLogFile("rolling/jdk14/rollinglogs/zip/rollover.zip").getFile().toPath();
+        List<String> expected = Arrays.asList(
+                "rollover.log.3", "rollover.log.4", "rollover.log.0", "rollover.log.1", "rollover.log.2", "rollover.log"
+        );
+        runRollingLogOrderingTest(path,expected, 246732);
     }
 }

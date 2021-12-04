@@ -49,7 +49,7 @@ public class ZGCParserRulesTest implements ZGCPatterns {
     }
 
     // Convenience test for debugging single rules
-    //@Test
+    // @Test
     public void testSingeRule() {
         int index = 14;
         assertEquals(captureTest(rules[index], lines[index]), lines[index].length);

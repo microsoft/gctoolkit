@@ -32,7 +32,7 @@ public class ConcurrentMarkSweepParserRulesTest implements CMSPatterns {
 
     private final boolean debugging = Boolean.getBoolean("microsoft.debug");
 
-    //@Test
+    // @Test
     //@Ignore("Not a real test, only for debugging")
     public void testDebugCMSParseRule() {
         int index = rules.length-1; // awesome fix from David.. thanks :-)

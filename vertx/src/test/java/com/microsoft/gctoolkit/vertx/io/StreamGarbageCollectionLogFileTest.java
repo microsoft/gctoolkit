@@ -80,7 +80,7 @@ public class StreamGarbageCollectionLogFileTest {
         }
     }
 
-    //@Test
+    @Test
     public void testDirectoryRotatingGCLogLineCount() {
         try {
             Path path = new TestLogFile("rotating_directory").getFile().toPath();

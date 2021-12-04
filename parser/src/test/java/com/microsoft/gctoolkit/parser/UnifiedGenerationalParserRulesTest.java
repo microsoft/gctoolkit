@@ -39,7 +39,7 @@ public class UnifiedGenerationalParserRulesTest implements UnifiedGenerationalPa
     }
 
     // Convenience test for debugging single rules
-    //@Test
+    // @Test
     public void testSingeRule() {
         int index = 0;
         assertEquals(4, captureTest(rules[index], lines[index]));

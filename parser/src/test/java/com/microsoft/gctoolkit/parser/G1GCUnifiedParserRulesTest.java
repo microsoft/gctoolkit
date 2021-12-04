@@ -39,7 +39,7 @@ public class G1GCUnifiedParserRulesTest implements UnifiedG1GCPatterns {
         assertTrue(true);
     }
 
-    //@Test
+    @Test
     public void testUnifiedLoggingDecorators() {
         for (String decoratorLine : decoratorLines) {
             Decorators decorators = new Decorators(decoratorLine);
@@ -47,13 +47,13 @@ public class G1GCUnifiedParserRulesTest implements UnifiedG1GCPatterns {
         }
     }
 
-    //@Test
+    // for debugging @Test
     public void testSingeRuleCapture() {
         int index = 10;
         assertEquals(lines[index].length, captureTest(rules[index], lines[index]), "Miss for " + rules[index].getName());
     }
 
-    //@Test
+    // for debugging @Test
     public void testSingleRuleMisses() {
         int index = 10;
         for (int i = 0; i < rules.length; i++)
@@ -61,7 +61,7 @@ public class G1GCUnifiedParserRulesTest implements UnifiedG1GCPatterns {
                 assertEquals(0, captureTest(rules[index], lines[i]), rules[index].getName() + " hits on lines for " + rules[i].getName());
     }
 
-    //@Test
+    // for debugging @Test
     public void testSingleRule() {
         testSingeRuleCapture();
         testSingleRuleMisses();

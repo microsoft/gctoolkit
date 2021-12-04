@@ -40,7 +40,7 @@ public class ShenandoahParserRulesTest implements ShenandoahPatterns {
     }
 
     // Convenience test for debugging single rules
-    //@Test
+    // @Test
     public void testSingeRule() {
         int index = 9;
         assertEquals(captureTest(rules[index], lines[index]), lines[index].length);
