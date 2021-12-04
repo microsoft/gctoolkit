@@ -78,7 +78,7 @@ public class RotatingGarbageCollectionLogFileTest {
                     rotatingGCLogFile
                             .getOrderedGarbageCollectionLogFiles()
                             .stream()
-                            .map(segment -> segment.getPath().getFileName().toString())
+                            .map(segment -> segment.getSegmentName())
                             .collect(Collectors.toList());
             assertEquals(expectedOrdering, actual);
             long count = rotatingGCLogFile.stream().count();

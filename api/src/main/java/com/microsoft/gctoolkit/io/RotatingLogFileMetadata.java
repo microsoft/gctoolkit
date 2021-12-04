@@ -54,6 +54,7 @@ public class RotatingLogFileMetadata extends LogFileMetadata {
         } catch (IOException ioe) {
             LOG.warning(ioe.getMessage());
         }
+        orderSegments();
     }
 
     /**
@@ -87,13 +88,17 @@ public class RotatingLogFileMetadata extends LogFileMetadata {
      */
     private String getRootPattern() {
 
+        // at this point we only have the path, not a segment... it maybe that we have to save the chosen segment
+        // so  that we can normalize the code path for zip and file based logs????
         String[] bits;
-        if ( getPath().toFile().isDirectory()) {
+        if (isDirectory()) {
             bits = segments.stream()
-                    .filter(segment -> ! segment.getPath().toFile().getName().matches(".+\\.\\d+$"))
+                    .filter(segment -> !segment.getSegmentName().matches(".+\\.\\d+$"))
                     .findFirst()
                     .get()
-                    .getPath().toFile().getName().split("\\.");
+                    .getSegmentName().split("\\.");
+        } else if ( isZip()) {
+            bits = segments.get(0).getSegmentName().split("\\.");
         } else {
             bits = getPath().getFileName().toString().split("\\.");
         }
@@ -115,7 +120,7 @@ public class RotatingLogFileMetadata extends LogFileMetadata {
     private void findSegments() {
         segments = new ArrayList<>();
         try {
-            if (getPath().toFile().isDirectory()) {
+            if (isDirectory()) {
                 Files.list(getPath()).map(GCLogFileSegment::new).forEach(segments::add);
             }
             else {
@@ -142,7 +147,7 @@ public class RotatingLogFileMetadata extends LogFileMetadata {
         // Find current
         String basePattern = getRootPattern();
         LogFileSegment current = workingList.stream()
-                .filter( segment -> segment.getPath().toFile().getName().equals(basePattern) || segment.getPath().toFile().getName().endsWith(".current"))
+                .filter( segment -> segment.getSegmentName().equals(basePattern) || segment.getSegmentName().endsWith(".current"))
                 .findFirst().get();
 
         orderedList.addFirst(current);

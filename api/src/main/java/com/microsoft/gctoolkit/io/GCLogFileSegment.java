@@ -83,6 +83,10 @@ public class GCLogFileSegment implements LogFileSegment {
         return path;
     }
 
+    public String getSegmentName() {
+        return getPath().toFile().getName();
+    }
+
     /**
      * return some comparable value for the first time found in the log.
      * If isn't found, then return min value. This combined with the end
@@ -163,7 +167,7 @@ public class GCLogFileSegment implements LogFileSegment {
 
     private DateTimeStamp ageOfJVMAtLogStart() throws IOException {
         if (startTime == null) {
-            startTime = Files.lines(path)
+            startTime = stream()
                     .map(this::matcher)
                     .filter(Matcher::find)
                     .findFirst()
@@ -243,11 +247,11 @@ public class GCLogFileSegment implements LogFileSegment {
 
     /**
      * {@inheritDoc}
-     * @return Returns {@code this.getPath().toString(); }
+     * @return Returns {@code this.getName(); }
      */
     @Override
     public String toString() {
-        return path.toString();
+        return getSegmentName();
     }
 
     private Matcher matcher(String line) {
