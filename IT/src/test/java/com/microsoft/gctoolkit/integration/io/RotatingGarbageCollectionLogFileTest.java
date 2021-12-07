@@ -2,21 +2,13 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.integration.io;
 
-import com.microsoft.gctoolkit.io.GCLogFileSegment;
 import com.microsoft.gctoolkit.io.LogFileSegment;
 import com.microsoft.gctoolkit.io.RotatingGCLogFile;
 import org.junit.jupiter.api.Test;
-
-import java.io.IOException;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.PathMatcher;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -102,6 +94,15 @@ public class RotatingGarbageCollectionLogFileTest {
         Path path = new TestLogFile("rolling/jdk14/rollinglogs/zip/rollover.zip").getFile().toPath();
         List<String> expected = Arrays.asList(
                 "rollover.log.3", "rollover.log.4", "rollover.log.0", "rollover.log.1", "rollover.log.2", "rollover.log"
+        );
+        runRollingLogOrderingTest(path,expected, 246732);
+    }
+
+    @Test
+    public void testRollingInDirInZip() {
+        Path path = new TestLogFile("rolling/jdk14/rollinglogs/zip/rolloverdir.zip").getFile().toPath();
+        List<String> expected = Arrays.asList(
+                "rollover/rollover.log.3", "rollover/rollover.log.4", "rollover/rollover.log.0", "rollover/rollover.log.1", "rollover/rollover.log.2", "rollover/rollover.log"
         );
         runRollingLogOrderingTest(path,expected, 246732);
     }

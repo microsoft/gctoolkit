@@ -2,7 +2,6 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.vertx.io;
 
-import com.microsoft.gctoolkit.io.RotatingGCLogFile;
 import com.microsoft.gctoolkit.io.RotatingLogFileMetadata;
 import com.microsoft.gctoolkit.io.SingleLogFileMetadata;
 import org.junit.jupiter.api.Test;

@@ -4,13 +4,9 @@ package com.microsoft.gctoolkit.io;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
-import java.util.zip.ZipFile;
 
 /**
  * Meta-data about a {@link FileDataSource}.

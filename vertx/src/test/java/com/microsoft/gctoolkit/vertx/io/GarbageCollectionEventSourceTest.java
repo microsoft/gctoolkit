@@ -30,7 +30,7 @@ public class GarbageCollectionEventSourceTest {
         return rotating ? new RotatingGCLogFile(path) : new SingleGCLogFile(path);
     }
     
-    // @ Test
+    @Test
     public void testRotatingLogDirectory() {
         Path path = new TestLogFile("rotating_directory").getFile().toPath();
         try {
@@ -40,13 +40,12 @@ public class GarbageCollectionEventSourceTest {
         }
     }
 
-    /*
-        @Test
-        public void testPlainTextFileLineCount() {
-            Path path = new TestLogFile("gc.log").getFile().toPath();
-            assertExpectedLineCountInLog(431604, new SingleGarbageCollectionLogFile(path));
-        }
-    */
+    @Test
+    public void testPlainTextFileLineCount() {
+        Path path = new TestLogFile("streaming/gc.log").getFile().toPath();
+        assertExpectedLineCountInLog(431604, new SingleGCLogFile(path));
+    }
+
     @Test
     public void testGZipTarFileLineCount() {
         try {

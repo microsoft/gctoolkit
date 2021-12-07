@@ -147,7 +147,7 @@ public class RotatingLogFileMetadata extends LogFileMetadata {
         // Find current
         String basePattern = getRootPattern();
         LogFileSegment current = workingList.stream()
-                .filter( segment -> segment.getSegmentName().equals(basePattern) || segment.getSegmentName().endsWith(".current"))
+                .filter( segment -> segment.getSegmentName().endsWith(basePattern) || segment.getSegmentName().endsWith(".current"))
                 .findFirst().get();
 
         orderedList.addFirst(current);

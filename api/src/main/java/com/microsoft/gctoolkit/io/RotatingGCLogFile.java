@@ -8,22 +8,14 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.SequenceInputStream;
 import java.io.UncheckedIOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Vector;
-import java.util.function.Predicate;
-import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
@@ -45,18 +37,6 @@ public class RotatingGCLogFile extends GCLogFile {
     public RotatingGCLogFile(Path path) {
         super(path);
     }
-
-    /**
-     * A regular expression for matching a file name suffix such as '.0' or '.5.current'
-     */
-    private static final String ROTATING_LOG_SUFFIX = ".*(\\.\\d+(?:\\.current)?)$";
-
-    /**
-     * A pattern for matching the suffix of a rotating log file, such as '.0' or '.5.current'. Given
-     * Path.getFileName().toString(), group(1) is the suffix of the rotating log. The dot is not
-     * captured in the first group.
-     */
-    public static final Pattern ROTATING_LOG_PATTERN = Pattern.compile(ROTATING_LOG_SUFFIX);
 
     private RotatingLogFileMetadata metaData;
 
