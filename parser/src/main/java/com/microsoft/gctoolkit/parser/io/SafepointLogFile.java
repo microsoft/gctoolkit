@@ -4,7 +4,6 @@ package com.microsoft.gctoolkit.parser.io;
 
 import com.microsoft.gctoolkit.io.DataSource;
 import com.microsoft.gctoolkit.io.LogFileMetadata;
-import com.microsoft.gctoolkit.io.SingleLogFileMetadata;
 import com.microsoft.gctoolkit.io.GCLogFile;
 import com.microsoft.gctoolkit.jvm.Diary;
 
@@ -27,11 +26,6 @@ public class SafepointLogFile implements DataSource<String> {
 
     public SafepointLogFile(Path path) {
         this.path = path;
-//        try {
-//            this.metadata = new SingleLogFileMetadata(path);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
     }
 
     /**

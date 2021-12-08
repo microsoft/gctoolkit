@@ -2,22 +2,13 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.integration.io;
 
-import com.microsoft.gctoolkit.io.GCLogFileSegment;
 import com.microsoft.gctoolkit.io.LogFileMetadata;
 import com.microsoft.gctoolkit.io.SingleGCLogFile;
 import com.microsoft.gctoolkit.jvm.Diary;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.PathMatcher;
-import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 

@@ -30,7 +30,7 @@ public class CMSLogDiaryTest extends LogDiaryTest {
     }
 
 
-    private static final String[] cms = {
+    private final String[] cms = {
             "530_gc.log",
             "718_SERVER.gc_100315_163149.log",
             "862_gc.log",
@@ -42,7 +42,7 @@ public class CMSLogDiaryTest extends LogDiaryTest {
             "939_par.cms.nd.wt.log"
     };
 
-    private static final boolean[][] cmsDiary = {
+    private final boolean[][] cmsDiary = {
             //    0      1      2    3     4      5      6      7      8      9     10     11     12     13     14     15     16     17     18     19     20     21     22     23     24     25     26     27
             {false, false, false, true, true, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false},
             {false, false, false, true, true, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false},
@@ -55,7 +55,7 @@ public class CMSLogDiaryTest extends LogDiaryTest {
             {false, false, false, true, true, false, false, false, false, false, false, false, false,  true, false, false, false, false, false, false, false, false, false, false, false, false, false, false}
     };
 
-    private static final int[][] cmsUnknown = {
+    private final int[][] cmsUnknown = {
             {-1},
             {-1},
             {-1},
@@ -67,7 +67,7 @@ public class CMSLogDiaryTest extends LogDiaryTest {
             {-1}
     };
 
-    private static final int[][] cmsKnown = {
+    private final int[][] cmsKnown = {
             {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27},
             {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27},
             {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27},
