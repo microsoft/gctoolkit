@@ -3,22 +3,29 @@
 package com.microsoft.gctoolkit.parser.unittests;
 
 
+import com.microsoft.gctoolkit.parser.diary.TestLogFile;
+import org.junit.jupiter.api.Test;
+
+import java.io.IOException;
+import java.nio.file.Path;
+
+import static org.junit.jupiter.api.Assertions.fail;
+
 public class ParallelCollectorParserTest extends ParserTest {
-    /*
-        @Test
-        public void testForDetailsTenuringGCCause170() {
-            int i = 0;
-            for ( String name : detailsTenuringGCCause170) {
-                try {
-                    Path path = new TestLogFile("ps/details/tenuring/gccause/170/" + name).getFile().toPath();
-                    TestResults testResults = testGenerationalSingleLogFile( path);
-                    analyzeResults(testResults, detailsTenuringGCCause170CountsNumberOfDifferentCollectors[i], detailsTenuringGCCause170Counts[i++]);
-                } catch (IOException ioe) {
-                    fail(ioe.getMessage());
-                }
+
+    @Test
+    public void testForDetailsTenuringGCCause170() {
+        int i = 0;
+        for ( String name : detailsTenuringGCCause170) {
+            try {
+                Path path = new TestLogFile("ps/details/tenuring/gccause/170/" + name).getFile().toPath();
+                TestResults testResults = testGenerationalSingleLogFile( path);
+                analyzeResults(path.toFile().getAbsolutePath(),testResults, detailsTenuringGCCause170CountsNumberOfDifferentCollectors[i], detailsTenuringGCCause170Counts[i++]);
+            } catch (IOException ioe) {
+                fail(ioe.getMessage());
             }
         }
-    */
+    }
     private static final String[] detailsTenuringGCCause170 = {
             "ps.cause.tenuring.details.v17051.log",
             "ps.dates.cause.tenuring.details.v17051.log",
@@ -35,21 +42,21 @@ public class ParallelCollectorParserTest extends ParserTest {
             {0, 0, 0, 0, 0, 0, 0, 90, 4, 0, 0, 0, 0},
             {0, 0, 0, 0, 0, 0, 0, 95, 3, 0, 0, 0, 0}
     };
-    /*
-        @Test
-        public void testForDetails() {
-            int i = 0;
-            for ( String name : details) {
-                try {
-                    Path path = new TestLogFile("ps/details/" + name).getFile().toPath();
-                    TestResults testResults = testGenerationalSingleLogFile( path);
-                    analyzeResults(testResults, detailsNumberOfDifferentCollectors[i], detailsCounts[i++]);
-                } catch (IOException ioe) {
-                    fail(ioe.getMessage());
-                }
+
+    @Test
+    public void testForDetails() {
+        int i = 0;
+        for ( String name : details) {
+            try {
+                Path path = new TestLogFile("ps/details/" + name).getFile().toPath();
+                TestResults testResults = testGenerationalSingleLogFile( path);
+                analyzeResults(path.toFile().getAbsolutePath(),testResults, detailsNumberOfDifferentCollectors[i], detailsCounts[i++]);
+            } catch (IOException ioe) {
+                fail(ioe.getMessage());
             }
         }
-    */
+    }
+
     private static final String[] details = {
             "long_pause.log"
     };

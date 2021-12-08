@@ -4,8 +4,8 @@ package com.microsoft.gctoolkit.parser;
 
 import com.microsoft.gctoolkit.event.jvm.JVMEvent;
 import com.microsoft.gctoolkit.event.jvm.JVMTermination;
+import com.microsoft.gctoolkit.jvm.Diary;
 import com.microsoft.gctoolkit.parser.collection.MRUQueue;
-import com.microsoft.gctoolkit.parser.jvm.LoggingDiary;
 import com.microsoft.gctoolkit.parser.unified.ShenandoahPatterns;
 
 import java.util.AbstractMap;
@@ -39,7 +39,7 @@ public class ShenandoahParser extends UnifiedGCLogParser implements ShenandoahPa
         parseRules.put(END_OF_FILE,this::endOfFile);
     }
 
-    public ShenandoahParser(LoggingDiary diary, JVMEventConsumer consumer) {
+    public ShenandoahParser(Diary diary, JVMEventConsumer consumer) {
         super(diary, consumer);
     }
 

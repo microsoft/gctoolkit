@@ -2,12 +2,22 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.io;
 
+import com.microsoft.gctoolkit.jvm.Diarizer;
+import com.microsoft.gctoolkit.jvm.Diary;
+import com.microsoft.gctoolkit.parser.datatype.TripleState;
+
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Objects;
+import java.util.ServiceConfigurationError;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
+
+import static java.util.ServiceLoader.Provider;
+import static java.util.ServiceLoader.load;
 
 
 /**
@@ -15,28 +25,62 @@ import java.util.stream.Stream;
  */
 public abstract class GCLogFile extends FileDataSource<String> {
 
+    private static final Logger LOGGER = Logger.getLogger(FileDataSource.class.getName());
+
     /**
      * The value used for the implementation of {@link #endOfData()}.
      */
     public static final String END_OF_DATA_SENTINEL = "END_OF_DATA_SENTINEL";
 
-    private final boolean unifiedFormat;
+    private Diary diary;
+    private TripleState unifiedFormat = TripleState.UNKNOWN;
 
     /**
      * Subclass only.
      * @param path The path to the GCLogFile or, in the case of rotating log files, the parent directory.
-     * @param unifiedFormat Whether the log file is in unified logging (JEP 158) format
      */
-    protected GCLogFile(Path path, boolean unifiedFormat) {
+    protected GCLogFile(Path path) {
         super(path);
-        this.unifiedFormat = unifiedFormat;
     }
 
     /**
      * Returns {@code true} if this GCLogFile is written in unified logging (JEP 158) format.
      * @return {@code true} if the log file is in unified logging format.
      */
-    public boolean isUnifiedFormat() { return unifiedFormat; }
+    public boolean isUnified() {
+        if ( ! unifiedFormat.isKnown())
+            unifiedFormat = discoverFormat();
+        return unifiedFormat.isTrue();
+    }
+
+    private Diarizer diarizer() {
+        return load(Diarizer.class)
+                .stream()
+                .map(Provider::get)
+                .filter(p -> p.isUnified() == isUnified())
+                .findFirst()
+                .orElseThrow(() -> new ServiceConfigurationError("Unable to find a suitable provider to create a diary"));
+    }
+
+    /**
+     *
+     * @return the computed diary
+     */
+
+    public Diary diary() throws IOException {
+        if ( diary == null) {
+            Diarizer diarizer = diarizer();
+            stream()
+                    .filter(Objects::nonNull)
+                    .map(String::trim)
+                    .filter(s -> s.length() > 0)
+                    .map(diarizer::diarize)
+                    .filter(completed -> completed)
+                    .findFirst();
+            this.diary = diarizer.getDiary();
+        }
+        return diary;
+    }
 
     @Override
     public final String endOfData() {
@@ -53,21 +97,26 @@ public abstract class GCLogFile extends FileDataSource<String> {
      * This method is used to determine whether or not the log file uses the unified log format
      * by looking for lines starting with the unified logging decorator. This method is called from
      * the constructors of the subclasses.
-     * @param stream A stream of lines from the file.
      * @return {@code true} if the file uses the unified log format.
      * @throws IOException Thrown from reading the stream.
      */
-    /* package */ static boolean isUnifiedLogging(Stream<String> stream) throws IOException {
-        return firstNLines(stream, SHOULD_HAVE_SEEN_A_UNIFIED_DECORATOR_BY_THIS_LINE_IN_THE_LOG)
-                .map(LINE_STARTS_WITH_DECORATOR::matcher)
-                .anyMatch(Matcher::find);
+    private TripleState discoverFormat() {
+        try {
+            boolean isUnified = firstNLines(stream(), SHOULD_HAVE_SEEN_A_UNIFIED_DECORATOR_BY_THIS_LINE_IN_THE_LOG)
+                    .map(LINE_STARTS_WITH_DECORATOR::matcher)
+                    .anyMatch(Matcher::find);
+            return TripleState.valueOf(isUnified);
+        } catch(IOException ioe) {
+            LOGGER.log(Level.SEVERE, "Unable to determine log file format", ioe);
+        }
+        return TripleState.UNKNOWN;
     }
 
-    private static Stream<String> firstNLines(Stream<String> stream, int limit) {
-        return stream.
-                filter(Objects::nonNull).
-                map(String::trim).
-                filter(s -> s.length() > 0).
-                limit(limit);
+    private Stream<String> firstNLines(Stream<String> stream, int limit) {
+        return stream
+                .filter(Objects::nonNull)
+                .map(String::trim)
+                .filter(s -> s.length() > 0)
+                .limit(limit);
     }
 }

@@ -9,10 +9,6 @@ public class MetaspaceSummary extends MemoryPoolSummary {
     private final long reserved;
     private final long available;
 
-    public MetaspaceSummary(long before, long after, long committed, long reserved) {
-        this(before, after, -1L, committed, reserved);
-    }
-
     public MetaspaceSummary(long before, long after, long available, long committed, long reserved) {
         super(before, after, committed);
         this.reserved = reserved;

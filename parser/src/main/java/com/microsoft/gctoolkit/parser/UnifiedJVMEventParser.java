@@ -5,8 +5,8 @@ package com.microsoft.gctoolkit.parser;
 import com.microsoft.gctoolkit.event.jvm.ApplicationConcurrentTime;
 import com.microsoft.gctoolkit.event.jvm.ApplicationStoppedTime;
 import com.microsoft.gctoolkit.event.jvm.JVMTermination;
+import com.microsoft.gctoolkit.jvm.Diary;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
-import com.microsoft.gctoolkit.parser.jvm.LoggingDiary;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -20,7 +20,7 @@ public class UnifiedJVMEventParser extends UnifiedGCLogParser implements JVMPatt
     private ApplicationStoppedTime.VMOperations safePointReason = null;
     private boolean gcPause = false;
 
-    public UnifiedJVMEventParser(LoggingDiary diary, JVMEventConsumer consumer) {
+    public UnifiedJVMEventParser(Diary diary, JVMEventConsumer consumer) {
         super(diary, consumer);
     }
 

@@ -7,9 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.logging.Logger;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ShenandoahParserRulesTest implements ShenandoahPatterns {
 
@@ -42,7 +40,7 @@ public class ShenandoahParserRulesTest implements ShenandoahPatterns {
     }
 
     // Convenience test for debugging single rules
-    //@Test
+    // @Test
     public void testSingeRule() {
         int index = 9;
         assertEquals(captureTest(rules[index], lines[index]), lines[index].length);

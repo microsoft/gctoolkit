@@ -6,15 +6,13 @@ import com.microsoft.gctoolkit.event.zgc.OccupancySummary;
 import com.microsoft.gctoolkit.event.zgc.ReclaimSummary;
 import com.microsoft.gctoolkit.event.zgc.ZGCCycle;
 import com.microsoft.gctoolkit.event.zgc.ZGCMemoryPoolSummary;
-import com.microsoft.gctoolkit.parser.jvm.LoggingDiary;
+import com.microsoft.gctoolkit.jvm.Diary;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ZGCParserTest {
 
@@ -58,7 +56,7 @@ public class ZGCParserTest {
         };
 
         AtomicBoolean eventCreated = new AtomicBoolean(false);
-        ZGCParser parser = new ZGCParser(new LoggingDiary(), event -> {
+        ZGCParser parser = new ZGCParser(new Diary(), event -> {
             try {
                 ZGCCycle zgc = (ZGCCycle) event;
                 assertEquals(toInt(0.038d,1000), toInt(zgc.getDuration(),1000));

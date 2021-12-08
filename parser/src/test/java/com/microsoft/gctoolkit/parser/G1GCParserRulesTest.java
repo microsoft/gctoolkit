@@ -6,9 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.logging.Logger;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class G1GCParserRulesTest implements G1GCPatterns {
 
@@ -29,7 +27,7 @@ public class G1GCParserRulesTest implements G1GCPatterns {
         assertTrue(true);
     }
 
-    //@Test
+    //  test for debugging only... @Test
     public void testSingeRule() {
         int index = 35;
         assertEquals(1, CommonTestHelper.captureTest(rules[index], lines[index]));

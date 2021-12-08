@@ -61,7 +61,7 @@ public abstract class RuntimeAggregation  implements Aggregation {
     /**
      * This class is meant to be extended.
      */
-    protected RuntimeAggregation() {}
+    public RuntimeAggregation() {}
 
     /**
      * RuntimeAggregation collates the time of an event and the duration of the event.

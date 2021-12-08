@@ -2,17 +2,14 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.parser;
 
-import com.microsoft.gctoolkit.parser.unified.UnifiedG1GCPatterns;
 import com.microsoft.gctoolkit.parser.jvm.Decorators;
+import com.microsoft.gctoolkit.parser.unified.UnifiedG1GCPatterns;
 import org.junit.jupiter.api.Test;
 
 import java.util.logging.Logger;
 
 import static com.microsoft.gctoolkit.parser.CommonTestHelper.captureTest;
-import static com.microsoft.gctoolkit.parser.unified.UnifiedG1GCPatterns.STRING_DEDUP;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class G1GCUnifiedParserRulesTest implements UnifiedG1GCPatterns {
 
@@ -42,7 +39,7 @@ public class G1GCUnifiedParserRulesTest implements UnifiedG1GCPatterns {
         assertTrue(true);
     }
 
-    //@Test
+    @Test
     public void testUnifiedLoggingDecorators() {
         for (String decoratorLine : decoratorLines) {
             Decorators decorators = new Decorators(decoratorLine);
@@ -50,21 +47,21 @@ public class G1GCUnifiedParserRulesTest implements UnifiedG1GCPatterns {
         }
     }
 
-    //@Test
+    // for debugging @Test
     public void testSingeRuleCapture() {
-        int index = 66;
+        int index = 10;
         assertEquals(lines[index].length, captureTest(rules[index], lines[index]), "Miss for " + rules[index].getName());
     }
 
-    //@Test
+    // for debugging @Test
     public void testSingleRuleMisses() {
-        int index = 66;
+        int index = 10;
         for (int i = 0; i < rules.length; i++)
             if ( index != i)
                 assertEquals(0, captureTest(rules[index], lines[i]), rules[index].getName() + " hits on lines for " + rules[i].getName());
     }
 
-    //@Test
+    // for debugging @Test
     public void testSingleRule() {
         testSingeRuleCapture();
         testSingleRuleMisses();
@@ -144,15 +141,17 @@ public class G1GCUnifiedParserRulesTest implements UnifiedG1GCPatterns {
             PURGE_CODE_ROOTS,
             UPDATE_DERIVED_POINTERS,
             EAGER_HUMONGOUS_RECLAIM,
-            HUMONGOUS,
+            HUMONGOUS,                    // 60
             REDIRTY_CARDS,
             REDIRTIED_CARDS,
             FREE_CSET,
             REBUILD_FREELIST,
-            NEW_CSET,
+            NEW_CSET,                     // 65
             RESIZE_TLAB,
             WEAK_PROCESSING,
-            CLEANUP__FINALIZE_CONC_MARK
+            CLEANUP__FINALIZE_CONC_MARK,
+            CONCURRENT_UNDO_CYCLE_START,
+            CONCURRENT_UNDO_CYCLE_END     // 70
     };
 
     /*
@@ -222,10 +221,9 @@ public class G1GCUnifiedParserRulesTest implements UnifiedG1GCPatterns {
             },
             {   // 10
                     "[73.082s][info ][gc           ] GC(263) Concurrent Cycle",
+                    "[2.179s][info ][gc          ] GC(9) Concurrent Mark Cycle"
             },
             {   // 11
-                    "[2.179s][info ][gc          ] GC(9) Concurrent Mark Cycle",
-                    "[155.787s][info ][gc          ] GC(2457) Concurrent Undo Cycle",
                     "[156.051s][info ][gc,marking  ] GC(2463) Concurrent Mark",
                     "[73.082s][info ][gc,marking   ] GC(263) Concurrent Clear Claimed Marks",
                     "[73.082s][info ][gc,marking   ] GC(263) Concurrent Scan Root Regions",
@@ -235,11 +233,10 @@ public class G1GCUnifiedParserRulesTest implements UnifiedG1GCPatterns {
             },
             {   // 12
                     "[73.171s][info ][gc            ] GC(263) Concurrent Cycle 89.437ms",
+                    "[2.179s][info ][gc          ] GC(9) Concurrent Mark Cycle 96.518ms"
             },
             {   // 13
-                    "[2.179s][info ][gc          ] GC(9) Concurrent Mark Cycle 96.518ms",
                     "[156.068s][info ][gc,marking  ] GC(2463) Concurrent Mark 16.895ms",
-                    "[155.836s][info ][gc          ] GC(2457) Concurrent Undo Cycle 49.351ms",
                     "[73.082s][info ][gc,marking   ] GC(263) Concurrent Clear Claimed Marks 0.018ms",
                     "[73.084s][info ][gc,marking   ] GC(263) Concurrent Scan Root Regions 2.325ms",
                     "[73.168s][info ][gc,marking    ] GC(263) Concurrent Create Live Data 8.089ms",
@@ -438,14 +435,19 @@ public class G1GCUnifiedParserRulesTest implements UnifiedG1GCPatterns {
             },
             {   // 67
                     "[155.889s][debug][gc,phases   ] GC(2458)     Weak Processing: 0.0ms",
-                    "[156.169s][debug][gc,phases   ] GC(2464)     Weak Processing: 0.0ms",
                     "[156.067s][debug][gc,phases   ] GC(2463) Weak Processing 0.189ms"
             },
             {   // 68
                     "[156.079s][debug][gc,phases   ] GC(2463) Finalize Concurrent Mark Cleanup 0.154ms"
+            },
+            {   // 69
+                    "[155.787s][info ][gc          ] GC(2457) Concurrent Undo Cycle",
+            },
+            {   // 70
+                    "[155.836s][info ][gc          ] GC(2457) Concurrent Undo Cycle 49.351ms",
             }
 
-            //[156.067s][debug][gc,phases   ] GC(2463) Weak Processing 0.189ms
+            // Remaining lines which may not need to be parsed...
             //[156.067s][debug][gc,phases   ] GC(2463) ClassLoaderData 0.002ms
             //[156.067s][debug][gc,phases   ] GC(2463) Trigger cleanups 0.000ms
             //[156.067s][debug][gc,phases   ] GC(2463) Flush Task Caches 0.206ms
@@ -455,7 +457,6 @@ public class G1GCUnifiedParserRulesTest implements UnifiedG1GCPatterns {
             //[156.068s][debug][gc,phases   ] GC(2463) Report Object Count 0.000ms
             //[156.079s][debug][gc,phases   ] GC(2463) Update Remembered Set Tracking After Rebuild 0.107ms
             //[156.079s][debug][gc,phases   ] GC(2463) Finalize Concurrent Mark Cleanup 0.154ms
-            //[156.169s][debug][gc,phases   ] GC(2464)     Weak Processing: 0.0ms
     };
 
     private String[] decoratorLines = {

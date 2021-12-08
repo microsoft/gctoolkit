@@ -21,9 +21,9 @@ import com.microsoft.gctoolkit.event.generational.PSYoungGen;
 import com.microsoft.gctoolkit.event.generational.ParNew;
 import com.microsoft.gctoolkit.event.generational.YoungGC;
 import com.microsoft.gctoolkit.event.jvm.JVMTermination;
+import com.microsoft.gctoolkit.jvm.Diary;
 import com.microsoft.gctoolkit.parser.collection.RuleSet;
 import com.microsoft.gctoolkit.parser.jvm.Decorators;
-import com.microsoft.gctoolkit.parser.jvm.LoggingDiary;
 import com.microsoft.gctoolkit.parser.unified.UnifiedGenerationalPatterns;
 
 import java.util.AbstractMap;
@@ -34,19 +34,7 @@ import java.util.function.BiConsumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static com.microsoft.gctoolkit.event.GarbageCollectionTypes.Abortable_Preclean;
-import static com.microsoft.gctoolkit.event.GarbageCollectionTypes.ConcurrentModeFailure;
-import static com.microsoft.gctoolkit.event.GarbageCollectionTypes.Concurrent_Mark;
-import static com.microsoft.gctoolkit.event.GarbageCollectionTypes.Concurrent_Preclean;
-import static com.microsoft.gctoolkit.event.GarbageCollectionTypes.Concurrent_Reset;
-import static com.microsoft.gctoolkit.event.GarbageCollectionTypes.Concurrent_Sweep;
-import static com.microsoft.gctoolkit.event.GarbageCollectionTypes.DefNew;
-import static com.microsoft.gctoolkit.event.GarbageCollectionTypes.FullGC;
-import static com.microsoft.gctoolkit.event.GarbageCollectionTypes.InitialMark;
-import static com.microsoft.gctoolkit.event.GarbageCollectionTypes.PSFull;
-import static com.microsoft.gctoolkit.event.GarbageCollectionTypes.PSYoungGen;
-import static com.microsoft.gctoolkit.event.GarbageCollectionTypes.ParNew;
-import static com.microsoft.gctoolkit.event.GarbageCollectionTypes.Remark;
+import static com.microsoft.gctoolkit.event.GarbageCollectionTypes.*;
 
 /**
  * TODO No reports or views generated from this data yet.
@@ -106,7 +94,7 @@ public class UnifiedGenerationalParser extends UnifiedGCLogParser implements Uni
             "Reset", Concurrent_Reset
     );
 
-    public UnifiedGenerationalParser(LoggingDiary diary, JVMEventConsumer consumer) {
+    public UnifiedGenerationalParser(Diary diary, JVMEventConsumer consumer) {
         super(diary, consumer);
     }
 

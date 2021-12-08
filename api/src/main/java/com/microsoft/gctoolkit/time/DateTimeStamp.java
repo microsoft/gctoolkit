@@ -5,13 +5,13 @@ package com.microsoft.gctoolkit.time;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
-
 import java.util.Comparator;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import static java.util.Comparator.comparingDouble;
-import static java.util.Comparator.nullsLast;
+import static java.util.Comparator.*;
 
 
 /**
@@ -22,6 +22,7 @@ import static java.util.Comparator.nullsLast;
  * Instance of DateTimeStamp are created by the parser. The constructors match what might be
  * found for dates and time stamps in a GC log file.
  */
+
 public class DateTimeStamp implements Comparable<DateTimeStamp> {
     // Represents the time from Epoch
     // In the case where we have timestamps, the epoch is start of JVM
@@ -41,7 +42,7 @@ public class DateTimeStamp implements Comparable<DateTimeStamp> {
     // For some reason, ISO_DATE_TIME doesn't like that time-zone is -0100. It wants -01:00.
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 
-    private static ZonedDateTime fromString(String iso8601DateTime) {
+    private static ZonedDateTime dateFromString(String iso8601DateTime) {
         if (iso8601DateTime != null) {
             TemporalAccessor temporalAccessor = formatter.parse(iso8601DateTime);
             return ZonedDateTime.from(temporalAccessor);
@@ -49,12 +50,54 @@ public class DateTimeStamp implements Comparable<DateTimeStamp> {
         return null;
     }
 
+    private static double ageFromString(String doubleFormat) {
+        if ( doubleFormat == null) return -1.0d;
+        return Double.parseDouble(doubleFormat.replace(",","."));
+    }
+
+    // Patterns needed to support conversion of a log line to a DateTimeStamp
+
+    private static final String DECIMAL_POINT = "(?:\\.|,)";
+    private static final String INTEGER = "\\d+";
+    private static final String DATE = "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}[\\+|\\-]\\d{4}";
+    private static final String TIME = INTEGER + DECIMAL_POINT + "\\d{3}";
+
+    // Unified Tokens
+    private static final String DATE_TAG = "\\[" + DATE + "\\]";
+    private static final String UPTIME_TAG = "\\[(" + TIME + ")s\\]";
+
+    // Pre-unified tokens
+    private static final String TIMESTAMP = "(" + TIME + "): ";
+    private static final String DATE_STAMP = "(" + DATE + "): ";
+    private static final String DATE_TIMESTAMP = "^(?:" + DATE_STAMP + ")?" + TIMESTAMP;
+
+    //  2017-09-07T09:00:12.795+0200: 0.716:
+    private static final Pattern PREUNIFIED_DATE_TIMESTAMP = Pattern.compile(DATE_TIMESTAMP);
+    // JEP 158 has ISO-8601 time and uptime in seconds and milliseconds as the first two decorators.
+    private static final Pattern UNIFIED_DATE_TIMESTAMP = Pattern.compile("^(" + DATE_TAG + ")?(" + UPTIME_TAG + ")?");
+    private static final DateTimeStamp EMPTY_DATE = new DateTimeStamp(-1.0d);
+
+    public static DateTimeStamp fromGCLogLine(String line) {
+        Matcher matcher;
+        int captureGroup = 2;
+        if ( line.startsWith("[")) {
+            matcher = UNIFIED_DATE_TIMESTAMP.matcher(line);
+            captureGroup = 3;
+        } else
+            matcher = PREUNIFIED_DATE_TIMESTAMP.matcher(line);
+
+        if ( matcher.find())
+            return new DateTimeStamp(dateFromString(matcher.group(1)), ageFromString(matcher.group(captureGroup)));
+        else
+            return EMPTY_DATE;
+    }
+
     /**
      * Create a DateTimeStamp by parsing an ISO 8601 date/time string.
      * @param iso8601DateTime A String in ISO 8601 format.
      */
     public DateTimeStamp(String iso8601DateTime) {
-        this(fromString(iso8601DateTime));
+        this(dateFromString(iso8601DateTime));
     }
 
     /**
@@ -72,7 +115,7 @@ public class DateTimeStamp implements Comparable<DateTimeStamp> {
      * @param timeStamp A time stamp in decimal seconds.
      */
     public DateTimeStamp(String iso8601DateTime, double timeStamp) {
-        this(fromString(iso8601DateTime), timeStamp);
+        this(dateFromString(iso8601DateTime), timeStamp);
     }
 
     /**
@@ -295,5 +338,20 @@ public class DateTimeStamp implements Comparable<DateTimeStamp> {
                             if (dtsA == null || dtsB == null) return 0;
                             else return dtsA.compareTo(dtsB);
                         });
+    }
+
+    public double toEpochInMillis() {
+        if ( dateTime != null) {
+            return (double)(dateTime.toEpochSecond() * 1000) + (((double)dateTime.getNano()) / 1000000.0d);
+        } // todo: a reasonable response here might be????
+        return -1.0d;
+    }
+
+    public boolean hasTimeStamp() {
+        return ! (timeStamp == -1.0d || Double.isNaN(timeStamp));
+    }
+
+    public boolean hasDateTime() {
+        return dateTime != null;
     }
 }

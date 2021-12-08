@@ -4,10 +4,13 @@ package com.microsoft.gctoolkit;
 
 import com.microsoft.gctoolkit.aggregator.Aggregation;
 import com.microsoft.gctoolkit.io.DataSource;
+import com.microsoft.gctoolkit.io.GCLogFile;
 import com.microsoft.gctoolkit.io.RotatingGCLogFile;
 import com.microsoft.gctoolkit.io.SingleGCLogFile;
+import com.microsoft.gctoolkit.jvm.Diary;
 import com.microsoft.gctoolkit.jvm.JavaVirtualMachine;
 
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.HashSet;
@@ -23,22 +26,24 @@ public class GCToolKit {
 
     private static final Logger LOGGER = Logger.getLogger(GCToolKit.class.getName());
 
-    private static JavaVirtualMachine loadJavaVirtualMachine() {
+    private JavaVirtualMachine loadJavaVirtualMachine(GCLogFile logFile) {
+        //todo: change to using ServiceLoader...
+        final String className = (logFile.isUnified()) ? "com.microsoft.gctoolkit.vertx.jvm.UnifiedJavaVirtualMachine" : "com.microsoft.gctoolkit.vertx.jvm.PreUnifiedJavaVirtualMachine";
         try {
             // TODO: property for to allow override of default implementation.
             Class<?> clazz =
-                    Class.forName("com.microsoft.gctoolkit.vertx.jvm.DefaultJavaVirtualMachine", true, Thread.currentThread()
-                            .getContextClassLoader());
+                    Class.forName( className, true, Thread.currentThread().getContextClassLoader());
             Constructor<?> constructor = clazz.getConstructor();
             JavaVirtualMachine javaVirtualMachine = (JavaVirtualMachine) constructor.newInstance();
             return javaVirtualMachine;
         } catch (ReflectiveOperationException e) {
-            LOGGER.log(Level.SEVERE, "Cannot load \"com.microsoft.gctoolkit.vertx.jvm.DefaultJavaVirtualMachine\"", e);
+            LOGGER.log(Level.SEVERE, "Cannot load " + className, e);
         }
         return null;
     }
 
     private final Set<Class<? extends Aggregation>> registeredAggregations;
+    private Diary diary;
 
     /**
      * Instantiate a GCToolKit object. The same GCToolKit object can be used to analyze
@@ -73,6 +78,9 @@ public class GCToolKit {
                 .map(ServiceLoader.Provider::get)
                 .map(Aggregation::getClass)
                 .forEach(registeredAggregations::add);
+        //Useful for debugging
+//        if ( LOGGER.getLevel().equals(Level.FINER))
+            registeredAggregations.forEach(a -> LOGGER.log(Level.FINER, "Registered " + a.toString()));
     }
 
     /**
@@ -97,19 +105,21 @@ public class GCToolKit {
      * that were {@link #registerAggregation(Class) registered}, if appropriate for
      * the GC log file.
      *
-     * @param dataSource The log to analyze, typically a
+     * @param logFile The log to analyze, typically a
      *                   {@link SingleGCLogFile} or
      *                   {@link RotatingGCLogFile}.
      * @return a representation of the state of the Java Virtual Machine resulting
      * from the analysis of the GC log file.
      */
-    public JavaVirtualMachine analyze(DataSource<?> dataSource) {
+    public JavaVirtualMachine analyze(GCLogFile logFile) throws IOException {
+        //todo: revert this to DataSource to account for non-GC log data sources once we have a use case (maybe JFR but JFR timers drift badly ATM)
         // Potential NPE, but would have logged if there was trouble creating the instance.
-        JavaVirtualMachine javaVirtualMachine = loadJavaVirtualMachine();
+        JavaVirtualMachine javaVirtualMachine = loadJavaVirtualMachine(logFile);
+        //todo: do we need reflection????
         try {
             Method analyze = javaVirtualMachine.getClass()
                     .getMethod("analyze", Set.class, DataSource.class);
-            analyze.invoke(javaVirtualMachine, this.registeredAggregations, dataSource);
+            analyze.invoke(javaVirtualMachine, this.registeredAggregations, logFile);
         } catch (ReflectiveOperationException e) {
             LOGGER.log(Level.SEVERE, "Cannot invoke analyze method", e);
         }

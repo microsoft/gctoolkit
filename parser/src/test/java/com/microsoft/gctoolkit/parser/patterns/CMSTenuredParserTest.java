@@ -13,7 +13,7 @@ import com.microsoft.gctoolkit.event.generational.InitialMark;
 import com.microsoft.gctoolkit.event.jvm.JVMEvent;
 import com.microsoft.gctoolkit.parser.CMSTenuredPoolParser;
 import com.microsoft.gctoolkit.parser.GCLogParser;
-import com.microsoft.gctoolkit.parser.jvm.PreUnifiedJVMConfiguration;
+import com.microsoft.gctoolkit.parser.jvm.PreUnifiedDiarizer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -33,7 +33,7 @@ public class CMSTenuredParserTest extends ParserTest {
 
         jvmEvents = new ArrayList<>();
 
-        parser = new CMSTenuredPoolParser(new PreUnifiedJVMConfiguration().getDiary(), event -> jvmEvents.add(event));
+        parser = new CMSTenuredPoolParser(new PreUnifiedDiarizer().getDiary(), event -> jvmEvents.add(event));
     }
 
     @Test
