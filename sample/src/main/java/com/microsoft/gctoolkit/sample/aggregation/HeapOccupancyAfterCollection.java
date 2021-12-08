@@ -33,7 +33,7 @@ public class HeapOccupancyAfterCollection extends Aggregator<HeapOccupancyAfterC
     }
 
     private void extractHeapOccupancy(ShenandoahCycle event) {
-        //aggregation.addDataPoint(event.getGarbageCollectionType(), event.getDateTimeStamp(), event.getOccupancyAfterMark());
+        //aggregation().addDataPoint(event.getGarbageCollectionType(), event.getDateTimeStamp(), event.getOccupancy());
     }
 }
 

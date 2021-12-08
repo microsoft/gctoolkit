@@ -17,7 +17,7 @@
     <packaging>pom</packaging>
 
     <properties>
-        <gctoolkit-testdata-version>1.0.4</gctoolkit-testdata-version>
+        <gctoolkit-testdata-version>1.0.5</gctoolkit-testdata-version>
     </properties>
 
     <build>

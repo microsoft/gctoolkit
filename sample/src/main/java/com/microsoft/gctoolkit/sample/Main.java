@@ -59,6 +59,20 @@ public class Main {
                 .ifPresent(summary -> {
                     summary.forEach((gcType, dataSet) -> {
                         System.out.printf(message, gcType, dataSet.size());
+                        switch (gcType) {
+                            case DefNew:
+                                defNewCount = dataSet.size();
+                                break;
+                            case InitialMark:
+                                initialMarkCount = dataSet.size();
+                                break;
+                            case Remark:
+                                remarkCount = dataSet.size();
+                                break;
+                            default:
+                                System.out.println(gcType + " not managed");
+                                break;
+                        }
                     });
                 });
 
@@ -88,5 +102,4 @@ public class Main {
     public int getDefNewCount() {
         return defNewCount;
     }
-
 }
