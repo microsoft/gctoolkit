@@ -113,13 +113,13 @@ public abstract class AbstractJavaVirtualMachine implements JavaVirtualMachine {
 
             this.jvmConfigurationFromParser = new UnifiedDiarizer();
 
-            gcLogFile.stream().
-                    filter(Objects::nonNull).
-                    map(String::trim).
-                    filter(s -> s.length() > 0).
-                    map(this.jvmConfigurationFromParser::diarize).
-                    filter(completed -> completed).
-                    findFirst();
+            gcLogFile.stream()
+                    .filter(Objects::nonNull)
+                    .map(String::trim)
+                    .filter(s -> s.length() > 0)
+                    .map(this.jvmConfigurationFromParser::diarize)
+                    .filter(completed -> completed)
+                    .findFirst();
 
             this.jvmConfigurationFromParser.fillInKnowns();
 

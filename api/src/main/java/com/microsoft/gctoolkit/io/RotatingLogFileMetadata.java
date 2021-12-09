@@ -92,6 +92,7 @@ public class RotatingLogFileMetadata extends LogFileMetadata {
         // so  that we can normalize the code path for zip and file based logs????
         String[] bits;
         if (isDirectory()) {
+            // if base is gc.log, filter out gc.log.<number>
             bits = segments.stream()
                     .filter(segment -> !segment.getSegmentName().matches(".+\\.\\d+$"))
                     .findFirst()

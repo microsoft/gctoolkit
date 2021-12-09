@@ -79,7 +79,7 @@ public class GCToolKit {
                 .map(Aggregation::getClass)
                 .forEach(registeredAggregations::add);
         //Useful for debugging
-//        if ( LOGGER.getLevel().equals(Level.FINER))
+        if ( LOGGER.getLevel().equals(Level.FINER))
             registeredAggregations.forEach(a -> LOGGER.log(Level.FINER, "Registered " + a.toString()));
     }
 
@@ -111,7 +111,7 @@ public class GCToolKit {
      * @return a representation of the state of the Java Virtual Machine resulting
      * from the analysis of the GC log file.
      */
-    public JavaVirtualMachine analyze(GCLogFile logFile) throws IOException {
+    public JavaVirtualMachine analyze(GCLogFile logFile) {
         //todo: revert this to DataSource to account for non-GC log data sources once we have a use case (maybe JFR but JFR timers drift badly ATM)
         // Potential NPE, but would have logged if there was trouble creating the instance.
         JavaVirtualMachine javaVirtualMachine = loadJavaVirtualMachine(logFile);
