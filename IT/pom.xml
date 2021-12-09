@@ -25,11 +25,11 @@
         </dependency>
         <dependency>
             <groupId>com.microsoft.gctoolkit</groupId>
-            <artifactId>gctoolkit-vertx</artifactId>
+            <artifactId>gctoolkit-parser</artifactId>
         </dependency>
         <dependency>
             <groupId>com.microsoft.gctoolkit</groupId>
-            <artifactId>gctoolkit-sample</artifactId>
+            <artifactId>gctoolkit-vertx</artifactId>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
