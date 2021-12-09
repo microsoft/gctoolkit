@@ -7,17 +7,13 @@ import com.microsoft.gctoolkit.io.DataSource;
 import com.microsoft.gctoolkit.io.GCLogFile;
 import com.microsoft.gctoolkit.io.RotatingGCLogFile;
 import com.microsoft.gctoolkit.io.SingleGCLogFile;
-import com.microsoft.gctoolkit.jvm.Diary;
 import com.microsoft.gctoolkit.jvm.JavaVirtualMachine;
 
-import java.io.IOException;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.ServiceConfigurationError;
 import java.util.ServiceLoader;
 import java.util.Set;
-import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -38,7 +34,6 @@ public class GCToolKit {
     }
 
     private final Set<Class<? extends Aggregation>> registeredAggregations;
-    private Diary diary;
 
     /**
      * Instantiate a GCToolKit object. The same GCToolKit object can be used to analyze
