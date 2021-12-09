@@ -14,8 +14,10 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.HashSet;
+import java.util.ServiceConfigurationError;
 import java.util.ServiceLoader;
 import java.util.Set;
+import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -27,19 +29,12 @@ public class GCToolKit {
     private static final Logger LOGGER = Logger.getLogger(GCToolKit.class.getName());
 
     private JavaVirtualMachine loadJavaVirtualMachine(GCLogFile logFile) {
-        //todo: change to using ServiceLoader...
-        final String className = (logFile.isUnified()) ? "com.microsoft.gctoolkit.vertx.jvm.UnifiedJavaVirtualMachine" : "com.microsoft.gctoolkit.vertx.jvm.PreUnifiedJavaVirtualMachine";
-        try {
-            // TODO: property for to allow override of default implementation.
-            Class<?> clazz =
-                    Class.forName( className, true, Thread.currentThread().getContextClassLoader());
-            Constructor<?> constructor = clazz.getConstructor();
-            JavaVirtualMachine javaVirtualMachine = (JavaVirtualMachine) constructor.newInstance();
-            return javaVirtualMachine;
-        } catch (ReflectiveOperationException e) {
-            LOGGER.log(Level.SEVERE, "Cannot load " + className, e);
-        }
-        return null;
+        return ServiceLoader.load(JavaVirtualMachine.class)
+                .stream()
+                .map(ServiceLoader.Provider::get)
+                .filter(jvm -> jvm.accepts(logFile))
+                .findFirst()
+                .orElseThrow(() -> new ServiceConfigurationError("No suitable service provider found"));
     }
 
     private final Set<Class<? extends Aggregation>> registeredAggregations;

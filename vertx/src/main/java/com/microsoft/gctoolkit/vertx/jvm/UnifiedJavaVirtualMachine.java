@@ -26,7 +26,7 @@ import java.util.logging.Logger;
  * having to import io.vertx. In the api module, the class GCToolKit uses the classloader
  * to load UnifiedJavaVirtualMachine.
  */
-public class UnifiedJavaVirtualMachine extends AbstractJavaVirtualMachine implements JavaVirtualMachine {
+public class UnifiedJavaVirtualMachine extends AbstractJavaVirtualMachine {
 
     private static final Logger LOGGER = Logger.getLogger(UnifiedJavaVirtualMachine.class.getName());
 
@@ -36,6 +36,11 @@ public class UnifiedJavaVirtualMachine extends AbstractJavaVirtualMachine implem
     private DateTimeStamp timeOfLastEvent;
     private final Map<Class<? extends Aggregation>, Aggregation> aggregatedData =
             new ConcurrentHashMap<>();
+
+    @Override
+    public boolean accepts(GCLogFile logFile) {
+        return logFile.isUnified();
+    }
 
     @Override
     public boolean isG1GC() {
