@@ -43,6 +43,7 @@ public enum GarbageCollectionTypes implements LabelledGCEventType {
     ConcurrentCleanupForNextMark("Cleanup for Next Mark"),
     ConcurrentStringDeduplication("G1GC Concurrent String deduplication"),
     ConcurrentRootRegionScan("G1GC Root Region Scan"),
+    G1GCConcurrentUndoCycle("Concurrent Undo Cycle"),
     G1GCRemark("G1GC Remark"),
     G1GCCleanup("G1GC Cleanup"),
     G1GCConcurrentCleanup("G1GC concurrent cleanup"),

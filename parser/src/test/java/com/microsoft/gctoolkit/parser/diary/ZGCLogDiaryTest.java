@@ -2,7 +2,6 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.parser.diary;
 
-import com.microsoft.gctoolkit.parser.TestLogFile;
 import org.junit.jupiter.api.Test;
 
 public class ZGCLogDiaryTest extends LogDiaryTest {

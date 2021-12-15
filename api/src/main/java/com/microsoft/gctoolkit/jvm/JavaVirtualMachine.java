@@ -3,10 +3,11 @@
 package com.microsoft.gctoolkit.jvm;
 
 
+import com.microsoft.gctoolkit.GCToolKit;
 import com.microsoft.gctoolkit.aggregator.Aggregation;
 import com.microsoft.gctoolkit.io.DataSource;
+import com.microsoft.gctoolkit.io.GCLogFile;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
-import com.microsoft.gctoolkit.GCToolKit;
 
 import java.util.Optional;
 
@@ -15,6 +16,12 @@ import java.util.Optional;
  * An instance of JavaVirtualMachine is created by calling {@link GCToolKit#analyze(DataSource)}
  */
 public interface JavaVirtualMachine {
+
+    /**
+     * @return {@code true} if the JavaVirtualMachine implementation can work with the GC Log.
+     */
+
+    boolean accepts(GCLogFile logFile);
 
     /**
      * Return {@code true} if the JVM was using G1GC.

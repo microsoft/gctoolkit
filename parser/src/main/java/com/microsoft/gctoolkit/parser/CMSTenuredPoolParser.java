@@ -12,8 +12,8 @@ import com.microsoft.gctoolkit.event.generational.ConcurrentReset;
 import com.microsoft.gctoolkit.event.generational.ConcurrentSweep;
 import com.microsoft.gctoolkit.event.generational.InitialMark;
 import com.microsoft.gctoolkit.event.jvm.JVMTermination;
+import com.microsoft.gctoolkit.jvm.Diary;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
-import com.microsoft.gctoolkit.parser.jvm.LoggingDiary;
 
 import java.util.logging.Logger;
 
@@ -23,7 +23,7 @@ public class CMSTenuredPoolParser extends PreUnifiedGCLogParser implements Simpl
     private DateTimeStamp startOfPhase = null;
     private GCParseRule EndOfFile = new GCParseRule("END_OF_DATA_SENTINEL", END_OF_DATA_SENTINEL);
 
-    public CMSTenuredPoolParser(LoggingDiary diary, JVMEventConsumer eventConsumer) {
+    public CMSTenuredPoolParser(Diary diary, JVMEventConsumer eventConsumer) {
         super(diary, eventConsumer);
     }
 

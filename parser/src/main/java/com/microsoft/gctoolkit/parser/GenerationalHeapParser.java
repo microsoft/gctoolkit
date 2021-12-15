@@ -22,9 +22,9 @@ import com.microsoft.gctoolkit.event.generational.SystemGC;
 import com.microsoft.gctoolkit.event.generational.YoungGC;
 import com.microsoft.gctoolkit.event.jvm.JVMEvent;
 import com.microsoft.gctoolkit.event.jvm.JVMTermination;
-import com.microsoft.gctoolkit.time.DateTimeStamp;
+import com.microsoft.gctoolkit.jvm.Diary;
 import com.microsoft.gctoolkit.parser.collection.MRUQueue;
-import com.microsoft.gctoolkit.parser.jvm.LoggingDiary;
+import com.microsoft.gctoolkit.time.DateTimeStamp;
 
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -267,7 +267,7 @@ public class GenerationalHeapParser extends PreUnifiedGCLogParser implements Sim
         parseRules.put(new GCParseRule("END_OF_DATA_SENTINEL", END_OF_DATA_SENTINEL), this::endOfFile);
     }
 
-    public GenerationalHeapParser(LoggingDiary diary, JVMEventConsumer consumer) {
+    public GenerationalHeapParser(Diary diary, JVMEventConsumer consumer) {
         super(diary, consumer);
     }
 
@@ -299,46 +299,28 @@ public class GenerationalHeapParser extends PreUnifiedGCLogParser implements Sim
         log(line);
     }
 
-    // TODO #151 populate with lines that should be ignored
-    // private boolean inPrintHeapAtGC = false;
-
     private boolean ignoreFrequentButUnwantedEntries(String line) {
 
-//         if ( deriveConfiguration.hasApplicationRunningTime()) {
         if (JVMPatterns.APPLICATION_TIME.parse(line) != null) return true;
         if (JVMPatterns.SIMPLE_APPLICATION_TIME.parse(line) != null) return true;
-        //         }
 
-//         if ( deriveConfiguration.hasApplicationStoppedTime()) {
         if (JVMPatterns.APPLICATION_STOP_TIME.parse(line) != null) return true;
         if (JVMPatterns.APPLICATION_STOP_TIME_WITH_STOPPING_TIME.parse(line) != null) return true;
         if (JVMPatterns.SIMPLE_APPLICATION_STOP_TIME.parse(line) != null) return true;
-//         }
 
-//         if ( deriveConfiguration.hasTenuringDistribution()) {
         if (TenuredPatterns.TENURING_SUMMARY.parse(line) != null) return true;
         if (TenuredPatterns.TENURING_AGE_BREAKDOWN.parse(line) != null) return true;
-//         }
-
-//         if ( ! deriveConfiguration.isJDK70()) {
-//             if ( line.contains("Metaspace ")) return true;
-//             if ( line.contains("class space ")) return true;
-//         }
 
         if (line.startsWith("TLAB: gc thread: ")) return true;
         if (line.startsWith("TLAB totals: thrds: ")) return true;
 
-//         if ( deriveConfiguration.hasPrintHeapAtGC()) {
         if (line.startsWith("{Heap before")) {
-            // inPrintHeapAtGC = true;
             return true;
         }
         if (line.equals("}")) {
-            // inPrintHeapAtGC = false;
             return true;
         }
 
-//             if ( inPrintHeapAtGC) {
         if (line.startsWith("Heap after")) return true;
         if (line.startsWith("PSYoungGen")) return true;
         if (line.startsWith("ParOldGen")) return true;
@@ -349,11 +331,8 @@ public class GenerationalHeapParser extends PreUnifiedGCLogParser implements Sim
         if (line.startsWith("from space")) return true;
         if (line.startsWith("to   space")) return true;
         if (line.contains("[0xffff") && line.endsWith("000)")) ;
-//             }
 
-        // TODO #152 remove when we start collecting this information
         if (line.startsWith("Finished ")) return true;
-//         }
 
         if (line.startsWith("GC locker: Trying a full collection because scavenge failed")) return true;
 

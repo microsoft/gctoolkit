@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.microsoft.gctoolkit</groupId>
+        <artifactId>gctoolkit</artifactId>
+        <version>2.0.5-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <artifactId>gctoolkit-integration</artifactId>
+    <description>Integration tests for GCToolKit</description>
+    <url>${project.parent.url}</url>
+    <name>GCToolKit Integration</name>
+    <properties>
+        <gcLogFile>../gclogs/preunified/cms/defnew/details/defnew.log</gcLogFile>
+    </properties>
+
+
+    <dependencies>
+        <dependency>
+            <groupId>com.microsoft.gctoolkit</groupId>
+            <artifactId>gctoolkit-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.microsoft.gctoolkit</groupId>
+            <artifactId>gctoolkit-parser</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.microsoft.gctoolkit</groupId>
+            <artifactId>gctoolkit-vertx</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.microsoft.gctoolkit</groupId>
+            <artifactId>gctoolkit-sample</artifactId>
+            <version>2.0.5-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <useModulePath>true</useModulePath>
+                    <!-- todo: Hack to deal with surefire deficiency -->
+                    <argLine>--add-modules=ALL-MODULE-PATH</argLine>
+                    <systemProperties>
+                        <property>
+                            <name>gcLogFile</name>
+                            <value>${gcLogFile}</value>
+                        </property>
+                    </systemProperties>
+                </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <configuration>
+                    <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <configuration>
+                    <executable>java</executable>
+                    <arguments>
+                        <argument>- -module-path</argument>
+                        <!-- Create the modulepath using all project dependencies and project build directory -->
+                        <modulepath />
+                        <argument>- -module</argument>
+                        <argument>com.microsoft.gctoolkit.sample/com.microsoft.gctoolkit.sample.Main</argument>
+                        <argument>${gcLogFile}</argument>
+                    </arguments>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

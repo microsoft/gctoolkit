@@ -4,9 +4,7 @@ package com.microsoft.gctoolkit.parser;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ConcurrentMarkSweepParserRulesTest implements CMSPatterns {
 
@@ -34,7 +32,7 @@ public class ConcurrentMarkSweepParserRulesTest implements CMSPatterns {
 
     private final boolean debugging = Boolean.getBoolean("microsoft.debug");
 
-    //@Test
+    // @Test
     //@Ignore("Not a real test, only for debugging")
     public void testDebugCMSParseRule() {
         int index = rules.length-1; // awesome fix from David.. thanks :-)

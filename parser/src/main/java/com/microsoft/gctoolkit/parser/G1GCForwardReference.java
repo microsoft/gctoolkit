@@ -17,6 +17,7 @@ import com.microsoft.gctoolkit.event.g1gc.ConcurrentScanRootRegion;
 import com.microsoft.gctoolkit.event.g1gc.G1Cleanup;
 import com.microsoft.gctoolkit.event.g1gc.G1ConcurrentMark;
 import com.microsoft.gctoolkit.event.g1gc.G1ConcurrentRebuildRememberedSets;
+import com.microsoft.gctoolkit.event.g1gc.G1ConcurrentUndoCycle;
 import com.microsoft.gctoolkit.event.g1gc.G1FullGC;
 import com.microsoft.gctoolkit.event.g1gc.G1FullGCNES;
 import com.microsoft.gctoolkit.event.g1gc.G1GCConcurrentEvent;
@@ -43,6 +44,7 @@ public class G1GCForwardReference extends ForwardReference {
     private static long minHeapSize;
     private static long initialHeapSize;
     private static long maxHeapSize;
+    private DateTimeStamp concurrentCycleStartTime;
 
     public static void setHeapRegionSize(int sizeInMegaBytes) {
         heapRegionSize = sizeInMegaBytes;
@@ -54,6 +56,7 @@ public class G1GCForwardReference extends ForwardReference {
 
     private GarbageCollectionTypes pausePhaseDuringConcurrentCycle = null;
     private GarbageCollectionTypes gcType = null;
+    private GarbageCollectionTypes concurrentPhase;
 
     public G1GCForwardReference(Decorators decorators, int gcID) {
         super(decorators, gcID);
@@ -95,7 +98,9 @@ public class G1GCForwardReference extends ForwardReference {
         gcType = garbageCollectionType;
     }
 
-    private GarbageCollectionTypes concurrentPhase;
+    public GarbageCollectionTypes getGcType() {
+        return gcType;
+    }
 
     public void setConcurrentPhase(GarbageCollectionTypes phase) {
         this.concurrentPhase = phase;
@@ -625,7 +630,7 @@ public class G1GCForwardReference extends ForwardReference {
         this.parallelUnloadingDuration = duration;
     }
 
-    public G1GCConcurrentEvent buildConcurrentEvent() {
+    public G1GCConcurrentEvent buildConcurrentPhaseEvent() {
         switch (getConcurrentPhase()) {
             case ConcurrentClearClaimedMarks:
                 return new ConcurrentClearClaimedMarks(getStartTime(), getDuration());
@@ -645,6 +650,10 @@ public class G1GCForwardReference extends ForwardReference {
                 LOGGER.warning("Unrecognized Concurrent Event " + getConcurrentPhase());
         }
         return null;
+    }
+
+    G1GCConcurrentEvent buildConcurrentUndoCycleEvent() {
+        return new G1ConcurrentUndoCycle(getConcurrentCycleStartTime(), getDuration());
     }
 
     /**
@@ -674,6 +683,12 @@ public class G1GCForwardReference extends ForwardReference {
                     default:
                         LOGGER.warning("Unrecognized (mostly) Concurrent Cycle Pause Event " + getConcurrentPhase());
                 }
+                return null;
+            case G1GCConcurrentUndoCycle:
+                // gctype is likely incorrectly set in the forward reference. The plan is to specialize the forward
+                // references thus allowing this event to be built here rather than in a specialized method.
+                // The phase is a reset that occurs after an eager collection of humongous regions. This event will be
+                // filled in a future PR.
                 return null;
             default:
                 LOGGER.warning("Unrecognized Event " + gcType);
@@ -799,5 +814,13 @@ public class G1GCForwardReference extends ForwardReference {
 
     public boolean setArchiveSizeAfterCollection(int value) {
         return setMemoryPoolMeasurement(ARCHIVE_SIZE_AFTER_COLLECTION, value);
+    }
+
+    public void setConcurrentCycleStartTime(DateTimeStamp clock) {
+        this.concurrentCycleStartTime = clock;
+    }
+
+    public DateTimeStamp getConcurrentCycleStartTime() {
+        return concurrentCycleStartTime;
     }
 }

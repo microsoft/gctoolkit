@@ -9,10 +9,10 @@ import com.microsoft.gctoolkit.event.zgc.OccupancySummary;
 import com.microsoft.gctoolkit.event.zgc.ReclaimSummary;
 import com.microsoft.gctoolkit.event.zgc.ZGCCycle;
 import com.microsoft.gctoolkit.event.zgc.ZGCMemoryPoolSummary;
-import com.microsoft.gctoolkit.time.DateTimeStamp;
+import com.microsoft.gctoolkit.jvm.Diary;
 import com.microsoft.gctoolkit.parser.collection.MRUQueue;
-import com.microsoft.gctoolkit.parser.jvm.LoggingDiary;
 import com.microsoft.gctoolkit.parser.unified.ZGCPatterns;
+import com.microsoft.gctoolkit.time.DateTimeStamp;
 
 import java.util.AbstractMap;
 import java.util.Optional;
@@ -61,7 +61,7 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
         parseRules.put(END_OF_FILE,this::endOfFile);
     }
 
-    public ZGCParser(LoggingDiary diary, JVMEventConsumer consumer) {
+    public ZGCParser(Diary diary, JVMEventConsumer consumer) {
         super(diary, consumer);
     }
 

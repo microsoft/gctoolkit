@@ -6,7 +6,7 @@ import com.microsoft.gctoolkit.event.CPUSummary;
 import com.microsoft.gctoolkit.event.MemoryPoolSummary;
 import com.microsoft.gctoolkit.event.generational.CMSRemark;
 import com.microsoft.gctoolkit.event.jvm.PermGenSummary;
-import com.microsoft.gctoolkit.parser.jvm.LoggingDiary;
+import com.microsoft.gctoolkit.jvm.Diary;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -17,7 +17,7 @@ public abstract class PreUnifiedGCLogParser extends GCLogParser {
     private static final Logger LOGGER = Logger.getLogger(PreUnifiedGCLogParser.class.getName());
     private final GCParseRule TIMESTAMP_BLOCK = new GCParseRule("TIMESTAMP_BLOCK", "^" + DATE_TIMESTAMP);
 
-    public PreUnifiedGCLogParser(LoggingDiary diary, JVMEventConsumer consumer) {
+    public PreUnifiedGCLogParser(Diary diary, JVMEventConsumer consumer) {
         super(diary, consumer);
     }
 

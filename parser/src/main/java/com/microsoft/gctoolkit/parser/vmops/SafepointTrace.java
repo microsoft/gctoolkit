@@ -4,8 +4,8 @@ package com.microsoft.gctoolkit.parser.vmops;
 
 
 import com.microsoft.gctoolkit.event.jvm.Safepoint;
-import com.microsoft.gctoolkit.time.DateTimeStamp;
 import com.microsoft.gctoolkit.parser.AbstractLogTrace;
+import com.microsoft.gctoolkit.time.DateTimeStamp;
 
 import java.util.regex.Matcher;
 

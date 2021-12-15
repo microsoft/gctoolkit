@@ -2,16 +2,14 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.parser;
 
-import com.microsoft.gctoolkit.parser.unified.UnifiedGenerationalPatterns;
 import com.microsoft.gctoolkit.parser.jvm.Decorators;
+import com.microsoft.gctoolkit.parser.unified.UnifiedGenerationalPatterns;
 import org.junit.jupiter.api.Test;
 
 import java.util.logging.Logger;
 
 import static com.microsoft.gctoolkit.parser.CommonTestHelper.captureTest;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class UnifiedGenerationalParserRulesTest implements UnifiedGenerationalPatterns {
 
@@ -41,7 +39,7 @@ public class UnifiedGenerationalParserRulesTest implements UnifiedGenerationalPa
     }
 
     // Convenience test for debugging single rules
-    //@Test
+    // @Test
     public void testSingeRule() {
         int index = 0;
         assertEquals(4, captureTest(rules[index], lines[index]));

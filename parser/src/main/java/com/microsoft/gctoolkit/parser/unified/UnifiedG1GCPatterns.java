@@ -59,9 +59,14 @@ public interface UnifiedG1GCPatterns extends UnifiedPatterns {
     GCParseRule HEAP_SIZE = new GCParseRule("HEAP_SIZE", "Minimum heap " + COUNTER + "  Initial heap " + COUNTER + "  Maximum heap " + COUNTER);
 
     //[73.082s][info ][gc           ] GC(263) Concurrent Cycle
-    GCParseRule CONCURRENT_CYCLE_START = new GCParseRule("CONCURRENT_CYCLE_START", "Concurrent Cycle$");
+    GCParseRule CONCURRENT_CYCLE_START = new GCParseRule("CONCURRENT_CYCLE_START", "Concurrent (?:Mark )?Cycle$");
     //[73.171s][info ][gc            ] GC(263) Concurrent Cycle 89.437ms
-    GCParseRule CONCURRENT_CYCLE_END = new GCParseRule("CONCURRENT_CYCLE_END", "Concurrent Cycle " + CONCURRENT_TIME);
+    GCParseRule CONCURRENT_CYCLE_END = new GCParseRule("CONCURRENT_CYCLE_END", "Concurrent (?:Mark )?Cycle " + CONCURRENT_TIME);
+
+    //[73.082s][info ][gc           ] GC(263) Concurrent Cycle
+    GCParseRule CONCURRENT_UNDO_CYCLE_START = new GCParseRule("CONCURRENT_CYCLE_START", "Concurrent Undo Cycle$");
+    //[73.171s][info ][gc            ] GC(263) Concurrent Cycle 89.437ms
+    GCParseRule CONCURRENT_UNDO_CYCLE_END = new GCParseRule("CONCURRENT_CYCLE_END", "Concurrent Undo Cycle " + CONCURRENT_TIME);
 
     //    [73.082s][info ][gc,marking   ] GC(263) Concurrent Clear Claimed Marks
     //    [73.082s][info ][gc,marking   ] GC(263) Concurrent Clear Claimed Marks 0.018ms
@@ -71,7 +76,7 @@ public interface UnifiedG1GCPatterns extends UnifiedPatterns {
     //
     //    [73.082s][info ][gc,marking   ] GC(263) Concurrent Scan Root Regions
     //    [73.084s][info ][gc,marking   ] GC(263) Concurrent Scan Root Regions 2.325ms
-    String CONCURRENT_PHASES = "(Mark(?: Cycle)?|Undo Cycle|Clear Claimed Marks|Scan Root Regions|Rebuild Remembered Sets|Create Live Data|Complete Cleanup|Cleanup for Next Mark)";
+    String CONCURRENT_PHASES = "(Mark|Clear Claimed Marks|Scan Root Regions|Rebuild Remembered Sets|Create Live Data|Complete Cleanup|Cleanup for Next Mark)";
     GCParseRule CONCURRENT_PHASE = new GCParseRule("CONCURRENT_PHASE", "Concurrent " + CONCURRENT_PHASES + "$");
     GCParseRule CONCURRENT_PHASE_DURATION = new GCParseRule("CONCURRENT_PHASE_DURATION", "Concurrent " + CONCURRENT_PHASES + " " + CONCURRENT_TIME);
 

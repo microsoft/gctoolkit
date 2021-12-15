@@ -5,13 +5,12 @@ package com.microsoft.gctoolkit.vertx.jvm;
 import com.microsoft.gctoolkit.aggregator.Aggregation;
 import com.microsoft.gctoolkit.aggregator.Aggregator;
 import com.microsoft.gctoolkit.aggregator.EventSource;
+import com.microsoft.gctoolkit.jvm.Diary;
 import com.microsoft.gctoolkit.parser.CMSTenuredPoolParser;
 import com.microsoft.gctoolkit.parser.GenerationalHeapParser;
 import com.microsoft.gctoolkit.parser.JVMEventParser;
 import com.microsoft.gctoolkit.parser.PreUnifiedG1GCParser;
 import com.microsoft.gctoolkit.parser.SurvivorMemoryPoolParser;
-import com.microsoft.gctoolkit.parser.jvm.JVMConfiguration;
-import com.microsoft.gctoolkit.parser.jvm.LoggingDiary;
 import com.microsoft.gctoolkit.vertx.GCToolkitVertx;
 import com.microsoft.gctoolkit.vertx.aggregator.AggregatorVerticle;
 
@@ -28,11 +27,11 @@ import java.util.Set;
 
     /* package */ GCToolkitVertxParametersForPreUnifiedLogs(
             Set<Class<? extends Aggregation>> registeredAggregations,
-            JVMConfiguration jvmConfiguration)
+            Diary diary)
     {
-        logFileParsers = initLogFileParsers(jvmConfiguration);
-        aggregatorVerticles = initAggregatorVerticles(registeredAggregations, jvmConfiguration);
-        mailBox = initMailBox(jvmConfiguration);
+        logFileParsers = initLogFileParsers(diary);
+        aggregatorVerticles = initAggregatorVerticles(registeredAggregations, diary);
+        mailBox = initMailBox(diary);
     }
 
     @Override
@@ -50,11 +49,10 @@ import java.util.Set;
         return mailBox;
     }
 
-    private  Set<LogFileParser> initLogFileParsers(JVMConfiguration jvmConfiguration) {
+    private  Set<LogFileParser> initLogFileParsers(Diary diary) {
         Set<LogFileParser> logFileParsers = new HashSet<>();
-        final LoggingDiary diary = jvmConfiguration.getDiary();
 
-        if (jvmConfiguration.hasJVMEvents()) {
+        if (diary.isApplicationRunningTime() || diary.isApplicationStoppedTime()) {
             logFileParsers.add(new LogFileParser(GCToolkitVertx.PARSER_INBOX, GCToolkitVertx.JVM_EVENT_PARSER_OUTBOX, consumer -> new JVMEventParser(diary, consumer)));
         }
 
@@ -87,10 +85,9 @@ import java.util.Set;
 
     private Set<AggregatorVerticle> initAggregatorVerticles(
             Set<Class<? extends Aggregation>> registeredAggregations,
-            JVMConfiguration jvmConfiguration) 
+            Diary diary)
     {
         final Set<AggregatorVerticle> aggregatorVerticles = new HashSet<>();
-        final LoggingDiary diary = jvmConfiguration.getDiary();
 
         if (diary.isG1GC()) {
             Set<Aggregator<?>> aggregators = getAggregators(EventSource.G1GC, registeredAggregations);
@@ -145,8 +142,7 @@ import java.util.Set;
         return aggregatorVerticles;
     }
 
-    private String initMailBox(JVMConfiguration jvmConfiguration) {
-        final LoggingDiary diary = jvmConfiguration.getDiary();
+    private String initMailBox(Diary diary) {
         if ( diary.isG1GC()) return GCToolkitVertx.G1GC_PARSER_OUTBOX;
         if ( diary.isGenerational())
             return (diary.isCMS()) ? GCToolkitVertx.CMS_TENURED_POOL_PARSER_OUTBOX : GCToolkitVertx.GENERATIONAL_HEAP_PARSER_OUTBOX;

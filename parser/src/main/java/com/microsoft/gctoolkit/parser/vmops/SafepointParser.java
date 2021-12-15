@@ -4,14 +4,14 @@ package com.microsoft.gctoolkit.parser.vmops;
 
 import com.microsoft.gctoolkit.event.jvm.JVMTermination;
 import com.microsoft.gctoolkit.event.jvm.Safepoint;
+import com.microsoft.gctoolkit.jvm.Diary;
 import com.microsoft.gctoolkit.parser.JVMEventConsumer;
 import com.microsoft.gctoolkit.parser.PreUnifiedGCLogParser;
-import com.microsoft.gctoolkit.parser.jvm.LoggingDiary;
 
 
 public class SafepointParser extends PreUnifiedGCLogParser implements SafepointPatterns {
 
-    public SafepointParser(LoggingDiary diary, JVMEventConsumer consumer) {
+    public SafepointParser(Diary diary, JVMEventConsumer consumer) {
         super(diary, consumer);
     }
 
