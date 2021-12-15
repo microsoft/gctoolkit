@@ -50,7 +50,7 @@ public class StreamGarbageCollectionLogFileTest {
             Path path = new TestLogFile("streaming/gc.log.tar.gz").getFile().toPath();
             GCLogFile logFile = createLogFile(path,false);
             assertEquals(1,logFile.getMetaData().getNumberOfFiles(),"file count mismatch");
-            assertExpectedLineCount(410055, logFile);
+            assertExpectedLineCount(410054, logFile);
         } catch (IOException ioe) {
             fail(ioe);
         }

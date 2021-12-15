@@ -50,7 +50,7 @@ public class GarbageCollectionEventSourceTest {
     public void testGZipTarFileLineCount() {
         try {
             Path path = new TestLogFile("streaming/gc.log.tar.gz").getFile().toPath();
-            assertExpectedLineCountInLog(410056, loadLogFile(path, false));
+            assertExpectedLineCountInLog(410055, loadLogFile(path, false));
         } catch (IOException ioe) {
             fail(ioe);
         }

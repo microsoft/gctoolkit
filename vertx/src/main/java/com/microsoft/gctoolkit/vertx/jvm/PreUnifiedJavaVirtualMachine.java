@@ -123,12 +123,9 @@ public class PreUnifiedJavaVirtualMachine extends AbstractJavaVirtualMachine {
                     : new PreUnifiedDiarizer();
 
             gcLogFile.stream().
-                    filter(Objects::nonNull).
-                    map(String::trim).
-                    filter(s -> s.length() > 0).
-                    map(this.jvmConfigurationFromParser::diarize).
-                    filter(completed -> completed).
-                    findFirst();
+                    map(this.jvmConfigurationFromParser::diarize)
+                    .filter(Boolean::booleanValue)
+                    .findFirst();
 
             this.jvmConfigurationFromParser.fillInKnowns();
 

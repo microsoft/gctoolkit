@@ -66,7 +66,6 @@ public abstract class GCLogFile extends FileDataSource<String> {
      *
      * @return the computed diary
      */
-
     public Diary diary() throws IOException {
         if ( diary == null) {
             Diarizer diarizer = diarizer();

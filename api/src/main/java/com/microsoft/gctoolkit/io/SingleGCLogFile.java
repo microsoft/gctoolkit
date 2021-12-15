@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Objects;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 import java.util.zip.GZIPInputStream;
@@ -47,14 +48,19 @@ public class SingleGCLogFile extends GCLogFile {
     }
 
     private Stream<String> stream(LogFileMetadata metadata) throws IOException {
+        Stream<String> stream = null;
         if (metadata.isPlainText()) {
-            return Files.lines(metadata.getPath());
+            stream = Files.lines(metadata.getPath());
         } else if (metadata.isZip()) {
-            return streamZipFile(metadata.getPath());
+            stream = streamZipFile(metadata.getPath());
         } else if (metadata.isGZip()) {
-            return streamGZipFile(metadata.getPath());
+            stream = streamGZipFile(metadata.getPath());
         }
-        throw new IOException("Unable to read " + path.toString());
+        if ( stream == null)
+            throw new IOException("Unable to read " + path.toString());
+        return stream.filter(Objects::nonNull)
+                .map(String::trim)
+                .filter(s -> s.length() > 0);
     }
 
     private static Stream<String> streamZipFile(Path path) throws IOException {

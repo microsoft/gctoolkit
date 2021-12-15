@@ -53,7 +53,7 @@ import com.microsoft.gctoolkit.time.DateTimeStamp;
  * </code></pre>
 
  */
-public abstract class RuntimeAggregation  implements Aggregation {
+public class RuntimeAggregation  implements Aggregation {
 
     private volatile DateTimeStamp timeOfFirstEvent = null;
     private volatile DateTimeStamp timeOfLastEvent = new DateTimeStamp(0d);
@@ -110,5 +110,15 @@ public abstract class RuntimeAggregation  implements Aggregation {
      */
     public double getRuntimeDuration() {
         return getTimeOfLastEvent().minus(getTimeOfFirstEvent());
+    }
+
+    @Override
+    public boolean hasWarning() {
+        return false;
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return false;
     }
 }

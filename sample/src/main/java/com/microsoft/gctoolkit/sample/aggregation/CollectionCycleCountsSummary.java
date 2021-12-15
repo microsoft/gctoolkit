@@ -10,9 +10,7 @@ public class CollectionCycleCountsSummary implements CollectionCycleCountsAggreg
     private HashMap<GarbageCollectionTypes,Integer> collectionCycleCounts = new HashMap<>();
     @Override
     public void count(GarbageCollectionTypes gcType) {
-        if ( !collectionCycleCounts.containsKey(gcType))
-            collectionCycleCounts.put(gcType,0);
-        collectionCycleCounts.put(gcType, collectionCycleCounts.get(gcType) + 1);
+        collectionCycleCounts.compute(gcType, (key, value) -> value == null ? 1 : ++value);
     }
 
     private String format = "%s : %s\n";

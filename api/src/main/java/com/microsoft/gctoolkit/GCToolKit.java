@@ -24,7 +24,13 @@ public class GCToolKit {
 
     private static final Logger LOGGER = Logger.getLogger(GCToolKit.class.getName());
 
-    private JavaVirtualMachine loadJavaVirtualMachine(GCLogFile logFile) {
+    /**
+     * Load the first implementation of JavaVirtualMachine that can process
+     * the supplied DataSource, GCLog in this instance.
+     * @param logFile GCLogFile DataSource
+     * @return JavaVirtualMachine implementation.
+     */
+    private static JavaVirtualMachine loadJavaVirtualMachine(GCLogFile logFile) {
         return ServiceLoader.load(JavaVirtualMachine.class)
                 .stream()
                 .map(ServiceLoader.Provider::get)

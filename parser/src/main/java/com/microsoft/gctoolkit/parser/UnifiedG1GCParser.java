@@ -537,6 +537,7 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
         forwardReference.setGcType(GarbageCollectionTypes.G1GCConcurrentUndoCycle);
     }
 
+    //todo: need support for JDK 17 undo concurrent cycle event.. started here, commented out for a future PR.
     private void concurrentUndoCycleEnd(GCLogTrace trace, String line) {
         forwardReference.setDuration(trace.getDurationInSeconds());
         recordUndoCycle((G1ConcurrentUndoCycle) forwardReference.buildConcurrentUndoCycleEvent());

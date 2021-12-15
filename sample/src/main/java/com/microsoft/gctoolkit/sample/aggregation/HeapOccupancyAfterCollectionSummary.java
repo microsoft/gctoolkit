@@ -14,12 +14,7 @@ public class HeapOccupancyAfterCollectionSummary implements HeapOccupancyAfterCo
     private final Map<GarbageCollectionTypes, XYDataSet> aggregations = new ConcurrentHashMap<>();
 
     public void addDataPoint(GarbageCollectionTypes gcType, DateTimeStamp timeStamp, long heapOccupancy) {
-        XYDataSet dataSet = aggregations.get(gcType);
-        if ( dataSet == null) {
-            dataSet = new XYDataSet();
-            aggregations.put(gcType,dataSet);
-        }
-        dataSet.add(timeStamp.getTimeStamp(),heapOccupancy);
+        aggregations.computeIfAbsent(gcType, key -> new XYDataSet()).add(timeStamp.getTimeStamp(),heapOccupancy);
     }
 
     public Map<GarbageCollectionTypes, XYDataSet> get() {

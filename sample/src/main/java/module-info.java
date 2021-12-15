@@ -13,7 +13,8 @@ module com.microsoft.gctoolkit.sample {
     exports com.microsoft.gctoolkit.sample;
 
     exports com.microsoft.gctoolkit.sample.aggregation to
-            com.microsoft.gctoolkit.vertx, com.microsoft.gctoolkit.integration;
+            com.microsoft.gctoolkit.vertx,
+            com.microsoft.gctoolkit.integration;
     exports com.microsoft.gctoolkit.sample.collections;
 
     provides com.microsoft.gctoolkit.aggregator.Aggregation with

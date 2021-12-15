@@ -10,27 +10,21 @@ import com.microsoft.gctoolkit.jvm.JavaVirtualMachine;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Optional;
 
-public class TestMain {
+public class EndToEndIntegrationTest {
 
     @Test
     public void testMain() {
-        try {
             String gcLogFile = System.getProperty("gcLogFile");
             analyze(gcLogFile);
-
             Assertions.assertEquals(26, getInitialMarkCount());
             Assertions.assertEquals(26, getRemarkCount());
             Assertions.assertEquals(19114, getDefNewCount());
-        } catch (IOException ioe) {
-            Assertions.fail(ioe);
-        }
     }
 
-    public void analyze(String gcLogFile) throws IOException {
+    public void analyze(String gcLogFile) {
         /**
          * GC log files can come in  one of two types: single or series of rolling logs.
          * In this sample, we load a single log file.
@@ -76,7 +70,6 @@ public class TestMain {
                 });
 
         Optional<CollectionCycleCountsSummary> summary = machine.getAggregation(CollectionCycleCountsSummary.class);
-        summary.ifPresent(s -> s.printOn(System.out));
         // Retrieves the Aggregation for PauseTimeSummary. This is a com.microsoft.gctoolkit.sample.aggregation.RuntimeAggregation.
         machine.getAggregation(PauseTimeSummary.class).ifPresent(pauseTimeSummary -> {
             Assertions.assertEquals( 208922, (int)(pauseTimeSummary.getTotalPauseTime() * 1000.0d));
