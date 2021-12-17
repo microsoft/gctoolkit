@@ -35,7 +35,6 @@ public class GCLogFileZipSegment implements LogFileSegment {
     /**
      * The constructor attempts to extract the segment index from the file name.
      * @param path The path to the file.
-     * @ see # segmentIndex
      */
     public GCLogFileZipSegment(Path path, String segmentName) {
         this.path = path;

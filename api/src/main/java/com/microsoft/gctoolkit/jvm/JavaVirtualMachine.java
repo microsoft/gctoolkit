@@ -13,11 +13,13 @@ import java.util.Optional;
 
 /**
  * JavaVirtualMachine is a representation of the JVM state obtained by analyzing a GC log file.
- * An instance of JavaVirtualMachine is created by calling {@link GCToolKit#analyze(DataSource)}
+ * An instance of JavaVirtualMachine is created by calling {@link GCToolKit#analyze(GCLogFile)}
  */
 public interface JavaVirtualMachine {
 
     /**
+     * @param logFile the log to be considered.
+     * Return {@code true} if the JavaVirtualMachine implementation can work with the GC log.
      * @return {@code true} if the JavaVirtualMachine implementation can work with the GC Log.
      */
 
