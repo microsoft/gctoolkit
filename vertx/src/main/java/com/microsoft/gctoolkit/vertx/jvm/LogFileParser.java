@@ -26,6 +26,14 @@ public class LogFileParser extends AbstractVerticle implements JVMEventConsumer 
         this.outbox = outbox;
         parser = factory.get(this);
     }
+    
+    public String getInbox() {
+    	return this.inbox;
+    }
+    
+    public String getOutbox() {
+    	return this.outbox;
+    }
 
     private final DeliveryOptions options = new DeliveryOptions().setCodecName("JVMEvent");
 

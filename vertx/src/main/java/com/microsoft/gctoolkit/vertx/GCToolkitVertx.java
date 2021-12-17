@@ -17,6 +17,7 @@ import io.vertx.core.Vertx;
 
 import java.io.IOException;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class GCToolkitVertx extends AbstractVerticle {
@@ -68,6 +69,14 @@ public class GCToolkitVertx extends AbstractVerticle {
             Set<LogFileParser> logFileParsers,
             Set<AggregatorVerticle> aggregatorVerticles,
             String mailBox) throws IOException {
+    	//remove AggregatorVerticle which can not match by the LogFileParser to prevent dead loop
+        aggregatorVerticles.removeIf(aggregatorVerticle->{
+            boolean isMatch = logFileParsers.stream().map(LogFileParser::getOutbox)
+                    .anyMatch(outbox->outbox.equals(aggregatorVerticle.getInbox()));
+            if(!isMatch)
+                LOGGER.log(Level.SEVERE, String.format("Remove %s %s",aggregatorVerticle.getInbox(),aggregatorVerticle));
+            return !isMatch;
+        });
 
         GCToolkitVertx GCToolkitVertx = new GCToolkitVertx(mailBox);
         JVMEventSource jvmEventSource = new JVMEventSource(PARSER_INBOX);

@@ -67,6 +67,10 @@ public class AggregatorVerticle extends AbstractVerticle {
     public AggregatorVerticle(String inbox) {
         this.inbox = inbox;
     }
+    
+    public String getInbox() {
+    	return this.inbox;
+    }
 
     @Override
     public boolean equals(Object other) {
