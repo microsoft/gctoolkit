@@ -16,9 +16,9 @@ public class CPUSummary {
 
     /**
      *
-     * @param user
-     * @param kernel
-     * @param wallClock
+     * @param user time
+     * @param kernel time
+     * @param wallClock time
      */
     public CPUSummary(double user, double kernel, double wallClock) {
         this.user = user;

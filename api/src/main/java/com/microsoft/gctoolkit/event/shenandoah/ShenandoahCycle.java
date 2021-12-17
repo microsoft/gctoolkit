@@ -11,30 +11,72 @@ public class ShenandoahCycle extends GCEvent {
 
     private ERGO ergonomics;
 
+    /**
+     *
+     * @param timeStamp
+     * @param gcType
+     * @param cause
+     * @param duration
+     */
     public ShenandoahCycle(DateTimeStamp timeStamp, GarbageCollectionTypes gcType, GCCause cause, double duration) {
         super(timeStamp, gcType, cause, duration);
     }
 
+    /**
+     *
+     * @param timeStamp
+     * @param duration
+     */
     public ShenandoahCycle(DateTimeStamp timeStamp, double duration) {
         super(timeStamp, duration);
     }
 
+    /**
+     *
+     * @param timeStamp
+     * @param cause
+     * @param duration
+     */
     public ShenandoahCycle(DateTimeStamp timeStamp, GCCause cause, double duration) {
         super(timeStamp, cause, duration);
     }
 
+    /**
+     *
+     * @param timeStamp
+     * @param gcType
+     * @param duration
+     */
     public ShenandoahCycle(DateTimeStamp timeStamp, GarbageCollectionTypes gcType, double duration) {
         super(timeStamp, gcType, duration);
     }
 
     /**
+     *
      * @deprecated use setErgonomics(...) instead
+     * @param free
+     * @param maxFree
+     * @param humongous
+     * @param fragExternal
+     * @param fragInternal
+     * @param reserve
+     * @param maxReserve
      */
     @Deprecated(forRemoval = true)
     public void addErgonomics(int free, int maxFree, int humongous, double fragExternal, double fragInternal, int reserve, int maxReserve) {
         setErgonomics(free, maxFree, humongous, fragExternal, fragInternal, reserve, maxReserve);
     }
 
+    /**
+     *
+     * @param free
+     * @param maxFree
+     * @param humongous
+     * @param fragExternal
+     * @param fragInternal
+     * @param reserve
+     * @param maxReserve
+     */
     public void setErgonomics(int free, int maxFree, int humongous, double fragExternal, double fragInternal, int reserve, int maxReserve) {
         this.ergonomics = new ERGO(free, maxFree, humongous, fragExternal, fragInternal, reserve, maxReserve);
     }
@@ -53,6 +95,7 @@ public class ShenandoahCycle extends GCEvent {
         Concurrent_evacuation, Pause_Init_Update_Refs,
         Concurrent_update_references, Pause_Final_Update_Refs;
     }
+
 
     class Phase {
 
@@ -74,6 +117,16 @@ public class ShenandoahCycle extends GCEvent {
         private final int reserve;
         private final int maxReserve;
 
+        /**
+         *
+         * @param free
+         * @param maxFree
+         * @param humongous
+         * @param fragExternal
+         * @param fragInternal
+         * @param reserve
+         * @param maxReserve
+         */
         public ERGO(int free, int maxFree, int humongous, double fragExternal, double fragInternal, int reserve, int maxReserve) {
             this.free = free;
             this.maxFree = maxFree;
@@ -84,30 +137,58 @@ public class ShenandoahCycle extends GCEvent {
             this.maxReserve = maxReserve;
         }
 
+        /**
+         *
+         * @return
+         */
         public int getFree() {
             return free;
         }
 
+        /**
+         *
+         * @return
+         */
         public int getMaxFree() {
             return maxFree;
         }
 
+        /**
+         *
+         * @return
+         */
         public int getHumongous() {
             return humongous;
         }
 
+        /**
+         *
+         * @return
+         */
         public double getFragExternal() {
             return fragExternal;
         }
 
+        /**
+         *
+         * @return
+         */
         public double getFragInternal() {
             return fragInternal;
         }
 
+        /**
+         *
+         * @return
+         */
         public int getReserve() {
             return reserve;
         }
 
+        /**
+         *
+         * @return
+         */
         public int getMaxReserve() {
             return maxReserve;
         }
