@@ -31,7 +31,6 @@ public class GCLogFileSegment implements LogFileSegment {
     /**
      * The constructor attempts to extract the segment index from the file name.
      * @param path The path to the file.
-     * @ see # segmentIndex
      */
     public GCLogFileSegment(Path path) {
         this.path = path;
