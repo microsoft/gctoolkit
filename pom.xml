@@ -28,7 +28,7 @@
         <connection>scm:git:${repository.url}</connection>
         <developerConnection>scm:git:${repository.url}</developerConnection>
         <url>${repository.url}</url>
-      <tag>HEAD</tag>
+      <tag>gctoolkit-2.0.5</tag>
   </scm>
 
     <developers>
@@ -332,6 +332,7 @@
                     <serverId>ossrh</serverId>
                     <nexusUrl>https://oss.sonatype.org/</nexusUrl>
                     <autoReleaseAfterClose>false</autoReleaseAfterClose>
+                    <stagingProgressTimeoutMinutes>10</stagingProgressTimeoutMinutes>
                 </configuration>
             </plugin>
             <plugin>

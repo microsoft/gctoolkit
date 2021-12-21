@@ -22,10 +22,10 @@ public abstract class GCEvent extends JVMEvent {
 
     /**
      *
-     * @param timeStamp
-     * @param gcType
-     * @param cause
-     * @param duration
+     * @param timeStamp for event
+     * @param gcType for event
+     * @param cause of event
+     * @param duration of event
      */
     protected GCEvent(DateTimeStamp timeStamp, GarbageCollectionTypes gcType, GCCause cause, double duration) {
         super(timeStamp, duration);
@@ -35,8 +35,8 @@ public abstract class GCEvent extends JVMEvent {
 
     /**
      *
-     * @param timeStamp
-     * @param duration
+     * @param timeStamp for event
+     * @param duration of event
      */
     protected GCEvent(DateTimeStamp timeStamp, double duration) {
         this(timeStamp, GarbageCollectionTypes.Unknown, GCCause.UNKNOWN_GCCAUSE, duration);
@@ -44,9 +44,9 @@ public abstract class GCEvent extends JVMEvent {
 
     /**
      *
-     * @param timeStamp
-     * @param cause
-     * @param duration
+     * @param timeStamp for event
+     * @param cause that triggered the event
+     * @param duration of event
      */
     protected GCEvent(DateTimeStamp timeStamp, GCCause cause, double duration) {
         this(timeStamp, GarbageCollectionTypes.Unknown, cause, duration);
@@ -54,9 +54,9 @@ public abstract class GCEvent extends JVMEvent {
 
     /**
      *
-     * @param timeStamp
-     * @param gcType
-     * @param duration
+     * @param timeStamp for event
+     * @param gcType of the event
+     * @param duration of the event
      */
     protected GCEvent(DateTimeStamp timeStamp, GarbageCollectionTypes gcType, double duration) {
         this(timeStamp, gcType, GCCause.UNKNOWN_GCCAUSE, duration);
@@ -64,7 +64,7 @@ public abstract class GCEvent extends JVMEvent {
 
     /**
      *
-     * @param cause
+     * @param cause of the event
      */
     public void setGCCause(GCCause cause) {
         this.cause = cause;
@@ -167,9 +167,9 @@ public abstract class GCEvent extends JVMEvent {
     /**
      *
      * Is the distance between x and y larger than the provided threshold.
-     * @param x
-     * @param y
-     * @return
+     * @param x is a value
+     * @param y is a value
+     * @return boolean is diff is greater than threshold
      */
     private static boolean withinThreshold(final double x, final double y) {
         return TIMESTAMP_THRESHOLD > Math.abs(x - y);
