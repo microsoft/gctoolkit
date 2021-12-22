@@ -1,4 +1,4 @@
-name: GCToolKit build with Maven
+name: GCToolKit Pre-release Notes
 
 on:
   push:
