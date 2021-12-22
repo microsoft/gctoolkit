@@ -98,6 +98,7 @@
         <spotbugs.version>4.4.1</spotbugs.version>
         <project.github.repository>microsoft/gctoolkit</project.github.repository>
         <repository.url>git@github.com:${project.github.repository}.git</repository.url>
+        <jreleaser.plugin.version>0.9.1</jreleaser.plugin.version>
     </properties>
 
     <dependencyManagement>
@@ -491,6 +492,66 @@
                                 </configuration>
                             </execution>
                         </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>jreleaser</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.jreleaser</groupId>
+                        <artifactId>jreleaser-maven-plugin</artifactId>
+                        <version>${jreleaser.plugin.version}</version>
+                        <inherited>false</inherited>
+                        <configuration>
+                            <jreleaser>
+                                <release>
+                                    <github>
+                                        <tagName>gctoolkit-{{projectVersion}}</tagName>
+                                        <skipTag>true</skipTag>
+                                        <changelog>
+                                            <formatted>ALWAYS</formatted>
+                                            <preset>conventional-commits</preset>
+                                            <labelers>
+                                                <labeler>
+                                                    <label>maven-release</label>
+                                                    <title>[maven-release-plugin]</title>
+                                                </labeler>
+                                                <labeler>
+                                                    <label>github-issue</label>
+                                                    <title>#</title>
+                                                </labeler>
+                                            </labelers>
+                                            <categories>
+                                                <category>
+                                                    <title>maven-release</title>
+                                                    <labels>maven-release</labels>
+                                                </category>
+                                                <category>
+                                                    <title>♻️  Changes</title>
+                                                    <labels>github-issue</labels>
+                                                </category>
+                                            </categories>
+                                            <contributors>
+                                                <format>
+                                                    - {{contributorName}}{{#contributorUsernameAsLink}} ({{.}}){{/contributorUsernameAsLink}}
+                                                </format>
+                                            </contributors>
+                                            <hide>
+                                                <contributors>
+                                                    GitHub
+                                                </contributors>
+                                                <categories>
+                                                    maven-release
+                                                </categories>
+                                            </hide>
+                                        </changelog>
+                                    </github>
+                                </release>
+                            </jreleaser>
+                        </configuration>
                     </plugin>
                 </plugins>
             </build>
