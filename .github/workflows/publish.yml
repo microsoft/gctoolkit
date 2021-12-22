@@ -60,7 +60,5 @@ jobs:
         run: |
           ./mvnw -B versions:set -DnewVersion=${{steps.version.outputs.version}}
           ./mvnw -B -pl :gctoolkit -Pjreleaser jreleaser:release
-
-
         env:
           JRELEASER_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
