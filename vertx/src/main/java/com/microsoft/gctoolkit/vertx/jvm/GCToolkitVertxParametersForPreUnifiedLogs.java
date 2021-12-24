@@ -54,6 +54,7 @@ import java.util.Set;
 
         if (diary.isApplicationRunningTime() || diary.isApplicationStoppedTime()) {
             logFileParsers.add(new LogFileParser(GCToolkitVertx.PARSER_INBOX, GCToolkitVertx.JVM_EVENT_PARSER_OUTBOX, consumer -> new JVMEventParser(diary, consumer)));
+            logFileParsers.add(new LogFileParser(GCToolkitVertx.PARSER_INBOX, SAFEPOINT_OUTBOX, consumer -> new JVMEventParser(diary, consumer)));
         }
 
         if (diary.isTenuringDistribution()) {
@@ -131,12 +132,14 @@ import java.util.Set;
                 aggregatorVerticles.add(aggregatorVerticle);
             }
         }
-
-        Set<Aggregator<?>> safepointAggregators = getAggregators(EventSource.SAFEPOINT, registeredAggregations);
-        if (safepointAggregators != null && !safepointAggregators.isEmpty()) {
-            AggregatorVerticle aggregatorVerticle = new AggregatorVerticle(SAFEPOINT_OUTBOX);
-            safepointAggregators.forEach(aggregatorVerticle::registerAggregator);
-            aggregatorVerticles.add(aggregatorVerticle);
+        
+        if (diary.isApplicationRunningTime() || diary.isApplicationStoppedTime()) {
+            Set<Aggregator<?>> safepointAggregators = getAggregators(EventSource.SAFEPOINT, registeredAggregations);
+	        if (safepointAggregators != null && !safepointAggregators.isEmpty()) {
+	            AggregatorVerticle aggregatorVerticle = new AggregatorVerticle(SAFEPOINT_OUTBOX);
+	            safepointAggregators.forEach(aggregatorVerticle::registerAggregator);
+	            aggregatorVerticles.add(aggregatorVerticle);
+	        }
         }
 
         return aggregatorVerticles;
