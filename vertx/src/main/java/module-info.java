@@ -17,6 +17,7 @@ module com.microsoft.gctoolkit.vertx {
             com.microsoft.gctoolkit.api;
 
     provides com.microsoft.gctoolkit.jvm.JavaVirtualMachine with
-            PreUnifiedJavaVirtualMachine;
+            com.microsoft.gctoolkit.vertx.jvm.PreUnifiedJavaVirtualMachine,
+            com.microsoft.gctoolkit.vertx.jvm.UnifiedJavaVirtualMachine;
 
 }

@@ -11,6 +11,7 @@ import com.microsoft.gctoolkit.jvm.JavaVirtualMachine;
 
 import java.lang.reflect.Method;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.ServiceConfigurationError;
 import java.util.ServiceLoader;
 import java.util.Set;

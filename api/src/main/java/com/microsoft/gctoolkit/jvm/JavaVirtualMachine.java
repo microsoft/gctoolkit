@@ -10,6 +10,7 @@ import com.microsoft.gctoolkit.io.GCLogFile;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
 
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * JavaVirtualMachine is a representation of the JVM state obtained by analyzing a GC log file.
@@ -71,13 +72,13 @@ public interface JavaVirtualMachine {
      * Return the time of the first event in the GC log file.
      * @return The time of the first event.
      */
-    DateTimeStamp getTimeOfFirstEvent();
+    DateTimeStamp getEstimatedJVMStartTime();
 
     /**
      * Return the time of the last event in the GC log file.
      * @return The time of the last event.
      */
-    DateTimeStamp getTimeOfLastEvent();
+    DateTimeStamp getJVMTerminationTime();
 
     /**
      * Return the runtime duration. This is not necessarily the difference
@@ -86,13 +87,6 @@ public interface JavaVirtualMachine {
      * @return The runtime duration that the GC log represents.
      */
     double getRuntimeDuration();
-
-    /**
-     * Get the configuration metadata. This configuration data is either
-     * known from JVM flags, or inferred from parsing the GC log file.
-     * @return The {@code JvmConfiguration}
-     */
-    JvmConfiguration getJvmConfiguration();
 
     /**
      * Return the {@code Aggregation} that was used in the analysis of the GC log file
@@ -106,4 +100,5 @@ public interface JavaVirtualMachine {
      * if given aggregationClass is not available.
      */
     <T extends Aggregation> Optional<T> getAggregation(Class<T> aggregationClass);
+
 }

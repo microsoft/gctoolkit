@@ -3,6 +3,7 @@
 package com.microsoft.gctoolkit.jvm;
 
 import com.microsoft.gctoolkit.parser.datatype.TripleState;
+import com.microsoft.gctoolkit.time.DateTimeStamp;
 
 import java.util.Arrays;
 
@@ -45,6 +46,7 @@ import java.util.Arrays;
 public class Diary {
 
     private final TripleState[] states;
+    private DateTimeStamp estimatedJVMStartTime;
 
     public Diary() {
         states = new TripleState[SupportedFlags.values().length];
@@ -365,5 +367,12 @@ public class Diary {
 
     public boolean isJVMEventsKnown() {
         return isApplicationStoppedTimeKnown() && isApplicationRunningTime();
+    }
+
+    public void setEstimatedJVMStartTime(DateTimeStamp startTime) {
+        this.estimatedJVMStartTime = startTime;
+    }
+    public DateTimeStamp getTimeOfFirstEvent() {
+        return this.estimatedJVMStartTime;
     }
 }
