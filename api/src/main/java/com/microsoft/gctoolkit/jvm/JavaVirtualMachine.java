@@ -70,6 +70,12 @@ public interface JavaVirtualMachine {
 
     /**
      * Return the time of the first event in the GC log file.
+     * @return The time of the last event.
+     */
+    DateTimeStamp getTimeOfFirstEvent();
+
+    /**
+     * Return the time of the first event in the GC log file.
      * @return The time of the first event.
      */
     DateTimeStamp getEstimatedJVMStartTime();

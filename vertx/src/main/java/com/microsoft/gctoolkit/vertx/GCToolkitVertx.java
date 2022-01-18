@@ -78,25 +78,25 @@ public class GCToolkitVertx extends AbstractVerticle {
             return !isMatch;
         });
 
-        GCToolkitVertx GCToolkitVertx = new GCToolkitVertx(mailBox);
+        GCToolkitVertx gcToolkitVertx = new GCToolkitVertx(mailBox);
         JVMEventSource jvmEventSource = new JVMEventSource(PARSER_INBOX);
-        GCToolkitVertx.deployVerticle(jvmEventSource);
+        gcToolkitVertx.deployVerticle(jvmEventSource);
         jvmEventSource.awaitDeployment();
 
-        GCToolkitVertx.deployVerticle(GCToolkitVertx);
+        gcToolkitVertx.deployVerticle(gcToolkitVertx);
 
-        logFileParsers.forEach(logFileParser -> GCToolkitVertx.deployVerticle(logFileParser, new DeploymentOptions().setWorker(true)));
+        logFileParsers.forEach(logFileParser -> gcToolkitVertx.deployVerticle(logFileParser, new DeploymentOptions().setWorker(true)));
         logFileParsers.forEach(LogFileParser::awaitDeployment);
 
-        aggregatorVerticles.forEach(GCToolkitVertx::deployVerticle);
+        aggregatorVerticles.forEach(gcToolkitVertx::deployVerticle);
         aggregatorVerticles.forEach(AggregatorVerticle::awaitDeployment);
 
         jvmEventSource.publishGCDataSource(dataSource);
         aggregatorVerticles.forEach(AggregatorVerticle::awaitCompletion);
 
-        GCToolkitVertx.shutdown();
+        gcToolkitVertx.shutdown();
 
-        return GCToolkitVertx.timeOfLastEvent;
+        return gcToolkitVertx.timeOfLastEvent;
     }
 
     private Future<String> deployVerticle(Verticle verticle) {
