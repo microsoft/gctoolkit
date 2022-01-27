@@ -112,8 +112,16 @@ public class AggregatorVerticle extends AbstractVerticle {
         deployed.awaitUninterruptibly();
     }
 
+    /*
+    we need some check on the state of the consumer...
+     */
     public DateTimeStamp awaitCompletion() {
         completion.awaitUninterruptibly();
+        try {
+            Thread.sleep(10000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         return timeOfTerminationEvent;
     }
 
@@ -134,6 +142,7 @@ public class AggregatorVerticle extends AbstractVerticle {
                     <JVMEvent>consumer(inbox, message -> {
                         try {
                             JVMEvent event = message.body();
+                            System.out.println(event.toString());
                             timeOfTerminationEvent = event.getDateTimeStamp();
                             this.record(event);
                         } catch (Throwable t) {

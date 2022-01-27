@@ -114,6 +114,7 @@ public class GCToolkitVertx extends AbstractVerticle {
                     consumer(mailBox, message -> {
                         try {
                             JVMEvent event = (JVMEvent) message.body();
+                            System.out.println(event.toString());
                             if (event instanceof JVMTermination)
                                 return;
                             DateTimeStamp now = event.getDateTimeStamp().add(event.getDuration());
