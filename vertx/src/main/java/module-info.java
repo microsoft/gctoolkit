@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 import com.microsoft.gctoolkit.vertx.jvm.PreUnifiedJavaVirtualMachine;
+import com.microsoft.gctoolkit.vertx.jvm.UnifiedJavaVirtualMachine;
 
 /**
  * Contains a vertx based implementation of GCToolKit. The vertx implementation is an internal module.
@@ -17,6 +18,7 @@ module com.microsoft.gctoolkit.vertx {
             com.microsoft.gctoolkit.api;
 
     provides com.microsoft.gctoolkit.jvm.JavaVirtualMachine with
-            PreUnifiedJavaVirtualMachine;
+            PreUnifiedJavaVirtualMachine,
+            UnifiedJavaVirtualMachine;
 
 }
