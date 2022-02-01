@@ -64,11 +64,7 @@ public class GCToolkitVertx extends AbstractVerticle {
      * @return The runtime duration
      * @throws IOException If an IOException is thrown while reading the DataSource
      */
-    public static DateTimeStamp aggregateDataSource(
-            DataSource<?> dataSource,
-            Set<LogFileParser> logFileParsers,
-            Set<AggregatorVerticle> aggregatorVerticles,
-            String mailBox) throws IOException {
+    public static DateTimeStamp aggregateDataSource(DataSource<?> dataSource, Set<LogFileParser> logFileParsers, Set<AggregatorVerticle> aggregatorVerticles,  String mailBox) throws IOException {
     	//remove AggregatorVerticle which can not match by the LogFileParser to prevent dead loop
         aggregatorVerticles.removeIf(aggregatorVerticle->{
             boolean isMatch = logFileParsers.stream().map(LogFileParser::getOutbox)
@@ -114,13 +110,12 @@ public class GCToolkitVertx extends AbstractVerticle {
                     consumer(mailBox, message -> {
                         try {
                             JVMEvent event = (JVMEvent) message.body();
-                            System.out.println(event.toString());
-                            if (event instanceof JVMTermination)
-                                return;
                             DateTimeStamp now = event.getDateTimeStamp().add(event.getDuration());
                             if (now.after(timeOfLastEvent)) {
                                 timeOfLastEvent = now;
                             }
+                            if (event instanceof JVMTermination)
+                                return;
                         } catch (Throwable t) {
                             LOGGER.throwing(this.getClass().getName(), "start", t);
                         }

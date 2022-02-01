@@ -10,8 +10,11 @@ import com.microsoft.gctoolkit.jvm.JavaVirtualMachine;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class EndToEndIntegrationTest {
 
@@ -43,7 +46,12 @@ public class EndToEndIntegrationTest {
          * The JavaVirtualMachine contains the aggregations as filled out by the Aggregators.
          * It also contains configuration information about how the JVM was configured for the runtime.
          */
-        JavaVirtualMachine machine = gcToolKit.analyze(logFile);
+        JavaVirtualMachine machine = null;
+        try {
+            machine = gcToolKit.analyze(logFile);
+        } catch (IOException e) {
+            fail(e.getMessage());
+        }
 
         // Retrieves the Aggregation for HeapOccupancyAfterCollectionSummary. This is a time-series aggregation.
         String message = "The XYDataSet for %s contains %s items.\n";

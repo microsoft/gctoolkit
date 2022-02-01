@@ -9,10 +9,14 @@ import com.microsoft.gctoolkit.jvm.JavaVirtualMachine;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
+
+import static org.junit.jupiter.api.Assertions.fail;
+
 public class JavaVirtualMachineConfigurationTest {
 
     private String logFile = "rolling/jdk14/rollinglogs/long_restart.log";
-    private int[][] times = { { 0, 13, 262172}, { 259077, 259077, 262172}};
+    private int[][] times = { { 0, 13, 262172, 262172}, { 259077, 259077, 262172, 3095}};
 
     @Test
     public void testRotating() {
@@ -29,10 +33,15 @@ public class JavaVirtualMachineConfigurationTest {
     private void test(GCLogFile log, int[] endStartTimes ) {
         GCToolKit gcToolKit = new GCToolKit();
         gcToolKit.loadAggregationsFromServiceLoader();
-        JavaVirtualMachine machine = gcToolKit.analyze(log);
+        JavaVirtualMachine machine = null;
+        try {
+            machine = gcToolKit.analyze(log);
+        } catch (IOException e) {
+            fail(e.getMessage());
+        }
         Assertions.assertEquals( endStartTimes[0], (int)(machine.getEstimatedJVMStartTime().getTimeStamp() * 1000.0d));
         Assertions.assertEquals( endStartTimes[1], (int)(machine.getTimeOfFirstEvent().getTimeStamp() * 1000.0d));
         Assertions.assertEquals( endStartTimes[2], (int)(machine.getJVMTerminationTime().getTimeStamp() * 1000.0d));
-        Assertions.assertEquals( endStartTimes[2] - endStartTimes[1], (int)(machine.getRuntimeDuration() * 1000.0d));
+        Assertions.assertEquals( endStartTimes[3], (int)(machine.getRuntimeDuration() * 1000.0d));
     }
 }
