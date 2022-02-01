@@ -29,7 +29,7 @@
         <developerConnection>scm:git:${repository.url}</developerConnection>
         <url>${repository.url}</url>
       <tag>gctoolkit-2.0.5</tag>
-  </scm>
+    </scm>
 
     <developers>
         <developer>
@@ -102,6 +102,15 @@
         <spotbugs.version>4.5.3</spotbugs.version>
     </properties>
 
+    <!-- 
+        These are listed in alphabetical order according to groupId 
+
+        Dependency management is for setting common dependency config 
+        and version numbers that you want the whole project to use.
+
+        Dependencies (a later section) are for setting the actual dependencies 
+        that you want to use.
+    -->
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -143,11 +152,6 @@
         <!-- NOTE: Some plugin configuration is set in the reporting section below as opposed to here by design -->
         <pluginManagement>
             <plugins>
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>exec-maven-plugin</artifactId>
-                    <version>${maven.exec-plugin.version}</version>
-                </plugin>
                 <plugin>
                     <groupId>com.github.spotbugs</groupId>
                     <artifactId>spotbugs-maven-plugin</artifactId>
@@ -285,6 +289,11 @@
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>exec-maven-plugin</artifactId>
+                    <version>${maven.exec-plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
                     <artifactId>license-maven-plugin</artifactId>
                     <version>${maven.license-plugin.version}</version>
                 </plugin>
@@ -327,6 +336,10 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
             </plugin>
             <plugin>
@@ -344,10 +357,6 @@
                     <autoReleaseAfterClose>false</autoReleaseAfterClose>
                     <stagingProgressTimeoutMinutes>10</stagingProgressTimeoutMinutes>
                 </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-enforcer-plugin</artifactId>
             </plugin>
         </plugins>
     </build>
