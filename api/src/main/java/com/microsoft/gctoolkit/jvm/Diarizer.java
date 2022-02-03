@@ -11,6 +11,7 @@ public interface Diarizer {
     String getCommandLine();
 
     DateTimeStamp getTimeOfFirstEvent();
+    DateTimeStamp getTimeOfLastEvent();
 
     int getMaxTenuringThreshold();
 

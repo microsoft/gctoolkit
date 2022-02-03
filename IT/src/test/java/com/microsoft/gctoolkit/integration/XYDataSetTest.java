@@ -1,7 +1,8 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
-package com.microsoft.gctoolkit.integration.collections;
+package com.microsoft.gctoolkit.integration;
 
+import com.microsoft.gctoolkit.integration.collections.XYDataSet;
 import com.microsoft.gctoolkit.integration.collections.XYDataSet.Point;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

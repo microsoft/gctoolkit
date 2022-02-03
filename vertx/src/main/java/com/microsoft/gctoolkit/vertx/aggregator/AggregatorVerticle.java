@@ -5,12 +5,14 @@ package com.microsoft.gctoolkit.vertx.aggregator;
 import com.microsoft.gctoolkit.aggregator.Aggregation;
 import com.microsoft.gctoolkit.aggregator.Aggregator;
 import com.microsoft.gctoolkit.event.jvm.JVMEvent;
+import com.microsoft.gctoolkit.event.jvm.JVMTermination;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
 import com.microsoft.gctoolkit.vertx.internal.util.concurrent.StartingGun;
 import io.vertx.core.AbstractVerticle;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -60,7 +62,7 @@ public class AggregatorVerticle extends AbstractVerticle {
     private final StartingGun deployed = new StartingGun();
     private final StartingGun completion = new StartingGun();
 
-    private DateTimeStamp timeOfTerminationEvent;
+    private volatile DateTimeStamp timeOfTerminationEvent;
 
     private final String inbox;
 
@@ -112,18 +114,16 @@ public class AggregatorVerticle extends AbstractVerticle {
         deployed.awaitUninterruptibly();
     }
 
+    /*
+    we need some check on the state of the consumer...
+     */
     public DateTimeStamp awaitCompletion() {
         completion.awaitUninterruptibly();
         return timeOfTerminationEvent;
     }
 
     private void monitorForTermination() {
-        AtomicInteger counter = new AtomicInteger(aggregators.size());
-        aggregators.forEach(aggregator -> ((AggregatorWrapper)aggregator).onCompletion(() -> {
-            if ( counter.decrementAndGet() == 0) {
-                completion.ready();
-            }
-        }));
+        Executors.newSingleThreadExecutor().execute(() -> completion.awaitUninterruptibly());
     }
 
     @Override
@@ -134,8 +134,11 @@ public class AggregatorVerticle extends AbstractVerticle {
                     <JVMEvent>consumer(inbox, message -> {
                         try {
                             JVMEvent event = message.body();
-                            timeOfTerminationEvent = event.getDateTimeStamp();
                             this.record(event);
+                            if ( event instanceof JVMTermination) {
+                                timeOfTerminationEvent = event.getDateTimeStamp();
+                                completion.ready();
+                            }
                         } catch (Throwable t) {
                             LOGGER.throwing(this.getClass().getName(), "start", t);
                         }
@@ -145,4 +148,6 @@ public class AggregatorVerticle extends AbstractVerticle {
             LOGGER.throwing(this.getClass().getName(), "start", t);
         }
     }
+
+
 }

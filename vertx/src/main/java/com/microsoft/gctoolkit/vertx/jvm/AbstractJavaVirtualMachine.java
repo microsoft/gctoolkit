@@ -5,16 +5,13 @@ package com.microsoft.gctoolkit.vertx.jvm;
 import com.microsoft.gctoolkit.aggregator.Aggregation;
 import com.microsoft.gctoolkit.io.DataSource;
 import com.microsoft.gctoolkit.io.GCLogFile;
-import com.microsoft.gctoolkit.jvm.Diarizer;
+import com.microsoft.gctoolkit.jvm.Diary;
 import com.microsoft.gctoolkit.jvm.JavaVirtualMachine;
-import com.microsoft.gctoolkit.jvm.JvmConfiguration;
-import com.microsoft.gctoolkit.parser.jvm.UnifiedDiarizer;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
 import com.microsoft.gctoolkit.vertx.GCToolkitVertx;
 
 import java.io.IOException;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -32,67 +29,95 @@ public abstract class AbstractJavaVirtualMachine implements JavaVirtualMachine {
 
     private static final Logger LOGGER = Logger.getLogger(AbstractJavaVirtualMachine.class.getName());
 
-    private static final double LOG_FRAGMENT_THRESHOLD = 18000;
+    private static final double LOG_FRAGMENT_THRESHOLD = 60.0d;
 
-    private Diarizer jvmConfigurationFromParser;
-    private JvmConfiguration jvmConfigurationForCoreApi;
+    private Diary diary;
     private DateTimeStamp timeOfLastEvent;
     private final Map<Class<? extends Aggregation>, Aggregation> aggregatedData = new ConcurrentHashMap<>();
 
     @Override
     public boolean isG1GC() {
-        return jvmConfigurationFromParser.getDiary().isG1GC();
+        return diary.isG1GC();
     }
 
     @Override
     public boolean isZGC() {
-        return jvmConfigurationFromParser.getDiary().isZGC();
+        return diary.isZGC();
     }
 
     @Override
     public boolean isShenandoah() {
-        return jvmConfigurationFromParser.getDiary().isShenandoah();
+        return diary.isShenandoah();
     }
 
     @Override
     public boolean isParallel() {
-        return jvmConfigurationFromParser.getDiary().isParNew();
+        return diary.isParNew();
     }
 
     @Override
     public boolean isSerial() {
-        return jvmConfigurationFromParser.getDiary().isSerialFull();
+        return diary.isSerialFull();
     }
 
     @Override
     public boolean isCMS() {
-        return jvmConfigurationFromParser.getDiary().isCMS();
+        return diary.isCMS();
     }
 
     @Override
     public String getCommandLine() {
-        return jvmConfigurationFromParser.getCommandLine();
+        return ""; //todo: extract from diary... jvmConfigurationFromParser.getCommandLine();
     }
 
+    /**
+     * of the first event is significantly away from zero in relation to the time intervals between the
+     * of the next N events, where N maybe 1.
+     *
+     * try to estimate the time at which the JVM started. For log fragments, this will be the time
+     * of the first event in the log. Otherwise it will be 0.000 seconds.
+     * @return DateTimeStamp
+     */
+    @Override
+    public DateTimeStamp getEstimatedJVMStartTime() {
+        DateTimeStamp startTime = getTimeOfFirstEvent();
+        // Initial entries in GC log happen within seconds. Lets allow for 60 before considering the log
+        // to be a fragment.
+        if (startTime.getTimeStamp() < LOG_FRAGMENT_THRESHOLD) {
+            return startTime.minus(startTime.getTimeStamp());
+        } else {
+            return startTime;
+        }
+    }
+
+    /**
+     * todo: fix this to be a globally available value. Also, the JVM start time is not zero if the time
+     * of the first event is significantly away from zero in relation to the time intervals between the
+     * of the next N events, where N maybe 1.
+     *
+     * try to estimate the time at which the JVM started. For log fragments, this will be the time
+     * of the first event in the log. Otherwise it will be 0.000 seconds.
+     * @return DateTimeStamp
+     */
     @Override
     public DateTimeStamp getTimeOfFirstEvent() {
-        return jvmConfigurationFromParser.getTimeOfFirstEvent();
+        return diary.getTimeOfFirstEvent();
     }
 
+    /**
+     * JVM termination time will be one of either, the time stamp in the termination event if present or, the
+     * time of the last event + that events duration.
+     * @return DateTimeStamp
+     */
     @Override
-    public DateTimeStamp getTimeOfLastEvent() {
-        if (getTimeOfFirstEvent().before(timeOfLastEvent))
-            return timeOfLastEvent;
-        else
-            return getTimeOfFirstEvent();
+    public DateTimeStamp getJVMTerminationTime() {
+        return timeOfLastEvent;
     }
 
     @Override
     public double getRuntimeDuration() {
-        boolean isLogFragment = getTimeOfFirstEvent().getTimeStamp() > LOG_FRAGMENT_THRESHOLD;
-        if (isLogFragment)
-            return getTimeOfLastEvent().minus(getTimeOfFirstEvent());
-        return getTimeOfLastEvent().getTimeStamp();        }
+        return getJVMTerminationTime().minus(getEstimatedJVMStartTime());
+    }
 
     @Override
     @SuppressWarnings("unchecked")
@@ -100,27 +125,16 @@ public abstract class AbstractJavaVirtualMachine implements JavaVirtualMachine {
         return Optional.ofNullable((T) aggregatedData.get(aggregationClass));
     }
 
-    @Override
-    public JvmConfiguration getJvmConfiguration() {   //todo: why????
-        return jvmConfigurationForCoreApi;
-    }
+    abstract GCToolkitVertxParameters getParameters(Set<Class<? extends Aggregation>> registeredAggregations, Diary diary);
 
     // Invoked reflectively from GCToolKit
     public void analyze(Set<Class<? extends Aggregation>> registeredAggregations, DataSource<?> dataSource) {
 
         try {
             final GCLogFile gcLogFile = (GCLogFile) dataSource;
+            this.diary = gcLogFile.diary();
 
-            this.jvmConfigurationFromParser = new UnifiedDiarizer();
-
-            gcLogFile.stream()
-                    .map(this.jvmConfigurationFromParser::diarize)
-                    .filter(Boolean::booleanValue)
-                    .findFirst();
-
-            this.jvmConfigurationFromParser.fillInKnowns();
-
-            GCToolkitVertxParameters GCToolkitVertxParameters = new GCToolkitVertxParametersForUnifiedLogs(registeredAggregations, gcLogFile.diary());
+            GCToolkitVertxParameters GCToolkitVertxParameters = getParameters(registeredAggregations, gcLogFile.diary());
 
             this.timeOfLastEvent = GCToolkitVertx.aggregateDataSource(
                     dataSource,
@@ -135,10 +149,6 @@ public abstract class AbstractJavaVirtualMachine implements JavaVirtualMachine {
                         Aggregation aggregation = aggregator.aggregation();
                         this.aggregatedData.put(aggregation.getClass(), aggregation);
                     });
-
-
-            this.jvmConfigurationForCoreApi = new JvmConfigurationImpl(gcLogFile.diary());
-
 
         } catch (IOException | ClassCastException e ) {
             LOGGER.log(Level.WARNING, e.getMessage(), e);

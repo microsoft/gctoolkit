@@ -5,6 +5,7 @@ gclogs/streaming
 gclogs/unified
 gclogs/zgc
 
+unifiedrules.txt
 gctoolkit-testdata-*.zip
 
 # Maven

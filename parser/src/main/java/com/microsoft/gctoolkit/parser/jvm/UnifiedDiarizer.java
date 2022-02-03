@@ -29,7 +29,6 @@ public class UnifiedDiarizer implements Diarizer {
 
     private final Diary diary;
     private final TreeSet<String> tagsAndLevels = new TreeSet<>();
-    private DateTimeStamp startTime = null;
     private int stopTheWorldEvents = 0;
 
     {
@@ -149,10 +148,7 @@ public class UnifiedDiarizer implements Diarizer {
     }
 
     private void timeOfFirstEvent(Decorators decorator) {
-        if (startTime == null) {
-            startTime = decorator.getDateTimeStamp();
-        }
-
+        diary.setTimeOfFirstEvent(decorator.getDateTimeStamp());
     }
 
     private void extractTagsAndLevels(Decorators decorators) {
@@ -240,6 +236,11 @@ public class UnifiedDiarizer implements Diarizer {
 
     @Override
     public DateTimeStamp getTimeOfFirstEvent() {
-        return startTime;
+        return getDiary().getTimeOfFirstEvent();
+    }
+
+    @Override
+    public DateTimeStamp getTimeOfLastEvent() {
+        return null;
     }
 }

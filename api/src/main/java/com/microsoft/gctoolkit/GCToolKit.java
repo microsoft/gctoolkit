@@ -7,8 +7,13 @@ import com.microsoft.gctoolkit.io.DataSource;
 import com.microsoft.gctoolkit.io.GCLogFile;
 import com.microsoft.gctoolkit.io.RotatingGCLogFile;
 import com.microsoft.gctoolkit.io.SingleGCLogFile;
+import com.microsoft.gctoolkit.jvm.Diary;
 import com.microsoft.gctoolkit.jvm.JavaVirtualMachine;
+import com.microsoft.gctoolkit.message.DataSourceBus;
+import com.microsoft.gctoolkit.message.JVMEventBus;
+import com.microsoft.gctoolkit.message.DataSourceParser;
 
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.ServiceConfigurationError;
@@ -30,13 +35,40 @@ public class GCToolKit {
      * @param logFile GCLogFile DataSource
      * @return JavaVirtualMachine implementation.
      */
-    private static JavaVirtualMachine loadJavaVirtualMachine(GCLogFile logFile) {
+    private JavaVirtualMachine loadJavaVirtualMachine(GCLogFile logFile) {
         return ServiceLoader.load(JavaVirtualMachine.class)
                 .stream()
                 .map(ServiceLoader.Provider::get)
                 .filter(jvm -> jvm.accepts(logFile))
                 .findFirst()
-                .orElseThrow(() -> new ServiceConfigurationError("No suitable service provider found"));
+                .orElseThrow(() -> new ServiceConfigurationError("No suitable JavaVirtualMachine implementation found"));
+    }
+
+    private DataSourceBus setupDataSourceBus() {
+        return ServiceLoader.load(DataSourceBus.class)
+                .stream()
+                .map(ServiceLoader.Provider::get)
+                .findFirst()
+                .orElseThrow(() -> new ServiceConfigurationError("No suitable DataSourceBus implementation found"));
+
+    }
+
+    private JVMEventBus setupJVMEventBus() {
+        return ServiceLoader.load(JVMEventBus.class)
+                .stream()
+                .map(ServiceLoader.Provider::get)
+                .findFirst()
+                .orElseThrow(() -> new ServiceConfigurationError("No suitable JVMEventBus implementation found"));
+
+    }
+
+    private void registerParsers(DataSourceBus bus, Diary diary) {
+        ServiceLoader.load(DataSourceParser.class)
+                .stream()
+                .map(ServiceLoader.Provider::get)
+                .filter(p->p.accepts(diary))
+                .forEach(parser->bus.register(parser));
+
     }
 
     private final Set<Class<? extends Aggregation>> registeredAggregations;
@@ -107,14 +139,17 @@ public class GCToolKit {
      * @return a representation of the state of the Java Virtual Machine resulting
      * from the analysis of the GC log file.
      */
-    public JavaVirtualMachine analyze(GCLogFile logFile) {
+    public JavaVirtualMachine analyze(GCLogFile logFile) throws IOException  {
         //todo: revert this to DataSource to account for non-GC log data sources once we have a use case (maybe JFR but JFR timers drift badly ATM)
         // Potential NPE, but would have logged if there was trouble creating the instance.
+        //setup message bus
+        //DataSourceBus dataSourceBus = setupDataSourceBus();
+        //JVMEventBus eventBus = setupJVMEventBus();
+        //registerParsers(dataSourceBus,logFile.diary());
         JavaVirtualMachine javaVirtualMachine = loadJavaVirtualMachine(logFile);
         //todo: do we need reflection????
         try {
-            Method analyze = javaVirtualMachine.getClass()
-                    .getMethod("analyze", Set.class, DataSource.class);
+            Method analyze = javaVirtualMachine.getClass().getMethod("analyze", Set.class, DataSource.class);
             analyze.invoke(javaVirtualMachine, this.registeredAggregations, logFile);
         } catch (ReflectiveOperationException e) {
             LOGGER.log(Level.SEVERE, "Cannot invoke analyze method", e);
