@@ -11,9 +11,6 @@ open module com.microsoft.gctoolkit.integration {
     requires com.microsoft.gctoolkit.vertx;
     requires java.logging;
 
-//    exports com.microsoft.gctoolkit.integration.aggregation;
-//    exports com.microsoft.gctoolkit.integration.collections;
-
     exports com.microsoft.gctoolkit.integration.aggregation to
             com.microsoft.gctoolkit.vertx;
 

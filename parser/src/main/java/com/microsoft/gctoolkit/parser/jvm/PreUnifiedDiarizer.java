@@ -233,11 +233,6 @@ public class PreUnifiedDiarizer implements Diarizer {
         return timeOfFirstEvent;
     }
 
-    @Override
-    public DateTimeStamp getTimeOfLastEvent() {
-        return null;
-    }
-
     private void timeOfFirstEvent(String line) {
         if (timeOfFirstEvent == null) {
             Matcher matcher = excludeG1Ergonomics.matcher(line);

@@ -114,9 +114,6 @@ public class AggregatorVerticle extends AbstractVerticle {
         deployed.awaitUninterruptibly();
     }
 
-    /*
-    we need some check on the state of the consumer...
-     */
     public DateTimeStamp awaitCompletion() {
         completion.awaitUninterruptibly();
         return timeOfTerminationEvent;
@@ -148,6 +145,4 @@ public class AggregatorVerticle extends AbstractVerticle {
             LOGGER.throwing(this.getClass().getName(), "start", t);
         }
     }
-
-
 }

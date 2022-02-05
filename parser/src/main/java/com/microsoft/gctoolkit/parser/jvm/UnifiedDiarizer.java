@@ -239,8 +239,4 @@ public class UnifiedDiarizer implements Diarizer {
         return getDiary().getTimeOfFirstEvent();
     }
 
-    @Override
-    public DateTimeStamp getTimeOfLastEvent() {
-        return null;
-    }
 }
