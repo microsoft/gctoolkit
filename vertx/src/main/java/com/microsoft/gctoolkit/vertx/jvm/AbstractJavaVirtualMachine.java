@@ -28,7 +28,6 @@ import java.util.logging.Logger;
 public abstract class AbstractJavaVirtualMachine implements JavaVirtualMachine {
 
     private static final Logger LOGGER = Logger.getLogger(AbstractJavaVirtualMachine.class.getName());
-
     private static final double LOG_FRAGMENT_THRESHOLD_SECONDS = 60.0d; //todo: replace magic threshold with a heuristic
 
     private Diary diary;
@@ -71,8 +70,13 @@ public abstract class AbstractJavaVirtualMachine implements JavaVirtualMachine {
     }
 
     /**
+<<<<<<< HEAD
      * If the first event is significantly distant from zero in relation to the time intervals between the
      * of the next N events, where N maybe 1, then this is likely a log fragment and not the start of the run.
+=======
+     * of the first event is significantly away from zero in relation to the time intervals between the
+     * of the next N events, where N maybe 1.
+>>>>>>> 4c4d0c41e72e68a504f76db856c8aa37d8850828
      *
      * try to estimate the time at which the JVM started. For log fragments, this will be the time
      * of the first event in the log. Otherwise it will be 0.000 seconds.
