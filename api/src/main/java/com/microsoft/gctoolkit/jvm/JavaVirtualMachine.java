@@ -5,12 +5,10 @@ package com.microsoft.gctoolkit.jvm;
 
 import com.microsoft.gctoolkit.GCToolKit;
 import com.microsoft.gctoolkit.aggregator.Aggregation;
-import com.microsoft.gctoolkit.io.DataSource;
 import com.microsoft.gctoolkit.io.GCLogFile;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
 
 import java.util.Optional;
-import java.util.Set;
 
 /**
  * JavaVirtualMachine is a representation of the JVM state obtained by analyzing a GC log file.
@@ -75,7 +73,8 @@ public interface JavaVirtualMachine {
     DateTimeStamp getTimeOfFirstEvent();
 
     /**
-     * Return the time of the first event in the GC log file.
+     * Estimates the initial start time of the log in the case that the log
+     * is determined to be a fragment. Otherwise, return a start time of 0.000 seconds
      * @return The time of the first event.
      */
     DateTimeStamp getEstimatedJVMStartTime();

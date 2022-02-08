@@ -141,7 +141,6 @@ public class GCToolKit {
      */
     public JavaVirtualMachine analyze(GCLogFile logFile) throws IOException  {
         //todo: revert this to DataSource to account for non-GC log data sources once we have a use case (maybe JFR but JFR timers drift badly ATM)
-        // Potential NPE, but would have logged if there was trouble creating the instance.
         //setup message bus
         //DataSourceBus dataSourceBus = setupDataSourceBus();
         //JVMEventBus eventBus = setupJVMEventBus();
