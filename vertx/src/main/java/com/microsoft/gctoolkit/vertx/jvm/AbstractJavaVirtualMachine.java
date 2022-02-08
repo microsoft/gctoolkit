@@ -73,7 +73,7 @@ public abstract class AbstractJavaVirtualMachine implements JavaVirtualMachine {
      * If the first event is significantly distant from zero in relation to the time intervals between the
      * of the next N events, where N maybe 1, then this is likely a log fragment and not the start of the run.
      *
-     * try to estimate the time at which the JVM started. For log fragments, this will be the time
+     * Try to estimate the time at which the JVM started. For log fragments, this will be the time
      * of the first event in the log. Otherwise it will be 0.000 seconds.
      * @return DateTimeStamp
      */
