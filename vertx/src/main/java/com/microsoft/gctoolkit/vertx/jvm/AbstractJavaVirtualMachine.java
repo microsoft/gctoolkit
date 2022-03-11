@@ -51,7 +51,7 @@ public abstract class AbstractJavaVirtualMachine implements JavaVirtualMachine {
 
     @Override
     public boolean isParallel() {
-        return diary.isParNew();
+        return diary.isPSYoung();
     }
 
     @Override
