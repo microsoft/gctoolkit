@@ -1,5 +1,6 @@
-package com.microsoft.gctoolkit.integration.aggregation;
+package com.microsoft.gctoolkit.integration;
 
+import com.microsoft.gctoolkit.integration.aggregation.RuntimeAggregation;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

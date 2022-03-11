@@ -46,7 +46,7 @@ import java.util.Arrays;
 public class Diary {
 
     private final TripleState[] states;
-    private DateTimeStamp estimatedJVMStartTime;
+    private DateTimeStamp timeOfFirstEvent;
 
     public Diary() {
         states = new TripleState[SupportedFlags.values().length];
@@ -369,10 +369,11 @@ public class Diary {
         return isApplicationStoppedTimeKnown() && isApplicationRunningTime();
     }
 
-    public void setEstimatedJVMStartTime(DateTimeStamp startTime) {
-        this.estimatedJVMStartTime = startTime;
+    public void setTimeOfFirstEvent(DateTimeStamp startTime) {
+        if ( this.timeOfFirstEvent == null)
+            this.timeOfFirstEvent = startTime;
     }
     public DateTimeStamp getTimeOfFirstEvent() {
-        return this.estimatedJVMStartTime;
+        return this.timeOfFirstEvent;
     }
 }

@@ -4,6 +4,7 @@ package com.microsoft.gctoolkit.parser;
 
 import com.microsoft.gctoolkit.event.GCCause;
 import com.microsoft.gctoolkit.event.GarbageCollectionTypes;
+import com.microsoft.gctoolkit.event.MalformedEvent;
 import com.microsoft.gctoolkit.event.MemoryPoolSummary;
 import com.microsoft.gctoolkit.event.ReferenceGCSummary;
 import com.microsoft.gctoolkit.event.SurvivorMemoryPoolSummary;
@@ -660,10 +661,9 @@ public class G1GCForwardReference extends ForwardReference {
      * gcType == null -> likely an incomplete record.
      * @return
      */
-    G1GCPauseEvent buildEvent() {
+    G1GCPauseEvent buildEvent() throws MalformedEvent {
         if (gcType == null ) {
-            LOGGER.warning("GC Event is undefined (null)");
-            throw new IllegalStateException("G1GC Event type is undefined (null): " + this.toString());
+            throw new MalformedEvent("G1GC Event type is undefined (null): " + this.toString());
         }
         switch (this.gcType) {
             case Young:
@@ -681,9 +681,8 @@ public class G1GCForwardReference extends ForwardReference {
                     case G1GCCleanup:
                         return buildCleanup();
                     default:
-                        LOGGER.warning("Unrecognized (mostly) Concurrent Cycle Pause Event " + getConcurrentPhase());
+                        throw new MalformedEvent("Unrecognized (mostly) Concurrent Cycle Pause Event " + getConcurrentPhase());
                 }
-                return null;
             case G1GCConcurrentUndoCycle:
                 // gctype is likely incorrectly set in the forward reference. The plan is to specialize the forward
                 // references thus allowing this event to be built here rather than in a specialized method.
@@ -691,8 +690,7 @@ public class G1GCForwardReference extends ForwardReference {
                 // filled in a future PR.
                 return null;
             default:
-                LOGGER.warning("Unrecognized Event " + gcType);
-                return null;
+                throw new MalformedEvent("Unrecognized Event " + gcType);
         }
     }
 

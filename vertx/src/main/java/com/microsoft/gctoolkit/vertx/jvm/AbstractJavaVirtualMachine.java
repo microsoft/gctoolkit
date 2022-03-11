@@ -28,8 +28,7 @@ import java.util.logging.Logger;
 public abstract class AbstractJavaVirtualMachine implements JavaVirtualMachine {
 
     private static final Logger LOGGER = Logger.getLogger(AbstractJavaVirtualMachine.class.getName());
-
-    private static final double LOG_FRAGMENT_THRESHOLD = 18000;
+    private static final double LOG_FRAGMENT_THRESHOLD_SECONDS = 60.0d; //todo: replace magic threshold with a heuristic
 
     private Diary diary;
     private DateTimeStamp timeOfLastEvent;
@@ -70,18 +69,29 @@ public abstract class AbstractJavaVirtualMachine implements JavaVirtualMachine {
         return ""; //todo: extract from diary... jvmConfigurationFromParser.getCommandLine();
     }
 
+    public DateTimeStamp getTimeOfFirstEvent() {
+        return diary.getTimeOfFirstEvent();
+    }
+
     /**
      * todo: fix this to be a globally available value. Also, the JVM start time is not zero if the time
-     * of the first event is significantly away from zero in relation to the time intervals between the
-     * of the next N events, where N maybe 1.
+     * If the first event is significantly distant from zero in relation to the time intervals between the
+     * of the next N events, where N maybe 1, then this is likely a log fragment and not the start of the run.
      *
-     * try to estimate the time at which the JVM started. For log fragments, this will be the time
+     * Try to estimate the time at which the JVM started. For log fragments, this will be the time
      * of the first event in the log. Otherwise it will be 0.000 seconds.
      * @return DateTimeStamp
      */
     @Override
     public DateTimeStamp getEstimatedJVMStartTime() {
-        return diary.getTimeOfFirstEvent();
+        DateTimeStamp startTime = diary.getTimeOfFirstEvent();
+        // Initial entries in GC log happen within seconds. Lets allow for 60 before considering the log
+        // to be a fragment.
+        if (startTime.getTimeStamp() < LOG_FRAGMENT_THRESHOLD_SECONDS) {
+            return startTime.minus(startTime.getTimeStamp());
+        } else {
+            return startTime;
+        }
     }
 
     /**
@@ -91,18 +101,13 @@ public abstract class AbstractJavaVirtualMachine implements JavaVirtualMachine {
      */
     @Override
     public DateTimeStamp getJVMTerminationTime() {
-        if (getEstimatedJVMStartTime().before(timeOfLastEvent))
-            return timeOfLastEvent;
-        else
-            return getEstimatedJVMStartTime();
+        return timeOfLastEvent;
     }
 
     @Override
     public double getRuntimeDuration() {
-        boolean isLogFragment = getEstimatedJVMStartTime().getTimeStamp() > LOG_FRAGMENT_THRESHOLD;
-        if (isLogFragment)
-            return getJVMTerminationTime().minus(getEstimatedJVMStartTime());
-        return getJVMTerminationTime().getTimeStamp();        }
+        return getJVMTerminationTime().minus(getEstimatedJVMStartTime());
+    }
 
     @Override
     @SuppressWarnings("unchecked")

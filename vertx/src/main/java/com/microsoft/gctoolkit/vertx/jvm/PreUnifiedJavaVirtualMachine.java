@@ -30,4 +30,14 @@ public class PreUnifiedJavaVirtualMachine extends AbstractJavaVirtualMachine {
         return new GCToolkitVertxParametersForPreUnifiedLogs(registeredAggregations, diary);
     }
 
+    @Override
+    public boolean isZGC() {
+        return false;
+    }
+
+    @Override
+    public boolean isShenandoah() {
+        return false;
+    }
+
 }

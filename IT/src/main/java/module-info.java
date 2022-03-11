@@ -10,9 +10,6 @@ open module com.microsoft.gctoolkit.integration {
     requires com.microsoft.gctoolkit.parser;
     requires com.microsoft.gctoolkit.vertx;
     requires java.logging;
-    requires org.junit.jupiter.api;
-
-    exports com.microsoft.gctoolkit.integration;
 
     exports com.microsoft.gctoolkit.integration.aggregation to
             com.microsoft.gctoolkit.vertx;

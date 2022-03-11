@@ -8,10 +8,10 @@ We use the Maven wrapper (`mvnw`) so you don't have to change your system wide M
 
 ### From Maven
 
-Compile the sample with `mvnw compile`, then use `mvnw exec:exec` to run the sample.
+Install the sample to your local maven repository with `mvnw install`, then use `mvnw exec:exec` to run the sample.
 
 ```shell
-mvnw clean compile
+mvnw clean install
 mvnw exec:exec
 ```
 

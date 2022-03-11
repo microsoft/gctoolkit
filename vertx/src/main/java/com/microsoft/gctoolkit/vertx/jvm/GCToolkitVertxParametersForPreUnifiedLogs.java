@@ -25,10 +25,7 @@ import java.util.Set;
     private final Set<AggregatorVerticle> aggregatorVerticles;
     private final String mailBox;
 
-    /* package */ GCToolkitVertxParametersForPreUnifiedLogs(
-            Set<Class<? extends Aggregation>> registeredAggregations,
-            Diary diary)
-    {
+    /* package */ GCToolkitVertxParametersForPreUnifiedLogs( Set<Class<? extends Aggregation>> registeredAggregations, Diary diary) {
         logFileParsers = initLogFileParsers(diary);
         aggregatorVerticles = initAggregatorVerticles(registeredAggregations, diary);
         mailBox = initMailBox(diary);

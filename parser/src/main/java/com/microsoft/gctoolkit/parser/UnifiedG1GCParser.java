@@ -4,6 +4,7 @@ package com.microsoft.gctoolkit.parser;
 
 import com.microsoft.gctoolkit.event.CPUSummary;
 import com.microsoft.gctoolkit.event.GarbageCollectionTypes;
+import com.microsoft.gctoolkit.event.MalformedEvent;
 import com.microsoft.gctoolkit.event.MemoryPoolSummary;
 import com.microsoft.gctoolkit.event.RegionSummary;
 import com.microsoft.gctoolkit.event.g1gc.G1ConcurrentUndoCycle;
@@ -208,10 +209,14 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
     private void cpuBreakout(GCLogTrace trace, String line) {
         CPUSummary cpuSummary = new CPUSummary(trace.getDoubleGroup(1), trace.getDoubleGroup(2), trace.getDoubleGroup(3));
         forwardReference.setCPUSummary(cpuSummary);
-        if (! forwardReference.isConcurrentCycle())
-            record(forwardReference.buildEvent());
-        else
-            recordPausePhaseInConcurrentCycle(forwardReference.buildEvent());
+        try {
+            if (!forwardReference.isConcurrentCycle())
+                record(forwardReference.buildEvent());
+            else
+                recordPausePhaseInConcurrentCycle(forwardReference.buildEvent());
+        } catch (MalformedEvent malformedEvent) {
+            LOGGER.warning(malformedEvent.getMessage());
+        }
     }
 
     // todo: need to drain the queues before terminating...

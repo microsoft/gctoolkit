@@ -64,11 +64,7 @@ public class GCToolkitVertx extends AbstractVerticle {
      * @return The runtime duration
      * @throws IOException If an IOException is thrown while reading the DataSource
      */
-    public static DateTimeStamp aggregateDataSource(
-            DataSource<?> dataSource,
-            Set<LogFileParser> logFileParsers,
-            Set<AggregatorVerticle> aggregatorVerticles,
-            String mailBox) throws IOException {
+    public static DateTimeStamp aggregateDataSource(DataSource<?> dataSource, Set<LogFileParser> logFileParsers, Set<AggregatorVerticle> aggregatorVerticles,  String mailBox) throws IOException {
     	//remove AggregatorVerticle which can not match by the LogFileParser to prevent dead loop
         aggregatorVerticles.removeIf(aggregatorVerticle->{
             boolean isMatch = logFileParsers.stream().map(LogFileParser::getOutbox)
@@ -78,25 +74,25 @@ public class GCToolkitVertx extends AbstractVerticle {
             return !isMatch;
         });
 
-        GCToolkitVertx GCToolkitVertx = new GCToolkitVertx(mailBox);
+        GCToolkitVertx gcToolkitVertx = new GCToolkitVertx(mailBox);
         JVMEventSource jvmEventSource = new JVMEventSource(PARSER_INBOX);
-        GCToolkitVertx.deployVerticle(jvmEventSource);
+        gcToolkitVertx.deployVerticle(jvmEventSource);
         jvmEventSource.awaitDeployment();
 
-        GCToolkitVertx.deployVerticle(GCToolkitVertx);
+        gcToolkitVertx.deployVerticle(gcToolkitVertx);
 
-        logFileParsers.forEach(logFileParser -> GCToolkitVertx.deployVerticle(logFileParser, new DeploymentOptions().setWorker(true)));
+        logFileParsers.forEach(logFileParser -> gcToolkitVertx.deployVerticle(logFileParser, new DeploymentOptions().setWorker(true)));
         logFileParsers.forEach(LogFileParser::awaitDeployment);
 
-        aggregatorVerticles.forEach(GCToolkitVertx::deployVerticle);
+        aggregatorVerticles.forEach(gcToolkitVertx::deployVerticle);
         aggregatorVerticles.forEach(AggregatorVerticle::awaitDeployment);
 
         jvmEventSource.publishGCDataSource(dataSource);
         aggregatorVerticles.forEach(AggregatorVerticle::awaitCompletion);
 
-        GCToolkitVertx.shutdown();
+        gcToolkitVertx.shutdown();
 
-        return GCToolkitVertx.timeOfLastEvent;
+        return gcToolkitVertx.timeOfLastEvent;
     }
 
     private Future<String> deployVerticle(Verticle verticle) {
@@ -114,12 +110,12 @@ public class GCToolkitVertx extends AbstractVerticle {
                     consumer(mailBox, message -> {
                         try {
                             JVMEvent event = (JVMEvent) message.body();
-                            if (event instanceof JVMTermination)
-                                return;
                             DateTimeStamp now = event.getDateTimeStamp().add(event.getDuration());
                             if (now.after(timeOfLastEvent)) {
                                 timeOfLastEvent = now;
                             }
+                            if (event instanceof JVMTermination)
+                                return;
                         } catch (Throwable t) {
                             LOGGER.throwing(this.getClass().getName(), "start", t);
                         }
