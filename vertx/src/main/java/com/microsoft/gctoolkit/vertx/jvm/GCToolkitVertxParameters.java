@@ -15,6 +15,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Stream;
 
 /* package-scope */ abstract class GCToolkitVertxParameters {
 
@@ -75,12 +76,15 @@ import java.util.logging.Logger;
             Class<? extends Aggregator<?>> aggregatorClass,
             Class<? extends Aggregation> aggregationClass) {
         try {
-            Constructor<?>[] constructors = aggregatorClass.getConstructors();
-            if (constructors.length == 0) {
-                LOGGER.log(Level.WARNING, aggregatorClass + " must have a public constructor which takes a " + Aggregation.class);
-                return null;
-            }
-            return (Aggregator<?>) aggregatorClass.getConstructors()[0].newInstance(aggregationClass.getConstructors()[0].newInstance());
+            Constructor<?>[] aggregatorCtors = aggregatorClass.getConstructors();
+            Constructor<?> aggregatorCtor = Stream.of(aggregatorCtors)
+                    .filter(ctor -> ctor.getParameterTypes().length == 1)
+                    .filter(ctor -> ctor.getParameterTypes()[0].isAssignableFrom(aggregationClass))
+                    .findFirst()
+                    .orElseThrow(() -> new NoSuchMethodException(aggregatorClass + " must have a public constructor which takes a " + Aggregation.class));
+            Constructor<? extends Aggregation> aggregationCtor = aggregationClass.getConstructor();
+            Aggregation aggregation = aggregationCtor.newInstance();
+            return (Aggregator<?>)aggregatorCtor.newInstance(aggregation);
         } catch (ReflectiveOperationException e) {
             LOGGER.log(Level.WARNING, e + ": Cannot construct instance of " + aggregatorClass);
         }
