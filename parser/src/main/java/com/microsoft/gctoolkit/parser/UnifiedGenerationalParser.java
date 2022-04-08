@@ -327,7 +327,7 @@ public class UnifiedGenerationalParser extends UnifiedGCLogParser implements Uni
     }
 
     private void jvmExit(GCLogTrace trace, String line) {
-        consumer.record(new JVMTermination(getClock()));
+        consumer.record(new JVMTermination(getClock(),diary.getTimeOfFirstEvent()));
     }
 
     /**
