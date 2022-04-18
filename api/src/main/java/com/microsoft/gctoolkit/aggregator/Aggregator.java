@@ -2,7 +2,6 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.aggregator;
 
-import com.microsoft.gctoolkit.event.generational.GenerationalGCPauseEvent;
 import com.microsoft.gctoolkit.event.jvm.JVMEvent;
 import com.microsoft.gctoolkit.event.jvm.JVMTermination;
 
@@ -124,7 +123,7 @@ public abstract class Aggregator<A extends Aggregation> {
      * @param event JVMTermination is a sentinel for the end of log processing.
      */
     private void terminationHandler(JVMTermination event) {
-        if (!done) done = true;
+        done = true;
     }
 
     /**
@@ -134,5 +133,4 @@ public abstract class Aggregator<A extends Aggregation> {
     public boolean isDone() {
         return done;
     }
-
 }

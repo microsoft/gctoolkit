@@ -5,7 +5,6 @@ package com.microsoft.gctoolkit.vertx.jvm;
 import com.microsoft.gctoolkit.aggregator.Aggregation;
 import com.microsoft.gctoolkit.io.GCLogFile;
 import com.microsoft.gctoolkit.jvm.Diary;
-import com.microsoft.gctoolkit.time.DateTimeStamp;
 
 import java.util.Set;
 import java.util.logging.Logger;

@@ -51,7 +51,7 @@ public abstract class AbstractJavaVirtualMachine implements JavaVirtualMachine {
 
     @Override
     public boolean isParallel() {
-        return diary.isParNew();
+        return diary.isPSYoung();
     }
 
     @Override
@@ -69,7 +69,12 @@ public abstract class AbstractJavaVirtualMachine implements JavaVirtualMachine {
         return ""; //todo: extract from diary... jvmConfigurationFromParser.getCommandLine();
     }
 
+    public DateTimeStamp getTimeOfFirstEvent() {
+        return diary.getTimeOfFirstEvent();
+    }
+
     /**
+     * todo: fix this to be a globally available value. Also, the JVM start time is not zero if the time
      * If the first event is significantly distant from zero in relation to the time intervals between the
      * of the next N events, where N maybe 1, then this is likely a log fragment and not the start of the run.
      *
@@ -79,7 +84,7 @@ public abstract class AbstractJavaVirtualMachine implements JavaVirtualMachine {
      */
     @Override
     public DateTimeStamp getEstimatedJVMStartTime() {
-        DateTimeStamp startTime = getTimeOfFirstEvent();
+        DateTimeStamp startTime = diary.getTimeOfFirstEvent();
         // Initial entries in GC log happen within seconds. Lets allow for 60 before considering the log
         // to be a fragment.
         if (startTime.getTimeStamp() < LOG_FRAGMENT_THRESHOLD_SECONDS) {
@@ -87,20 +92,6 @@ public abstract class AbstractJavaVirtualMachine implements JavaVirtualMachine {
         } else {
             return startTime;
         }
-    }
-
-    /**
-     * todo: fix this to be a globally available value. Also, the JVM start time is not zero if the time
-     * of the first event is significantly away from zero in relation to the time intervals between the
-     * of the next N events, where N maybe 1.
-     *
-     * try to estimate the time at which the JVM started. For log fragments, this will be the time
-     * of the first event in the log. Otherwise it will be 0.000 seconds.
-     * @return DateTimeStamp
-     */
-    @Override
-    public DateTimeStamp getTimeOfFirstEvent() {
-        return diary.getTimeOfFirstEvent();
     }
 
     /**

@@ -223,7 +223,7 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
     // Just in case there isn't a JVM termination event in the log.
     public void endOfFile(GCLogTrace trace, String line) {
         consumer.record(new JVMTermination((jvmTerminationEventTime.getTimeStamp() < 0.0d)
-                ? getClock() : jvmTerminationEventTime));
+                ? getClock() : jvmTerminationEventTime,diary.getTimeOfFirstEvent()));
     }
 
 

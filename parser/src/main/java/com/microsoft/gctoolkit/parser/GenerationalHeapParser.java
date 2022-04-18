@@ -345,7 +345,7 @@ public class GenerationalHeapParser extends PreUnifiedGCLogParser implements Sim
     }
 
     public void endOfFile(GCLogTrace trace, String line) {
-        record(new JVMTermination(getClock()));
+        record(new JVMTermination(getClock(),diary.getTimeOfFirstEvent()));
     }
 
     public void defNew(GCLogTrace trace, String line) {

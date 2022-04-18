@@ -64,15 +64,12 @@ public abstract class G1GCPauseEvent extends G1GCEvent {
         if ((getEden() == null) || (getHeap() == null)) {
             return NULL_POOL;
         } else if (getSurvivor() == null) {
-            return new MemoryPoolSummary(getHeap().getOccupancyBeforeCollection() - this.getEden().getOccupancyBeforeCollection(),
-                    getHeap().getSizeBeforeCollection() - getEden().getSizeBeforeCollection(),
-                    getHeap().getOccupancyAfterCollection() - getEden().getOccupancyAfterCollection(),
-                    getHeap().getSizeAfterCollection() - getEden().getSizeAfterCollection());
+            return getHeap().minus(getEden());
         } else {
-            return new MemoryPoolSummary(getHeap().getOccupancyBeforeCollection() - this.getEden().getOccupancyBeforeCollection(),
+            return new MemoryPoolSummary(getHeap().getOccupancyBeforeCollection() - this.getEden().getOccupancyBeforeCollection() - getSurvivor().getOccupancyBeforeCollection(),
                     getHeap().getSizeBeforeCollection() - getEden().getSizeBeforeCollection() - getSurvivor().getOccupancyBeforeCollection(),
                     getHeap().getOccupancyAfterCollection() - getEden().getOccupancyAfterCollection() - getSurvivor().getOccupancyAfterCollection(),
-                    getHeap().getSizeAfterCollection() - getEden().getSizeAfterCollection());
+                    getHeap().getSizeAfterCollection() - getEden().getSizeAfterCollection() - getSurvivor().getOccupancyAfterCollection());
         }
     }
 
