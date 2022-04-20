@@ -19,10 +19,4 @@ public class SystemGC extends FullGC {
     public SystemGC(DateTimeStamp timeStamp, double duration) {
         this(timeStamp, GarbageCollectionTypes.SystemGC, GCCause.JAVA_LANG_SYSTEM, duration);
     }
-
-    @Override
-    public boolean isSystemGC() {
-        return true;
-    }
-
 }

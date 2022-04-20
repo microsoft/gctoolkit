@@ -15,10 +15,4 @@ public class ConcurrentModeInterrupted extends FullGC {
     public ConcurrentModeInterrupted(DateTimeStamp timeStamp, GCCause cause, double duration) {
         this(timeStamp, GarbageCollectionTypes.ConcurrentModeInterrupted, cause, duration);
     }
-
-    @Override
-    public boolean isConcurrentModeInterrupted() {
-        return true;
-    }
-
 }

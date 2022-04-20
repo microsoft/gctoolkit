@@ -11,14 +11,4 @@ public class G1SystemGC extends G1FullGC {
     public G1SystemGC(DateTimeStamp timeStamp, double pauseTime) {
         super(timeStamp, GarbageCollectionTypes.SystemGC, GCCause.JAVA_LANG_SYSTEM, pauseTime);
     }
-
-    public boolean isFull() {
-        return true;
-    }
-
-    public boolean isSystemGC() {
-        return true;
-    }
-
-
 }

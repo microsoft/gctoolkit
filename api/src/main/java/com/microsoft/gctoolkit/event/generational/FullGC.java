@@ -26,10 +26,4 @@ public class FullGC extends GenerationalGCPauseEvent {
         return dutyCycle;
     }
 
-    @Override
-    public boolean isFull() {
-        return true;
-    }
-
-
 }

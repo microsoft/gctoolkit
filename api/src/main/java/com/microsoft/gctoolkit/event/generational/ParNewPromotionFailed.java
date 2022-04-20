@@ -15,10 +15,4 @@ public class ParNewPromotionFailed extends ParNew {
     public ParNewPromotionFailed(DateTimeStamp dateTimeStamp, double pauseTime) {
         this(dateTimeStamp, GCCause.PROMOTION_FAILED, pauseTime);
     }
-
-    @Override
-    public boolean isYoung() {
-        return true;
-    }
-
 }
