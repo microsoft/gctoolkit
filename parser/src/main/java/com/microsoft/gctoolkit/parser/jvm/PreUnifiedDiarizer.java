@@ -240,8 +240,10 @@ public class PreUnifiedDiarizer implements Diarizer {
                 return;      // G1Ergonomics doesn't respect PrintDateStamp which confuses downstream calculations
             }
             GCLogTrace trace = PreUnifiedTokens.DATE_TIMESTAMP_RECORD.parse(line);
-            if (trace != null)
+            if (trace != null) {
                 timeOfFirstEvent = trace.getDateTimeStamp();
+                diary.setTimeOfFirstEvent(timeOfFirstEvent);
+            }
         }
     }
 

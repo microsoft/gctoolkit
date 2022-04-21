@@ -28,7 +28,7 @@
         <connection>scm:git:${repository.url}</connection>
         <developerConnection>scm:git:${repository.url}</developerConnection>
         <url>${repository.url}</url>
-      <tag>gctoolkit-2.0.5</tag>
+      <tag>gctoolkit-2.0.10</tag>
     </scm>
 
     <developers>

@@ -373,6 +373,7 @@ public class Diary {
         if ( this.timeOfFirstEvent == null)
             this.timeOfFirstEvent = startTime;
     }
+
     public DateTimeStamp getTimeOfFirstEvent() {
         return this.timeOfFirstEvent;
     }
