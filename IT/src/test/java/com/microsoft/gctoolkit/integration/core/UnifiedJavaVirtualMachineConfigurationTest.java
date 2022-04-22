@@ -13,7 +13,7 @@ import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class JavaVirtualMachineConfigurationTest {
+public class UnifiedJavaVirtualMachineConfigurationTest {
 
     private String logFile = "rolling/jdk14/rollinglogs/long_restart.log";
     private int[][] times = { { 0, 13, 262172, 262172}, { 259077, 259077, 262172, 3095}};
