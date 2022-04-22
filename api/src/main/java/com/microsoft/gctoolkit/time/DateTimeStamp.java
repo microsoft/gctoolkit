@@ -164,6 +164,7 @@ public class DateTimeStamp implements Comparable<DateTimeStamp> {
 
     /**
      * Return {@code true} if the date stamp is not {@code null}.
+     * It is possible to have two DateTimeStamps from the same GC log, one with a DateStamp and one without.
      * @return {@code true} if the the date stamp is not {@code null}.
      */
     public boolean hasDateStamp() {
@@ -172,12 +173,14 @@ public class DateTimeStamp implements Comparable<DateTimeStamp> {
 
     @Override
     public boolean equals(Object obj) {
+        boolean eq = false;
         if ( obj instanceof  DateTimeStamp) {
             DateTimeStamp other = (DateTimeStamp)obj;
-            boolean eq = getDateTime() == null ? other.getDateTime() == null : getDateTime().equals(other.getDateTime());
-            return eq && getTimeStamp() == other.getTimeStamp();
+            eq = getTimeStamp() == other.getTimeStamp();
+            if ( getDateTime() != null && other.getDateTime() != null)
+                eq = eq && getDateTime().equals(other.getDateTime());
         }
-        return false;
+        return eq;
     }
 
     @Override
@@ -319,7 +322,6 @@ public class DateTimeStamp implements Comparable<DateTimeStamp> {
      */
     @Override
     public int compareTo(DateTimeStamp dateTimeStamp) {
-
         return  comparator.compare(this,dateTimeStamp);
     }
 
