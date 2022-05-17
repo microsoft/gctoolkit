@@ -4,7 +4,6 @@ import com.microsoft.gctoolkit.GCToolKit;
 import com.microsoft.gctoolkit.integration.io.TestLogFile;
 import com.microsoft.gctoolkit.io.GCLogFile;
 import com.microsoft.gctoolkit.io.SingleGCLogFile;
-import com.microsoft.gctoolkit.io.SingleGCLogFile;
 import com.microsoft.gctoolkit.jvm.JavaVirtualMachine;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -33,11 +32,9 @@ public class PreunifiedJavaVirtualMachineConfigurationTest {
         } catch (IOException e) {
             fail(e.getMessage());
         }
-        System.out.println("************************************************************");
         Assertions.assertEquals( endStartTimes[0], (int)(machine.getEstimatedJVMStartTime().getTimeStamp() * 1000.0d));
         Assertions.assertEquals( endStartTimes[1], (int)(machine.getTimeOfFirstEvent().getTimeStamp() * 1000.0d));
         Assertions.assertEquals( endStartTimes[2], (int)(machine.getJVMTerminationTime().getTimeStamp() * 1000.0d));
         Assertions.assertEquals( endStartTimes[3], (int)(machine.getRuntimeDuration() * 1000.0d));
-        System.out.println("************************************************************");
     }
 }
