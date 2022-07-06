@@ -70,48 +70,6 @@ public class G1Trap extends G1GCPauseEvent {
     }
 
     @Override
-    public boolean isYoung() {
-        trap(new Exception());
-        return super.isYoung();
-    }
-
-    @Override
-    public boolean isFull() {
-        trap(new Exception());
-        return super.isFull();
-    }
-
-    @Override
-    public boolean isConcurrent() {
-        trap(new Exception());
-        return super.isConcurrent();
-    }
-
-    @Override
-    public boolean isG1Young() {
-        trap(new Exception());
-        return super.isG1Young();
-    }
-
-    @Override
-    public boolean isG1Mixed() {
-        trap(new Exception());
-        return super.isG1Mixed();
-    }
-
-    @Override
-    public boolean isG1Concurrent() {
-        trap(new Exception());
-        return super.isG1Concurrent();
-    }
-
-    @Override
-    public boolean isSystemGC() {
-        trap(new Exception());
-        return super.isSystemGC();
-    }
-
-    @Override
     public void addMemorySummary(MemoryPoolSummary eden, SurvivorMemoryPoolSummary survivor, MemoryPoolSummary heap) {
         trap(new Exception());
     }

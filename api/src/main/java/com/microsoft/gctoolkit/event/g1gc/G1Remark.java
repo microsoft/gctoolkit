@@ -36,5 +36,4 @@ public class G1Remark extends G1RealPause {
         return this.unloadingTime;
     }
 
-
 }

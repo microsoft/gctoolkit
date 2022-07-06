@@ -86,83 +86,83 @@ public abstract class GCEvent extends JVMEvent {
         return gcType;
     }
 
-    /**
-     *
-     * @return is a Z cycle
-     */
-    public boolean isZGC() { return false; }
-
-    /**
-     *
-     * @return is a young collection
-     */
-    public boolean isYoung() {
-        return false;
-    }
-
-    /**
-     *
-     * @return is a full collection
-     */
-    public boolean isFull() {
-        return false;
-    }
-
-    /**
-     *
-     * @return is a concurrent phase
-     */
-    public boolean isConcurrent() {
-        return false;
-    }
-
-    /**
-     *
-     * @return is a G1 young collection
-     */
-    public boolean isG1Young() {
-        return false;
-    }
-
-    /**
-     *
-     * @return is a G1 mixed collection
-     */
-    public boolean isG1Mixed() {
-        return false;
-    }
-
-    /**
-     *
-     * @return is a G1 concurrent phase
-     */
-    public boolean isG1Concurrent() {
-        return false;
-    }
-
-    /**
-     *
-     * @return triggered by System.gc() or Runtime.gc().
-     */
-    public boolean isSystemGC() {
-        return false;
-    }
-
-    /**
-     *
-     * @return the type is a CMF
-     */
-    public boolean isConcurrentModeFailure() {
-        return false;
-    }
-
-    /**
-     *
-     * @return the type is a CMI
-     */
-    public boolean isConcurrentModeInterrupted() {
-        return false;
-    }
+//    /**
+//     *
+//     * @return is a Z cycle
+//     */
+//    public boolean isZGC() { return false; }
+//
+//    /**
+//     *
+//     * @return is a young collection
+//     */
+//    public boolean isYoung() {
+//        return false;
+//    }
+//
+//    /**
+//     *
+//     * @return is a full collection
+//     */
+//    public boolean isFull() {
+//        return false;
+//    }
+//
+//    /**
+//     *
+//     * @return is a concurrent phase
+//     */
+//    public boolean isConcurrent() {
+//        return false;
+//    }
+//
+//    /**
+//     *
+//     * @return is a G1 young collection
+//     */
+//    public boolean isG1Young() {
+//        return false;
+//    }
+//
+//    /**
+//     *
+//     * @return is a G1 mixed collection
+//     */
+//    public boolean isG1Mixed() {
+//        return false;
+//    }
+//
+//    /**
+//     *
+//     * @return is a G1 concurrent phase
+//     */
+//    public boolean isG1Concurrent() {
+//        return false;
+//    }
+//
+//    /**
+//     *
+//     * @return triggered by System.gc() or Runtime.gc().
+//     */
+//    public boolean isSystemGC() {
+//        return false;
+//    }
+//
+//    /**
+//     *
+//     * @return the type is a CMF
+//     */
+//    public boolean isConcurrentModeFailure() {
+//        return false;
+//    }
+//
+//    /**
+//     *
+//     * @return the type is a CMI
+//     */
+//    public boolean isConcurrentModeInterrupted() {
+//        return false;
+//    }
 
     /**
      *
@@ -171,7 +171,7 @@ public abstract class GCEvent extends JVMEvent {
      * @param y is a value
      * @return boolean is diff is greater than threshold
      */
-    private static boolean withinThreshold(final double x, final double y) {
+    private boolean withinThreshold(final double x, final double y) {
         return TIMESTAMP_THRESHOLD > Math.abs(x - y);
     }
 

@@ -25,9 +25,4 @@ public abstract class CMSConcurrentEvent extends GenerationalGCEvent implements 
         return wallClockTime;
     }
 
-    @Override
-    public boolean isConcurrent() {
-        return true;
-    }
-
 }

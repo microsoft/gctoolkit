@@ -3,7 +3,6 @@ package com.microsoft.gctoolkit.integration.core;
 import com.microsoft.gctoolkit.GCToolKit;
 import com.microsoft.gctoolkit.integration.io.TestLogFile;
 import com.microsoft.gctoolkit.io.GCLogFile;
-import com.microsoft.gctoolkit.io.RotatingGCLogFile;
 import com.microsoft.gctoolkit.io.SingleGCLogFile;
 import com.microsoft.gctoolkit.jvm.JavaVirtualMachine;
 import org.junit.jupiter.api.Assertions;
@@ -13,21 +12,15 @@ import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class JavaVirtualMachineConfigurationTest {
+public class PreunifiedJavaVirtualMachineConfigurationTest {
 
-    private String logFile = "rolling/jdk14/rollinglogs/long_restart.log";
-    private int[][] times = { { 0, 13, 262172, 262172}, { 259077, 259077, 262172, 3095}};
-
-    @Test
-    public void testRotating() {
-        TestLogFile log = new TestLogFile(logFile);
-        test(new RotatingGCLogFile(log.getFile().toPath()), times[0]);
-    }
+    private String logFile = "preunified/g1gc/details/tenuring/180/g1gc.log";
+    private int[] times = { 0, 1028, 945481, 945481};
 
     @Test
     public void testSingle() {
         TestLogFile log = new TestLogFile(logFile);
-        test(new SingleGCLogFile(log.getFile().toPath()), times[1]);
+        test(new SingleGCLogFile(log.getFile().toPath()), times);
     }
 
     private void test(GCLogFile log, int[] endStartTimes ) {

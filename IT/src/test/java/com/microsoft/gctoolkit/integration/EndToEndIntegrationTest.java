@@ -83,6 +83,7 @@ public class EndToEndIntegrationTest {
             Assertions.assertEquals( 208922, (int)(pauseTimeSummary.getTotalPauseTime() * 1000.0d));
             Assertions.assertEquals( 608797894, (int)(pauseTimeSummary.getRuntimeDuration() * 1000.0d));
             Assertions.assertEquals( 34, (int)(pauseTimeSummary.getPercentPaused() * 1000d));
+            Assertions.assertEquals(608797.886d, pauseTimeSummary.getRuntime());
         });
 
     }
@@ -90,6 +91,7 @@ public class EndToEndIntegrationTest {
     private int initialMarkCount = 0;
     private int remarkCount = 0;
     private int defNewCount = 0;
+    private double runtime = 0.0d;
 
     public int getInitialMarkCount() {
         return initialMarkCount;
@@ -101,6 +103,10 @@ public class EndToEndIntegrationTest {
 
     public int getDefNewCount() {
         return defNewCount;
+    }
+
+    public double getRuntime() {
+        return runtime;
     }
 
 }

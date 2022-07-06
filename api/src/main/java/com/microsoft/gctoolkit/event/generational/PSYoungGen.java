@@ -15,10 +15,4 @@ public class PSYoungGen extends GenerationalGCPauseEvent {
     public PSYoungGen(DateTimeStamp timeStamp, GCCause cause, double duration) {
         super(timeStamp, GarbageCollectionTypes.PSYoungGen, cause, duration);
     }
-
-    @Override
-    public boolean isYoung() {
-        return true;
-    }
-
 }

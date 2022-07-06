@@ -15,10 +15,4 @@ public class YoungGC extends GenerationalGCPauseEvent {
     public YoungGC(DateTimeStamp timeStamp, GCCause cause, double duration) {
         this(timeStamp, GarbageCollectionTypes.GC, cause, duration);
     }
-
-    @Override
-    public boolean isYoung() {
-        return true;
-    }
-
 }

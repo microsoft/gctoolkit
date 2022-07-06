@@ -37,9 +37,4 @@ public class ParNew extends GenerationalGCPauseEvent {
         return tlabSummary;
     }
 
-    @Override
-    public boolean isYoung() {
-        return true;
-    }
-
 }

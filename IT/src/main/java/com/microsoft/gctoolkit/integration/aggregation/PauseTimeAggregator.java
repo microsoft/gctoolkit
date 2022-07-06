@@ -4,6 +4,7 @@ import com.microsoft.gctoolkit.aggregator.Aggregates;
 import com.microsoft.gctoolkit.aggregator.EventSource;
 import com.microsoft.gctoolkit.event.g1gc.G1RealPause;
 import com.microsoft.gctoolkit.event.generational.GenerationalGCPauseEvent;
+import com.microsoft.gctoolkit.event.jvm.JVMTermination;
 
 /**
  * An Aggregator that extracts pause time.
@@ -15,6 +16,7 @@ public class PauseTimeAggregator extends RuntimeAggregator<PauseTimeAggregation>
         super(aggregation);
         register(G1RealPause.class, this::process);
         register(GenerationalGCPauseEvent.class, this::record);
+        register(JVMTermination.class, this::record);
     }
 
     private void record(GenerationalGCPauseEvent event) {
@@ -23,5 +25,9 @@ public class PauseTimeAggregator extends RuntimeAggregator<PauseTimeAggregation>
 
     private void process(G1RealPause event) {
         aggregation().recordPauseDuration(event.getDuration());
+    }
+
+    private void record(JVMTermination event) {
+        aggregation().recordRuntime(event.getEstimatedRuntimeDuration());
     }
 }

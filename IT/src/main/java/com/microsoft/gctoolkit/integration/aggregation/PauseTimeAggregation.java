@@ -13,4 +13,6 @@ public abstract class PauseTimeAggregation extends RuntimeAggregation {
      * @param duration The duration (in decimal seconds) of a GC pause.
      */
     public abstract void recordPauseDuration(double duration);
+
+    public abstract void recordRuntime(double runtime);
 }

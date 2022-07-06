@@ -11,9 +11,4 @@ public class ConcurrentModeFailure extends FullGC {
     public ConcurrentModeFailure(DateTimeStamp timeStamp, GCCause cause, double duration) {
         super(timeStamp, GarbageCollectionTypes.ConcurrentModeFailure, cause, duration);
     }
-
-    @Override
-    public boolean isConcurrentModeFailure() {
-        return true;
-    }
 }

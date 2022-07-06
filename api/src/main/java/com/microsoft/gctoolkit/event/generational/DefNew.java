@@ -11,10 +11,4 @@ public class DefNew extends GenerationalGCPauseEvent {
     public DefNew(DateTimeStamp timeStamp, GCCause cause, double duration) {
         super(timeStamp, GarbageCollectionTypes.DefNew, cause, duration);
     }
-
-    @Override
-    public boolean isYoung() {
-        return true;
-    }
-
 }

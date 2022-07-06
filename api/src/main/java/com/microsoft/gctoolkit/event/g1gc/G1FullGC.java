@@ -22,10 +22,6 @@ public class G1FullGC extends G1RealPause {
         super(timeStamp, type, cause, pauseTime);
     }
 
-    public boolean isFull() {
-        return true;
-    }
-
     public void addInternalPhase(String internalPhase, Double duration) {
         internalPhaseTimes.put(internalPhase, duration);
     }

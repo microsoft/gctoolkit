@@ -24,8 +24,9 @@ public class HeapOccupancyAfterCollection extends Aggregator<HeapOccupancyAfterC
     }
 
     private void extractHeapOccupancy(G1GCPauseEvent event) {
-        aggregation().addDataPoint(event.getGarbageCollectionType(), event.getDateTimeStamp(), event.getHeap().getOccupancyAfterCollection());
-
+        // JDK 8.0 Remark doesn't report on heap occupancies.
+        if ( event.getHeap() != null)
+            aggregation().addDataPoint(event.getGarbageCollectionType(), event.getDateTimeStamp(), event.getHeap().getOccupancyAfterCollection());
     }
 
     private void extractHeapOccupancy(ZGCCycle event) {

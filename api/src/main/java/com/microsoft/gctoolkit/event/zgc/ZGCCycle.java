@@ -24,9 +24,6 @@ public class ZGCCycle extends GCEvent {
         super(timeStamp, gcType, duration);
     }
 
-    @Override
-    public boolean isZGC() { return true; }
-
     private DateTimeStamp pauseMarkStartTimeStamp;
     private double pauseMarkStartDuration;
 
