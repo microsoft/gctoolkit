@@ -15,7 +15,8 @@ import static org.junit.jupiter.api.Assertions.*;
 public class SingleGarbageCollectionLogFileTest {
 
 
-    private String[] unifiedLogs = { "unified/cms/gc.log", "unified/g1gc/G1-80-16gbps2.log.0", "unified/g1gc/gc-all-info.log.zip"};
+    // TODO re-enable gc-all-info log in array once we commit that file
+    private String[] unifiedLogs = { "unified/cms/gc.log", "unified/g1gc/G1-80-16gbps2.log.0"/*, "unified/g1gc/gc-all-info.log.zip"*/};
     private boolean[] zipped = { false, false, true};
 
     private void logTest(String log, boolean zipped) {
