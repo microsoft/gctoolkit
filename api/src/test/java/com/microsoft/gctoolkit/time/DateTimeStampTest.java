@@ -518,4 +518,16 @@ public class DateTimeStampTest {
         assertTrue(stamp1.compareTo(stamp3) < 0);
     }
 
+
+    @Test
+    public void compareToTransitivityWithEqualTimeStamps() {
+        DateTimeStamp stamp1 = new DateTimeStamp("2021-09-01T11:12:13.111-0100", 100);
+        DateTimeStamp stamp2 = new DateTimeStamp((String)null, 100);
+        DateTimeStamp stamp3 = new DateTimeStamp("2021-08-31T11:12:13.111-0100", 100);
+        int comp1To2 = stamp1.compareTo(stamp2);
+        int comp2To3 = stamp2.compareTo(stamp3);
+        assertEquals(comp1To2, comp2To3);
+        int comp1To3 = stamp1.compareTo(stamp3);
+        assertEquals(comp1To2, comp1To3, "compareTo() is not transitive");
+    }
 }
