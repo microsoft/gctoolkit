@@ -1,8 +1,6 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
-package com.microsoft.gctoolkit.parser;
-
-import com.microsoft.gctoolkit.parser.vmops.SafepointTrace;
+package com.microsoft.gctoolkit.parser.vmops;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;

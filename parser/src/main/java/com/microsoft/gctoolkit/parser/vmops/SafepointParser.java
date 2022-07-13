@@ -7,12 +7,16 @@ import com.microsoft.gctoolkit.event.jvm.Safepoint;
 import com.microsoft.gctoolkit.jvm.Diary;
 import com.microsoft.gctoolkit.parser.JVMEventConsumer;
 import com.microsoft.gctoolkit.parser.PreUnifiedGCLogParser;
+import com.microsoft.gctoolkit.parser.unified.UnifiedPatterns;
 
 
 public class SafepointParser extends PreUnifiedGCLogParser implements SafepointPatterns {
 
+    private final SafepointParseRule parseRule;
     public SafepointParser(Diary diary, JVMEventConsumer consumer) {
         super(diary, consumer);
+        if (diary.isUnifiedLogging()) parseRule = UnifiedPatterns.SAFEPOINT;
+        else parseRule = SafepointPatterns.TRACE;
     }
 
     public String getName() {
@@ -21,7 +25,7 @@ public class SafepointParser extends PreUnifiedGCLogParser implements SafepointP
 
     protected void process(String line) {
         SafepointTrace trace;
-        if ((trace = TRACE.parse(line)) != null) {
+        if ((trace = parseRule.parse(line)) != null) {
             Safepoint safepoint = trace.toSafepoint();
             consumer.record(safepoint);
         } else if (line.equals(END_OF_DATA_SENTINEL))

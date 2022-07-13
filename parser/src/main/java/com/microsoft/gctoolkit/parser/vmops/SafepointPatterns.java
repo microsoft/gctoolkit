@@ -4,7 +4,6 @@ package com.microsoft.gctoolkit.parser.vmops;
 
 
 import com.microsoft.gctoolkit.parser.PreUnifiedTokens;
-import com.microsoft.gctoolkit.parser.SafepointParseRule;
 
 /**
  * General format is;

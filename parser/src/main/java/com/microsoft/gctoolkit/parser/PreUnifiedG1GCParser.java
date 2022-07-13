@@ -26,6 +26,7 @@ import com.microsoft.gctoolkit.event.g1gc.G1Young;
 import com.microsoft.gctoolkit.event.g1gc.G1YoungInitialMark;
 import com.microsoft.gctoolkit.event.jvm.JVMEvent;
 import com.microsoft.gctoolkit.event.jvm.JVMTermination;
+import com.microsoft.gctoolkit.event.jvm.Safepoint;
 import com.microsoft.gctoolkit.jvm.Diary;
 import com.microsoft.gctoolkit.parser.collection.MRUQueue;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
@@ -35,6 +36,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.function.BiConsumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+//import static com.microsoft.gctoolkit.parser.unified.UnifiedG1GCPatterns.SAFEPOINT;
 
 /**
  * TODO No reports or views generated from this data yet.
@@ -230,8 +233,24 @@ public class PreUnifiedG1GCParser extends PreUnifiedGCLogParser implements G1GCP
         parseRules.put(CSET_FINISH, this::notYetDefined);
         parseRules.put(CSET_ADDING, this::notYetDefined);
 
+//        parseRules.put(SAFEPOINT, this::safepoint);
+
         parseRules.put(new GCParseRule("END_OF_DATA_SENTINEL", END_OF_DATA_SENTINEL), this::endOfFile);
     }
+
+//    // [108.400s][info ][safepoint   ] Safepoint "G1Concurrent", Time since last: 7404646 ns, Reaching safepoint: 2138853 ns, At safepoint: 384083 ns, Total: 2522936 ns
+//    private void safepoint(GCLogTrace trace, String line) {
+//        double duration = (double)trace.getLongGroup(5) / 1_000_000L;
+//        Safepoint collection = new Safepoint(trace.getGroup(1), getClock(), duration);
+//        //int spinDuration, int blockDuration, int syncDuration, int cleanupDuration, int vmopDuration
+//        int spinDuration = -1;
+//        int blockDuration = (int)(trace.getLongGroup(3) / 1_000_000L);
+//        int syncDuration = (int)(trace.getLongGroup(4) / 1_000_000L);
+//        int cleanupDuration = -1;
+//        int vmopDuration = (int)(trace.getLongGroup(5) / 1_000_000L);
+//        collection.recordDurations(spinDuration, blockDuration, syncDuration, cleanupDuration, vmopDuration);
+//        record(collection);
+//    }
 
     public PreUnifiedG1GCParser(Diary diary, JVMEventConsumer consumer) {
         super(diary, consumer);

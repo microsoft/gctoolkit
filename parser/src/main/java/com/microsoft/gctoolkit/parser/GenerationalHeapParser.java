@@ -22,6 +22,7 @@ import com.microsoft.gctoolkit.event.generational.SystemGC;
 import com.microsoft.gctoolkit.event.generational.YoungGC;
 import com.microsoft.gctoolkit.event.jvm.JVMEvent;
 import com.microsoft.gctoolkit.event.jvm.JVMTermination;
+import com.microsoft.gctoolkit.event.jvm.Safepoint;
 import com.microsoft.gctoolkit.jvm.Diary;
 import com.microsoft.gctoolkit.parser.collection.MRUQueue;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
@@ -262,7 +263,6 @@ public class GenerationalHeapParser extends PreUnifiedGCLogParser implements Sim
         parseRules.put(FULL_SPLIT_BY_CONCURRENT_PHASE, this::fullSplitByConcurrentPhase);
         parseRules.put(CMF_LARGE_BLOCK, this::concurrentModeFailureSplitByLargeBlock);
         parseRules.put(WEAK_PROCESSING, this::noop);
-
 
         parseRules.put(new GCParseRule("END_OF_DATA_SENTINEL", END_OF_DATA_SENTINEL), this::endOfFile);
     }
