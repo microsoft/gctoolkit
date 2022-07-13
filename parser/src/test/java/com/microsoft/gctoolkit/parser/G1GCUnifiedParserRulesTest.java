@@ -4,6 +4,7 @@ package com.microsoft.gctoolkit.parser;
 
 import com.microsoft.gctoolkit.parser.jvm.Decorators;
 import com.microsoft.gctoolkit.parser.unified.UnifiedG1GCPatterns;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.logging.Logger;
@@ -48,23 +49,21 @@ public class G1GCUnifiedParserRulesTest implements UnifiedG1GCPatterns {
     }
 
     // for debugging @Test
-    public void testSingeRuleCapture() {
-        int index = 10;
+    public void testSingeRuleCapture(int index) {
         assertEquals(lines[index].length, captureTest(rules[index], lines[index]), "Miss for " + rules[index].getName());
     }
 
     // for debugging @Test
-    public void testSingleRuleMisses() {
-        int index = 10;
+    public void testSingleRuleMisses(int index) {
         for (int i = 0; i < rules.length; i++)
             if ( index != i)
                 assertEquals(0, captureTest(rules[index], lines[i]), rules[index].getName() + " hits on lines for " + rules[i].getName());
     }
 
-    // for debugging @Test
+    @Test //@Disabled("Enable for testing a single rule")
     public void testSingleRule() {
-        testSingeRuleCapture();
-        testSingleRuleMisses();
+        testSingeRuleCapture(rules.length-1);
+        testSingleRuleMisses(rules.length-1);
     }
 
 
@@ -151,7 +150,8 @@ public class G1GCUnifiedParserRulesTest implements UnifiedG1GCPatterns {
             WEAK_PROCESSING,
             CLEANUP__FINALIZE_CONC_MARK,
             CONCURRENT_UNDO_CYCLE_START,
-            CONCURRENT_UNDO_CYCLE_END     // 70
+            CONCURRENT_UNDO_CYCLE_END,     // 70
+//            SAFEPOINT
     };
 
     /*
@@ -445,6 +445,9 @@ public class G1GCUnifiedParserRulesTest implements UnifiedG1GCPatterns {
             },
             {   // 70
                     "[155.836s][info ][gc          ] GC(2457) Concurrent Undo Cycle 49.351ms",
+            },
+            {   // 71
+                    "[108.400s][info ][safepoint   ] Safepoint \"G1Concurrent\", Time since last: 7404646 ns, Reaching safepoint: 2138853 ns, At safepoint: 384083 ns, Total: 2522936 ns",
             }
 
             // Remaining lines which may not need to be parsed...

@@ -43,7 +43,7 @@ public abstract class GCLogParser implements SharedPatterns {
 
     protected abstract void process(String trace);
 
-    abstract void advanceClock(String record);
+    protected abstract void advanceClock(String record);
 
     /**
      * The assumption is, this method will manage the global clock and thus should never be over ridden

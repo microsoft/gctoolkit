@@ -24,11 +24,4 @@ public interface UnifiedPatterns extends UnifiedLoggingTokens {
     GCParseRule END_OF_FILE = new GCParseRule("END_OF_FILE", GCLogParser.END_OF_DATA_SENTINEL);
     GCParseRule JVM_EXIT = new GCParseRule("JVM_EXIT", "Heap$");
 
-    // [108.400s][info ][safepoint   ] Safepoint "G1Concurrent", Time since last: 7404646 ns, Reaching safepoint: 2138853 ns, At safepoint: 384083 ns, Total: 2522936 ns
-    String VMOP = "Safepoint\\s+\"(\\w+)\"";
-    String SAFEPOINT_TIME = "(\\d+)\\s+ns";
-
-    SafepointParseRule SAFEPOINT = new SafepointParseRule(VMOP + ",\\s+Time since last:\\s+" + SAFEPOINT_TIME + ",\\s+Reaching safepoint:\\s+" + SAFEPOINT_TIME + ",\\s+At safepoint:\\s+" + SAFEPOINT_TIME + ",\\s+Total:\\s+" + SAFEPOINT_TIME);
-
-
 }

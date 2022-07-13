@@ -7,29 +7,57 @@ import com.microsoft.gctoolkit.event.jvm.Safepoint;
 import com.microsoft.gctoolkit.jvm.Diary;
 import com.microsoft.gctoolkit.parser.JVMEventConsumer;
 import com.microsoft.gctoolkit.parser.PreUnifiedGCLogParser;
-import com.microsoft.gctoolkit.parser.unified.UnifiedPatterns;
+import com.microsoft.gctoolkit.parser.UnifiedGCLogParser;
 
+import java.util.function.Supplier;
 
-public class SafepointParser extends PreUnifiedGCLogParser implements SafepointPatterns {
+public class SafepointParser {
 
-    private final SafepointParseRule parseRule;
-    public SafepointParser(Diary diary, JVMEventConsumer consumer) {
-        super(diary, consumer);
-        if (diary.isUnifiedLogging()) parseRule = UnifiedPatterns.SAFEPOINT;
-        else parseRule = SafepointPatterns.TRACE;
+    public class PreUnified extends PreUnifiedGCLogParser implements SafepointPatterns.PreUnified {
+        public PreUnified(Diary diary, JVMEventConsumer consumer) {
+            super(diary, consumer);
+        }
+
+        @Override
+        public String getName() {
+            return "SafepointParser.PreUnified";
+        }
+
+        // TODO - refactor to remove duplicate code (with SafepointParser.Unified)
+        @Override
+        protected void process(String line) {
+            SafepointTrace trace;
+            if ((trace = TRACE.parse(line)) != null) {
+                Safepoint safepoint = trace.toSafepoint();
+                consumer.record(safepoint);
+            } else if (line.equals(END_OF_DATA_SENTINEL))
+                consumer.record(new JVMTermination(getClock(), diary.getTimeOfFirstEvent()));
+        }
     }
 
-    public String getName() {
-        return "SafepointParser";
+    public static class Unified extends UnifiedGCLogParser implements SafepointPatterns.Unified {
+        public Unified(Diary diary, JVMEventConsumer consumer) {
+            super(diary, consumer);
+        }
+
+        @Override
+        public String getName() {
+            return "SafepointParser.Unified";
+        }
+
+        // TODO - refactor to remove duplicate code (with SafepointParser.PreUnified)
+        @Override
+        protected void process(String line) {
+            SafepointTrace trace;
+            if ((trace = TRACE.parse(line)) != null) {
+                Safepoint safepoint = trace.toSafepoint();
+                consumer.record(safepoint);
+            } else if (line.equals(END_OF_DATA_SENTINEL))
+                consumer.record(new JVMTermination(getClock(), diary.getTimeOfFirstEvent()));
+        }
     }
 
-    protected void process(String line) {
-        SafepointTrace trace;
-        if ((trace = parseRule.parse(line)) != null) {
-            Safepoint safepoint = trace.toSafepoint();
-            consumer.record(safepoint);
-        } else if (line.equals(END_OF_DATA_SENTINEL))
-            consumer.record(new JVMTermination(getClock(),diary.getTimeOfFirstEvent()));
-    }
+    private SafepointParser() {}
+
 }
 

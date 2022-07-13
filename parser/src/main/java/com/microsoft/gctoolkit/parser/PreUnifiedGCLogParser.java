@@ -21,7 +21,7 @@ public abstract class PreUnifiedGCLogParser extends GCLogParser {
         super(diary, consumer);
     }
 
-    void advanceClock(String record) {
+    protected void advanceClock(String record) {
         try {
             GCLogTrace trace = TIMESTAMP_BLOCK.parse(record);
             if (trace == null) {

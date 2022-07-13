@@ -9,16 +9,16 @@ import com.microsoft.gctoolkit.time.DateTimeStamp;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-abstract class UnifiedGCLogParser extends GCLogParser {
+public abstract class UnifiedGCLogParser extends GCLogParser {
 
     private static final Logger LOGGER = Logger.getLogger(UnifiedGCLogParser.class.getName());
     private static final boolean DEBUG = Boolean.getBoolean("microsoft.debug");
 
-    UnifiedGCLogParser(Diary diary, JVMEventConsumer consumer) {
+    protected UnifiedGCLogParser(Diary diary, JVMEventConsumer consumer) {
         super(diary, consumer);
     }
 
-    void advanceClock(String record) {
+    protected void advanceClock(String record) {
         try {
             DateTimeStamp now = new Decorators(record).getDateTimeStamp();
             super.advanceClock(now);
