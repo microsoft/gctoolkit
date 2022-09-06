@@ -83,14 +83,14 @@ public class ZGCParserTest {
                 assertEquals(toInt(12.962d, 1000), toInt(zgc.getConcurrentRelocateDuration(), 1000));
 
                 //Memory
-                assertTrue(checkZGCMemoryPoolSummary(zgc.getMarkStart(), 936L, 42L, 3160L, 894)); //1074L, 1074L, 1074L));
-                assertTrue(checkZGCMemoryPoolSummary(zgc.getMarkEnd(), 1074L, 42L, 3084L, 970L));
-                assertTrue(checkZGCMemoryPoolSummary(zgc.getRelocateStart(),1074L, 42L, 3852L, 202L));
-                assertTrue(checkZGCMemoryPoolSummary(zgc.getRelocateEnd(), 1074L, 42L, 3868L, 186L));
+                assertTrue(checkZGCMemoryPoolSummary(zgc.getMarkStart(), 958464, 43008, 3235840, 915456));
+                assertTrue(checkZGCMemoryPoolSummary(zgc.getMarkEnd(), 1099776, 43008, 3158016, 993280));
+                assertTrue(checkZGCMemoryPoolSummary(zgc.getRelocateStart(),1099776, 43008, 3944448, 206848));
+                assertTrue(checkZGCMemoryPoolSummary(zgc.getRelocateEnd(), 1099776, 43008, 3960832, 190464));
 
-                assertTrue(checkOccupancySummary(zgc.getLive(), 8L, 8L, 8L));
-                assertTrue(checkOccupancySummary(zgc.getAllocated(), 172L, 172L, 376L));
-                assertTrue(checkOccupancySummary(zgc.getGarbage(), 885L, 117L, 5L));
+                assertTrue(checkOccupancySummary(zgc.getLive(), 8192, 8192, 8192));
+                assertTrue(checkOccupancySummary(zgc.getAllocated(), 176128, 176128, 385024));
+                assertTrue(checkOccupancySummary(zgc.getGarbage(), 906240, 119808, 5120));
 
                 assertTrue(checkReclaimSummary(zgc.getReclaimed(), 768L, 880L));
                 assertTrue(checkReclaimSummary(zgc.getMemorySummary(), 894L, 186L));
