@@ -252,7 +252,7 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
         forwardReference.setMemorySummary(
                 new ReclaimSummary(
                         trace.toKBytes(2),
-                        trace.toKBytes(2)
+                        trace.toKBytes(5)
                 )
         );
         record();
