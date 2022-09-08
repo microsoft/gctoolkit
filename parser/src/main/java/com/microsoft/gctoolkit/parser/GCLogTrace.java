@@ -121,7 +121,7 @@ public class GCLogTrace extends AbstractLogTrace {
         return toKBytes(getLongGroup(offset), getGroup(offset + 1));
     }
 
-    long toKBytes(long value, String units) {
+    public long toKBytes(long value, String units) {
         long returnValue = value;
         switch (Character.toUpperCase(units.codePointAt(0))) {
             case 'G':
@@ -138,6 +138,14 @@ public class GCLogTrace extends AbstractLogTrace {
         }
 
         return returnValue;
+    }
+
+    long toKBytes(int offset) {
+        return (long)toKBytes((double)getLongGroup(offset), getGroup(offset+1));
+    }
+
+    long doubleToKBytes(int offset) {
+        return (long)toKBytes(getDoubleGroup(offset), getGroup(offset+1));
     }
 
     double toKBytes(double value, String units) {

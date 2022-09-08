@@ -175,24 +175,24 @@ public abstract class GCLogParser implements SharedPatterns {
         return null;
     }
 
-    double toKBytes(double value, String units) {
-        switch (units.charAt(0)) {
-            case 'G':
-            case 'g':
-                value *= 1024L;
-            case 'M':
-            case 'm':
-                value *= 1024L;
-            case 'K':
-            case 'k':
-                break;
-            case 'B':
-            case 'b':
-                value /= 1024;
-                break;
-            default:
-        }
-
-        return value;
-    }
+//    double toKBytes(double value, String units) {
+//        switch (units.charAt(0)) {
+//            case 'G':
+//            case 'g':
+//                value *= 1024L;
+//            case 'M':
+//            case 'm':
+//                value *= 1024L;
+//            case 'K':
+//            case 'k':
+//                break;
+//            case 'B':
+//            case 'b':
+//                value /= 1024;
+//                break;
+//            default:
+//        }
+//
+//        return value;
+//    }
 }

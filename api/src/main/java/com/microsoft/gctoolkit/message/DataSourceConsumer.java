@@ -2,7 +2,7 @@ package com.microsoft.gctoolkit.message;
 
 import com.microsoft.gctoolkit.jvm.Diary;
 
-public interface DataSourceParser {
+public interface DataSourceConsumer {
 
     boolean accepts(Diary diary);
 
