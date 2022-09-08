@@ -144,14 +144,14 @@ public abstract class GCLogParser implements SharedPatterns {
                 metaDataPool = extractPermGenRecord(trace);
             else if ("Metaspace".equals(type)) {
                 if (trace.getGroup(2) != null) {
-                    metaDataPool = new MetaspaceRecord(trace.getMemoryInKBytes(2), trace.getMemoryInKBytes(4), trace.getMemoryInKBytes(6));
+                    metaDataPool = new MetaspaceRecord(trace.toKBytes(2), trace.toKBytes(4), trace.toKBytes(6));
                 } else {
-                    metaDataPool = new MetaspaceRecord(trace.getMemoryInKBytes(4), trace.getMemoryInKBytes(4), trace.getMemoryInKBytes(6));
+                    metaDataPool = new MetaspaceRecord(trace.toKBytes(4), trace.toKBytes(4), trace.toKBytes(6));
                 }
             }
         } else if ((trace = META_SPACE_RECORD.parse(line)) != null) {
             int index = (trace.getGroup(1) == null) ? 1 : 3;
-            metaDataPool = new MetaspaceRecord(trace.getMemoryInKBytes(index), trace.getMemoryInKBytes(3), trace.getMemoryInKBytes(5));
+            metaDataPool = new MetaspaceRecord(trace.toKBytes(index), trace.toKBytes(3), trace.toKBytes(5));
         }
 
         return metaDataPool;
@@ -175,24 +175,24 @@ public abstract class GCLogParser implements SharedPatterns {
         return null;
     }
 
-    double toKBytes(double value, String units) {
-        switch (units.charAt(0)) {
-            case 'G':
-            case 'g':
-                value *= 1024L;
-            case 'M':
-            case 'm':
-                value *= 1024L;
-            case 'K':
-            case 'k':
-                break;
-            case 'B':
-            case 'b':
-                value /= 1024;
-                break;
-            default:
-        }
-
-        return value;
-    }
+//    double toKBytes(double value, String units) {
+//        switch (units.charAt(0)) {
+//            case 'G':
+//            case 'g':
+//                value *= 1024L;
+//            case 'M':
+//            case 'm':
+//                value *= 1024L;
+//            case 'K':
+//            case 'k':
+//                break;
+//            case 'B':
+//            case 'b':
+//                value /= 1024;
+//                break;
+//            default:
+//        }
+//
+//        return value;
+//    }
 }

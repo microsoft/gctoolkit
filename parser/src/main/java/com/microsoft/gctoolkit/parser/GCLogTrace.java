@@ -117,11 +117,33 @@ public class GCLogTrace extends AbstractLogTrace {
         return trace.end();
     }
 
-    public long getMemoryInKBytes(int offset) {
+    public long toKBytes(int offset) {
         return toKBytes(getLongGroup(offset), getGroup(offset + 1));
     }
 
-    long toKBytes(long value, String units) {
+    public long doubleToKBytes(int offset) {
+        return (long)toKBytes(getDoubleGroup(offset), getGroup(offset+1));
+    }
+
+    private double toKBytes(double value, String units) {
+        double returnValue = value;
+        switch (Character.toUpperCase(units.codePointAt(0))) {
+            case 'G':
+                returnValue *= 1024.0D;
+            case 'M':
+                returnValue *= 1024.0D;
+            case 'K':
+                break;
+            case 'B':
+                returnValue /= 1024.0D;
+                break;
+            default:
+                LOGGER.log(Level.WARNING, "Invalid unit [B,K,M,G] {0}", units);
+        }
+        return returnValue;
+    }
+
+    public long toKBytes(long value, String units) {
         long returnValue = value;
         switch (Character.toUpperCase(units.codePointAt(0))) {
             case 'G':
@@ -140,29 +162,11 @@ public class GCLogTrace extends AbstractLogTrace {
         return returnValue;
     }
 
-    double toKBytes(double value, String units) {
-        double returnValue = value;
-        switch (Character.toUpperCase(units.codePointAt(0))) {
-            case 'G':
-                returnValue *= 1024.0D;
-            case 'M':
-                returnValue *= 1024.0D;
-            case 'K':
-                break;
-            case 'B':
-                returnValue /= 1024.0D;
-                break;
-            default:
-                LOGGER.log(Level.WARNING, "Invalid unit [B,K,M,G] {0}", units);
-        }
-        return returnValue;
-    }
-
     public PermGenSummary getMetaspaceSummary(int offset) {
         try {
-            long before = getMemoryInKBytes(offset);
-            long after = getMemoryInKBytes(offset + 2);
-            long size = getMemoryInKBytes(offset + 4);
+            long before = toKBytes(offset);
+            long after = toKBytes(offset + 2);
+            long size = toKBytes(offset + 4);
             return new PermGenSummary(before, after, size);
         } catch (NumberFormatException numberFormatException) {
             LOGGER.fine("Unable to calculate Metaspace summary.");
@@ -173,9 +177,9 @@ public class GCLogTrace extends AbstractLogTrace {
 
     public MemoryPoolSummary getOccupancyBeforeAfterWithMemoryPoolSizeSummary(int offset) {
         try {
-            long before = getMemoryInKBytes(offset);
-            long after = getMemoryInKBytes(offset + 2);
-            long size = getMemoryInKBytes(offset + 4);
+            long before = toKBytes(offset);
+            long after = toKBytes(offset + 2);
+            long size = toKBytes(offset + 4);
             return new MemoryPoolSummary(before, size, after, size);
         } catch (NumberFormatException numberFormatException) {
             LOGGER.fine("Unable to calculate generational memory pool summary.");
@@ -188,8 +192,8 @@ public class GCLogTrace extends AbstractLogTrace {
     public MemoryPoolSummary getOccupancyWithMemoryPoolSizeSummary(int offset) {
 
         try {
-            long occupancy = getMemoryInKBytes(offset);
-            long size = getMemoryInKBytes(offset + 2);
+            long occupancy = toKBytes(offset);
+            long size = toKBytes(offset + 2);
             return new MemoryPoolSummary(occupancy, size, occupancy, size);
         } catch (NumberFormatException numberFormatException) {
             LOGGER.fine("Unable to calculate generational memory pool occupancy summary.");
@@ -201,9 +205,9 @@ public class GCLogTrace extends AbstractLogTrace {
 
     public MetaspaceRecord getMetaSpaceRecord(int offset) {
         try {
-            long before = getMemoryInKBytes(offset);
-            long after = getMemoryInKBytes(offset + 2);
-            long size = getMemoryInKBytes(offset + 4);
+            long before = toKBytes(offset);
+            long after = toKBytes(offset + 2);
+            long size = toKBytes(offset + 4);
             return new MetaspaceRecord(before, after, size);
         } catch (NumberFormatException numberFormatException) {
             LOGGER.fine("Unable to calculate Metaspace summary.");
@@ -214,9 +218,9 @@ public class GCLogTrace extends AbstractLogTrace {
 
     public MetaspaceRecord getEnlargedMemoryPoolRecord(int offset) {
         try {
-            long before = getMemoryInKBytes(offset);
-            long after = getMemoryInKBytes(offset + 4);
-            long size = getMemoryInKBytes(offset + 6);
+            long before = toKBytes(offset);
+            long after = toKBytes(offset + 4);
+            long size = toKBytes(offset + 6);
             return new MetaspaceRecord(before, after, size);
         } catch (NumberFormatException numberFormatException) {
             LOGGER.fine("Unable to calculate Metaspace summary.");
@@ -227,10 +231,10 @@ public class GCLogTrace extends AbstractLogTrace {
 
     public MetaspaceRecord getEnlargedMetaSpaceRecord(int offset) {
         try {
-            long before = getMemoryInKBytes(offset);
-            long sizeBefore = getMemoryInKBytes(offset + 2);
-            long after = getMemoryInKBytes(offset + 4);
-            long size = getMemoryInKBytes(offset + 6);
+            long before = toKBytes(offset);
+            long sizeBefore = toKBytes(offset + 2);
+            long after = toKBytes(offset + 4);
+            long size = toKBytes(offset + 6);
             return new MetaspaceRecord(before, sizeBefore, after, size);
         } catch (NumberFormatException numberFormatException) {
             LOGGER.fine("Unable to calculate Metaspace summary.");

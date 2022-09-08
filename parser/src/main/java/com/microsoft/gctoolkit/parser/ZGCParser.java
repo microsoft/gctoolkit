@@ -184,9 +184,9 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
 
     private void metaspace(GCLogTrace trace, String s) {
         ZGCMetaspaceSummary summary = new ZGCMetaspaceSummary(
-                trace.toKBytes(trace.getLongGroup(1),  trace.getGroup(2)),
-                trace.toKBytes(trace.getLongGroup(3), trace.getGroup(4)),
-                trace.toKBytes(trace.getLongGroup(5), trace.getGroup(6)));
+                trace.toKBytes(1),
+                trace.toKBytes(3),
+                trace.toKBytes(5));
         forwardReference.setMetaspace(summary);
     }
 
@@ -199,10 +199,10 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
     }
 
     private void captureAtIndex(GCLogTrace trace, int index) {
-        markStart[index] = trace.toKBytes(trace.getLongGroup(2), trace.getGroup(3));
-        markEnd[index] = trace.toKBytes(trace.getLongGroup(5), trace.getGroup(6));
-        relocateStart[index] = trace.toKBytes(trace.getLongGroup(8), trace.getGroup(9));
-        relocateEnd[index] = trace.toKBytes(trace.getLongGroup(11), trace.getGroup(12));
+        markStart[index] = trace.toKBytes(2);
+        markEnd[index] = trace.toKBytes(5);
+        relocateStart[index] = trace.toKBytes(8);
+        relocateEnd[index] = trace.toKBytes(11);
     }
 
     private void sizeEntry(GCLogTrace trace, String s) {
@@ -214,10 +214,10 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
                 captureAtIndex(trace, 1);
                 break;
             case "Used":
-                forwardReference.setMarkStart(new ZGCMemoryPoolSummary(markStart[0], markStart[1], trace.toKBytes(trace.getLongGroup(2), trace.getGroup(3))));
-                forwardReference.setMarkEnd(new ZGCMemoryPoolSummary(markEnd[0], markEnd[1], trace.toKBytes(trace.getLongGroup(5), trace.getGroup(6))));
-                forwardReference.setRelocateStart(new ZGCMemoryPoolSummary(relocateStart[0], relocateStart[1], trace.toKBytes(trace.getLongGroup(8), trace.getGroup(9))));
-                forwardReference.setRelocateEnd(new ZGCMemoryPoolSummary(relocateEnd[0], relocateEnd[1], trace.toKBytes(trace.getLongGroup(11), trace.getGroup(12))));
+                forwardReference.setMarkStart(new ZGCMemoryPoolSummary(markStart[0], markStart[1], trace.toKBytes(2)));
+                forwardReference.setMarkEnd(new ZGCMemoryPoolSummary(markEnd[0], markEnd[1], trace.toKBytes(5)));
+                forwardReference.setRelocateStart(new ZGCMemoryPoolSummary(relocateStart[0], relocateStart[1], trace.toKBytes(8)));
+                forwardReference.setRelocateEnd(new ZGCMemoryPoolSummary(relocateEnd[0], relocateEnd[1], trace.toKBytes(11)));
                 break;
             default:
                 LOGGER.warning(trace.getGroup(1) + "not recognized, Heap Occupancy/size is is ignored. Please report this with the GC log");
@@ -226,9 +226,9 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
 
     private void occupancyEntry(GCLogTrace trace, String s) {
         OccupancySummary summary = new OccupancySummary(
-                trace.toKBytes(trace.getLongGroup(2), trace.getGroup(3)),
-                trace.toKBytes(trace.getLongGroup(5), trace.getGroup(6)),
-                trace.toKBytes(trace.getLongGroup(8), trace.getGroup(9)));
+                trace.toKBytes(2),
+                trace.toKBytes(5),
+                trace.toKBytes(8));
         if ("Live".equals(trace.getGroup(1))) {
             forwardReference.setMarkedLive(summary);
         } else if ("Allocated".equals(trace.getGroup(1))) {
@@ -242,8 +242,8 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
     private void reclaimed(GCLogTrace trace, String s) {
         forwardReference.setReclaimed(
                 new ReclaimSummary(
-                        trace.toKBytes(trace.getLongGroup(1), trace.getGroup(2)),
-                        trace.toKBytes(trace.getLongGroup(4), trace.getGroup(5))
+                        trace.toKBytes(1),
+                        trace.toKBytes(4)
                 )
         );
     }
@@ -251,8 +251,8 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
     private void memorySummary(GCLogTrace trace, String s) {
         forwardReference.setMemorySummary(
                 new ReclaimSummary(
-                        trace.toKBytes(trace.getLongGroup(2), trace.getGroup(3)),
-                        trace.toKBytes(trace.getLongGroup(5), trace.getGroup(6))
+                        trace.toKBytes(2),
+                        trace.toKBytes(5)
                 )
         );
         record();

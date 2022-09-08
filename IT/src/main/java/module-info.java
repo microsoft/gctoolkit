@@ -13,9 +13,13 @@ open module com.microsoft.gctoolkit.integration {
 
     exports com.microsoft.gctoolkit.integration.aggregation to
             com.microsoft.gctoolkit.vertx;
+    exports com.microsoft.gctoolkit.integration.shared to
+            com.microsoft.gctoolkit.vertx;
 
     provides com.microsoft.gctoolkit.aggregator.Aggregation with
             com.microsoft.gctoolkit.integration.aggregation.HeapOccupancyAfterCollectionSummary,
             com.microsoft.gctoolkit.integration.aggregation.PauseTimeSummary,
-            com.microsoft.gctoolkit.integration.aggregation.CollectionCycleCountsSummary;
+            com.microsoft.gctoolkit.integration.aggregation.CollectionCycleCountsSummary,
+            com.microsoft.gctoolkit.integration.shared.OneRuntimeReport,
+            com.microsoft.gctoolkit.integration.shared.TwoRuntimeReport;
 }
