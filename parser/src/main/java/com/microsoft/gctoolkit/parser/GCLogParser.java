@@ -14,7 +14,6 @@ import com.microsoft.gctoolkit.time.DateTimeStamp;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-
 public abstract class GCLogParser implements SharedPatterns {
 
     private static final Logger LOGGER = Logger.getLogger(GCLogParser.class.getName());
