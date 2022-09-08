@@ -130,8 +130,8 @@ public class ShenandoahParserTest {
 
     }
 
-    private boolean checkZGCMemoryPoolSummary(ZGCMemoryPoolSummary summary, long capacity, long reserved, long free, long used) {
-        return summary.getCapacity() == capacity && summary.getReserved() == reserved && summary.getFree() == free && summary.getUsed() == used;
+    private boolean checkZGCMemoryPoolSummary(ZGCMemoryPoolSummary summary, long capacity, long free, long used) {
+        return summary.getCapacity() == capacity && summary.getFree() == free && summary.getUsed() == used;
     }
 
     private boolean checkOccupancySummary(OccupancySummary summary, long markEnd, long relocateStart, long relocateEnd) {
