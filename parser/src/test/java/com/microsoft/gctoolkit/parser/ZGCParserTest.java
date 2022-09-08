@@ -62,6 +62,9 @@ public class ZGCParserTest {
         ZGCParser parser = new ZGCParser(new Diary(), event -> {
             try {
                 ZGCCycle zgc = (ZGCCycle) event;
+
+                assertEquals(zgc.getGcId(), 3L);
+
                 assertEquals(toInt(0.0719d,1000), toInt(zgc.getDuration(),1000));
                 assertEquals(toInt(32.121d, 1000), toInt(zgc.getDateTimeStamp().getTimeStamp(), 1000));
                 assertEquals("Metadata GC Threshold", zgc.getGCCause().getLabel());

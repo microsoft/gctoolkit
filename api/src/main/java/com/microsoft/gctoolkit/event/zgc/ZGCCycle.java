@@ -24,6 +24,8 @@ public class ZGCCycle extends GCEvent {
         super(timeStamp, gcType, duration);
     }
 
+    private long gcId;
+
     private DateTimeStamp pauseMarkStartTimeStamp;
     private double pauseMarkStartDuration;
 
@@ -65,6 +67,14 @@ public class ZGCCycle extends GCEvent {
     public void setPauseMarkStart(DateTimeStamp pauseMarkStartTimeStamp, double duration) {
         this.pauseMarkStartTimeStamp = pauseMarkStartTimeStamp;
         this.pauseMarkStartDuration = duration;
+    }
+
+    public long getGcId() {
+        return gcId;
+    }
+
+    public void setGcId(long gcId) {
+        this.gcId = gcId;
     }
 
     public DateTimeStamp getConcurrentMarkTimeStamp() {
