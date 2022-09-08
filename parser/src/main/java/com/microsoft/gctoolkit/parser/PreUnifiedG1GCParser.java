@@ -1061,17 +1061,17 @@ public class PreUnifiedG1GCParser extends PreUnifiedGCLogParser implements G1GCP
     }
 
     private void metaspaceFinal(GCLogTrace trace, String line) {
-        metaSpaceUsed = trace.getMemoryInKBytes(1);
-        metaCapacity = trace.getMemoryInKBytes(3);
-        metaCommitted = trace.getMemoryInKBytes(5);
-        metaReserved = trace.getMemoryInKBytes(7);
+        metaSpaceUsed = trace.toKBytes(1);
+        metaCapacity = trace.toKBytes(3);
+        metaCommitted = trace.toKBytes(5);
+        metaReserved = trace.toKBytes(7);
     }
 
     private void classspaceFinal(GCLogTrace trace, String line) {
-        classSpaceUsed = trace.getMemoryInKBytes(1);
-        classSpaceCapacity = trace.getMemoryInKBytes(3);
-        classSpaceCommitted = trace.getMemoryInKBytes(5);
-        classSpaceReserved = trace.getMemoryInKBytes(7);
+        classSpaceUsed = trace.toKBytes(1);
+        classSpaceCapacity = trace.toKBytes(3);
+        classSpaceCommitted = trace.toKBytes(5);
+        classSpaceReserved = trace.toKBytes(7);
     }
 
     /***********************************/
