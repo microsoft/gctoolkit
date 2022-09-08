@@ -108,7 +108,7 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
     }
 
     private void cycleStart(GCLogTrace trace, String s) {
-        forwardReference = new ZGCForwardReference(getClock(), trace.gcCause(0, 1));
+        forwardReference = new ZGCForwardReference(getClock(), trace.getLongGroup(1), trace.gcCause(1, 1));
     }
 
     private void pausePhase(GCLogTrace trace, String s) {
@@ -271,6 +271,7 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
     private class ZGCForwardReference {
         private final DateTimeStamp startTimeStamp;
         private final GCCause gcCause;
+        private final long gcId;
 
         // Timing
         private DateTimeStamp pauseMarkStart;
@@ -307,13 +308,15 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
         private double[] mmu = new double[6];
 
 
-        public ZGCForwardReference(DateTimeStamp dateTimeStamp, GCCause cause) {
+        public ZGCForwardReference(DateTimeStamp dateTimeStamp, long gcId, GCCause cause) {
             this.startTimeStamp = dateTimeStamp;
+            this.gcId = gcId;
             gcCause = cause;
         }
 
         ZGCCycle toZGCCycle(DateTimeStamp endTime) {
             ZGCCycle cycle = new ZGCCycle(startTimeStamp, gcCause, endTime.minus(startTimeStamp));
+            cycle.setGcId(gcId);
             cycle.setPauseMarkStart(pauseMarkStart, pauseMarkStartDuration);
             cycle.setConcurrentMark(concurrentMarkStart, concurrentMarkDuration);
             cycle.setPauseMarkEnd(pauseMarkEndStart, pauseMarkEndDuration);

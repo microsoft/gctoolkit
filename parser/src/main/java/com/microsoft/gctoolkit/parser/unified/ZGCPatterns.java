@@ -12,7 +12,7 @@ public interface ZGCPatterns extends UnifiedPatterns {
     GCParseRule ZGC_TAG = new GCParseRule("ZGC Tag", "Initializing The Z Garbage Collector$");
 
     //[3.558s][info ][gc,start       ] GC(3) Garbage Collection (Warmup)
-    GCParseRule CYCLE_START = new GCParseRule("CYCLE_START", "Garbage Collection " + GenericTokens.GC_CAUSE + "$");
+    GCParseRule CYCLE_START = new GCParseRule("CYCLE_START", "GC\\(" + GenericTokens.INT + "\\) Garbage Collection " + GenericTokens.GC_CAUSE + "$");
 
     //[3.559s][info ][gc,phases      ] GC(3) Pause Mark Start 0.460ms
     //[3.574s][info ][gc,phases      ] GC(3) Pause Mark End 0.830ms
