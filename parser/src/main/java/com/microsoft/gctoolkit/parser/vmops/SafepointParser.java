@@ -13,7 +13,7 @@ import java.util.function.Supplier;
 
 public class SafepointParser {
 
-    public class PreUnified extends PreUnifiedGCLogParser implements SafepointPatterns.PreUnified {
+    public static class PreUnified extends PreUnifiedGCLogParser implements SafepointPatterns.PreUnified {
         public PreUnified(Diary diary, JVMEventConsumer consumer) {
             super(diary, consumer);
         }
@@ -27,7 +27,7 @@ public class SafepointParser {
         @Override
         protected void process(String line) {
             SafepointTrace trace;
-            if ((trace = TRACE.parse(line)) != null) {
+            if ((trace = TRACE.parse(line, this.getClass())) != null) {
                 Safepoint safepoint = trace.toSafepoint();
                 consumer.record(safepoint);
             } else if (line.equals(END_OF_DATA_SENTINEL))
@@ -49,7 +49,7 @@ public class SafepointParser {
         @Override
         protected void process(String line) {
             SafepointTrace trace;
-            if ((trace = TRACE.parse(line)) != null) {
+            if ((trace = TRACE.parse(line, this.getClass())) != null) {
                 Safepoint safepoint = trace.toSafepoint();
                 consumer.record(safepoint);
             } else if (line.equals(END_OF_DATA_SENTINEL))

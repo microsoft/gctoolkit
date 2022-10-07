@@ -9,86 +9,106 @@ import com.microsoft.gctoolkit.time.DateTimeStamp;
 
 import java.util.regex.Matcher;
 
-public class SafepointTrace extends AbstractLogTrace {
+public abstract class SafepointTrace extends AbstractLogTrace {
 
     public SafepointTrace(Matcher matcher) {
         super(matcher);
     }
 
-    public Safepoint toSafepoint() {
-        Safepoint safepoint = new Safepoint(getVMOP(), getDateTimeStamp(), getDuration());
-        safepoint.recordThreadCounts(totalThreads(), initiallyRunningThreads(), waitingToBlockThreads());
-        safepoint.recordDurations(spinTime(), blockTime(), syncTime(), cleanupTime(), vmopTime());
-        safepoint.recordPageTrapCount(getTrapCount());
-        return safepoint;
+    public abstract Safepoint toSafepoint();
+
+    public static class UnifiedSafepointTrace extends SafepointTrace {
+        public UnifiedSafepointTrace(Matcher matcher) {
+            super(matcher);
+        }
+
+        //"[48.623s][info ][safepoint   ] Safepoint \"G1TryInitiateConcMark\", Time since last: 57800 ns, Reaching safepoint: 695245 ns, At safepoint: 11720 ns, Total: 706965 ns",
+        public Safepoint toSafepoint() {
+            return new Safepoint(this.getGroup(VMOP), null, this.getIntegerGroup(DURATION));
+        }
+
+        private final int VMOP = 1;
+        private final int DURATION = 4;
     }
 
-    public String getVMOP() {
-        return super.getGroup(VMOP);
-    }
+    public static class PreUnifiedSafepointTrace extends SafepointTrace {
+        public PreUnifiedSafepointTrace(Matcher matcher) {
+            super(matcher);
+        }
 
-    public DateTimeStamp getDateTimeStamp() {
-        return new DateTimeStamp(getTimeStampGroup());
-    }
+        public Safepoint toSafepoint() {
+            Safepoint safepoint = new Safepoint(getVMOP(), getDateTimeStamp(), getDuration());
+            safepoint.recordThreadCounts(totalThreads(), initiallyRunningThreads(), waitingToBlockThreads());
+            safepoint.recordDurations(spinTime(), blockTime(), syncTime(), cleanupTime(), vmopTime());
+            safepoint.recordPageTrapCount(getTrapCount());
+            return safepoint;
+        }
 
-    public double getDuration() {
-        return (spinTime() + blockTime() + syncTime() + cleanupTime() + vmopTime()) / 1000.0d;
-    }
+        public String getVMOP() {
+            return super.getGroup(VMOP);
+        }
 
-    public int totalThreads() {
-        return getIntegerGroup(TOTAL_THREADS);
-    }
+        public DateTimeStamp getDateTimeStamp() {
+            return new DateTimeStamp(getTimeStampGroup());
+        }
 
-    public int initiallyRunningThreads() {
-        return getIntegerGroup(INITIALLY_RUNNING_THREADS);
-    }
+        public double getDuration() {
+            return (spinTime() + blockTime() + syncTime() + cleanupTime() + vmopTime()) / 1000.0d;
+        }
 
-    public int waitingToBlockThreads() {
-        return getIntegerGroup(WAITING_TO_BLOCK);
-    }
+        public int totalThreads() {
+            return getIntegerGroup(TOTAL_THREADS);
+        }
 
-    public int spinTime() {
-        return getIntegerGroup(SPIN_TIME);
-    }
+        public int initiallyRunningThreads() {
+            return getIntegerGroup(INITIALLY_RUNNING_THREADS);
+        }
 
-    public int blockTime() {
-        return getIntegerGroup(BLOCK_TIME);
-    }
+        public int waitingToBlockThreads() {
+            return getIntegerGroup(WAITING_TO_BLOCK);
+        }
 
-    public int syncTime() {
-        return getIntegerGroup(SYNC_TIME);
-    }
+        public int spinTime() {
+            return getIntegerGroup(SPIN_TIME);
+        }
 
-    public int cleanupTime() {
-        return getIntegerGroup(CLEANUP_TIME);
-    }
+        public int blockTime() {
+            return getIntegerGroup(BLOCK_TIME);
+        }
 
-    public int vmopTime() {
-        return getIntegerGroup(VMOP_TIME);
-    }
+        public int syncTime() {
+            return getIntegerGroup(SYNC_TIME);
+        }
 
-    public int getTrapCount() {
-        return getIntegerGroup(TRAP_COUNT);
-    }
+        public int cleanupTime() {
+            return getIntegerGroup(CLEANUP_TIME);
+        }
 
-    private double getTimeStampGroup() {
-        return getDoubleGroup(TIME_STAMP);
-    }
+        public int vmopTime() {
+            return getIntegerGroup(VMOP_TIME);
+        }
 
-    private final int TIME_STAMP = 1;
-    private final int VMOP = 2;
-    private final int TOTAL_THREADS = 3;
-    private final int INITIALLY_RUNNING_THREADS = 4;
-    private final int WAITING_TO_BLOCK = 5;
-    private final int SPIN_TIME = 6;
-    private final int BLOCK_TIME = 7;
-    private final int SYNC_TIME = 8;
-    private final int CLEANUP_TIME = 9;
-    private final int VMOP_TIME = 10;
-    private final int TRAP_COUNT = 11;
+        public int getTrapCount() {
+            return getIntegerGroup(TRAP_COUNT);
+        }
 
-}
+        private double getTimeStampGroup() {
+            return getDoubleGroup(TIME_STAMP);
+        }
 
+        private final int TIME_STAMP = 1;
+        private final int VMOP = 2;
+        private final int TOTAL_THREADS = 3;
+        private final int INITIALLY_RUNNING_THREADS = 4;
+        private final int WAITING_TO_BLOCK = 5;
+        private final int SPIN_TIME = 6;
+        private final int BLOCK_TIME = 7;
+        private final int SYNC_TIME = 8;
+        private final int CLEANUP_TIME = 9;
+        private final int VMOP_TIME = 10;
+        private final int TRAP_COUNT = 11;
+
+        // "[48.623s][info ][safepoint   ] Safepoint \"G1TryInitiateConcMark\", Time since last: 57800 ns, Reaching safepoint: 695245 ns, At safepoint: 11720 ns, Total: 706965 ns",
 /*
          vmop                    [threads: total initially_running wait_to_block]    [time: spin block sync cleanup vmop] page_trap_count
 0.099: Deoptimize                       [       9          0              0    ]      [     0     0     0     0     0    ]  0
@@ -111,3 +131,6 @@ Exit                               1
     0 VM operations coalesced during safepoint
 Maximum sync time      0 ms
  */
+    }
+}
+

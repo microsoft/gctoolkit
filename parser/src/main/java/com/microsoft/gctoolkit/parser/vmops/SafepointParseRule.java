@@ -2,6 +2,8 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.parser.vmops;
 
+import com.microsoft.gctoolkit.parser.GCLogParser;
+
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -34,15 +36,18 @@ public class SafepointParseRule {
      * @param trace The trace to match against the pattern
      * @return A trace with a valid matcher or null
      */
-    public SafepointTrace parse(String trace) {
+    public SafepointTrace parse(String trace, Class<? extends GCLogParser> parserClass) {
         Matcher matcher = pattern.matcher(trace);
         if (matcher.find()) {
             hits();
-            return new SafepointTrace(matcher);
+            if (parserClass.getName().equals(SafepointParser.PreUnified.class.getName()))
+                return new SafepointTrace.PreUnifiedSafepointTrace(matcher);
+            else if (parserClass.getName().equals(SafepointParser.Unified.class.getName()))
+                return new SafepointTrace.UnifiedSafepointTrace(matcher);
         } else {
             misses();
-            return null;
         }
+        return null;
     }
 
     private void hits() {
