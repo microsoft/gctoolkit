@@ -19,4 +19,5 @@ public class ReclaimSummary {
     public long getReclaimEnd() {
         return reclaimEnd;
     }
+
 }

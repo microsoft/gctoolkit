@@ -487,16 +487,16 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
     }
 
     public void unifiedMetaData(GCLogTrace trace, String line) {
-        if (forwardReference.setMetaspaceOccupancyBeforeCollection(trace.getMemoryInKBytes(1))) {
-            forwardReference.setMetaspaceOccupancyAfterCollection(trace.getMemoryInKBytes(3));
-            forwardReference.setMetaspaceSizeAfterCollection(trace.getMemoryInKBytes(5));
+        if (forwardReference.setMetaspaceOccupancyBeforeCollection(trace.toKBytes(1))) {
+            forwardReference.setMetaspaceOccupancyAfterCollection(trace.toKBytes(3));
+            forwardReference.setMetaspaceSizeAfterCollection(trace.toKBytes(5));
         }
     }
 
     public void youngDetails(GCLogTrace trace, String line) {
-        forwardReference.setHeapOccupancyBeforeCollection(trace.getMemoryInKBytes(5));
-        forwardReference.setHeapOccupancyAfterCollection(trace.getMemoryInKBytes(7));
-        forwardReference.setHeapSizeAfterCollection(trace.getMemoryInKBytes(9));
+        forwardReference.setHeapOccupancyBeforeCollection(trace.toKBytes(5));
+        forwardReference.setHeapOccupancyAfterCollection(trace.toKBytes(7));
+        forwardReference.setHeapSizeAfterCollection(trace.toKBytes(9));
         forwardReference.setDuration(trace.getDurationInSeconds());
     }
 
@@ -626,10 +626,10 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
 
     private void pausePhaseDuringConcurrentCycleDurationEnd(GCLogTrace trace, String line) {
         forwardReference.pausePhaseDuringConcurrentCycleDuration(trace.getDurationInSeconds());
-        forwardReference.setHeapOccupancyBeforeCollection(trace.getMemoryInKBytes(1));
-        forwardReference.setHeapSizeBeforeCollection(trace.getMemoryInKBytes(5));
-        forwardReference.setHeapOccupancyAfterCollection(trace.getMemoryInKBytes(3));
-        forwardReference.setHeapSizeAfterCollection(trace.getMemoryInKBytes(5));
+        forwardReference.setHeapOccupancyBeforeCollection(trace.toKBytes(1));
+        forwardReference.setHeapSizeBeforeCollection(trace.toKBytes(5));
+        forwardReference.setHeapOccupancyAfterCollection(trace.toKBytes(3));
+        forwardReference.setHeapSizeAfterCollection(trace.toKBytes(5));
     }
 
     //Full

@@ -143,7 +143,7 @@ public class UnifiedGenerationalParser extends UnifiedGCLogParser implements Uni
 
     private void youngHeader(GCLogTrace trace, String line) {
         if (pauseEvent != null)
-            LOGGER.warning("Pause event not recorded: " + pauseEvent.getGcID());
+            LOGGER.warning("Young pause event not recorded: " + pauseEvent.getGcID());
         if (diary.isCMS())
             pauseEvent = new GenerationalForwardReference(ParNew, new Decorators(line), super.GCID_COUNTER.parse(line).getIntegerGroup(1));
         else if (diary.isPSYoung())
@@ -292,7 +292,7 @@ public class UnifiedGenerationalParser extends UnifiedGCLogParser implements Uni
         } else if (pauseEvent.getGarbageCollectionType() == DefNew) {
             pauseEvent.convertToSerialFull();
         } else if (pauseEvent.getGarbageCollectionType() != ConcurrentModeFailure) {
-            LOGGER.warning("Pause event not recorded: " + pauseEvent.getGcID()); //todo: difficult to know if this is a full or a CMF
+            LOGGER.warning("Maybe Full Pause event not recorded: " + pauseEvent.getGcID()); //todo: difficult to know if this is a full or a CMF
             pauseEvent = new GenerationalForwardReference(FullGC, new Decorators(line), super.GCID_COUNTER.parse(line).getIntegerGroup(1));
             pauseEvent.setStartTime(getClock());
         }

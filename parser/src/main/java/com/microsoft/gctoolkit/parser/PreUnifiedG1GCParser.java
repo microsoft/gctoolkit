@@ -815,9 +815,9 @@ public class PreUnifiedG1GCParser extends PreUnifiedGCLogParser implements G1GCP
     }
 
     private void concurrentStringDedup(GCLogTrace trace, String line) {
-        double startingStringVolume = trace.toKBytes(trace.getDoubleGroup(4), trace.getGroup(5));
-        double endingStringValue = trace.toKBytes(trace.getDoubleGroup(6), trace.getGroup(7));
-        double reduction = trace.toKBytes(trace.getDoubleGroup(8), trace.getGroup(9));
+        double startingStringVolume = trace.toKBytes(4);
+        double endingStringValue = trace.toKBytes(6);
+        double reduction = trace.toKBytes(8);
         double percentReduction = trace.getDoubleGroup(10);
         record(new G1ConcurrentStringDeduplication(getClock(), trace.gcCause(), startingStringVolume, endingStringValue, reduction, percentReduction, trace.getDoubleGroup(trace.groupCount())));
     }
@@ -909,7 +909,6 @@ public class PreUnifiedG1GCParser extends PreUnifiedGCLogParser implements G1GCP
 
     /***********************************/
     /* Reference processing            */
-
     /***********************************/
 
 
@@ -1062,17 +1061,17 @@ public class PreUnifiedG1GCParser extends PreUnifiedGCLogParser implements G1GCP
     }
 
     private void metaspaceFinal(GCLogTrace trace, String line) {
-        metaSpaceUsed = trace.getMemoryInKBytes(1);
-        metaCapacity = trace.getMemoryInKBytes(3);
-        metaCommitted = trace.getMemoryInKBytes(5);
-        metaReserved = trace.getMemoryInKBytes(7);
+        metaSpaceUsed = trace.toKBytes(1);
+        metaCapacity = trace.toKBytes(3);
+        metaCommitted = trace.toKBytes(5);
+        metaReserved = trace.toKBytes(7);
     }
 
     private void classspaceFinal(GCLogTrace trace, String line) {
-        classSpaceUsed = trace.getMemoryInKBytes(1);
-        classSpaceCapacity = trace.getMemoryInKBytes(3);
-        classSpaceCommitted = trace.getMemoryInKBytes(5);
-        classSpaceReserved = trace.getMemoryInKBytes(7);
+        classSpaceUsed = trace.toKBytes(1);
+        classSpaceCapacity = trace.toKBytes(3);
+        classSpaceCommitted = trace.toKBytes(5);
+        classSpaceReserved = trace.toKBytes(7);
     }
 
     /***********************************/
@@ -1083,11 +1082,15 @@ public class PreUnifiedG1GCParser extends PreUnifiedGCLogParser implements G1GCP
 
     @SuppressWarnings("unused")
     private void g1Pre17040Summary(GCLogTrace trace, String line) {
-        MemoryPoolSummary edenSummary = extractPoolSummary(trace, 1);
-        MemoryPoolSummary heap = extractPoolSummary(trace, 13);
-        SurvivorMemoryPoolSummary survivor = extractSurvivorPoolSummary(trace, 9);
-        forwardReference.addMemorySummary(edenSummary, survivor, heap);
-        record(forwardReference);
+        try {
+            MemoryPoolSummary edenSummary = extractPoolSummary(trace, 1);
+            MemoryPoolSummary heap = extractPoolSummary(trace, 13);
+            SurvivorMemoryPoolSummary survivor = extractSurvivorPoolSummary(trace, 9);
+            forwardReference.addMemorySummary(edenSummary, survivor, heap);
+            record(forwardReference);
+        } catch (Throwable t) {
+            t.printStackTrace();
+        }
     }
 
     /*************************/
@@ -1140,16 +1143,16 @@ public class PreUnifiedG1GCParser extends PreUnifiedGCLogParser implements G1GCP
     }
 
     private MemoryPoolSummary extractPoolSummary(GCLogTrace trace, int offset) {
-        long occupancyBefore = Math.round(toKBytes(trace.getDoubleGroup(offset), trace.getGroup(1 + offset)));
-        long sizeBefore = Math.round(toKBytes(trace.getDoubleGroup(2 + offset), trace.getGroup(3 + offset)));
-        long occupancyAfter = Math.round(toKBytes(trace.getDoubleGroup(4 + offset), trace.getGroup(5 + offset)));
-        long size = Math.round(toKBytes(trace.getDoubleGroup(6 + offset), trace.getGroup(7 + offset)));
+        long occupancyBefore = trace.doubleToKBytes(offset);
+        long sizeBefore = trace.doubleToKBytes(offset + 2);
+        long occupancyAfter = trace.doubleToKBytes(offset + 4);
+        long size = trace.doubleToKBytes(offset + 6);
         return new MemoryPoolSummary(occupancyBefore, sizeBefore, occupancyAfter, size);
     }
 
     private SurvivorMemoryPoolSummary extractSurvivorPoolSummary(GCLogTrace trace, int offset) {
-        long occupancyBefore = Math.round(toKBytes(trace.getDoubleGroup(offset), trace.getGroup(1 + offset)));
-        long occupancyAfter = Math.round(toKBytes(trace.getDoubleGroup(2 + offset), trace.getGroup(3 + offset)));
+        long occupancyBefore = trace.doubleToKBytes(offset);
+        long occupancyAfter = trace.doubleToKBytes(offset + 2);
         return new SurvivorMemoryPoolSummary(occupancyBefore, occupancyAfter);
     }
 
@@ -1207,6 +1210,5 @@ public class PreUnifiedG1GCParser extends PreUnifiedGCLogParser implements G1GCP
             LOGGER.fine("Missed: " + line);
 
         LOGGER.log(Level.FINE, "Missed: {0}", line);
-
     }
 }

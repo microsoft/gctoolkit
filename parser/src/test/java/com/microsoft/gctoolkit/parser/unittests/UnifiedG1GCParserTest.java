@@ -28,7 +28,7 @@ public class UnifiedG1GCParserTest extends ParserTest {
 
     private static final String[] details = {
             "details_reference.log",
-            "jdk11_details.log",
+            "jdk11_details.log.zip"
     };
 
     private static final int[] detailsNumberOfDifferentCollectors = {

@@ -11,12 +11,11 @@ import com.microsoft.gctoolkit.jvm.Diary;
 import com.microsoft.gctoolkit.jvm.JavaVirtualMachine;
 import com.microsoft.gctoolkit.message.DataSourceBus;
 import com.microsoft.gctoolkit.message.JVMEventBus;
-import com.microsoft.gctoolkit.message.DataSourceParser;
+import com.microsoft.gctoolkit.message.DataSourceConsumer;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.ServiceConfigurationError;
 import java.util.ServiceLoader;
 import java.util.Set;
@@ -64,7 +63,7 @@ public class GCToolKit {
     }
 
     private void registerParsers(DataSourceBus bus, Diary diary) {
-        ServiceLoader.load(DataSourceParser.class)
+        ServiceLoader.load(DataSourceConsumer.class)
                 .stream()
                 .map(ServiceLoader.Provider::get)
                 .filter(p->p.accepts(diary))
