@@ -17,8 +17,8 @@ public abstract class PreUnifiedGCLogParser extends GCLogParser {
     private static final Logger LOGGER = Logger.getLogger(PreUnifiedGCLogParser.class.getName());
     private final GCParseRule TIMESTAMP_BLOCK = new GCParseRule("TIMESTAMP_BLOCK", "^" + DATE_TIMESTAMP);
 
-    public PreUnifiedGCLogParser(Diary diary, JVMEventConsumer consumer) {
-        super(diary, consumer);
+    public PreUnifiedGCLogParser(Diary diary) {
+        super(diary);
     }
 
     void advanceClock(String record) {

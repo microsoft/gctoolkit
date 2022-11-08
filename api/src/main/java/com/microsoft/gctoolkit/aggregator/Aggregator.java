@@ -112,9 +112,10 @@ public abstract class Aggregator<A extends Aggregation> {
      * This method consumes a JVMEvent and dispatches it to the
      * {@link #register(Class, Consumer) registered consumer}.
      * @param event an event to be processed
-     * @param <E> the type of JVMEvent
+     * @param < E> the type of JVMEvent
      */
-    public <E extends JVMEvent> void consume(E event) {
+    //@Override
+    public void receive(JVMEvent event) {
         jvmEventDispatcher.dispatch(event);
     }
 

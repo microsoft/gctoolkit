@@ -14,8 +14,8 @@ abstract class UnifiedGCLogParser extends GCLogParser {
     private static final Logger LOGGER = Logger.getLogger(UnifiedGCLogParser.class.getName());
     private static final boolean DEBUG = Boolean.getBoolean("microsoft.debug");
 
-    UnifiedGCLogParser(Diary diary, JVMEventConsumer consumer) {
-        super(diary, consumer);
+    UnifiedGCLogParser(Diary diary) {
+        super(diary);
     }
 
     void advanceClock(String record) {

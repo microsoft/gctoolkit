@@ -7,6 +7,8 @@ import com.microsoft.gctoolkit.event.jvm.ApplicationStoppedTime;
 import com.microsoft.gctoolkit.event.jvm.JVMEvent;
 import com.microsoft.gctoolkit.event.jvm.JVMTermination;
 import com.microsoft.gctoolkit.jvm.Diary;
+import com.microsoft.gctoolkit.message.Channels;
+import com.microsoft.gctoolkit.message.JVMEventBus;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
 
 import java.util.ArrayList;
@@ -23,8 +25,8 @@ public class JVMEventParser extends PreUnifiedGCLogParser implements JVMPatterns
     private boolean lastEventWasGC = false;
     private double gcPauseTime = GCPAUSE_TIME_NOT_SET;
 
-    public JVMEventParser(Diary diary, JVMEventConsumer consumer) {
-        super(diary, consumer);
+    public JVMEventParser(Diary diary) {
+        super(diary);
     }
 
     public String getName() {
@@ -43,22 +45,23 @@ public class JVMEventParser extends PreUnifiedGCLogParser implements JVMPatterns
         GCLogTrace trace = null;
 
         try {
+            //todo: unified safepointing here???
             if ((trace = APPLICATION_STOP_TIME.parse(line)) != null) {
                 if (lastEventWasGC) {
                     // can estimate TTSP
                     double duration = trace.getDoubleGroup(3);
-                    consumer.record(new ApplicationStoppedTime(trace.getDateTimeStamp(), duration, duration - gcPauseTime, lastEventWasGC));
+                    consumer.publish(new ApplicationStoppedTime(trace.getDateTimeStamp(), duration, duration - gcPauseTime, lastEventWasGC));
                     lastEventWasGC = false;
                     gcPauseTime = GCPAUSE_TIME_NOT_SET;
                 } else {
-                    consumer.record(new ApplicationStoppedTime(trace.getDateTimeStamp(), trace.getDoubleGroup(3), lastEventWasGC));
+                    consumer.publish(new ApplicationStoppedTime(trace.getDateTimeStamp(), trace.getDoubleGroup(3), lastEventWasGC));
                 }
             } else if ((trace = APPLICATION_STOP_TIME_WITH_STOPPING_TIME.parse(line)) != null) {
-                consumer.record(new ApplicationStoppedTime(trace.getDateTimeStamp(), trace.getDoubleGroup(3), trace.getDoubleGroup(4), lastEventWasGC));
+                consumer.publish(new ApplicationStoppedTime(trace.getDateTimeStamp(), trace.getDoubleGroup(3), trace.getDoubleGroup(4), lastEventWasGC));
                 lastEventWasGC = false;
                 gcPauseTime = GCPAUSE_TIME_NOT_SET;
             } else if ((trace = APPLICATION_TIME.parse(line)) != null) {
-                consumer.record(new ApplicationConcurrentTime(trace.getDateTimeStamp(), trace.getDoubleGroup(3)));
+                consumer.publish(new ApplicationConcurrentTime(trace.getDateTimeStamp(), trace.getDoubleGroup(3)));
                 lastEventWasGC = false;
             } else if ((trace = SIMPLE_APPLICATION_STOP_TIME.parse(line)) != null) {
                 safePoints.add(new StoppedTime(trace.getDoubleGroup(1), safePoints.isEmpty()));
@@ -79,7 +82,7 @@ public class JVMEventParser extends PreUnifiedGCLogParser implements JVMPatterns
                 // at issue is if logs have been concatenated then we're not at the end and we
                 // shouldn't release the
                 drainSafePoints();
-                consumer.record(new JVMTermination(getClock(),diary.getTimeOfFirstEvent()));
+                consumer.publish(new JVMTermination(getClock(),diary.getTimeOfFirstEvent()));
             } else if (getClock().getTimeStamp() > timeStamp.getTimeStamp()) {
                 drainSafePoints();
                 timeStamp = getClock();
@@ -115,7 +118,7 @@ public class JVMEventParser extends PreUnifiedGCLogParser implements JVMPatterns
         double interval = (getClock().getTimeStamp() - (timeStamp.getTimeStamp())) / (safePoints.size() + 1);
         double timeValue = getClock().getTimeStamp() + interval;
         for (SafePointData safePointData : safePoints) {
-            consumer.record(safePointData.complete(new DateTimeStamp(timeValue)));
+            consumer.publish(safePointData.complete(new DateTimeStamp(timeValue)));
             timeValue += interval;
         }
         safePoints.clear();
@@ -151,5 +154,15 @@ public class JVMEventParser extends PreUnifiedGCLogParser implements JVMPatterns
         JVMEvent complete(DateTimeStamp dateTimeStamp) {
             return new ApplicationConcurrentTime(dateTimeStamp, duration);
         }
+    }
+
+    @Override
+    public boolean accepts(Diary diary) {
+        return (diary.isTLABData() || diary.isApplicationStoppedTime() || diary.isApplicationRunningTime()) && ! diary.isUnifiedLogging();
+    }
+
+    @Override
+    public void publishTo(JVMEventBus bus) {
+        super.publishTo(bus, Channels.JVM_EVENT_PARSER_OUTBOX.getChannel());
     }
 }

@@ -3,6 +3,7 @@
 package com.microsoft.gctoolkit;
 
 import com.microsoft.gctoolkit.aggregator.Aggregation;
+import com.microsoft.gctoolkit.event.jvm.JVMEvent;
 import com.microsoft.gctoolkit.io.DataSource;
 import com.microsoft.gctoolkit.io.GCLogFile;
 import com.microsoft.gctoolkit.io.RotatingGCLogFile;
@@ -10,17 +11,18 @@ import com.microsoft.gctoolkit.io.SingleGCLogFile;
 import com.microsoft.gctoolkit.jvm.Diary;
 import com.microsoft.gctoolkit.jvm.JavaVirtualMachine;
 import com.microsoft.gctoolkit.message.DataSourceBus;
+import com.microsoft.gctoolkit.message.DataSourceParser;
 import com.microsoft.gctoolkit.message.JVMEventBus;
-import com.microsoft.gctoolkit.message.DataSourceConsumer;
 
 import java.io.IOException;
-import java.lang.reflect.Method;
 import java.util.HashSet;
+import java.util.List;
 import java.util.ServiceConfigurationError;
 import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 /**
  * The primary API for analyzing Java Garbage Collection (GC) logs.
@@ -41,10 +43,10 @@ public class GCToolKit {
                 .map(ServiceLoader.Provider::get)
                 .filter(jvm -> jvm.accepts(logFile))
                 .findFirst()
-                .orElseThrow(() -> new ServiceConfigurationError("No suitable JavaVirtualMachine implementation found"));
+                .orElseThrow(() -> new ServiceConfigurationError("Internal Error - No suitable JavaVirtualMachine implementation found"));
     }
 
-    private DataSourceBus setupDataSourceBus() {
+    private DataSourceBus loadDataSourceBus() {
         return ServiceLoader.load(DataSourceBus.class)
                 .stream()
                 .map(ServiceLoader.Provider::get)
@@ -53,7 +55,7 @@ public class GCToolKit {
 
     }
 
-    private JVMEventBus setupJVMEventBus() {
+    private JVMEventBus loadJVMEventBus() {
         return ServiceLoader.load(JVMEventBus.class)
                 .stream()
                 .map(ServiceLoader.Provider::get)
@@ -62,13 +64,16 @@ public class GCToolKit {
 
     }
 
-    private void registerParsers(DataSourceBus bus, Diary diary) {
-        ServiceLoader.load(DataSourceConsumer.class)
+    private void loadDataSourceParsers(DataSourceBus dataBus, JVMEventBus bus, Diary diary) throws IOException {
+        List<DataSourceParser> parsers = ServiceLoader.load(DataSourceParser.class)
                 .stream()
                 .map(ServiceLoader.Provider::get)
-                .filter(p->p.accepts(diary))
-                .forEach(parser->bus.register(parser));
-
+                .filter(consumer->consumer.accepts(diary))
+                .collect(Collectors.toList());
+        for (DataSourceParser parser : parsers) {
+            dataBus.register(parser);
+            parser.publishTo(bus);
+        }
     }
 
     private final Set<Class<? extends Aggregation>> registeredAggregations;
@@ -133,26 +138,27 @@ public class GCToolKit {
      * that were {@link #registerAggregation(Class) registered}, if appropriate for
      * the GC log file.
      *
-     * @param logFile The log to analyze, typically a
+     * @param dataSource The log to analyze, typically a
      *                   {@link SingleGCLogFile} or
      *                   {@link RotatingGCLogFile}.
      * @return a representation of the state of the Java Virtual Machine resulting
      * from the analysis of the GC log file.
      */
-    public JavaVirtualMachine analyze(GCLogFile logFile) throws IOException  {
-        //todo: revert this to DataSource to account for non-GC log data sources once we have a use case (maybe JFR but JFR timers drift badly ATM)
-        //setup message bus
-        //DataSourceBus dataSourceBus = setupDataSourceBus();
-        //JVMEventBus eventBus = setupJVMEventBus();
-        //registerParsers(dataSourceBus,logFile.diary());
-        JavaVirtualMachine javaVirtualMachine = loadJavaVirtualMachine(logFile);
-        //todo: do we need reflection????
+    public JavaVirtualMachine analyze(DataSource<?> dataSource) throws IOException  {
+        GCLogFile logFile = (GCLogFile)dataSource;
+        JVMEventBus eventBus = loadJVMEventBus();
+        DataSourceBus dataSourceBus = loadDataSourceBus();
+        loadDataSourceParsers(dataSourceBus, eventBus, logFile.diary());
+        loadAggregationsFromServiceLoader();
+        JavaVirtualMachine javaVirtualMachine = null;
         try {
-            Method analyze = javaVirtualMachine.getClass().getMethod("analyze", Set.class, DataSource.class);
-            analyze.invoke(javaVirtualMachine, this.registeredAggregations, logFile);
-        } catch (ReflectiveOperationException e) {
-            LOGGER.log(Level.SEVERE, "Cannot invoke analyze method", e);
+            javaVirtualMachine = loadJavaVirtualMachine(logFile);
+            javaVirtualMachine.analyze(this.registeredAggregations, eventBus, dataSourceBus, logFile);
+            // close all resources
+        } catch(Throwable t) {
+            LOGGER.log(Level.SEVERE, "Internal Error: Cannot invoke analyze method", t);
         }
         return javaVirtualMachine;
     }
+
 }

@@ -23,6 +23,8 @@ import com.microsoft.gctoolkit.event.generational.YoungGC;
 import com.microsoft.gctoolkit.event.jvm.JVMEvent;
 import com.microsoft.gctoolkit.event.jvm.JVMTermination;
 import com.microsoft.gctoolkit.jvm.Diary;
+import com.microsoft.gctoolkit.message.Channels;
+import com.microsoft.gctoolkit.message.JVMEventBus;
 import com.microsoft.gctoolkit.parser.collection.MRUQueue;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
 
@@ -267,8 +269,8 @@ public class GenerationalHeapParser extends PreUnifiedGCLogParser implements Sim
         parseRules.put(new GCParseRule("END_OF_DATA_SENTINEL", END_OF_DATA_SENTINEL), this::endOfFile);
     }
 
-    public GenerationalHeapParser(Diary diary, JVMEventConsumer consumer) {
-        super(diary, consumer);
+    public GenerationalHeapParser(Diary diary) {
+        super(diary);
     }
 
     @Override
@@ -2016,7 +2018,7 @@ public class GenerationalHeapParser extends PreUnifiedGCLogParser implements Sim
     }
 
     public void record(JVMEvent event, boolean clear) {
-        consumer.record(event);
+        consumer.publish(event);
         if (clear) {
             garbageCollectionTypeForwardReference = null;
             gcCauseForwardReference = GCCause.UNKNOWN_GCCAUSE;
@@ -2038,5 +2040,15 @@ public class GenerationalHeapParser extends PreUnifiedGCLogParser implements Sim
 
     public void record(JVMEvent event) {
         this.record(event, true);
+    }
+
+    @Override
+    public boolean accepts(Diary diary) {
+        return (diary.isGenerational() || diary.isCMS() ) && ! diary.isUnifiedLogging();
+    }
+
+    @Override
+    public void publishTo(JVMEventBus bus) {
+        super.publishTo(bus, Channels.GENERATIONAL_HEAP_PARSER_OUTBOX.getChannel());
     }
 }

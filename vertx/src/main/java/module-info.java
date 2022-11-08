@@ -14,8 +14,7 @@ module com.microsoft.gctoolkit.vertx {
     exports com.microsoft.gctoolkit.vertx.jvm to
             com.microsoft.gctoolkit.api;
 
-    provides com.microsoft.gctoolkit.jvm.JavaVirtualMachine with
-            com.microsoft.gctoolkit.vertx.jvm.PreUnifiedJavaVirtualMachine,
-            com.microsoft.gctoolkit.vertx.jvm.UnifiedJavaVirtualMachine;
+    provides com.microsoft.gctoolkit.message.JVMEventBus with com.microsoft.gctoolkit.vertx.JVMEventSource;
+    provides com.microsoft.gctoolkit.message.DataSourceBus with com.microsoft.gctoolkit.vertx.GCToolkitVertx;
 
 }

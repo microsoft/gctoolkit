@@ -6,6 +6,7 @@ import com.microsoft.gctoolkit.aggregator.Aggregation;
 import com.microsoft.gctoolkit.aggregator.Aggregator;
 import com.microsoft.gctoolkit.event.jvm.JVMEvent;
 import com.microsoft.gctoolkit.event.jvm.JVMTermination;
+import com.microsoft.gctoolkit.parser.JVMEventConsumer;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
 import com.microsoft.gctoolkit.vertx.internal.util.concurrent.StartingGun;
 import io.vertx.core.AbstractVerticle;
@@ -17,7 +18,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class AggregatorVerticle extends AbstractVerticle {
+public class AggregatorVerticle extends AbstractVerticle implements JVMEventConsumer {
 
     private static class AggregatorWrapper extends Aggregator<Aggregation> {
 
@@ -34,8 +35,8 @@ public class AggregatorVerticle extends AbstractVerticle {
         }
 
         @Override
-        public <E extends JVMEvent> void consume(E event) {
-            proxy.consume(event);
+        public void receive(JVMEvent event) {
+            proxy.receive(event);
             if (isDone()) {
                 if (completionHandler != null) completionHandler.run();
             }
@@ -102,7 +103,7 @@ public class AggregatorVerticle extends AbstractVerticle {
     public void record(JVMEvent event) {
         aggregators.forEach(aggregator -> {
                     try {
-                        aggregator.consume(event);
+                        aggregator.receive(event);
                     } catch (Exception e) {
                         LOGGER.log(Level.WARNING, "Error in aggregator", e);
                     }

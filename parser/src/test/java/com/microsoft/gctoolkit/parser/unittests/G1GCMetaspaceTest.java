@@ -16,9 +16,6 @@ public class G1GCMetaspaceTest extends ParserTest {
     @Test
     public void countMetaspaceRecordsTest() {
         int i = 0;
-        System.out.println("==========> countMetaspaceRecordsTest <=============");
-        System.out.println(Path.of("."));
-        System.out.println();
         for (String name : details) {
             try {
                 Path path = new TestLogFile("g1gc/details/" + name).getFile().toPath();

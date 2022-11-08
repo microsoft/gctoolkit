@@ -13,6 +13,8 @@ import com.microsoft.gctoolkit.event.g1gc.G1GCEvent;
 import com.microsoft.gctoolkit.event.g1gc.G1GCPauseEvent;
 import com.microsoft.gctoolkit.event.jvm.JVMTermination;
 import com.microsoft.gctoolkit.jvm.Diary;
+import com.microsoft.gctoolkit.message.Channels;
+import com.microsoft.gctoolkit.message.JVMEventBus;
 import com.microsoft.gctoolkit.parser.collection.RuleSet;
 import com.microsoft.gctoolkit.parser.jvm.Decorators;
 import com.microsoft.gctoolkit.parser.unified.UnifiedG1GCPatterns;
@@ -150,8 +152,8 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
         parseRules.put(RESIZE_TLAB, this::noop);
     }
 
-    public UnifiedG1GCParser(Diary diary, JVMEventConsumer consumer) {
-        super(diary, consumer);
+    public UnifiedG1GCParser(Diary diary) {
+        super(diary);
     }
 
     public String getName() {
@@ -222,7 +224,7 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
     // todo: need to drain the queues before terminating...
     // Just in case there isn't a JVM termination event in the log.
     public void endOfFile(GCLogTrace trace, String line) {
-        consumer.record(new JVMTermination((jvmTerminationEventTime.getTimeStamp() < 0.0d)
+        consumer.publish(new JVMTermination((jvmTerminationEventTime.getTimeStamp() < 0.0d)
                 ? getClock() : jvmTerminationEventTime,diary.getTimeOfFirstEvent()));
     }
 
@@ -668,9 +670,9 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
         if ( event == null) return;
 
         if ( forwardReference.getGcType() != GarbageCollectionTypes.G1GCConcurrentUndoCycle) {
-            consumer.record(event);
+            consumer.publish(event);
             concurrentPhaseActive = false;
-            eventQueue.stream().forEach(consumer::record);
+            eventQueue.stream().forEach(consumer::publish);
             eventQueue.clear();
         } else {
             eventQueue.add(event);
@@ -679,8 +681,8 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
 
     private void recordUndoCycle(G1ConcurrentUndoCycle cycle) {
         concurrentPhaseActive = false;
-        consumer.record(cycle);
-        eventQueue.stream().forEach(consumer::record);
+        consumer.publish(cycle);
+        eventQueue.stream().forEach(consumer::publish);
         eventQueue.clear();
     }
 
@@ -694,7 +696,7 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
         if ( concurrentPhaseActive)
             eventQueue.add(event);
         else {
-            consumer.record(event);
+            consumer.publish(event);
         }
     }
 
@@ -712,7 +714,7 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
             eventQueue.add(event);
             removeForwardReference(forwardReference);
         } else {
-            consumer.record(event);
+            consumer.publish(event);
             if ( ! forwardReference.isConcurrentCycle())
                 removeForwardReference(forwardReference);
         }
@@ -757,5 +759,15 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
                 LOGGER.fine("Missed: " + line);
             LOGGER.log(Level.FINE, "Missed: {0}", line);
         }
+    }
+
+    @Override
+    public boolean accepts(Diary diary) {
+        return (diary.isGenerational() || diary.isCMS() ) && diary.isUnifiedLogging();
+    }
+
+    @Override
+    public void publishTo(JVMEventBus bus) {
+        super.publishTo(bus, Channels.G1GC_PARSER_OUTBOX.getChannel());
     }
 }

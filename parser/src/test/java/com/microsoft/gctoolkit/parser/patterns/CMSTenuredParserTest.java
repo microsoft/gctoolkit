@@ -32,8 +32,8 @@ public class CMSTenuredParserTest extends ParserTest {
     public void setUp() {
 
         jvmEvents = new ArrayList<>();
-
-        parser = new CMSTenuredPoolParser(new PreUnifiedDiarizer().getDiary(), event -> jvmEvents.add(event));
+        //parser = new CMSTenuredPoolParser(new PreUnifiedDiarizer().getDiary(), event -> jvmEvents.add(event));
+        parser = new CMSTenuredPoolParser(new PreUnifiedDiarizer().getDiary());
     }
 
     @Test

@@ -1,14 +1,14 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
-package com.microsoft.gctoolkit.vertx.jvm;
+package com.microsoft.gctoolkit.jvm;
 
 import com.microsoft.gctoolkit.aggregator.Aggregation;
 import com.microsoft.gctoolkit.io.DataSource;
 import com.microsoft.gctoolkit.io.GCLogFile;
-import com.microsoft.gctoolkit.jvm.Diary;
-import com.microsoft.gctoolkit.jvm.JavaVirtualMachine;
+import com.microsoft.gctoolkit.message.Channels;
+import com.microsoft.gctoolkit.message.DataSourceBus;
+import com.microsoft.gctoolkit.message.JVMEventBus;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
-import com.microsoft.gctoolkit.vertx.GCToolkitVertx;
 
 import java.io.IOException;
 import java.util.Map;
@@ -115,30 +115,31 @@ public abstract class AbstractJavaVirtualMachine implements JavaVirtualMachine {
         return Optional.ofNullable((T) aggregatedData.get(aggregationClass));
     }
 
-    abstract GCToolkitVertxParameters getParameters(Set<Class<? extends Aggregation>> registeredAggregations, Diary diary);
-
-    // Invoked reflectively from GCToolKit
-    public void analyze(Set<Class<? extends Aggregation>> registeredAggregations, DataSource<?> dataSource) {
+    @Override
+    public void analyze(Set<Class<? extends Aggregation>> registeredAggregations, JVMEventBus eventBus, DataSourceBus dataSourceBus, DataSource<String> dataSource) {
 
         try {
             final GCLogFile gcLogFile = (GCLogFile) dataSource;
             this.diary = gcLogFile.diary();
+            //register aggregations with JVMEventBus
 
-            GCToolkitVertxParameters GCToolkitVertxParameters = getParameters(registeredAggregations, gcLogFile.diary());
+            dataSourceBus.publish(Channels.PARSER_INBOX, dataSource.stream());
 
-            this.timeOfLastEvent = GCToolkitVertx.aggregateDataSource(
-                    dataSource,
-                    GCToolkitVertxParameters.logFileParsers(),
-                    GCToolkitVertxParameters.aggregatorVerticles(),
-                    GCToolkitVertxParameters.mailBox()
-            );
+//            GCToolkitVertxParameters GCToolkitVertxParameters = getParameters(registeredAggregations, gcLogFile.diary());
 
-            GCToolkitVertxParameters.aggregatorVerticles().stream()
-                    .flatMap(aggregatorVerticle -> aggregatorVerticle.aggregators().stream())
-                    .forEach(aggregator -> {
-                        Aggregation aggregation = aggregator.aggregation();
-                        this.aggregatedData.put(aggregation.getClass(), aggregation);
-                    });
+//            this.timeOfLastEvent = GCToolkitVertx.aggregateDataSource(
+//                    dataSource,
+//                    GCToolkitVertxParameters.logFileParsers(),
+//                    GCToolkitVertxParameters.aggregatorVerticles(),
+//                    GCToolkitVertxParameters.mailBox()
+//            );
+//
+//            GCToolkitVertxParameters.aggregatorVerticles().stream()
+//                    .flatMap(aggregatorVerticle -> aggregatorVerticle.aggregators().stream())
+//                    .forEach(aggregator -> {
+//                        Aggregation aggregation = aggregator.aggregation();
+//                        this.aggregatedData.put(aggregation.getClass(), aggregation);
+//                    });
 
         } catch (IOException | ClassCastException e ) {
             LOGGER.log(Level.WARNING, e.getMessage(), e);

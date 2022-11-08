@@ -5,6 +5,8 @@ package com.microsoft.gctoolkit.parser;
 import com.microsoft.gctoolkit.event.jvm.JVMTermination;
 import com.microsoft.gctoolkit.event.jvm.SurvivorRecord;
 import com.microsoft.gctoolkit.jvm.Diary;
+import com.microsoft.gctoolkit.message.Channels;
+import com.microsoft.gctoolkit.message.JVMEventBus;
 import com.microsoft.gctoolkit.parser.jvm.Decorators;
 
 import static com.microsoft.gctoolkit.parser.unified.UnifiedPatterns.CPU_BREAKOUT;
@@ -26,8 +28,8 @@ public class UnifiedSurvivorMemoryPoolParser extends UnifiedGCLogParser implemen
     private SurvivorRecord forwardReference = null;
     private boolean ageDataCollected = false;
 
-    public UnifiedSurvivorMemoryPoolParser(Diary diary, JVMEventConsumer consumer) {
-        super(diary, consumer);
+    public UnifiedSurvivorMemoryPoolParser(Diary diary) {
+        super(diary);
     }
 
     public String getName() {
@@ -47,18 +49,28 @@ public class UnifiedSurvivorMemoryPoolParser extends UnifiedGCLogParser implemen
             ageDataCollected = true;
         } else if (entry.equals(END_OF_DATA_SENTINEL) || (JVM_EXIT.parse(entry) != null)) {
             if (forwardReference != null)
-                consumer.record(forwardReference);
-            consumer.record(new JVMTermination(getClock(),diary.getTimeOfFirstEvent()));
+                consumer.publish(forwardReference);
+            consumer.publish(new JVMTermination(getClock(),diary.getTimeOfFirstEvent()));
         } else if (forwardReference != null && ageDataCollected) {
-            consumer.record(forwardReference);
+            consumer.publish(forwardReference);
             forwardReference = null;
             ageDataCollected = false;
         } else if (CPU_BREAKOUT.parse(entry) != null) {
             if (forwardReference != null) {
-                consumer.record(forwardReference);
+                consumer.publish(forwardReference);
                 forwardReference = null;
                 ageDataCollected = false;
             }
         }
+    }
+
+    @Override
+    public boolean accepts(Diary diary) {
+        return (diary.isTLABData() || diary.isApplicationStoppedTime() || diary.isApplicationRunningTime()) && diary.isUnifiedLogging();
+    }
+
+    @Override
+    public void publishTo(JVMEventBus bus) {
+        super.publishTo(bus, Channels.SURVIVOR_MEMORY_POOL_PARSER_OUTBOX.getChannel());
     }
 }

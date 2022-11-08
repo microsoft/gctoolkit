@@ -112,7 +112,8 @@ public class GarbageCollectionEventSourceTest {
         GCLogConsumer consumer = new GCLogConsumer();
         vertx.deployVerticle(consumer, asyncResult -> consumerStarted.countDown());
 
-        JVMEventSource garbageCollectionLogSource = new JVMEventSource(TEST_CHANNEL);
+        //todo: this just completely broke this test :-/ JVMEventSource garbageCollectionLogSource = new JVMEventSource(TEST_CHANNEL);
+        JVMEventSource garbageCollectionLogSource = new JVMEventSource();
         vertx.deployVerticle(garbageCollectionLogSource, asyncResult -> consumerStarted.countDown());
 
         try {

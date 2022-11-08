@@ -11,6 +11,8 @@ import com.microsoft.gctoolkit.event.zgc.ZGCCycle;
 import com.microsoft.gctoolkit.event.zgc.ZGCMemoryPoolSummary;
 import com.microsoft.gctoolkit.event.zgc.ZGCMetaspaceSummary;
 import com.microsoft.gctoolkit.jvm.Diary;
+import com.microsoft.gctoolkit.message.Channels;
+import com.microsoft.gctoolkit.message.JVMEventBus;
 import com.microsoft.gctoolkit.parser.collection.MRUQueue;
 import com.microsoft.gctoolkit.parser.unified.ZGCPatterns;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
@@ -68,8 +70,10 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
         parseRules.put(MEMORY_SUMMARY, this::memorySummary);
         parseRules.put(END_OF_FILE, this::endOfFile);
     }
-    public ZGCParser(Diary diary, JVMEventConsumer consumer) {
-        super(diary, consumer);
+
+
+    public ZGCParser(Diary diary) {
+        super(diary);
     }
 
     @Override
@@ -274,7 +278,7 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
     }
 
     public void record(JVMEvent event) {
-        consumer.record(event);
+        consumer.publish(event);
         forwardReference = null;
     }
 
@@ -473,5 +477,15 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
         public void setMMU(double[] mmu) {
             this.mmu = mmu;
         }
+    }
+
+    @Override
+    public boolean accepts(Diary diary) {
+        return diary.isZGC();
+    }
+
+    @Override
+    public void publishTo(JVMEventBus bus) {
+        super.publishTo(bus, Channels.ZGC_PARSER_OUTBOX.getChannel());
     }
 }

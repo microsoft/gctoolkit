@@ -26,6 +26,7 @@ import static java.util.ServiceLoader.load;
 public abstract class GCLogFile extends FileDataSource<String> {
 
     private static final Logger LOGGER = Logger.getLogger(FileDataSource.class.getName());
+    public final static String CHANNEL = "GCLOG";
 
     /**
      * The value used for the implementation of {@link #endOfData()}.

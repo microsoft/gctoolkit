@@ -13,6 +13,8 @@ import com.microsoft.gctoolkit.event.generational.ConcurrentSweep;
 import com.microsoft.gctoolkit.event.generational.InitialMark;
 import com.microsoft.gctoolkit.event.jvm.JVMTermination;
 import com.microsoft.gctoolkit.jvm.Diary;
+import com.microsoft.gctoolkit.message.Channels;
+import com.microsoft.gctoolkit.message.JVMEventBus;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
 
 import java.util.logging.Logger;
@@ -23,8 +25,8 @@ public class CMSTenuredPoolParser extends PreUnifiedGCLogParser implements Simpl
     private DateTimeStamp startOfPhase = null;
     private GCParseRule EndOfFile = new GCParseRule("END_OF_DATA_SENTINEL", END_OF_DATA_SENTINEL);
 
-    public CMSTenuredPoolParser(Diary diary, JVMEventConsumer eventConsumer) {
-        super(diary, eventConsumer);
+    public CMSTenuredPoolParser(Diary diary) {
+        super(diary);
     }
 
     public String getName() {
@@ -54,7 +56,7 @@ public class CMSTenuredPoolParser extends PreUnifiedGCLogParser implements Simpl
         else if ((trace = SPLIT_REMARK.parse(line)) != null)
             startOfPhase = getClock();
         else if ((trace = EndOfFile.parse(line)) != null) {
-            consumer.record(new JVMTermination(getClock(),diary.getTimeOfFirstEvent()));
+            consumer.publish(new JVMTermination(getClock(), diary.getTimeOfFirstEvent()));
         }
 
     }
@@ -69,7 +71,7 @@ public class CMSTenuredPoolParser extends PreUnifiedGCLogParser implements Simpl
         MemoryPoolSummary tenured = trace.getOccupancyBeforeAfterWithMemoryPoolSizeSummary(4);
         MemoryPoolSummary heap = trace.getOccupancyWithMemoryPoolSizeSummary(8);
         initialMark.add(heap.minus(tenured), tenured, heap);
-        consumer.record(initialMark);
+        consumer.publish(initialMark);
     }
 
     //12.987: [CMS-concurrent-mark-start]
@@ -84,7 +86,7 @@ public class CMSTenuredPoolParser extends PreUnifiedGCLogParser implements Simpl
 
     private void endConcurrentPrecleanWithReferenceProcessing(GCLogTrace trace) {
         try {
-            consumer.record(new ConcurrentPreClean(startOfPhase, trace.getDoubleGroup(14) - startOfPhase.getTimeStamp(), trace.getDoubleGroup(16), trace.getDoubleGroup(17)));
+            consumer.publish(new ConcurrentPreClean(startOfPhase, trace.getDoubleGroup(14) - startOfPhase.getTimeStamp(), trace.getDoubleGroup(16), trace.getDoubleGroup(17)));
         } catch (Throwable t) {
             LOG.warning("concurrent phase choked on " + trace.toString());
         }
@@ -96,15 +98,15 @@ public class CMSTenuredPoolParser extends PreUnifiedGCLogParser implements Simpl
         double wallTime = trace.getDoubleGroup(5);
         double duration = timeStamp.getTimeStamp() - startOfPhase.getTimeStamp();
         if ("mark".equals(phase))
-            consumer.record(new ConcurrentMark(startOfPhase, duration, cpuTime, wallTime));
+            consumer.publish(new ConcurrentMark(startOfPhase, duration, cpuTime, wallTime));
         else if ("preclean".equals(phase))
-            consumer.record(new ConcurrentPreClean(startOfPhase, duration, cpuTime, wallTime));
+            consumer.publish(new ConcurrentPreClean(startOfPhase, duration, cpuTime, wallTime));
         else if ("abortable-preclean".equals(phase))
-            consumer.record(new AbortablePreClean(startOfPhase, duration, cpuTime, wallTime, false));
+            consumer.publish(new AbortablePreClean(startOfPhase, duration, cpuTime, wallTime, false));
         else if ("sweep".equals(phase))
-            consumer.record(new ConcurrentSweep(startOfPhase, duration, cpuTime, wallTime));
+            consumer.publish(new ConcurrentSweep(startOfPhase, duration, cpuTime, wallTime));
         else if ("reset".equals(phase))
-            consumer.record(new ConcurrentReset(startOfPhase, duration, cpuTime, wallTime));
+            consumer.publish(new ConcurrentReset(startOfPhase, duration, cpuTime, wallTime));
         else
             LOG.warning("concurrent phase choked on " + trace.toString());
     }
@@ -113,20 +115,20 @@ public class CMSTenuredPoolParser extends PreUnifiedGCLogParser implements Simpl
         try {
             double cpuTime = trace.getDoubleGroup(4);
             double wallClock = trace.getDoubleGroup(5);
-            consumer.record(new AbortablePreClean(startOfPhase, trace.getDateTimeStamp().getTimeStamp() - startOfPhase.getTimeStamp(), cpuTime, wallClock, true));
+            consumer.publish(new AbortablePreClean(startOfPhase, trace.getDateTimeStamp().getTimeStamp() - startOfPhase.getTimeStamp(), cpuTime, wallClock, true));
         } catch (Exception e) {
             LOG.warning("concurrent phase end choked on " + trace);
         }
     }
 
     private void remark(GCLogTrace trace, String line) {
-        consumer.record(extractRemark(trace, line));
+        consumer.publish(extractRemark(trace, line));
     }
 
     private void remarkWithReferenceProcessing(GCLogTrace trace, String line) {
         CMSRemark remark = extractRemark(trace, line);
         remark.addReferenceGCSummary(extractPrintReferenceGC(line));
-        consumer.record(remark);
+        consumer.publish(remark);
     }
 
     private CMSRemark extractRemark(GCLogTrace trace, String line) {
@@ -152,6 +154,16 @@ public class CMSTenuredPoolParser extends PreUnifiedGCLogParser implements Simpl
             LOG.warning("Unable to properly extract data from " + trace);
         }
         return remark;
+    }
+
+    @Override
+    public boolean accepts(Diary diary) {
+        return diary.isCMS() && ! diary.isUnifiedLogging();
+    }
+
+    @Override
+    public void publishTo(JVMEventBus bus) {
+        super.publishTo(bus, Channels.CMS_TENURED_POOL_PARSER_OUTBOX.getChannel());
     }
 }
 

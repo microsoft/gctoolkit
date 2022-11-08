@@ -23,8 +23,8 @@ public class RuntimeAggregator<T extends RuntimeAggregation> extends Aggregator<
     }
 
     @Override
-    public <E extends JVMEvent> void consume(E event) {
+    public void receive(JVMEvent event) {
         process(event);
-        super.consume(event);
+        super.receive(event);
     }
 }

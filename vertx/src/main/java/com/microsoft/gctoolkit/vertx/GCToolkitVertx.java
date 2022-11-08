@@ -5,6 +5,11 @@ package com.microsoft.gctoolkit.vertx;
 import com.microsoft.gctoolkit.event.jvm.JVMEvent;
 import com.microsoft.gctoolkit.event.jvm.JVMTermination;
 import com.microsoft.gctoolkit.io.DataSource;
+import com.microsoft.gctoolkit.message.Channels;
+import com.microsoft.gctoolkit.message.DataSourceBus;
+import com.microsoft.gctoolkit.message.DataSourceParser;
+import com.microsoft.gctoolkit.message.JVMEventBus;
+import com.microsoft.gctoolkit.message.JVMEventListener;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
 import com.microsoft.gctoolkit.vertx.aggregator.AggregatorVerticle;
 import com.microsoft.gctoolkit.vertx.io.JVMEventCodec;
@@ -19,8 +24,9 @@ import java.io.IOException;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Stream;
 
-public class GCToolkitVertx extends AbstractVerticle {
+public class GCToolkitVertx extends AbstractVerticle implements DataSourceBus {
 
     private static final Logger LOGGER = Logger.getLogger(GCToolkitVertx.class.getName());
 
@@ -46,14 +52,16 @@ public class GCToolkitVertx extends AbstractVerticle {
     private final Vertx vertx;
     private DateTimeStamp timeOfLastEvent = new DateTimeStamp(0.0d);
 
+    public GCToolkitVertx() {
+        this("");
+    }
+
     private GCToolkitVertx(String mailBox) {
         disableCaching();
         this.mailBox = mailBox;
         this.vertx = Vertx.vertx();
         vertx.eventBus().registerDefaultCodec(JVMEvent.class, new JVMEventCodec());
     }
-
-    public void shutdown() { vertx.close(); }
 
     /**
      * Parse the data source and feed events to the aggregators.
@@ -75,7 +83,7 @@ public class GCToolkitVertx extends AbstractVerticle {
         });
 
         GCToolkitVertx gcToolkitVertx = new GCToolkitVertx(mailBox);
-        JVMEventSource jvmEventSource = new JVMEventSource(PARSER_INBOX);
+        JVMEventSource jvmEventSource = new JVMEventSource();
         gcToolkitVertx.deployVerticle(jvmEventSource);
         jvmEventSource.awaitDeployment();
 
@@ -90,7 +98,7 @@ public class GCToolkitVertx extends AbstractVerticle {
         jvmEventSource.publishGCDataSource(dataSource);
         aggregatorVerticles.forEach(AggregatorVerticle::awaitCompletion);
 
-        gcToolkitVertx.shutdown();
+        gcToolkitVertx.close();
 
         return gcToolkitVertx.timeOfLastEvent;
     }
@@ -123,6 +131,26 @@ public class GCToolkitVertx extends AbstractVerticle {
         } catch (Throwable t) {
             LOGGER.throwing(this.getClass().getName(), "start", t);
         }
+    }
+
+    @Override
+    public void register(DataSourceParser consumer) {
+
+    }
+
+    @Override
+    public void close() {
+        vertx.close();
+    }
+
+    @Override
+    public void publish(String channel, String payload) {
+
+    }
+
+    @Override
+    public void publish(Channels channel, Stream<String> dataSource) {
+
     }
 
 }

@@ -1,9 +1,10 @@
 package com.microsoft.gctoolkit.message;
 
-public interface DataSourceBus<S> {
+import java.util.stream.Stream;
 
-    void register(DataSourceConsumer parser);
-    void start();
-    void stop();
-    void publish(S data);
+public interface DataSourceBus {
+    void register(DataSourceParser consumer);
+    void close();
+    void publish(String channel, String payload);
+    void publish(Channels channel, Stream<String> dataSource);
 }

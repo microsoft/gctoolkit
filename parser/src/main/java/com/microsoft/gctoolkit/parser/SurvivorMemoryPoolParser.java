@@ -5,6 +5,8 @@ package com.microsoft.gctoolkit.parser;
 import com.microsoft.gctoolkit.event.jvm.JVMTermination;
 import com.microsoft.gctoolkit.event.jvm.SurvivorRecord;
 import com.microsoft.gctoolkit.jvm.Diary;
+import com.microsoft.gctoolkit.message.Channels;
+import com.microsoft.gctoolkit.message.JVMEventBus;
 
 import static com.microsoft.gctoolkit.parser.unified.UnifiedPatterns.JVM_EXIT;
 
@@ -12,8 +14,8 @@ public class SurvivorMemoryPoolParser extends PreUnifiedGCLogParser implements T
 
     private SurvivorRecord forwardReference = null;
 
-    public SurvivorMemoryPoolParser(Diary diary, JVMEventConsumer consumer) {
-        super(diary, consumer);
+    public SurvivorMemoryPoolParser(Diary diary) {
+        super(diary);
     }
 
     public String getName() {
@@ -37,11 +39,21 @@ public class SurvivorMemoryPoolParser extends PreUnifiedGCLogParser implements T
             forwardReference.add(trace.getIntegerGroup(1), trace.getLongGroup(2));
         } else if (entry.equals(END_OF_DATA_SENTINEL) || (JVM_EXIT.parse(entry) != null)) {
             if (forwardReference != null)
-                consumer.record(forwardReference);
-            consumer.record(new JVMTermination(getClock(),diary.getTimeOfFirstEvent()));
+                consumer.publish(forwardReference);
+            consumer.publish(new JVMTermination(getClock(),diary.getTimeOfFirstEvent()));
         } else if (forwardReference != null) {
-            consumer.record(forwardReference);
+            consumer.publish(forwardReference);
             forwardReference = null;
         }
+    }
+
+    @Override
+    public boolean accepts(Diary diary) {
+        return diary.isTenuringDistribution();
+    }
+
+    @Override
+    public void publishTo(JVMEventBus bus) {
+        super.publishTo(bus, Channels.SURVIVOR_MEMORY_POOL_PARSER_OUTBOX.getChannel());
     }
 }

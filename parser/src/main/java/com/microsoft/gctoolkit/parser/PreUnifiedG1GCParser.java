@@ -27,6 +27,8 @@ import com.microsoft.gctoolkit.event.g1gc.G1YoungInitialMark;
 import com.microsoft.gctoolkit.event.jvm.JVMEvent;
 import com.microsoft.gctoolkit.event.jvm.JVMTermination;
 import com.microsoft.gctoolkit.jvm.Diary;
+import com.microsoft.gctoolkit.message.Channels;
+import com.microsoft.gctoolkit.message.JVMEventBus;
 import com.microsoft.gctoolkit.parser.collection.MRUQueue;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
 
@@ -233,8 +235,8 @@ public class PreUnifiedG1GCParser extends PreUnifiedGCLogParser implements G1GCP
         parseRules.put(new GCParseRule("END_OF_DATA_SENTINEL", END_OF_DATA_SENTINEL), this::endOfFile);
     }
 
-    public PreUnifiedG1GCParser(Diary diary, JVMEventConsumer consumer) {
-        super(diary, consumer);
+    public PreUnifiedG1GCParser(Diary diary) {
+        super(diary);
         forwardReference = trap;
     }
 
@@ -267,7 +269,7 @@ public class PreUnifiedG1GCParser extends PreUnifiedGCLogParser implements G1GCP
     }
 
     public void endOfFile(GCLogTrace trace, String line) {
-        consumer.record(new JVMTermination(getClock(),diary.getTimeOfFirstEvent()));
+        consumer.publish(new JVMTermination(getClock(),diary.getTimeOfFirstEvent()));
     }
 
     //18.298: [G1Ergonomics (CSet Construction) add young regions to CSet, eden: 512 regions, survivors: 0 regions, predicted young region time: 7833.33 ms]
@@ -1165,12 +1167,12 @@ public class PreUnifiedG1GCParser extends PreUnifiedGCLogParser implements G1GCP
     private void drainBacklog() throws InterruptedException {
         if (backlog.size() > 0)
             for (JVMEvent event : backlog)
-                consumer.record(event);
+                consumer.publish(event);
     }
 
     public void record(G1GCConcurrentEvent concurrentEvent) {
         try {
-            consumer.record(concurrentEvent);
+            consumer.publish(concurrentEvent);
             drainBacklog();
         } catch (InterruptedException e) {
             LOGGER.log(Level.INFO, e.getMessage(), e);
@@ -1193,7 +1195,7 @@ public class PreUnifiedG1GCParser extends PreUnifiedGCLogParser implements G1GCP
         if ((collection.getCpuSummary() == null) && (diary == null || diary.isPrintGCDetails())) {
             forwardReference = collection;
         } else {
-            consumer.record(collection);
+            consumer.publish(collection);
             forwardReference = trap;
             collectionTypeForwardReference = null;
             referenceGCForwardReferenceSummary = null;
@@ -1210,5 +1212,15 @@ public class PreUnifiedG1GCParser extends PreUnifiedGCLogParser implements G1GCP
             LOGGER.fine("Missed: " + line);
 
         LOGGER.log(Level.FINE, "Missed: {0}", line);
+    }
+
+    @Override
+    public boolean accepts(Diary diary) {
+        return diary.isG1GC() && ! diary.isUnifiedLogging();
+    }
+
+    @Override
+    public void publishTo(JVMEventBus bus) {
+        super.publishTo(bus, Channels.G1GC_PARSER_OUTBOX.getChannel());
     }
 }

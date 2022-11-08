@@ -1,10 +1,10 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
-package com.microsoft.gctoolkit.vertx.jvm;
+package com.microsoft.gctoolkit.jvm;
 
 import com.microsoft.gctoolkit.aggregator.Aggregation;
+import com.microsoft.gctoolkit.io.DataSource;
 import com.microsoft.gctoolkit.io.GCLogFile;
-import com.microsoft.gctoolkit.jvm.Diary;
 
 import java.util.Set;
 import java.util.logging.Logger;
@@ -20,15 +20,18 @@ public class PreUnifiedJavaVirtualMachine extends AbstractJavaVirtualMachine {
 
     private static final Logger LOGGER = Logger.getLogger(PreUnifiedJavaVirtualMachine.class.getName());
 
+    // Safepoint details are in a different log and would be loaded separately pre-unified.
     @Override
-    public boolean accepts(GCLogFile logFile) {
-        return ! logFile.isUnified();
+    public boolean accepts(DataSource logFile) {
+        if ( logFile instanceof GCLogFile)
+            return ! ((GCLogFile)logFile).isUnified();
+        return false;
     }
 
-    @Override
-    GCToolkitVertxParameters getParameters(Set<Class<? extends Aggregation>> registeredAggregations, Diary diary) {
-        return new GCToolkitVertxParametersForPreUnifiedLogs(registeredAggregations, diary);
-    }
+//    @Override
+//    GCToolkitVertxParameters getParameters(Set<Class<? extends Aggregation>> registeredAggregations, Diary diary) {
+//        return new GCToolkitVertxParametersForPreUnifiedLogs(registeredAggregations, diary);
+//    }
 
     @Override
     public boolean isZGC() {

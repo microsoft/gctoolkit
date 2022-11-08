@@ -1,6 +1,9 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+import com.microsoft.gctoolkit.jvm.PreUnifiedJavaVirtualMachine;
+import com.microsoft.gctoolkit.jvm.UnifiedJavaVirtualMachine;
+
 /**
  * Contains the core API for the Microsoft, Java Garbage Collection Toolkit.
  * The toolkit is a GC log parser and a framework for consuming and extracting data from
@@ -39,10 +42,16 @@ module com.microsoft.gctoolkit.api {
     exports com.microsoft.gctoolkit.io;
     exports com.microsoft.gctoolkit.jvm;
     exports com.microsoft.gctoolkit.time;
+    exports com.microsoft.gctoolkit.message;
 
     uses com.microsoft.gctoolkit.aggregator.Aggregation;
     uses com.microsoft.gctoolkit.jvm.JavaVirtualMachine;
     uses com.microsoft.gctoolkit.jvm.Diarizer;
     uses com.microsoft.gctoolkit.message.DataSourceBus;
     uses com.microsoft.gctoolkit.message.JVMEventBus;
+    uses com.microsoft.gctoolkit.message.DataSourceParser;
+
+    provides com.microsoft.gctoolkit.jvm.JavaVirtualMachine with
+            PreUnifiedJavaVirtualMachine,
+            UnifiedJavaVirtualMachine;
 }

@@ -11,6 +11,7 @@ import com.microsoft.gctoolkit.io.GCLogFile;
 import com.microsoft.gctoolkit.io.RotatingGCLogFile;
 import com.microsoft.gctoolkit.io.SingleGCLogFile;
 import com.microsoft.gctoolkit.jvm.Diarizer;
+import com.microsoft.gctoolkit.message.JVMEventListener;
 import com.microsoft.gctoolkit.parser.GCLogParser;
 import com.microsoft.gctoolkit.parser.GenerationalHeapParser;
 import com.microsoft.gctoolkit.parser.JVMEventConsumer;
@@ -117,7 +118,7 @@ public abstract class ParserTest {
         TestResults testResults = new TestResults();
         GCLogFile logfile = loadLogFile(path, true);
         Diarizer jvmConfiguration = getJVMConfiguration(logfile);
-        GenerationalHeapParser generationalHeapParser = new GenerationalHeapParser(jvmConfiguration.getDiary(), testResults);
+        GenerationalHeapParser generationalHeapParser = new GenerationalHeapParser(jvmConfiguration.getDiary());
         logfile.stream().map(String::trim).forEach(generationalHeapParser::receive);
         return testResults;
     }
@@ -126,7 +127,7 @@ public abstract class ParserTest {
         TestResults testResults = new TestResults();
         GCLogFile logfile = loadLogFile(path, false);
         Diarizer jvmConfiguration = getJVMConfiguration(logfile);
-        GCLogParser generationalHeapParser = (jvmConfiguration.getDiary().isUnifiedLogging()) ? new UnifiedGenerationalParser(jvmConfiguration.getDiary(), testResults) : new GenerationalHeapParser(jvmConfiguration.getDiary(), testResults);
+        GCLogParser generationalHeapParser = (jvmConfiguration.getDiary().isUnifiedLogging()) ? new UnifiedGenerationalParser(jvmConfiguration.getDiary()) : new GenerationalHeapParser(jvmConfiguration.getDiary());
         logfile.stream().map(String::trim).forEach(generationalHeapParser::receive);
         return testResults;
     }
@@ -135,7 +136,7 @@ public abstract class ParserTest {
         TestResults testResults = new TestResults();
         SingleGCLogFile logfile = new SingleGCLogFile(path);
         UnifiedDiarizer unifiedJVMConfiguration = new UnifiedDiarizer();
-        UnifiedG1GCParser parser = new UnifiedG1GCParser(unifiedJVMConfiguration.getDiary(), testResults);
+        UnifiedG1GCParser parser = new UnifiedG1GCParser(unifiedJVMConfiguration.getDiary());
         logfile.stream().map(String::trim).forEach(parser::receive);
         return testResults;
     }
@@ -144,7 +145,7 @@ public abstract class ParserTest {
         TestResults testResults = new TestResults();
         GCLogFile logfile = loadLogFile(path, true);
         Diarizer jvmConfiguration = getJVMConfiguration(logfile);
-        PreUnifiedG1GCParser parser = new PreUnifiedG1GCParser(jvmConfiguration.getDiary(), testResults);
+        PreUnifiedG1GCParser parser = new PreUnifiedG1GCParser(jvmConfiguration.getDiary());
         logfile.stream().map(String::trim).forEach(parser::receive);
         return testResults;
     }
@@ -153,7 +154,7 @@ public abstract class ParserTest {
         TestResults testResults = new TestResults();
         GCLogFile logfile = loadLogFile(path, false);
         Diarizer jvmConfiguration = getJVMConfiguration(logfile);
-        PreUnifiedG1GCParser parser = new PreUnifiedG1GCParser(jvmConfiguration.getDiary(), testResults);
+        PreUnifiedG1GCParser parser = new PreUnifiedG1GCParser(jvmConfiguration.getDiary());
         logfile.stream().map(String::trim).forEach(parser::receive);
         return testResults;
     }
@@ -161,7 +162,7 @@ public abstract class ParserTest {
     /**
      * Setups an array of counts that is indexed by the type of GC event.
      */
-    class TestResults implements JVMEventConsumer {
+    class TestResults implements JVMEventListener {
 
         private final int[] counts = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 , 0, 0, 0, 0, 0};
         private int metaSpaceRecordCount = 0;
@@ -187,7 +188,7 @@ public abstract class ParserTest {
          * @param event
          */
         @Override
-        public void record(JVMEvent event) {
+        public void receive(JVMEvent event) {
             if (!(event instanceof JVMTermination)) {
                 GCEvent gcEvent = (GCEvent) event;
                 int index = collectorNameMapping.get(gcEvent.getGarbageCollectionType());

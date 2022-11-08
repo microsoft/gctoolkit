@@ -3,6 +3,9 @@
 package com.microsoft.gctoolkit.vertx.jvm;
 
 import com.microsoft.gctoolkit.event.jvm.JVMEvent;
+import com.microsoft.gctoolkit.jvm.Diary;
+import com.microsoft.gctoolkit.message.DataSourceParser;
+import com.microsoft.gctoolkit.message.JVMEventBus;
 import com.microsoft.gctoolkit.parser.GCLogParser;
 import com.microsoft.gctoolkit.parser.JVMEventConsumer;
 import com.microsoft.gctoolkit.vertx.internal.util.concurrent.StartingGun;
@@ -13,18 +16,17 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
-public class LogFileParser extends AbstractVerticle implements JVMEventConsumer {
+public class LogFileParser extends AbstractVerticle implements DataSourceParser {
 
     protected static final Logger LOGGER = Logger.getLogger(LogFileParser.class.getName());
-    private final GCLogParser parser;
+    private GCLogParser parser;
 
     private final String inbox;
     private final String outbox;
 
-    public LogFileParser(String inbox, String outbox, ParserFactory factory) {
+    public LogFileParser(String inbox, String outbox) {
         this.inbox = inbox;
         this.outbox = outbox;
-        parser = factory.get(this);
     }
     
     public String getInbox() {
@@ -69,5 +71,15 @@ public class LogFileParser extends AbstractVerticle implements JVMEventConsumer 
                     }
                 });
         deployed.ready();
+    }
+
+    @Override
+    public boolean accepts(Diary diary) {
+        return false;
+    }
+
+    @Override
+    public void publishTo(JVMEventBus bus) {
+
     }
 }
