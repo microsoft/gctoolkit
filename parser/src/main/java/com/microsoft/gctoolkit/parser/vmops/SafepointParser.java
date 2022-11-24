@@ -36,7 +36,7 @@ public class SafepointParser extends PreUnifiedGCLogParser implements SafepointP
 
     @Override
     public void publishTo(JVMEventBus bus) {
-        super.publishTo(bus, Channels.JVM_EVENT_PARSER_OUTBOX.getChannel());
+        super.publishTo(bus, Channels.JVM_EVENT_PARSER_OUTBOX.getName());
     }
 }
 

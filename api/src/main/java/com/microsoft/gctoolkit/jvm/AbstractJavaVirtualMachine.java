@@ -121,6 +121,7 @@ public abstract class AbstractJavaVirtualMachine implements JavaVirtualMachine {
         try {
             final GCLogFile gcLogFile = (GCLogFile) dataSource;
             this.diary = gcLogFile.diary();
+
             //register aggregations with JVMEventBus
 
             dataSourceBus.publish(Channels.PARSER_INBOX, dataSource.stream());

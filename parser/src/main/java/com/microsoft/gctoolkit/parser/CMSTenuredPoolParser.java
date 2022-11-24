@@ -163,7 +163,7 @@ public class CMSTenuredPoolParser extends PreUnifiedGCLogParser implements Simpl
 
     @Override
     public void publishTo(JVMEventBus bus) {
-        super.publishTo(bus, Channels.CMS_TENURED_POOL_PARSER_OUTBOX.getChannel());
+        super.publishTo(bus, Channels.CMS_TENURED_POOL_PARSER_OUTBOX.getName());
     }
 }
 

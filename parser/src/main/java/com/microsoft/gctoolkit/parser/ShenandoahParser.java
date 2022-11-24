@@ -118,7 +118,7 @@ public class ShenandoahParser extends UnifiedGCLogParser implements ShenandoahPa
 
     @Override
     public void publishTo(JVMEventBus bus) {
-        super.publishTo(bus, Channels.SHENANDOAH_PARSER_OUTBOX.getChannel());
+        super.publishTo(bus, Channels.SHENANDOAH_PARSER_OUTBOX.getName());
     }
 
 }

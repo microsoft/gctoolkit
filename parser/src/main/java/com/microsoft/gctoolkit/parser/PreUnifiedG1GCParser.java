@@ -1221,6 +1221,6 @@ public class PreUnifiedG1GCParser extends PreUnifiedGCLogParser implements G1GCP
 
     @Override
     public void publishTo(JVMEventBus bus) {
-        super.publishTo(bus, Channels.G1GC_PARSER_OUTBOX.getChannel());
+        super.publishTo(bus, Channels.G1GC_PARSER_OUTBOX.getName());
     }
 }

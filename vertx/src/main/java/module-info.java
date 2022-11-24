@@ -16,5 +16,8 @@ module com.microsoft.gctoolkit.vertx {
 
     provides com.microsoft.gctoolkit.message.JVMEventBus with com.microsoft.gctoolkit.vertx.JVMEventSource;
     provides com.microsoft.gctoolkit.message.DataSourceBus with com.microsoft.gctoolkit.vertx.GCToolkitVertx;
+    provides com.microsoft.gctoolkit.message.DataSourceChannel with com.microsoft.gctoolkit.vertx.VertxDataSourceChannel;
+    provides com.microsoft.gctoolkit.message.JVMEventChannel with com.microsoft.gctoolkit.vertx.VertxJVMEventChannel;
+
 
 }

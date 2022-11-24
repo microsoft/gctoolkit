@@ -556,6 +556,6 @@ public class UnifiedGenerationalParser extends UnifiedGCLogParser implements Uni
 
     @Override
     public void publishTo(JVMEventBus bus) {
-        super.publishTo(bus, Channels.GENERATIONAL_HEAP_PARSER_OUTBOX.getChannel());
+        super.publishTo(bus, Channels.GENERATIONAL_HEAP_PARSER_OUTBOX.getName());
     }
 }

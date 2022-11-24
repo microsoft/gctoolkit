@@ -486,6 +486,6 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
 
     @Override
     public void publishTo(JVMEventBus bus) {
-        super.publishTo(bus, Channels.ZGC_PARSER_OUTBOX.getChannel());
+        super.publishTo(bus, Channels.ZGC_PARSER_OUTBOX.getName());
     }
 }

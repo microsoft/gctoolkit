@@ -71,6 +71,6 @@ public class UnifiedSurvivorMemoryPoolParser extends UnifiedGCLogParser implemen
 
     @Override
     public void publishTo(JVMEventBus bus) {
-        super.publishTo(bus, Channels.SURVIVOR_MEMORY_POOL_PARSER_OUTBOX.getChannel());
+        super.publishTo(bus, Channels.SURVIVOR_MEMORY_POOL_PARSER_OUTBOX.getName());
     }
 }

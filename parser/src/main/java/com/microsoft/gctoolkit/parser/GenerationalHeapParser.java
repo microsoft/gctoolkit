@@ -2049,6 +2049,6 @@ public class GenerationalHeapParser extends PreUnifiedGCLogParser implements Sim
 
     @Override
     public void publishTo(JVMEventBus bus) {
-        super.publishTo(bus, Channels.GENERATIONAL_HEAP_PARSER_OUTBOX.getChannel());
+        super.publishTo(bus, Channels.GENERATIONAL_HEAP_PARSER_OUTBOX.getName());
     }
 }

@@ -3,16 +3,21 @@
 package com.microsoft.gctoolkit;
 
 import com.microsoft.gctoolkit.aggregator.Aggregation;
-import com.microsoft.gctoolkit.event.jvm.JVMEvent;
 import com.microsoft.gctoolkit.io.DataSource;
 import com.microsoft.gctoolkit.io.GCLogFile;
 import com.microsoft.gctoolkit.io.RotatingGCLogFile;
 import com.microsoft.gctoolkit.io.SingleGCLogFile;
 import com.microsoft.gctoolkit.jvm.Diary;
 import com.microsoft.gctoolkit.jvm.JavaVirtualMachine;
+import com.microsoft.gctoolkit.message.Channel;
+import com.microsoft.gctoolkit.message.ChannelListener;
+import com.microsoft.gctoolkit.message.Channels;
 import com.microsoft.gctoolkit.message.DataSourceBus;
+import com.microsoft.gctoolkit.message.DataSourceChannel;
+import com.microsoft.gctoolkit.message.DataSourceChannelListener;
 import com.microsoft.gctoolkit.message.DataSourceParser;
 import com.microsoft.gctoolkit.message.JVMEventBus;
+import com.microsoft.gctoolkit.message.JVMEventChannel;
 
 import java.io.IOException;
 import java.util.HashSet;
@@ -46,8 +51,8 @@ public class GCToolKit {
                 .orElseThrow(() -> new ServiceConfigurationError("Internal Error - No suitable JavaVirtualMachine implementation found"));
     }
 
-    private DataSourceBus loadDataSourceBus() {
-        return ServiceLoader.load(DataSourceBus.class)
+    private Channel loadDataSourceChannel() {
+        return ServiceLoader.load(DataSourceChannel.class)
                 .stream()
                 .map(ServiceLoader.Provider::get)
                 .findFirst()
@@ -55,8 +60,8 @@ public class GCToolKit {
 
     }
 
-    private JVMEventBus loadJVMEventBus() {
-        return ServiceLoader.load(JVMEventBus.class)
+    private JVMEventChannel loadJVMEventChannel() {
+        return ServiceLoader.load(JVMEventChannel.class)
                 .stream()
                 .map(ServiceLoader.Provider::get)
                 .findFirst()
@@ -64,15 +69,15 @@ public class GCToolKit {
 
     }
 
-    private void loadDataSourceParsers(DataSourceBus dataBus, JVMEventBus bus, Diary diary) throws IOException {
-        List<DataSourceParser> parsers = ServiceLoader.load(DataSourceParser.class)
+    private void loadDataSourceParsers(final DataSourceChannel dataSourceChannel, final JVMEventChannel jvmEventChannel, Diary diary) throws IOException {
+        List<DataSourceChannelListener> listeners = ServiceLoader.load(DataSourceChannelListener.class)
                 .stream()
                 .map(ServiceLoader.Provider::get)
                 .filter(consumer->consumer.accepts(diary))
                 .collect(Collectors.toList());
-        for (DataSourceParser parser : parsers) {
-            dataBus.register(parser);
-            parser.publishTo(bus);
+        for (DataSourceChannelListener listener : listeners) {
+            dataSourceChannel.registerListener(listener);
+            listener.forward(jvmEventChannel);
         }
     }
 
@@ -145,15 +150,20 @@ public class GCToolKit {
      * from the analysis of the GC log file.
      */
     public JavaVirtualMachine analyze(DataSource<?> dataSource) throws IOException  {
+        /*
+        Assembly....b
+         */
         GCLogFile logFile = (GCLogFile)dataSource;
-        JVMEventBus eventBus = loadJVMEventBus();
-        DataSourceBus dataSourceBus = loadDataSourceBus();
-        loadDataSourceParsers(dataSourceBus, eventBus, logFile.diary());
+        Channel dataSourceChannel = loadDataSourceChannel();
+        dataSourceChannel.setChannel(Channels.DATA_SOURCE);
+        Channel eventChannel = loadJVMEventChannel();
+        //JVMEventBus eventBus = loadJVMEventBus();
+        loadDataSourceParsers(dataSourceChannel, eventChannel, logFile.diary());
         loadAggregationsFromServiceLoader();
         JavaVirtualMachine javaVirtualMachine = null;
         try {
             javaVirtualMachine = loadJavaVirtualMachine(logFile);
-            javaVirtualMachine.analyze(this.registeredAggregations, eventBus, dataSourceBus, logFile);
+            //javaVirtualMachine.analyze(this.registeredAggregations, eventBus, dataSourceBus, logFile);
             // close all resources
         } catch(Throwable t) {
             LOGGER.log(Level.SEVERE, "Internal Error: Cannot invoke analyze method", t);

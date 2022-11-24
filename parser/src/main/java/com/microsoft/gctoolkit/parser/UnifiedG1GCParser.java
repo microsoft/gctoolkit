@@ -768,6 +768,6 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
 
     @Override
     public void publishTo(JVMEventBus bus) {
-        super.publishTo(bus, Channels.G1GC_PARSER_OUTBOX.getChannel());
+        super.publishTo(bus, Channels.G1GC_PARSER_OUTBOX.getName());
     }
 }

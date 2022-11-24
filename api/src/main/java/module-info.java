@@ -50,6 +50,12 @@ module com.microsoft.gctoolkit.api {
     uses com.microsoft.gctoolkit.message.DataSourceBus;
     uses com.microsoft.gctoolkit.message.JVMEventBus;
     uses com.microsoft.gctoolkit.message.DataSourceParser;
+    uses com.microsoft.gctoolkit.message.DataSourceChannel;
+    uses com.microsoft.gctoolkit.message.DataSourceChannelListener;
+    uses com.microsoft.gctoolkit.message.JVMEventChannel;
+    uses com.microsoft.gctoolkit.message.JVMEventChannelListener;
+//    uses com.microsoft.gctoolkit.message.ChannelListener;
+//    uses com.microsoft.gctoolkit.message.Channel;
 
     provides com.microsoft.gctoolkit.jvm.JavaVirtualMachine with
             PreUnifiedJavaVirtualMachine,

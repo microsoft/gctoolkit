@@ -1,6 +1,6 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
-package com.microsoft.gctoolkit.vertx.aggregator;
+package com.microsoft.gctoolkit.vertx;
 
 import com.microsoft.gctoolkit.aggregator.Aggregation;
 import com.microsoft.gctoolkit.aggregator.Aggregator;
@@ -14,7 +14,6 @@ import io.vertx.core.AbstractVerticle;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
