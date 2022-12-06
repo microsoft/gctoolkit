@@ -68,7 +68,7 @@ public abstract class RuntimeAggregation  implements Aggregation {
      * @param eventTime The time a JVMEvent occurred.
      * @param duration The duration of the JVMEvent.
      */
-    public void record(DateTimeStamp eventTime, double duration) {
+    public void publish(DateTimeStamp eventTime, double duration) {
 
         if (timeOfFirstEvent == null && eventTime != null) {
             timeOfFirstEvent = eventTime;

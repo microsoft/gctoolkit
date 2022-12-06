@@ -11,10 +11,10 @@ import com.microsoft.gctoolkit.io.GCLogFile;
 import com.microsoft.gctoolkit.io.RotatingGCLogFile;
 import com.microsoft.gctoolkit.io.SingleGCLogFile;
 import com.microsoft.gctoolkit.jvm.Diarizer;
-import com.microsoft.gctoolkit.message.JVMEventListener;
+import com.microsoft.gctoolkit.message.Channels;
+import com.microsoft.gctoolkit.message.JVMEventChannelListener;
 import com.microsoft.gctoolkit.parser.GCLogParser;
 import com.microsoft.gctoolkit.parser.GenerationalHeapParser;
-import com.microsoft.gctoolkit.parser.JVMEventConsumer;
 import com.microsoft.gctoolkit.parser.PreUnifiedG1GCParser;
 import com.microsoft.gctoolkit.parser.UnifiedG1GCParser;
 import com.microsoft.gctoolkit.parser.UnifiedGenerationalParser;
@@ -118,7 +118,8 @@ public abstract class ParserTest {
         TestResults testResults = new TestResults();
         GCLogFile logfile = loadLogFile(path, true);
         Diarizer jvmConfiguration = getJVMConfiguration(logfile);
-        GenerationalHeapParser generationalHeapParser = new GenerationalHeapParser(jvmConfiguration.getDiary());
+        GenerationalHeapParser generationalHeapParser = new GenerationalHeapParser();
+        generationalHeapParser.diary(jvmConfiguration.getDiary());
         logfile.stream().map(String::trim).forEach(generationalHeapParser::receive);
         return testResults;
     }
@@ -127,7 +128,8 @@ public abstract class ParserTest {
         TestResults testResults = new TestResults();
         GCLogFile logfile = loadLogFile(path, false);
         Diarizer jvmConfiguration = getJVMConfiguration(logfile);
-        GCLogParser generationalHeapParser = (jvmConfiguration.getDiary().isUnifiedLogging()) ? new UnifiedGenerationalParser(jvmConfiguration.getDiary()) : new GenerationalHeapParser(jvmConfiguration.getDiary());
+        GCLogParser generationalHeapParser = (jvmConfiguration.getDiary().isUnifiedLogging()) ? new UnifiedGenerationalParser() : new GenerationalHeapParser();
+        generationalHeapParser.diary(jvmConfiguration.getDiary());
         logfile.stream().map(String::trim).forEach(generationalHeapParser::receive);
         return testResults;
     }
@@ -136,7 +138,8 @@ public abstract class ParserTest {
         TestResults testResults = new TestResults();
         SingleGCLogFile logfile = new SingleGCLogFile(path);
         UnifiedDiarizer unifiedJVMConfiguration = new UnifiedDiarizer();
-        UnifiedG1GCParser parser = new UnifiedG1GCParser(unifiedJVMConfiguration.getDiary());
+        UnifiedG1GCParser parser = new UnifiedG1GCParser();
+        parser.diary(unifiedJVMConfiguration.getDiary());
         logfile.stream().map(String::trim).forEach(parser::receive);
         return testResults;
     }
@@ -145,7 +148,8 @@ public abstract class ParserTest {
         TestResults testResults = new TestResults();
         GCLogFile logfile = loadLogFile(path, true);
         Diarizer jvmConfiguration = getJVMConfiguration(logfile);
-        PreUnifiedG1GCParser parser = new PreUnifiedG1GCParser(jvmConfiguration.getDiary());
+        PreUnifiedG1GCParser parser = new PreUnifiedG1GCParser();
+        parser.diary(jvmConfiguration.getDiary());
         logfile.stream().map(String::trim).forEach(parser::receive);
         return testResults;
     }
@@ -154,7 +158,8 @@ public abstract class ParserTest {
         TestResults testResults = new TestResults();
         GCLogFile logfile = loadLogFile(path, false);
         Diarizer jvmConfiguration = getJVMConfiguration(logfile);
-        PreUnifiedG1GCParser parser = new PreUnifiedG1GCParser(jvmConfiguration.getDiary());
+        PreUnifiedG1GCParser parser = new PreUnifiedG1GCParser();
+        parser.diary(jvmConfiguration.getDiary());
         logfile.stream().map(String::trim).forEach(parser::receive);
         return testResults;
     }
@@ -162,7 +167,7 @@ public abstract class ParserTest {
     /**
      * Setups an array of counts that is indexed by the type of GC event.
      */
-    class TestResults implements JVMEventListener {
+    class TestResults implements JVMEventChannelListener {
 
         private final int[] counts = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 , 0, 0, 0, 0, 0};
         private int metaSpaceRecordCount = 0;
@@ -181,6 +186,11 @@ public abstract class ParserTest {
 
         public int getMetaSpaceRecordCount() {
             return metaSpaceRecordCount;
+        }
+
+        @Override
+        public Channels channel() {
+            return null;
         }
 
         /**

@@ -6,7 +6,7 @@ import com.microsoft.gctoolkit.event.jvm.JVMTermination;
 import com.microsoft.gctoolkit.event.jvm.SurvivorRecord;
 import com.microsoft.gctoolkit.jvm.Diary;
 import com.microsoft.gctoolkit.message.Channels;
-import com.microsoft.gctoolkit.message.JVMEventBus;
+import com.microsoft.gctoolkit.message.JVMEventChannel;
 
 import static com.microsoft.gctoolkit.parser.unified.UnifiedPatterns.JVM_EXIT;
 
@@ -14,9 +14,7 @@ public class SurvivorMemoryPoolParser extends PreUnifiedGCLogParser implements T
 
     private SurvivorRecord forwardReference = null;
 
-    public SurvivorMemoryPoolParser(Diary diary) {
-        super(diary);
-    }
+    public SurvivorMemoryPoolParser() {}
 
     public String getName() {
         return "SurvivorMemoryPoolParser";
@@ -39,10 +37,10 @@ public class SurvivorMemoryPoolParser extends PreUnifiedGCLogParser implements T
             forwardReference.add(trace.getIntegerGroup(1), trace.getLongGroup(2));
         } else if (entry.equals(END_OF_DATA_SENTINEL) || (JVM_EXIT.parse(entry) != null)) {
             if (forwardReference != null)
-                consumer.publish(forwardReference);
-            consumer.publish(new JVMTermination(getClock(),diary.getTimeOfFirstEvent()));
+                consumer.publish(Channels.SURVIVOR_MEMORY_POOL_PARSER_OUTBOX, forwardReference);
+            consumer.publish(Channels.SURVIVOR_MEMORY_POOL_PARSER_OUTBOX, new JVMTermination(getClock(),diary.getTimeOfFirstEvent()));
         } else if (forwardReference != null) {
-            consumer.publish(forwardReference);
+            consumer.publish(Channels.SURVIVOR_MEMORY_POOL_PARSER_OUTBOX, forwardReference);
             forwardReference = null;
         }
     }
@@ -53,7 +51,7 @@ public class SurvivorMemoryPoolParser extends PreUnifiedGCLogParser implements T
     }
 
     @Override
-    public void publishTo(JVMEventBus bus) {
-        super.publishTo(bus, Channels.SURVIVOR_MEMORY_POOL_PARSER_OUTBOX.getName());
+    public void publishTo(JVMEventChannel channel) {
+        super.publishTo(channel);
     }
 }

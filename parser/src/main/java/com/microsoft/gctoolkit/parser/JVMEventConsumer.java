@@ -6,5 +6,5 @@ import com.microsoft.gctoolkit.event.jvm.JVMEvent;
 
 public interface JVMEventConsumer {
 
-    void record(JVMEvent event);
+    void publish(JVMEvent event);
 }

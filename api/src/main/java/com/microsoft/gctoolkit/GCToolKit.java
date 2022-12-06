@@ -9,14 +9,9 @@ import com.microsoft.gctoolkit.io.RotatingGCLogFile;
 import com.microsoft.gctoolkit.io.SingleGCLogFile;
 import com.microsoft.gctoolkit.jvm.Diary;
 import com.microsoft.gctoolkit.jvm.JavaVirtualMachine;
-import com.microsoft.gctoolkit.message.Channel;
-import com.microsoft.gctoolkit.message.ChannelListener;
 import com.microsoft.gctoolkit.message.Channels;
-import com.microsoft.gctoolkit.message.DataSourceBus;
 import com.microsoft.gctoolkit.message.DataSourceChannel;
-import com.microsoft.gctoolkit.message.DataSourceChannelListener;
 import com.microsoft.gctoolkit.message.DataSourceParser;
-import com.microsoft.gctoolkit.message.JVMEventBus;
 import com.microsoft.gctoolkit.message.JVMEventChannel;
 
 import java.io.IOException;
@@ -51,7 +46,7 @@ public class GCToolKit {
                 .orElseThrow(() -> new ServiceConfigurationError("Internal Error - No suitable JavaVirtualMachine implementation found"));
     }
 
-    private Channel loadDataSourceChannel() {
+    private DataSourceChannel loadDataSourceChannel() {
         return ServiceLoader.load(DataSourceChannel.class)
                 .stream()
                 .map(ServiceLoader.Provider::get)
@@ -70,14 +65,14 @@ public class GCToolKit {
     }
 
     private void loadDataSourceParsers(final DataSourceChannel dataSourceChannel, final JVMEventChannel jvmEventChannel, Diary diary) throws IOException {
-        List<DataSourceChannelListener> listeners = ServiceLoader.load(DataSourceChannelListener.class)
+        List<DataSourceParser> dataSourceParsers = ServiceLoader.load(DataSourceParser.class)
                 .stream()
                 .map(ServiceLoader.Provider::get)
                 .filter(consumer->consumer.accepts(diary))
                 .collect(Collectors.toList());
-        for (DataSourceChannelListener listener : listeners) {
-            dataSourceChannel.registerListener(listener);
-            listener.forward(jvmEventChannel);
+        for (DataSourceParser dataSourceParser : dataSourceParsers) {
+            dataSourceChannel.registerListener(dataSourceParser);
+            dataSourceParser.publishTo(jvmEventChannel);
         }
     }
 
@@ -154,17 +149,14 @@ public class GCToolKit {
         Assembly....b
          */
         GCLogFile logFile = (GCLogFile)dataSource;
-        Channel dataSourceChannel = loadDataSourceChannel();
-        dataSourceChannel.setChannel(Channels.DATA_SOURCE);
-        Channel eventChannel = loadJVMEventChannel();
-        //JVMEventBus eventBus = loadJVMEventBus();
-        loadDataSourceParsers(dataSourceChannel, eventChannel, logFile.diary());
+        DataSourceChannel dataSourceChannel = loadDataSourceChannel();
+        JVMEventChannel jvmEventChannel = loadJVMEventChannel();
+        loadDataSourceParsers(dataSourceChannel, jvmEventChannel, logFile.diary());
         loadAggregationsFromServiceLoader();
         JavaVirtualMachine javaVirtualMachine = null;
         try {
             javaVirtualMachine = loadJavaVirtualMachine(logFile);
-            //javaVirtualMachine.analyze(this.registeredAggregations, eventBus, dataSourceBus, logFile);
-            // close all resources
+            javaVirtualMachine.analyze(this.registeredAggregations, jvmEventChannel, dataSourceChannel, logFile);
         } catch(Throwable t) {
             LOGGER.log(Level.SEVERE, "Internal Error: Cannot invoke analyze method", t);
         }

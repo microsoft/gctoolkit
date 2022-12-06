@@ -12,9 +12,9 @@ public class RuntimeAggregationTest {
         final double duration = 1.5d;
         RuntimeAggregation testRuntimeAggregation = new RuntimeAggregation();
         DateTimeStamp first = new DateTimeStamp(0.0);
-        testRuntimeAggregation.record(null, duration);
+        testRuntimeAggregation.publish(null, duration);
         DateTimeStamp last = first.add(duration);
-        testRuntimeAggregation.record(null, duration);
+        testRuntimeAggregation.publish(null, duration);
         last = last.add(duration);
         Assertions.assertEquals(first, testRuntimeAggregation.getTimeOfFirstEvent());
         Assertions.assertEquals(last, testRuntimeAggregation.getTimeOfLastEvent());
@@ -26,7 +26,7 @@ public class RuntimeAggregationTest {
 
         final int nTimes = 10;
         for (int n = 0; n < nTimes; n++) {
-            testRuntimeAggregation.record(null, duration);
+            testRuntimeAggregation.publish(null, duration);
         }
         // expect runtime duration to be timeOfLastEvent().minus(timeOfFirstEvent())
         // in this case since the difference exceeds
@@ -43,8 +43,8 @@ public class RuntimeAggregationTest {
         RuntimeAggregation testRuntimeAggregation = new RuntimeAggregation();
         DateTimeStamp first = new DateTimeStamp(0.0d);
         DateTimeStamp last = first.add(deltaTime);
-        testRuntimeAggregation.record(first, Double.NaN);
-        testRuntimeAggregation.record(last, Double.NaN);
+        testRuntimeAggregation.publish(first, Double.NaN);
+        testRuntimeAggregation.publish(last, Double.NaN);
         Assertions.assertEquals(first, testRuntimeAggregation.getTimeOfFirstEvent());
         Assertions.assertEquals(last, testRuntimeAggregation.getTimeOfLastEvent());
         // expect runtime duration to be the time of last event in this case
@@ -56,7 +56,7 @@ public class RuntimeAggregationTest {
         final int nTimes = 10;
         for (int n = 0; n < nTimes; n++) {
             last = last.add(deltaTime);
-            testRuntimeAggregation.record(last, duration);
+            testRuntimeAggregation.publish(last, duration);
         }
         // expect runtime duration to be timeOfLastEvent().minus(timeOfFirstEvent())
         // in this case since the difference exceeds
@@ -75,7 +75,7 @@ public class RuntimeAggregationTest {
         DateTimeStamp last = first;
         final int nTimes = 10;
         for (int n = 0; n < nTimes; n++) {
-            testRuntimeAggregation.record(last, duration);
+            testRuntimeAggregation.publish(last, duration);
             last = last.add(deltaTime);
         }
         Assertions.assertEquals(first, testRuntimeAggregation.getTimeOfFirstEvent());
@@ -90,7 +90,7 @@ public class RuntimeAggregationTest {
         DateTimeStamp next = first;
         final int nTimes = 10;
         for (int n = 0; n < nTimes; n++) {
-            testRuntimeAggregation.record(next, duration);
+            testRuntimeAggregation.publish(next, duration);
             next = next.add(deltaTime);
         }
         DateTimeStamp last = first.add(testRuntimeAggregation.getRuntimeDuration());
@@ -106,7 +106,7 @@ public class RuntimeAggregationTest {
         DateTimeStamp next = first;
         final int nTimes = 10;
         for (int n = 0; n < nTimes; n++) {
-            testRuntimeAggregation.record(next, duration);
+            testRuntimeAggregation.publish(next, duration);
             next = next.add(deltaTime);
         }
         double totalDuration = testRuntimeAggregation.getTimeOfLastEvent().minus(testRuntimeAggregation.getTimeOfFirstEvent());

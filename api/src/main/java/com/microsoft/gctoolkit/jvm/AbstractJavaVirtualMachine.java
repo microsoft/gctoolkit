@@ -6,8 +6,8 @@ import com.microsoft.gctoolkit.aggregator.Aggregation;
 import com.microsoft.gctoolkit.io.DataSource;
 import com.microsoft.gctoolkit.io.GCLogFile;
 import com.microsoft.gctoolkit.message.Channels;
-import com.microsoft.gctoolkit.message.DataSourceBus;
-import com.microsoft.gctoolkit.message.JVMEventBus;
+import com.microsoft.gctoolkit.message.DataSourceChannel;
+import com.microsoft.gctoolkit.message.JVMEventChannel;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
 
 import java.io.IOException;
@@ -116,15 +116,14 @@ public abstract class AbstractJavaVirtualMachine implements JavaVirtualMachine {
     }
 
     @Override
-    public void analyze(Set<Class<? extends Aggregation>> registeredAggregations, JVMEventBus eventBus, DataSourceBus dataSourceBus, DataSource<String> dataSource) {
+    public void analyze(Set<Class<? extends Aggregation>> registeredAggregations, JVMEventChannel eventBus, DataSourceChannel dataSourceBus, DataSource<String> dataSource) {
 
         try {
             final GCLogFile gcLogFile = (GCLogFile) dataSource;
             this.diary = gcLogFile.diary();
 
             //register aggregations with JVMEventBus
-
-            dataSourceBus.publish(Channels.PARSER_INBOX, dataSource.stream());
+            dataSource.stream().forEach(message -> dataSourceBus.publish(Channels.DATA_SOURCE,message));
 
 //            GCToolkitVertxParameters GCToolkitVertxParameters = getParameters(registeredAggregations, gcLogFile.diary());
 

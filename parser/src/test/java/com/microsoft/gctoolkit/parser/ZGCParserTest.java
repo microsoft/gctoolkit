@@ -59,7 +59,8 @@ public class ZGCParserTest {
         };
 
         AtomicBoolean eventCreated = new AtomicBoolean(false);
-        ZGCParser parser = new ZGCParser(new Diary());
+        ZGCParser parser = new ZGCParser();
+        parser.diary(new Diary());
 //        , event -> {
 //            try {
 //                ZGCCycle zgc = (ZGCCycle) event;

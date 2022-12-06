@@ -6,8 +6,8 @@ package com.microsoft.gctoolkit.jvm;
 import com.microsoft.gctoolkit.GCToolKit;
 import com.microsoft.gctoolkit.aggregator.Aggregation;
 import com.microsoft.gctoolkit.io.DataSource;
-import com.microsoft.gctoolkit.message.DataSourceBus;
-import com.microsoft.gctoolkit.message.JVMEventBus;
+import com.microsoft.gctoolkit.message.DataSourceChannel;
+import com.microsoft.gctoolkit.message.JVMEventChannel;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
 
 import java.util.Optional;
@@ -109,5 +109,5 @@ public interface JavaVirtualMachine {
      */
     <T extends Aggregation> Optional<T> getAggregation(Class<T> aggregationClass);
 
-    void analyze(Set<Class<? extends Aggregation>> registeredAggregations, JVMEventBus eventBus, DataSourceBus dataSourceBus, DataSource<String> dataSource);
+    void analyze(Set<Class<? extends Aggregation>> registeredAggregations, JVMEventChannel eventBus, DataSourceChannel dataSourceBus, DataSource<String> dataSource);
 }

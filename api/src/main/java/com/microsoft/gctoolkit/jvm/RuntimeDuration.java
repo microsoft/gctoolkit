@@ -43,7 +43,7 @@ import com.microsoft.gctoolkit.time.DateTimeStamp;
         return false;
     }
 
-    public void record(DateTimeStamp eventTime, double eventDuration) {
+    public void publish(DateTimeStamp eventTime, double eventDuration) {
         DateTimeStamp now = eventTime.add(eventDuration);
         if (timeOfFirstEvent == null) {
             timeOfFirstEvent = now;

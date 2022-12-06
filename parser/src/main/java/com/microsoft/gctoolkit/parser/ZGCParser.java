@@ -12,7 +12,7 @@ import com.microsoft.gctoolkit.event.zgc.ZGCMemoryPoolSummary;
 import com.microsoft.gctoolkit.event.zgc.ZGCMetaspaceSummary;
 import com.microsoft.gctoolkit.jvm.Diary;
 import com.microsoft.gctoolkit.message.Channels;
-import com.microsoft.gctoolkit.message.JVMEventBus;
+import com.microsoft.gctoolkit.message.JVMEventChannel;
 import com.microsoft.gctoolkit.parser.collection.MRUQueue;
 import com.microsoft.gctoolkit.parser.unified.ZGCPatterns;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
@@ -72,9 +72,7 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
     }
 
 
-    public ZGCParser(Diary diary) {
-        super(diary);
-    }
+    public ZGCParser() {}
 
     @Override
     public String getName() {
@@ -109,7 +107,7 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
     }
 
     public void endOfFile(GCLogTrace trace, String line) {
-        record(new JVMTermination(getClock(), diary.getTimeOfFirstEvent()));
+        publish(new JVMTermination(getClock(), diary.getTimeOfFirstEvent()));
     }
 
     private void cycleStart(GCLogTrace trace, String s) {
@@ -259,7 +257,7 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
                         trace.toKBytes(5)
                 )
         );
-        record();
+        publish();
     }
 
     private void log(String line) {
@@ -273,12 +271,12 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
         LOGGER.log(Level.WARNING, "Missing initial record for: {0}", line);
     }
 
-    public void record() {
-        record(forwardReference.toZGCCycle(getClock()));
+    public void publish() {
+        publish(forwardReference.toZGCCycle(getClock()));
     }
 
-    public void record(JVMEvent event) {
-        consumer.publish(event);
+    public void publish(JVMEvent event) {
+        consumer.publish(Channels.ZGC_PARSER_OUTBOX, event);
         forwardReference = null;
     }
 
@@ -485,7 +483,7 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
     }
 
     @Override
-    public void publishTo(JVMEventBus bus) {
-        super.publishTo(bus, Channels.ZGC_PARSER_OUTBOX.getName());
+    public void publishTo(JVMEventChannel bus) {
+        super.publishTo(bus);
     }
 }

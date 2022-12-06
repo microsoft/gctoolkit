@@ -16,10 +16,10 @@ public class TwoRuntimeAggregator extends Aggregator<TwoRuntimeReport> {
      */
     public TwoRuntimeAggregator(TwoRuntimeReport aggregation) {
         super(aggregation);
-        register(JVMTermination.class,this::record);
+        register(JVMTermination.class,this::publish);
     }
 
-    public void record(JVMTermination termination) {
+    public void publish(JVMTermination termination) {
         System.out.println("sleeping: " + termination.toString());
         try {
             Thread.sleep(1000);

@@ -23,7 +23,7 @@ import java.util.function.Consumer;
  *
  * {@literal @}Collates(GCCauseAggregator)
  * public interface GCCauseAggregation extends Aggregation {
- *     record(GarbageCollectionType type, GCCause cause);
+ *     publish(GarbageCollectionType type, GCCause cause);
  * }
  *
  * {@literal @}Aggregates(EventSource.G1GC)
@@ -38,19 +38,19 @@ import java.util.function.Consumer;
  *     }
  *
  *     private void process(G1Young collection) {
- *         aggregation().record(GarbageCollectionTypes.Young, collection.getGCCause());
+ *         aggregation().publish(GarbageCollectionTypes.Young, collection.getGCCause());
  *     }
  *
  *     private void process(G1Mixed collection) {
- *         aggregation().record(GarbageCollectionTypes.Mixed, collection.getGCCause());
+ *         aggregation().publish(GarbageCollectionTypes.Mixed, collection.getGCCause());
  *     }
  *
  *     private void process(G1YoungInitialMark collection) {
- *         aggregation().record(GarbageCollectionTypes.G1GCYoungInitialMark, collection.getGCCause());
+ *         aggregation().publish(GarbageCollectionTypes.G1GCYoungInitialMark, collection.getGCCause());
  *     }
  *
  *     private void process(G1FullGC collection) {
- *         aggregation().record(GarbageCollectionTypes.FullGC, collection.getGCCause());
+ *         aggregation().publish(GarbageCollectionTypes.FullGC, collection.getGCCause());
  *     }
  * }
  * </code></pre>

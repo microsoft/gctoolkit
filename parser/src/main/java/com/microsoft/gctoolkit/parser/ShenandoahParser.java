@@ -6,7 +6,7 @@ import com.microsoft.gctoolkit.event.jvm.JVMEvent;
 import com.microsoft.gctoolkit.event.jvm.JVMTermination;
 import com.microsoft.gctoolkit.jvm.Diary;
 import com.microsoft.gctoolkit.message.Channels;
-import com.microsoft.gctoolkit.message.JVMEventBus;
+import com.microsoft.gctoolkit.message.JVMEventChannel;
 import com.microsoft.gctoolkit.parser.collection.MRUQueue;
 import com.microsoft.gctoolkit.parser.unified.ShenandoahPatterns;
 
@@ -41,9 +41,7 @@ public class ShenandoahParser extends UnifiedGCLogParser implements ShenandoahPa
         parseRules.put(END_OF_FILE,this::endOfFile);
     }
 
-    public ShenandoahParser(Diary diary) {
-        super(diary);
-    }
+    public ShenandoahParser() {}
 
     @Override
     public String getName() {
@@ -81,7 +79,7 @@ public class ShenandoahParser extends UnifiedGCLogParser implements ShenandoahPa
     }
 
     public void endOfFile(GCLogTrace trace, String line) {
-        record(new JVMTermination(getClock(),diary.getTimeOfFirstEvent()));
+        publish(new JVMTermination(getClock(),diary.getTimeOfFirstEvent()));
     }
 
     //Implement all capture methods
@@ -93,12 +91,12 @@ public class ShenandoahParser extends UnifiedGCLogParser implements ShenandoahPa
 
     }
 
-    public void record() {
-        record(forwardReference.toShenandoahCycle());
+    public void publish() {
+        publish(forwardReference.toShenandoahCycle());
     }
 
-    public void record(JVMEvent event) {
-        consumer.publish(event);
+    public void publish(JVMEvent event) {
+        consumer.publish(Channels.SHENANDOAH_PARSER_OUTBOX, event);
         forwardReference = null;
     }
 
@@ -117,8 +115,8 @@ public class ShenandoahParser extends UnifiedGCLogParser implements ShenandoahPa
     }
 
     @Override
-    public void publishTo(JVMEventBus bus) {
-        super.publishTo(bus, Channels.SHENANDOAH_PARSER_OUTBOX.getName());
+    public void publishTo(JVMEventChannel bus) {
+        super.publishTo(bus);
     }
 
 }

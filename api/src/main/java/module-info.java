@@ -47,8 +47,6 @@ module com.microsoft.gctoolkit.api {
     uses com.microsoft.gctoolkit.aggregator.Aggregation;
     uses com.microsoft.gctoolkit.jvm.JavaVirtualMachine;
     uses com.microsoft.gctoolkit.jvm.Diarizer;
-    uses com.microsoft.gctoolkit.message.DataSourceBus;
-    uses com.microsoft.gctoolkit.message.JVMEventBus;
     uses com.microsoft.gctoolkit.message.DataSourceParser;
     uses com.microsoft.gctoolkit.message.DataSourceChannel;
     uses com.microsoft.gctoolkit.message.DataSourceChannelListener;

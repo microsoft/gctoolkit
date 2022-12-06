@@ -99,7 +99,7 @@ public class AggregatorVerticle extends AbstractVerticle implements JVMEventCons
 
     public Set<Aggregator<?>> aggregators() { return aggregators; }
 
-    public void record(JVMEvent event) {
+    public void publish(JVMEvent event) {
         aggregators.forEach(aggregator -> {
                     try {
                         aggregator.receive(event);
@@ -134,7 +134,7 @@ public class AggregatorVerticle extends AbstractVerticle implements JVMEventCons
                     <JVMEvent>consumer(inbox, message -> {
                         try {
                             JVMEvent event = message.body();
-                            this.record(event);
+                            this.publish(event);
                             if ( event instanceof JVMTermination) {
                                 timeOfTerminationEvent = event.getDateTimeStamp();
                                 completion.ready();

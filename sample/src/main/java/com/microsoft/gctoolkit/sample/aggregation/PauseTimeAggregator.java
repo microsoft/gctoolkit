@@ -14,10 +14,10 @@ public class PauseTimeAggregator extends RuntimeAggregator<PauseTimeAggregation>
     public PauseTimeAggregator(PauseTimeAggregation aggregation) {
         super(aggregation);
         register(G1RealPause.class, this::process);
-        register(GenerationalGCPauseEvent.class, this::record);
+        register(GenerationalGCPauseEvent.class, this::publish);
     }
 
-    private void record(GenerationalGCPauseEvent event) {
+    private void publish(GenerationalGCPauseEvent event) {
         aggregation().recordPauseDuration(event.getDuration());
     }
 

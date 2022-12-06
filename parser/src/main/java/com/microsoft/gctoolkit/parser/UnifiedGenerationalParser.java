@@ -14,6 +14,7 @@ import com.microsoft.gctoolkit.event.generational.ConcurrentReset;
 import com.microsoft.gctoolkit.event.generational.ConcurrentSweep;
 import com.microsoft.gctoolkit.event.generational.DefNew;
 import com.microsoft.gctoolkit.event.generational.FullGC;
+import com.microsoft.gctoolkit.event.generational.GenerationalGCEvent;
 import com.microsoft.gctoolkit.event.generational.GenerationalGCPauseEvent;
 import com.microsoft.gctoolkit.event.generational.InitialMark;
 import com.microsoft.gctoolkit.event.generational.PSFullGC;
@@ -22,8 +23,9 @@ import com.microsoft.gctoolkit.event.generational.ParNew;
 import com.microsoft.gctoolkit.event.generational.YoungGC;
 import com.microsoft.gctoolkit.event.jvm.JVMTermination;
 import com.microsoft.gctoolkit.jvm.Diary;
+import com.microsoft.gctoolkit.message.Channel;
 import com.microsoft.gctoolkit.message.Channels;
-import com.microsoft.gctoolkit.message.JVMEventBus;
+import com.microsoft.gctoolkit.message.JVMEventChannel;
 import com.microsoft.gctoolkit.parser.collection.RuleSet;
 import com.microsoft.gctoolkit.parser.jvm.Decorators;
 import com.microsoft.gctoolkit.parser.unified.UnifiedGenerationalPatterns;
@@ -96,8 +98,7 @@ public class UnifiedGenerationalParser extends UnifiedGCLogParser implements Uni
             "Reset", Concurrent_Reset
     );
 
-    public UnifiedGenerationalParser(Diary diary) {
-        super(diary);
+    public UnifiedGenerationalParser() {
     }
 
     public String getName() {
@@ -329,7 +330,7 @@ public class UnifiedGenerationalParser extends UnifiedGCLogParser implements Uni
     }
 
     private void jvmExit(GCLogTrace trace, String line) {
-        consumer.publish(new JVMTermination(getClock(),diary.getTimeOfFirstEvent()));
+        consumer.publish(Channels.GENERATIONAL_HEAP_PARSER_OUTBOX,  new JVMTermination(getClock(),diary.getTimeOfFirstEvent()));
     }
 
     /**
@@ -358,19 +359,19 @@ public class UnifiedGenerationalParser extends UnifiedGCLogParser implements Uni
                 if (inConcurrentPhase) {
                     cache.add(buildPauseEvent((pauseEvent)));
                 } else {
-                    consumer.publish(buildPauseEvent(pauseEvent));
+                    publish(buildPauseEvent(pauseEvent));
                 }
                 pauseEvent = null;
             } else if (concurrentCyclePauseEvent != null && concurrentCyclePauseEvent.getGcID() == gcid) {
                 concurrentCyclePauseEvent.add(cpuSummary);
-                consumer.publish(buildPauseEvent(concurrentCyclePauseEvent));
+                publish(buildPauseEvent(concurrentCyclePauseEvent));
                 concurrentCyclePauseEvent = null;
             } else if ((concurrentEvent != null) && (concurrentEvent.getGcID() == gcid)) {
                 concurrentEvent.add(cpuSummary);
-                consumer.publish(buildConcurrentPhase(concurrentEvent));
+                publish(buildConcurrentPhase(concurrentEvent));
                 concurrentEvent = null;
                 inConcurrentPhase = false;
-                cache.forEach(consumer::publish);
+                cache.forEach(this::publish);
                 cache.clear();
             }
         }
@@ -555,7 +556,11 @@ public class UnifiedGenerationalParser extends UnifiedGCLogParser implements Uni
     }
 
     @Override
-    public void publishTo(JVMEventBus bus) {
-        super.publishTo(bus, Channels.GENERATIONAL_HEAP_PARSER_OUTBOX.getName());
+    public void publishTo(JVMEventChannel bus) {
+        super.publishTo(bus);
+    }
+
+    private void publish(GenerationalGCEvent event) {
+        consumer.publish(Channels.GENERATIONAL_HEAP_PARSER_OUTBOX, event);
     }
 }

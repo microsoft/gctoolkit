@@ -9,8 +9,9 @@ import com.microsoft.gctoolkit.event.jvm.MetaspaceRecord;
 import com.microsoft.gctoolkit.event.jvm.PermGenSummary;
 import com.microsoft.gctoolkit.io.GCLogFile;
 import com.microsoft.gctoolkit.jvm.Diary;
+import com.microsoft.gctoolkit.message.Channels;
 import com.microsoft.gctoolkit.message.DataSourceParser;
-import com.microsoft.gctoolkit.message.JVMEventBus;
+import com.microsoft.gctoolkit.message.JVMEventChannel;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
 
 import java.util.logging.Level;
@@ -22,13 +23,15 @@ public abstract class GCLogParser implements DataSourceParser, SharedPatterns {
     public static final String END_OF_DATA_SENTINEL = GCLogFile.END_OF_DATA_SENTINEL;
 
     public static final GCParseRule GCID_COUNTER = new GCParseRule("GCID_COUNTER", " GC\\((\\d+)\\) ");
-    protected JVMEventBus consumer;
-    protected String channel;
+    protected JVMEventChannel consumer;
     protected Diary diary;
     private DateTimeStamp clock = new DateTimeStamp(0.0d);
 
 
-    public GCLogParser(Diary diary) {
+    public GCLogParser() {}
+
+    @Override
+    public void diary(Diary diary) {
         this.diary = diary;
     }
 
@@ -176,8 +179,13 @@ public abstract class GCLogParser implements DataSourceParser, SharedPatterns {
         return null;
     }
 
-    protected void publishTo(JVMEventBus bus, String channel) {
-        this.channel = channel;
-        this.consumer = bus;
+    @Override
+    public void publishTo(JVMEventChannel channel) {
+        this.consumer = channel;
+    }
+
+    @Override
+    public Channels channel() {
+        return Channels.DATA_SOURCE;
     }
 }

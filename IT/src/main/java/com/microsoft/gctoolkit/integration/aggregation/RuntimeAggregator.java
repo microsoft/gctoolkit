@@ -19,7 +19,7 @@ public class RuntimeAggregator<T extends RuntimeAggregation> extends Aggregator<
     // regardless of what JVMEvent classes are registered by subclasses of RuntimeAggregator.
     private void process(JVMEvent event) {
         if (event instanceof JVMTermination) return;
-        aggregation().record(event.getDateTimeStamp(), event.getDuration());
+        aggregation().publish(event.getDateTimeStamp(), event.getDuration());
     }
 
     @Override

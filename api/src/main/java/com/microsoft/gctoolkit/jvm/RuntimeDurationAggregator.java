@@ -18,6 +18,6 @@ RuntimeDurationAggregator(RuntimeDuration runtimeDuration) {
 
     private void process(JVMEvent event) {
         if (event instanceof JVMTermination) return;
-        aggregation().record(event.getDateTimeStamp(), event.getDuration());
+        aggregation().publish(event.getDateTimeStamp(), event.getDuration());
     }
 }

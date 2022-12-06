@@ -68,7 +68,8 @@ public class ShenandoahParserTest {
         };
 
         AtomicBoolean eventCreated = new AtomicBoolean(false);
-        ShenandoahParser parser = new ShenandoahParser(new Diary()); //, event -> {
+        ShenandoahParser parser = new ShenandoahParser(); //, event -> {
+        parser.diary(new Diary());
 //        try {
 //                ShenandoahCycle sc = (ShenandoahCycle) event;
 //                Assertions.assertEquals(toInt(0.038d,1000), toInt(sc.getDuration(),1000));

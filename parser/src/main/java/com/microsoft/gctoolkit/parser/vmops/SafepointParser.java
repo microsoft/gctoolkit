@@ -6,15 +6,13 @@ import com.microsoft.gctoolkit.event.jvm.JVMTermination;
 import com.microsoft.gctoolkit.event.jvm.Safepoint;
 import com.microsoft.gctoolkit.jvm.Diary;
 import com.microsoft.gctoolkit.message.Channels;
-import com.microsoft.gctoolkit.message.JVMEventBus;
+import com.microsoft.gctoolkit.message.JVMEventChannel;
 import com.microsoft.gctoolkit.parser.PreUnifiedGCLogParser;
 
 
 public class SafepointParser extends PreUnifiedGCLogParser implements SafepointPatterns {
 
-    public SafepointParser(Diary diary) {
-        super(diary);
-    }
+    public SafepointParser() {}
 
     public String getName() {
         return "SafepointParser";
@@ -24,9 +22,9 @@ public class SafepointParser extends PreUnifiedGCLogParser implements SafepointP
         SafepointTrace trace;
         if ((trace = TRACE.parse(line)) != null) {
             Safepoint safepoint = trace.toSafepoint();
-            consumer.publish(safepoint);
+            consumer.publish(Channels.JVM_EVENT_PARSER_OUTBOX, safepoint);
         } else if (line.equals(END_OF_DATA_SENTINEL))
-            consumer.publish(new JVMTermination(getClock(),diary.getTimeOfFirstEvent()));
+            consumer.publish( Channels.JVM_EVENT_PARSER_OUTBOX, new JVMTermination(getClock(),diary.getTimeOfFirstEvent()));
     }
 
     @Override
@@ -35,8 +33,8 @@ public class SafepointParser extends PreUnifiedGCLogParser implements SafepointP
     }
 
     @Override
-    public void publishTo(JVMEventBus bus) {
-        super.publishTo(bus, Channels.JVM_EVENT_PARSER_OUTBOX.getName());
+    public void publishTo(JVMEventChannel bus) {
+        super.publishTo(bus);
     }
 }
 

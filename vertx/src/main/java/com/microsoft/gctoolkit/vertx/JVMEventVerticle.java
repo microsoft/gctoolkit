@@ -32,7 +32,8 @@ public class JVMEventVerticle extends AbstractVerticle {
                 processor.receive(event);
                 if ( event instanceof JVMTermination) {
                     vertx.undeploy(id);
-                    //todo: something
+                    if (vertx.deploymentIDs().size() == 0)
+                        vertx.close();
                 }
             });
             promise.complete();

@@ -5,9 +5,8 @@ package com.microsoft.gctoolkit.vertx.jvm;
 import com.microsoft.gctoolkit.event.jvm.JVMEvent;
 import com.microsoft.gctoolkit.jvm.Diary;
 import com.microsoft.gctoolkit.message.DataSourceParser;
-import com.microsoft.gctoolkit.message.JVMEventBus;
+import com.microsoft.gctoolkit.message.JVMEventChannel;
 import com.microsoft.gctoolkit.parser.GCLogParser;
-import com.microsoft.gctoolkit.parser.JVMEventConsumer;
 import com.microsoft.gctoolkit.vertx.internal.util.concurrent.StartingGun;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.eventbus.DeliveryOptions;
@@ -15,8 +14,10 @@ import io.vertx.core.eventbus.DeliveryOptions;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+// todo: this is the wrapper for the parser. Maybe the parsers don't need to know about channels? anyways, it's all messed up here....
 
-public class LogFileParser extends AbstractVerticle implements DataSourceParser {
+
+public abstract class LogFileParser extends AbstractVerticle implements DataSourceParser {
 
     protected static final Logger LOGGER = Logger.getLogger(LogFileParser.class.getName());
     private GCLogParser parser;
@@ -39,7 +40,7 @@ public class LogFileParser extends AbstractVerticle implements DataSourceParser 
 
     private final DeliveryOptions options = new DeliveryOptions().setCodecName("JVMEvent");
 
-    public void record(JVMEvent event) {
+    public void publish(JVMEvent event) {
         try {
             if (event != null && event.getDateTimeStamp() != null) {
                 vertx.eventBus().publish(outbox, event, options);
@@ -79,7 +80,12 @@ public class LogFileParser extends AbstractVerticle implements DataSourceParser 
     }
 
     @Override
-    public void publishTo(JVMEventBus bus) {
+    public void publishTo(JVMEventChannel channel) {
+
+    }
+
+    @Override
+    public void receive(String payload) {
 
     }
 }

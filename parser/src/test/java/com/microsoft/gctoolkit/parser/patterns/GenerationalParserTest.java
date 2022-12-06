@@ -36,7 +36,8 @@ public class GenerationalParserTest extends ParserTest {
         collection = new ArrayList<>();
 
         //parser = new GenerationalHeapParser(new PreUnifiedDiarizer().getDiary(), event -> collection.add(event));
-        parser = new GenerationalHeapParser(new PreUnifiedDiarizer().getDiary());
+        parser = new GenerationalHeapParser();
+        parser.diary(new PreUnifiedDiarizer().getDiary());
     }
 
     @Test

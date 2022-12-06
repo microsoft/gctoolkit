@@ -4,31 +4,22 @@ package com.microsoft.gctoolkit.vertx;
 
 import com.microsoft.gctoolkit.message.Channels;
 import com.microsoft.gctoolkit.message.DataSourceChannel;
-import com.microsoft.gctoolkit.message.DataSourceChannelListener;
-import io.vertx.core.Vertx;
+import com.microsoft.gctoolkit.message.DataSourceParser;
 
-public class VertxDataSourceChannel implements DataSourceChannel {
-
-    private Channels channel;
-    final private Vertx vertx;
+public class VertxDataSourceChannel extends AbstractVertxChannel implements DataSourceChannel {
 
     public VertxDataSourceChannel() {
-        vertx = Vertx.vertx();
+        super();
     }
 
     @Override
-    public void setChannel(Channels channel) {
-        this.channel = channel;
+    public void registerListener(DataSourceParser listener) {
+        final DataSourceVerticle processor = new DataSourceVerticle(vertx(), listener.channel().getName(), listener);
+        vertx().deployVerticle(processor, state -> processor.setID((state.succeeded()) ? state.result() : ""));
     }
 
     @Override
-    public void publish(String message) {
-        vertx.eventBus().publish(channel.getName(),message);
-    }
-
-    @Override
-    public void registerListener(DataSourceChannelListener listener) {
-        final DataSourceVerticle processor = new DataSourceVerticle(vertx, channel.getName(), listener);
-        vertx.deployVerticle(processor, state -> processor.setID((state.succeeded()) ? state.result() : ""));
+    public void publish(Channels channel, String message) {
+        vertx().eventBus().publish(channel.getName(),message);
     }
 }

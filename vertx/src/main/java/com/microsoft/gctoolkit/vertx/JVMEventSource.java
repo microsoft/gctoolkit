@@ -4,14 +4,15 @@ package com.microsoft.gctoolkit.vertx;
 
 import com.microsoft.gctoolkit.event.jvm.JVMEvent;
 import com.microsoft.gctoolkit.io.DataSource;
-import com.microsoft.gctoolkit.message.JVMEventBus;
-import com.microsoft.gctoolkit.message.JVMEventListener;
+import com.microsoft.gctoolkit.message.Channels;
+import com.microsoft.gctoolkit.message.JVMEventChannel;
+import com.microsoft.gctoolkit.message.JVMEventChannelListener;
 import com.microsoft.gctoolkit.vertx.internal.util.concurrent.StartingGun;
 import io.vertx.core.AbstractVerticle;
 
 import java.io.IOException;
 
-public class JVMEventSource extends AbstractVerticle implements JVMEventBus  {
+public class JVMEventSource extends AbstractVerticle implements JVMEventChannel {
 
     public JVMEventSource() {}
 
@@ -40,17 +41,13 @@ public class JVMEventSource extends AbstractVerticle implements JVMEventBus  {
     }
 
     @Override
-    public void registerJVMEventListener(JVMEventListener listener) {
+    public void registerListener(JVMEventChannelListener listener) {
 
     }
 
     @Override
-    public void close() {
+    public void publish(Channels channel, JVMEvent message) {
 
     }
 
-    @Override
-    public void publish(JVMEvent event) {
-
-    }
 }
