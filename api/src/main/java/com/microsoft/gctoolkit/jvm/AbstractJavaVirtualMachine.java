@@ -3,6 +3,9 @@
 package com.microsoft.gctoolkit.jvm;
 
 import com.microsoft.gctoolkit.aggregator.Aggregation;
+import com.microsoft.gctoolkit.aggregator.Aggregator;
+import com.microsoft.gctoolkit.aggregator.Collates;
+import com.microsoft.gctoolkit.aggregator.EventSource;
 import com.microsoft.gctoolkit.io.DataSource;
 import com.microsoft.gctoolkit.io.GCLogFile;
 import com.microsoft.gctoolkit.message.Channels;
@@ -11,12 +14,14 @@ import com.microsoft.gctoolkit.message.JVMEventChannel;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 /**
  * An implementation of JavaVirtualMachine that uses io.vertx verticles to feed
@@ -116,16 +121,28 @@ public abstract class AbstractJavaVirtualMachine implements JavaVirtualMachine {
     }
 
     @Override
-    public void analyze(Set<Class<? extends Aggregation>> registeredAggregations, JVMEventChannel eventBus, DataSourceChannel dataSourceBus, DataSource<String> dataSource) {
+    public void analyze(List<Aggregation> registeredAggregations, JVMEventChannel eventBus, DataSourceChannel dataSourceBus, DataSource<String> dataSource) {
 
         try {
             final GCLogFile gcLogFile = (GCLogFile) dataSource;
             this.diary = gcLogFile.diary();
+            Set<EventSource> generatedEvents = diary.generatesEvents();
+            //List<? extends Class<? extends Aggregator<?>>> collations =
+            List<Class<? extends Aggregator<?>>> collations = registeredAggregations.stream()
+                    .map(aggregation -> aggregation.collates())
+                    .filter(value -> value != null)
+                    .collect(Collectors.toList());
+//            Set<? extends Class<? extends Aggregator<?>>> collations = collates.stream().map(Collates::value).collect(Collectors.toSet());
+//                    .filter(value -> value == null)
+//                    .map(Collates::value)
+//                    .filter(value -> value == null)
+//                    .collect(Collectors.toList());
+            System.out.println(collations.size() + ":" + registeredAggregations.size());
 
             //register aggregations with JVMEventBus
             dataSource.stream().forEach(message -> dataSourceBus.publish(Channels.DATA_SOURCE,message));
 
-//            GCToolkitVertxParameters GCToolkitVertxParameters = getParameters(registeredAggregations, gcLogFile.diary());
+            //GCToolkitVertxParameters GCToolkitVertxParameters = getParameters(registeredAggregations, gcLogFile.diary());
 
 //            this.timeOfLastEvent = GCToolkitVertx.aggregateDataSource(
 //                    dataSource,

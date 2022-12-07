@@ -26,9 +26,8 @@ public class DataSourceVerticle extends AbstractVerticle {
     public void start(Promise<Void> promise) {
         try {
             vertx.eventBus().<String>consumer(inbox, message -> {
-                String payload = message.body();
                 processor.receive(message.body());
-                if (GCLogFile.END_OF_DATA_SENTINEL.equals(payload)) {
+                if (GCLogFile.END_OF_DATA_SENTINEL.equals(message.body())) {
                     vertx.undeploy(id);
                     if (vertx.deploymentIDs().size() == 0)
                         vertx.close();

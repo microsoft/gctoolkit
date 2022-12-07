@@ -12,6 +12,7 @@ public enum EventSource {
      * Event come from CMS, Parallel or Serial collectors.
      */
     GENERATIONAL,
+    CMS,
     /**
      * Events come from the G1 collector.
      */
@@ -35,5 +36,9 @@ public enum EventSource {
     /**
      * Events come from the tenured space.
      */
-    TENURED;
+    TENURED,
+    /**
+     * Events that come from all sources
+     */
+    JVM;
 }

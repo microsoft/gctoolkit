@@ -4,7 +4,9 @@ package com.microsoft.gctoolkit.aggregator;
 
 import com.microsoft.gctoolkit.event.jvm.JVMEvent;
 
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
@@ -76,4 +78,5 @@ public class JVMEventDispatcher {
     public <R extends JVMEvent> void dispatch(R event) {
         getConsumerForClass(event.getClass()).accept(event);
     }
+
 }

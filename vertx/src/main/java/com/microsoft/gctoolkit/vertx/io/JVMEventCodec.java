@@ -7,6 +7,9 @@ import io.vertx.core.buffer.Buffer;
 import io.vertx.core.eventbus.MessageCodec;
 
 public class JVMEventCodec implements MessageCodec<JVMEvent, JVMEvent> {
+
+    public static String NAME = "JVMEvent";
+
     @Override
     public void encodeToWire(Buffer buffer, JVMEvent jvmEvent) {
         throw new UnsupportedOperationException();
@@ -24,7 +27,7 @@ public class JVMEventCodec implements MessageCodec<JVMEvent, JVMEvent> {
 
     @Override
     public String name() {
-        return "JVMEvent";
+        return NAME;
     }
 
     @Override

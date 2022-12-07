@@ -5,6 +5,10 @@ package com.microsoft.gctoolkit.aggregator;
 import com.microsoft.gctoolkit.event.jvm.JVMEvent;
 import com.microsoft.gctoolkit.event.jvm.JVMTermination;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.function.Consumer;
 
 /**
@@ -133,5 +137,32 @@ public abstract class Aggregator<A extends Aggregation> {
      */
     public boolean isDone() {
         return done;
+    }
+
+    public boolean aggregates(EventSource eventSource) {
+        return (eventSource != null) && aggregates(getClass(), eventSource);
+    }
+
+    private boolean aggregates(Class<?> clazz, EventSource targetEventSource) {
+        if (clazz != null && clazz != Aggregator.class) {
+
+            if (clazz.isAnnotationPresent(Aggregates.class)) {
+                Aggregates aggregates = clazz.getAnnotation(Aggregates.class);
+                if (aggregates != null) {
+                    if (Arrays.stream(aggregates.value()).anyMatch(eventSource -> eventSource.equals(targetEventSource)))
+                        return true;
+                }
+            }
+
+            if (aggregates(clazz.getSuperclass(), targetEventSource))
+                return true;
+
+            Class<?>[] interfaces = clazz.getInterfaces();
+            for (Class<?> iface : interfaces) {
+                if ( aggregates(iface, targetEventSource))
+                    return true;
+            }
+        }
+        return false;
     }
 }

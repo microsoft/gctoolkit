@@ -2,12 +2,19 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.event.jvm;
 
+import com.microsoft.gctoolkit.aggregator.EventSource;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
+
+import static com.microsoft.gctoolkit.aggregator.EventSource.JVM;
 
 /**
  * This is the base class for all JVM events created by the parser.
  */
 public abstract class JVMEvent {
+
+    public static EventSource eventSource() {
+        return JVM;
+    };
 
     private final DateTimeStamp timeStamp;
     private final double duration;
@@ -37,7 +44,6 @@ public abstract class JVMEvent {
     public double getDuration() {
         return duration;
     }
-
 
     @Override
     public String toString() {

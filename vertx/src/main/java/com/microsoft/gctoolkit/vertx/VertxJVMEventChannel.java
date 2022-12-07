@@ -7,8 +7,11 @@ import com.microsoft.gctoolkit.message.Channels;
 import com.microsoft.gctoolkit.message.JVMEventChannel;
 import com.microsoft.gctoolkit.message.JVMEventChannelListener;
 import com.microsoft.gctoolkit.vertx.io.JVMEventCodec;
+import io.vertx.core.eventbus.DeliveryOptions;
 
 public class VertxJVMEventChannel extends AbstractVertxChannel implements JVMEventChannel {
+
+    final private DeliveryOptions options = new DeliveryOptions().setCodecName(JVMEventCodec.NAME);
 
     public VertxJVMEventChannel() {
         super();
@@ -17,7 +20,11 @@ public class VertxJVMEventChannel extends AbstractVertxChannel implements JVMEve
 
     @Override
     public void publish(Channels channel, JVMEvent message) {
-        vertx().eventBus().publish(channel.getName(),message);
+        try {
+            vertx().eventBus().publish(channel.getName(), message, options);
+        } catch(Exception ex) {
+            System.out.println(ex.getCause());
+        }
     }
 
     @Override

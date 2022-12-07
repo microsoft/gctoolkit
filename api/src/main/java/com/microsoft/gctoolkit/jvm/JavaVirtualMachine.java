@@ -10,8 +10,8 @@ import com.microsoft.gctoolkit.message.DataSourceChannel;
 import com.microsoft.gctoolkit.message.JVMEventChannel;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
 
+import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 /**
  * JavaVirtualMachine is a representation of the JVM state obtained by analyzing a GC log file.
@@ -109,5 +109,5 @@ public interface JavaVirtualMachine {
      */
     <T extends Aggregation> Optional<T> getAggregation(Class<T> aggregationClass);
 
-    void analyze(Set<Class<? extends Aggregation>> registeredAggregations, JVMEventChannel eventBus, DataSourceChannel dataSourceBus, DataSource<String> dataSource);
+    void analyze(List<Aggregation> registeredAggregations, JVMEventChannel eventBus, DataSourceChannel dataSourceBus, DataSource<String> dataSource);
 }

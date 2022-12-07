@@ -15,6 +15,7 @@ import com.microsoft.gctoolkit.message.DataSourceParser;
 import com.microsoft.gctoolkit.message.JVMEventChannel;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.ServiceConfigurationError;
@@ -76,7 +77,7 @@ public class GCToolKit {
         }
     }
 
-    private final Set<Class<? extends Aggregation>> registeredAggregations;
+    private final List<Aggregation> registeredAggregations;
 
     /**
      * Instantiate a GCToolKit object. The same GCToolKit object can be used to analyze
@@ -87,7 +88,7 @@ public class GCToolKit {
     public GCToolKit() {
         // Allow for adding aggregations from source code,
         // but don't corrupt the ones loaded by the service loader
-        this.registeredAggregations = new HashSet<>();
+        this.registeredAggregations = new ArrayList<>();
     }
 
     /**
@@ -109,7 +110,6 @@ public class GCToolKit {
         ServiceLoader.load(Aggregation.class)
                 .stream()
                 .map(ServiceLoader.Provider::get)
-                .map(Aggregation::getClass)
                 .forEach(registeredAggregations::add);
         //Useful for debugging
         if ( Level.FINER.equals(LOGGER.getLevel()))
@@ -125,17 +125,17 @@ public class GCToolKit {
      * an Aggregation was registered, the {@code getAggregation} method will return
      * null if the Aggregation was not used in the analysis.
      *
-     * @param aggregationClass the Aggregation class to register.
+     * @param aggregation the Aggregation class to register.
      * @see Aggregation
      * @see JavaVirtualMachine
      */
-    public void registerAggregation(Class<? extends Aggregation> aggregationClass) {
-        registeredAggregations.add(aggregationClass);
+    public void registerAggregation(Aggregation aggregation) {
+        registeredAggregations.add(aggregation);
     }
 
     /**
      * Perform an analysis on a GC log file. The analysis will use the Aggregations
-     * that were {@link #registerAggregation(Class) registered}, if appropriate for
+     * that were {@link #registerAggregation(Aggregation) registered}, if appropriate for
      * the GC log file.
      *
      * @param dataSource The log to analyze, typically a

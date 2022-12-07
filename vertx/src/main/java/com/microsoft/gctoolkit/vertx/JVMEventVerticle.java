@@ -29,6 +29,7 @@ public class JVMEventVerticle extends AbstractVerticle {
         try {
             vertx.eventBus().<JVMEvent>consumer(inbox, message -> {
                 JVMEvent event = message.body();
+                System.out.println("JVMEvent receive : " + event.toString());
                 processor.receive(event);
                 if ( event instanceof JVMTermination) {
                     vertx.undeploy(id);

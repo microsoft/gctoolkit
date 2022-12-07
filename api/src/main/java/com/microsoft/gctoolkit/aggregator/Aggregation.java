@@ -4,6 +4,8 @@ package com.microsoft.gctoolkit.aggregator;
 
 import com.microsoft.gctoolkit.jvm.JavaVirtualMachine;
 
+import java.util.Arrays;
+
 /**
  * An {@code Aggregation} collates data from an {@link Aggregator} and may be thought of as a view
  * of the data. An {@code Aggregation} might collate data into a time series for plotting, or it might
@@ -99,5 +101,33 @@ public interface Aggregation {
      * @return {@code true} if there is no data in the Aggregation.
      */
     boolean isEmpty();
+
+    default Class<? extends Aggregator<?>> collates() {
+        return collates(getClass());
+    }
+
+    private Class<? extends Aggregator<?>> collates(Class<?> clazz) {
+        Class<? extends Aggregator<?>> target;
+        if (clazz != null && clazz != Aggregation.class) {
+
+            if (clazz.isAnnotationPresent(Collates.class)) {
+                Collates collates = clazz.getAnnotation(Collates.class);
+                return collates.value();
+            }
+
+            Class<?> superClass = clazz.getSuperclass();
+            target = collates(superClass);
+            if ( target != null)
+                return target;
+
+            Class<?>[] interfaces = clazz.getInterfaces();
+            for (Class<?> iface : interfaces) {
+                target = collates(iface);
+                if (target != null)
+                    return target;
+            }
+        }
+        return null;
+    }
     
 }
