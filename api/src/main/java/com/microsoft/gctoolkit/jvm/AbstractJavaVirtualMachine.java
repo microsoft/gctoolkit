@@ -6,14 +6,21 @@ import com.microsoft.gctoolkit.aggregator.Aggregation;
 import com.microsoft.gctoolkit.aggregator.Aggregator;
 import com.microsoft.gctoolkit.aggregator.Collates;
 import com.microsoft.gctoolkit.aggregator.EventSource;
+import com.microsoft.gctoolkit.event.jvm.JVMEvent;
 import com.microsoft.gctoolkit.io.DataSource;
 import com.microsoft.gctoolkit.io.GCLogFile;
 import com.microsoft.gctoolkit.message.Channels;
 import com.microsoft.gctoolkit.message.DataSourceChannel;
 import com.microsoft.gctoolkit.message.JVMEventChannel;
+import com.microsoft.gctoolkit.message.JVMEventChannelAggregator;
+import com.microsoft.gctoolkit.message.JVMEventChannelListener;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
 
 import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Parameter;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -82,9 +89,10 @@ public abstract class AbstractJavaVirtualMachine implements JavaVirtualMachine {
      * todo: fix this to be a globally available value. Also, the JVM start time is not zero if the time
      * If the first event is significantly distant from zero in relation to the time intervals between the
      * of the next N events, where N maybe 1, then this is likely a log fragment and not the start of the run.
-     *
+     * <p>
      * Try to estimate the time at which the JVM started. For log fragments, this will be the time
      * of the first event in the log. Otherwise it will be 0.000 seconds.
+     *
      * @return DateTimeStamp
      */
     @Override
@@ -102,6 +110,7 @@ public abstract class AbstractJavaVirtualMachine implements JavaVirtualMachine {
     /**
      * JVM termination time will be one of either, the time stamp in the termination event if present or, the
      * time of the last event + that events duration.
+     *
      * @return DateTimeStamp
      */
     @Override
@@ -120,6 +129,16 @@ public abstract class AbstractJavaVirtualMachine implements JavaVirtualMachine {
         return Optional.ofNullable((T) aggregatedData.get(aggregationClass));
     }
 
+    private Constructor<? extends Aggregator<?>> constructor(Class targetClazz) {
+        Constructor[] constructors = targetClazz.getConstructors();
+        for ( Constructor constructor : constructors) {
+            Parameter[] parameters = constructor.getParameters();
+            if ( parameters.length == 1 && Aggregation.class.isAssignableFrom(parameters[0].getType()))
+                return constructor;
+        }
+        return null;
+    }
+
     @Override
     public void analyze(List<Aggregation> registeredAggregations, JVMEventChannel eventBus, DataSourceChannel dataSourceBus, DataSource<String> dataSource) {
 
@@ -127,38 +146,21 @@ public abstract class AbstractJavaVirtualMachine implements JavaVirtualMachine {
             final GCLogFile gcLogFile = (GCLogFile) dataSource;
             this.diary = gcLogFile.diary();
             Set<EventSource> generatedEvents = diary.generatesEvents();
-            //List<? extends Class<? extends Aggregator<?>>> collations =
-            List<Class<? extends Aggregator<?>>> collations = registeredAggregations.stream()
-                    .map(aggregation -> aggregation.collates())
-                    .filter(value -> value != null)
-                    .collect(Collectors.toList());
-//            Set<? extends Class<? extends Aggregator<?>>> collations = collates.stream().map(Collates::value).collect(Collectors.toSet());
-//                    .filter(value -> value == null)
-//                    .map(Collates::value)
-//                    .filter(value -> value == null)
-//                    .collect(Collectors.toList());
-            System.out.println(collations.size() + ":" + registeredAggregations.size());
+            for (Aggregation aggregation : registeredAggregations) {
+                Constructor<? extends Aggregator<?>> constructor = constructor(aggregation.collates());
+                if ( constructor == null) continue;
+                Aggregator aggregator = constructor.newInstance(aggregation);
+                aggregatedData.put(aggregation.getClass(), aggregation);
+                Optional<EventSource> source = generatedEvents.stream().filter(event -> aggregator.aggregates(event)).findFirst();
+                if (source.isPresent()) {
+                    JVMEventChannelAggregator eventChannelAggregator = new JVMEventChannelAggregator(source.get().toChannel(), aggregator);
+                    eventBus.registerListener(eventChannelAggregator);
+                }
+            }
 
-            //register aggregations with JVMEventBus
-            dataSource.stream().forEach(message -> dataSourceBus.publish(Channels.DATA_SOURCE,message));
+            dataSource.stream().forEach(message -> dataSourceBus.publish(Channels.DATA_SOURCE, message));
 
-            //GCToolkitVertxParameters GCToolkitVertxParameters = getParameters(registeredAggregations, gcLogFile.diary());
-
-//            this.timeOfLastEvent = GCToolkitVertx.aggregateDataSource(
-//                    dataSource,
-//                    GCToolkitVertxParameters.logFileParsers(),
-//                    GCToolkitVertxParameters.aggregatorVerticles(),
-//                    GCToolkitVertxParameters.mailBox()
-//            );
-//
-//            GCToolkitVertxParameters.aggregatorVerticles().stream()
-//                    .flatMap(aggregatorVerticle -> aggregatorVerticle.aggregators().stream())
-//                    .forEach(aggregator -> {
-//                        Aggregation aggregation = aggregator.aggregation();
-//                        this.aggregatedData.put(aggregation.getClass(), aggregation);
-//                    });
-
-        } catch (IOException | ClassCastException e ) {
+        } catch (IOException | ClassCastException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
             LOGGER.log(Level.WARNING, e.getMessage(), e);
         }
     }

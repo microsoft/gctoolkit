@@ -29,7 +29,7 @@ public class CMSTenuredPoolParser extends PreUnifiedGCLogParser implements Simpl
     public CMSTenuredPoolParser() {}
 
     public String getName() {
-        return "CMSTenuredPoolParser";
+        return Channels.CMS_TENURED_POOL_PARSER_OUTBOX.toString();
     }
 
     @Override

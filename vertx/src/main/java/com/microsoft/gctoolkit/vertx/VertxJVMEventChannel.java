@@ -14,7 +14,6 @@ public class VertxJVMEventChannel extends AbstractVertxChannel implements JVMEve
     final private DeliveryOptions options = new DeliveryOptions().setCodecName(JVMEventCodec.NAME);
 
     public VertxJVMEventChannel() {
-        super();
         vertx().eventBus().registerDefaultCodec(JVMEvent.class, new JVMEventCodec());
     }
 

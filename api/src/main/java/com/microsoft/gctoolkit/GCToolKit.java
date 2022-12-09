@@ -152,7 +152,6 @@ public class GCToolKit {
         DataSourceChannel dataSourceChannel = loadDataSourceChannel();
         JVMEventChannel jvmEventChannel = loadJVMEventChannel();
         loadDataSourceParsers(dataSourceChannel, jvmEventChannel, logFile.diary());
-        loadAggregationsFromServiceLoader();
         JavaVirtualMachine javaVirtualMachine = null;
         try {
             javaVirtualMachine = loadJavaVirtualMachine(logFile);

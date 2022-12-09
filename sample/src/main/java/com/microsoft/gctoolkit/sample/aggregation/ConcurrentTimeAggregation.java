@@ -7,10 +7,20 @@ import com.microsoft.gctoolkit.aggregator.Collates;
  * PauseTimeAggregation gets its data from a PauseTimeAggregator.
  */
 @Collates(ConcurrentTimeAggregator.class)
-public abstract class PauseTimeAggregation extends RuntimeAggregation {
+public class ConcurrentTimeAggregation extends RuntimeAggregation {
     /**
      * Record the duration of a pause event. This method is called from PauseTimeAggregator.
      * @param duration The duration (in decimal seconds) of a GC pause.
      */
-    public abstract void recordPauseDuration(double duration);
+    public void recordDuration(double duration) {};
+
+    @Override
+    public boolean hasWarning() {
+        return false;
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return false;
+    }
 }

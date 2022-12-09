@@ -406,8 +406,11 @@ public class Diary {
         evaluate(generatedEvents, APPLICATION_CONCURRENT_TIME, SAFEPOINT);
         evaluate(generatedEvents, DEFNEW, EventSource.GENERATIONAL);
         evaluate(generatedEvents, PARNEW, EventSource.GENERATIONAL);
-        evaluate(generatedEvents, CMS, EventSource.CMS);
-        evaluate(generatedEvents, ICMS, EventSource.CMS);
+        if (isUnifiedLogging())
+            evaluate(generatedEvents, CMS, EventSource.CMS_UNIFIED);
+        else
+            evaluate(generatedEvents, CMS, EventSource.CMS8);
+        evaluate(generatedEvents, ICMS, EventSource.CMS8);
         evaluate(generatedEvents, PARALLELGC, EventSource.GENERATIONAL);
         evaluate(generatedEvents, PARALLELOLDGC, EventSource.GENERATIONAL);
         evaluate(generatedEvents, SERIAL, EventSource.GENERATIONAL);

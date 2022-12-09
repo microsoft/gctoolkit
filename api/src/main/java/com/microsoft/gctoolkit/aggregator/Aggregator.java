@@ -4,6 +4,7 @@ package com.microsoft.gctoolkit.aggregator;
 
 import com.microsoft.gctoolkit.event.jvm.JVMEvent;
 import com.microsoft.gctoolkit.event.jvm.JVMTermination;
+import com.microsoft.gctoolkit.message.JVMEventChannelListener;
 
 import java.util.Arrays;
 import java.util.Collections;
