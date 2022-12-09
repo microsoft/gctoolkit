@@ -144,7 +144,6 @@ public abstract class AbstractJavaVirtualMachine implements JavaVirtualMachine {
 
         try {
             final GCLogFile gcLogFile = (GCLogFile) dataSource;
-            this.diary = gcLogFile.diary();
             Set<EventSource> generatedEvents = diary.generatesEvents();
             for (Aggregation aggregation : registeredAggregations) {
                 Constructor<? extends Aggregator<?>> constructor = constructor(aggregation.collates());
