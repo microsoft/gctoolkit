@@ -2,11 +2,11 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.jvm;
 
-import com.microsoft.gctoolkit.aggregator.Aggregation;
 import com.microsoft.gctoolkit.io.DataSource;
 import com.microsoft.gctoolkit.io.GCLogFile;
 
-import java.util.Set;
+import java.io.IOException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -18,9 +18,18 @@ import java.util.logging.Logger;
  */
 public class UnifiedJavaVirtualMachine extends AbstractJavaVirtualMachine {
 
+    private static final Logger LOGGER = Logger.getLogger(UnifiedJavaVirtualMachine.class.getName());
+
     @Override
     public boolean accepts(DataSource logFile) {
-        return ((GCLogFile)logFile).isUnified();
+        try {
+            if (((GCLogFile) logFile).isUnified()) {
+                super.setDataSource(logFile);
+                return true;
+            }
+        } catch(IOException ioe) {
+            LOGGER.log(Level.WARNING, ioe.getMessage());
+        }
+        return false;
     }
-
 }

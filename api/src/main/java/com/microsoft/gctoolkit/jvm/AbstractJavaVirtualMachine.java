@@ -4,23 +4,19 @@ package com.microsoft.gctoolkit.jvm;
 
 import com.microsoft.gctoolkit.aggregator.Aggregation;
 import com.microsoft.gctoolkit.aggregator.Aggregator;
-import com.microsoft.gctoolkit.aggregator.Collates;
 import com.microsoft.gctoolkit.aggregator.EventSource;
-import com.microsoft.gctoolkit.event.jvm.JVMEvent;
 import com.microsoft.gctoolkit.io.DataSource;
 import com.microsoft.gctoolkit.io.GCLogFile;
 import com.microsoft.gctoolkit.message.Channels;
 import com.microsoft.gctoolkit.message.DataSourceChannel;
 import com.microsoft.gctoolkit.message.JVMEventChannel;
 import com.microsoft.gctoolkit.message.JVMEventChannelAggregator;
-import com.microsoft.gctoolkit.message.JVMEventChannelListener;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
 
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Parameter;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -28,7 +24,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 /**
  * An implementation of JavaVirtualMachine that uses io.vertx verticles to feed
@@ -42,9 +37,15 @@ public abstract class AbstractJavaVirtualMachine implements JavaVirtualMachine {
     private static final Logger LOGGER = Logger.getLogger(AbstractJavaVirtualMachine.class.getName());
     private static final double LOG_FRAGMENT_THRESHOLD_SECONDS = 60.0d; //todo: replace magic threshold with a heuristic
 
+    private GCLogFile dataSource;
     private Diary diary;
     private DateTimeStamp timeOfLastEvent;
     private final Map<Class<? extends Aggregation>, Aggregation> aggregatedData = new ConcurrentHashMap<>();
+
+    public void setDataSource(DataSource logFile) throws IOException {
+        this.dataSource = (GCLogFile) logFile;
+        this.diary = logFile.diary();
+    }
 
     @Override
     public boolean isG1GC() {
@@ -140,10 +141,9 @@ public abstract class AbstractJavaVirtualMachine implements JavaVirtualMachine {
     }
 
     @Override
-    public void analyze(List<Aggregation> registeredAggregations, JVMEventChannel eventBus, DataSourceChannel dataSourceBus, DataSource<String> dataSource) {
+    public void analyze(List<Aggregation> registeredAggregations, JVMEventChannel eventBus, DataSourceChannel dataSourceBus) {
 
         try {
-            final GCLogFile gcLogFile = (GCLogFile) dataSource;
             Set<EventSource> generatedEvents = diary.generatesEvents();
             for (Aggregation aggregation : registeredAggregations) {
                 Constructor<? extends Aggregator<?>> constructor = constructor(aggregation.collates());

@@ -4,12 +4,8 @@ package com.microsoft.gctoolkit.aggregator;
 
 import com.microsoft.gctoolkit.event.jvm.JVMEvent;
 import com.microsoft.gctoolkit.event.jvm.JVMTermination;
-import com.microsoft.gctoolkit.message.JVMEventChannelListener;
 
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.function.Consumer;
 
 /**
@@ -119,8 +115,8 @@ public abstract class Aggregator<A extends Aggregation> {
      * @param event an event to be processed
      * @param < E> the type of JVMEvent
      */
-    //@Override
     public void receive(JVMEvent event) {
+        aggregation().updateTime(event.getDateTimeStamp(), event.getDuration());
         jvmEventDispatcher.dispatch(event);
     }
 
@@ -129,6 +125,7 @@ public abstract class Aggregator<A extends Aggregation> {
      * @param event JVMTermination is a sentinel for the end of log processing.
      */
     private void terminationHandler(JVMTermination event) {
+        aggregation().updateTime(event.getDateTimeStamp(), event.getDuration());
         done = true;
     }
 

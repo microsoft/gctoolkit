@@ -3,6 +3,7 @@
 package com.microsoft.gctoolkit.aggregator;
 
 import com.microsoft.gctoolkit.jvm.JavaVirtualMachine;
+import com.microsoft.gctoolkit.time.DateTimeStamp;
 
 /**
  * An {@code Aggregation} collates data from an {@link Aggregator} and may be thought of as a view
@@ -99,6 +100,22 @@ public interface Aggregation {
      * @return {@code true} if there is no data in the Aggregation.
      */
     boolean isEmpty();
+
+    RuntimeDuration runtimeDuration = new RuntimeDuration();
+
+    default void updateTime(DateTimeStamp eventTime, double eventDuration) {
+        runtimeDuration.update(eventTime, eventDuration);
+    }
+
+    default RuntimeDuration getRuntimeDurationDetails() {
+        return runtimeDuration;
+    }
+
+    default double getRuntimeDuration() {
+        return runtimeDuration.getEstimatedRuntime();
+    }
+
+    //todo: add method to process termination. Should be processed irregardless of any user defined handler
 
     default Class<? extends Aggregator<?>> collates() {
         return collates(getClass());

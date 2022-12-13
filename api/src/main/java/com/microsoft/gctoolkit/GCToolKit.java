@@ -9,18 +9,15 @@ import com.microsoft.gctoolkit.io.RotatingGCLogFile;
 import com.microsoft.gctoolkit.io.SingleGCLogFile;
 import com.microsoft.gctoolkit.jvm.Diary;
 import com.microsoft.gctoolkit.jvm.JavaVirtualMachine;
-import com.microsoft.gctoolkit.message.Channels;
 import com.microsoft.gctoolkit.message.DataSourceChannel;
 import com.microsoft.gctoolkit.message.DataSourceParser;
 import com.microsoft.gctoolkit.message.JVMEventChannel;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.ServiceConfigurationError;
 import java.util.ServiceLoader;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -155,7 +152,7 @@ public class GCToolKit {
         JavaVirtualMachine javaVirtualMachine = null;
         try {
             javaVirtualMachine = loadJavaVirtualMachine(logFile);
-            javaVirtualMachine.analyze(this.registeredAggregations, jvmEventChannel, dataSourceChannel, logFile);
+            javaVirtualMachine.analyze(this.registeredAggregations, jvmEventChannel, dataSourceChannel);
         } catch(Throwable t) {
             LOGGER.log(Level.SEVERE, "Internal Error: Cannot invoke analyze method", t);
         }

@@ -6,7 +6,9 @@ import com.microsoft.gctoolkit.aggregator.Aggregation;
 import com.microsoft.gctoolkit.io.DataSource;
 import com.microsoft.gctoolkit.io.GCLogFile;
 
+import java.io.IOException;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -23,15 +25,19 @@ public class PreUnifiedJavaVirtualMachine extends AbstractJavaVirtualMachine {
     // Safepoint details are in a different log and would be loaded separately pre-unified.
     @Override
     public boolean accepts(DataSource logFile) {
-        if ( logFile instanceof GCLogFile)
-            return ! ((GCLogFile)logFile).isUnified();
+        try {
+            if (logFile instanceof GCLogFile) {
+                if (!((GCLogFile) logFile).isUnified()) {
+                    super.setDataSource(logFile);
+                    return true;
+                }
+            }
+        } catch(IOException ioe) {
+            LOGGER.log(Level.WARNING, ioe.getMessage());
+        }
+
         return false;
     }
-
-//    @Override
-//    GCToolkitVertxParameters getParameters(Set<Class<? extends Aggregation>> registeredAggregations, Diary diary) {
-//        return new GCToolkitVertxParametersForPreUnifiedLogs(registeredAggregations, diary);
-//    }
 
     @Override
     public boolean isZGC() {
