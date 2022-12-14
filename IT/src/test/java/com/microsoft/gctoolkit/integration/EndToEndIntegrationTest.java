@@ -100,7 +100,6 @@ public class EndToEndIntegrationTest {
     private int initialMarkCount = 0;
     private int remarkCount = 0;
     private int defNewCount = 0;
-    private double runtime = 0.0d;
 
     public int getInitialMarkCount() {
         return initialMarkCount;
@@ -112,10 +111,6 @@ public class EndToEndIntegrationTest {
 
     public int getDefNewCount() {
         return defNewCount;
-    }
-
-    public double getRuntime() {
-        return runtime;
     }
 
 }

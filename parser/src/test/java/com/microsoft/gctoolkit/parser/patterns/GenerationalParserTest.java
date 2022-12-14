@@ -19,7 +19,7 @@ import com.microsoft.gctoolkit.parser.jvm.PreUnifiedDiarizer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
@@ -28,16 +28,14 @@ public class GenerationalParserTest extends ParserTest {
 
     private static final String END_OF_DATA_SENTINEL = GCLogFile.END_OF_DATA_SENTINEL;
 
+    private ParserTestSupportChannel channel;
     private GenerationalHeapParser parser;
-    private ArrayList<JVMEvent> collection;
+    private List<JVMEvent> collection;
 
     @BeforeEach
     public void setUp() {
-        collection = new ArrayList<>();
-
-        //parser = new GenerationalHeapParser(new PreUnifiedDiarizer().getDiary(), event -> collection.add(event));
         parser = new GenerationalHeapParser();
-        parser.diary(new PreUnifiedDiarizer().getDiary());
+        collection = super.setup(parser, new PreUnifiedDiarizer().getDiary()).events();
     }
 
     @Test

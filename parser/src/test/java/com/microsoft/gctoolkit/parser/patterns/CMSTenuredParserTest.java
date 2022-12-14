@@ -17,7 +17,7 @@ import com.microsoft.gctoolkit.parser.jvm.PreUnifiedDiarizer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -25,15 +25,12 @@ import static org.junit.jupiter.api.Assertions.fail;
 public class CMSTenuredParserTest extends ParserTest {
 
     private CMSTenuredPoolParser parser;
-
-    private ArrayList<JVMEvent> jvmEvents;
+    private List<JVMEvent> jvmEvents;
 
     @BeforeEach
     public void setUp() {
-
-        jvmEvents = new ArrayList<>();
         parser = new CMSTenuredPoolParser();
-        parser.diary(new PreUnifiedDiarizer().getDiary());
+        jvmEvents = super.setup(parser, new PreUnifiedDiarizer().getDiary()).events();
     }
 
     @Test

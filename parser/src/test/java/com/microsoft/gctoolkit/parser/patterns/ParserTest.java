@@ -4,13 +4,27 @@ package com.microsoft.gctoolkit.parser.patterns;
 
 
 import com.microsoft.gctoolkit.event.MemoryPoolSummary;
+import com.microsoft.gctoolkit.event.jvm.JVMEvent;
+import com.microsoft.gctoolkit.jvm.Diary;
+import com.microsoft.gctoolkit.message.Channels;
+import com.microsoft.gctoolkit.message.JVMEventChannel;
+import com.microsoft.gctoolkit.message.JVMEventChannelListener;
 import com.microsoft.gctoolkit.parser.GCLogParser;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ParserTest {
+
+    protected ParserTestSupportChannel setup(GCLogParser parser, Diary diary) {
+        ParserTestSupportChannel  channel = new ParserTestSupportChannel();
+        parser.publishTo(channel);
+        parser.diary(diary);
+        return channel;
+    }
 
 
     /**
@@ -37,5 +51,25 @@ public class ParserTest {
         assertEquals(summary.getSizeBeforeCollection(), sizeAtStartOfCollection);
         assertEquals(summary.getOccupancyAfterCollection(), occupancyAfterCollection);
         assertEquals(summary.getSizeAfterCollection(), sizeAfterCollection);
+    }
+
+    public class ParserTestSupportChannel implements JVMEventChannel {
+
+        final List<JVMEvent> events = new ArrayList<>();
+        ParserTestSupportChannel() {}
+
+        @Override
+        public void registerListener(JVMEventChannelListener listener) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void publish(Channels channel, JVMEvent message) {
+            events.add(message);
+        }
+
+        public List<JVMEvent> events() {
+            return events;
+        }
     }
 }
