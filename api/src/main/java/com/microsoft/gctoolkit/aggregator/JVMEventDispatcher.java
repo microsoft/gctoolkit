@@ -4,31 +4,25 @@ package com.microsoft.gctoolkit.aggregator;
 
 import com.microsoft.gctoolkit.event.jvm.JVMEvent;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * This is a utility class that supports the {@link Aggregator#register(Class, Consumer)} method.
  */
 public class JVMEventDispatcher {
 
-    private static final Logger LOGGER = Logger.getLogger(JVMEventDispatcher.class.getName());
-    private final Map<Class<? extends JVMEvent>, List<Consumer<? super JVMEvent>>> eventConsumers = new ConcurrentHashMap<>();
+    private final Map<Class<? extends JVMEvent>, Consumer<? super JVMEvent>> eventConsumers = new ConcurrentHashMap<>();
 
-    private final List<Consumer<? super JVMEvent>> nopConsumer = List.of((evt) -> {
-    });
+    private final Consumer<? super JVMEvent> nopConsumer = (evt) -> {};
 
     @SuppressWarnings("unchecked")
-    private <R extends JVMEvent> List<Consumer<? super JVMEvent>> getConsumersForClass(Class<R> eventClass) {
+    private <R extends JVMEvent> Consumer<? super JVMEvent> getConsumerForClass(Class<R> eventClass) {
         Class<? extends JVMEvent> clazz = eventClass;
 
         //Fast path that should hit after the event has been seen for the first time
-        List<Consumer<? super JVMEvent>> eventConsumer = eventConsumers.get(clazz);
+        Consumer<? super JVMEvent> eventConsumer = eventConsumers.get(clazz);
         if (eventConsumer != null) {
             return eventConsumer;
         }
@@ -70,11 +64,7 @@ public class JVMEventDispatcher {
      */
     @SuppressWarnings("unchecked")
     public <R extends JVMEvent> void register(Class<R> eventClass, Consumer<? super R> process) {
-        List<Consumer<? super JVMEvent>> consumers = eventConsumers.get(eventClass);
-        if (consumers == null)
-            consumers = new ArrayList<>();
-        consumers.add((Consumer<? super JVMEvent>) process);
-        eventConsumers.put(eventClass, consumers);
+        eventConsumers.put(eventClass, eventConsumers.get(eventClass));
     }
 
     /**
@@ -85,13 +75,7 @@ public class JVMEventDispatcher {
      * @param <R> the type of JVMEvent.
      */
     public <R extends JVMEvent> void dispatch(R event) {
-        getConsumersForClass(event.getClass()).forEach(consumer -> {
-            try {
-                consumer.accept(event);
-            } catch(Throwable t) {
-                LOGGER.log(Level.WARNING,t.getMessage());
-            }
-        });
+        getConsumerForClass(event.getClass()).accept(event);
     }
 
 }
