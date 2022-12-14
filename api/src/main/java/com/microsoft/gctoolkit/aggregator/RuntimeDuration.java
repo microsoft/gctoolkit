@@ -29,8 +29,9 @@ public class RuntimeDuration {
      * @return double for life span of JVM.
      */
     public double getEstimatedRuntime() {
-        if ( estimatedTimeOfTermination != null && jvmStartTime != null)
-            return estimatedTimeOfTermination.getTimeStamp() - jvmStartTime.getTimeStamp();
+        if ( estimatedTimeOfTermination != null && jvmStartTime != null) {
+            return estimatedTimeOfTermination.getTimeStamp() - ((jvmStartTime.getTimeStamp() < 10.0d) ? 0.0d : jvmStartTime.getTimeStamp());
+        }
         return -1.0d;
     }
 }

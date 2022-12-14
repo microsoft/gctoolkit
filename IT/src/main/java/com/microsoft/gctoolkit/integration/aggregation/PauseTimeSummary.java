@@ -9,7 +9,6 @@ package com.microsoft.gctoolkit.integration.aggregation;
 public class PauseTimeSummary extends PauseTimeAggregation {
 
     private double totalPauseTime;
-    private double runtime;
 
     @Override
     public boolean hasWarning() {
@@ -26,11 +25,6 @@ public class PauseTimeSummary extends PauseTimeAggregation {
         totalPauseTime += duration;
     }
 
-    @Override
-    public void recordRuntime(double runtime) {
-        this.runtime = runtime;
-    }
-
     /**
      * Get the total amount of time the application was paused for garbage collection.
      * @return The total pause time.
@@ -44,11 +38,11 @@ public class PauseTimeSummary extends PauseTimeAggregation {
      * @return The percentage of time the application was paused.
      */
     public double getPercentPaused() {
-        return (totalPauseTime / runtime) * 100.0D;
+        return (totalPauseTime / super.getRuntimeDuration()) * 100.0D;
     }
 
     /**
      *
      */
-    public double getRuntime() { return runtime; }
+    public double getRuntime() { return super.getRuntimeDuration(); }
 }

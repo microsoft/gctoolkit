@@ -73,7 +73,6 @@ public abstract class Aggregator<A extends Aggregation> {
      */
     protected Aggregator(A aggregation) {
         this.aggregation = aggregation;
-        register(JVMTermination.class,this::terminationHandler);
     }
 
     /**
@@ -118,15 +117,7 @@ public abstract class Aggregator<A extends Aggregation> {
     public void receive(JVMEvent event) {
         aggregation().updateTime(event.getDateTimeStamp(), event.getDuration());
         jvmEventDispatcher.dispatch(event);
-    }
-
-    /**
-     * The JVMTermination event signals the end of processing of a log file.
-     * @param event JVMTermination is a sentinel for the end of log processing.
-     */
-    private void terminationHandler(JVMTermination event) {
-        aggregation().updateTime(event.getDateTimeStamp(), event.getDuration());
-        done = true;
+        if (event instanceof JVMTermination) done = true;
     }
 
     /**

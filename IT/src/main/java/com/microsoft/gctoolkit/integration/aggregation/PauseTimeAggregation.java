@@ -14,5 +14,4 @@ public abstract class PauseTimeAggregation extends RuntimeAggregation {
      */
     public abstract void recordPauseDuration(double duration);
 
-    public abstract void recordRuntime(double runtime);
 }

@@ -16,7 +16,6 @@ public class PauseTimeAggregator extends RuntimeAggregator<PauseTimeAggregation>
         super(aggregation);
         register(G1RealPause.class, this::process);
         register(GenerationalGCPauseEvent.class, this::publish);
-        register(JVMTermination.class, this::publish);
     }
 
     private void publish(GenerationalGCPauseEvent event) {
@@ -25,9 +24,5 @@ public class PauseTimeAggregator extends RuntimeAggregator<PauseTimeAggregation>
 
     private void process(G1RealPause event) {
         aggregation().recordPauseDuration(event.getDuration());
-    }
-
-    private void publish(JVMTermination event) {
-        aggregation().recordRuntime(event.getEstimatedRuntimeDuration());
     }
 }
