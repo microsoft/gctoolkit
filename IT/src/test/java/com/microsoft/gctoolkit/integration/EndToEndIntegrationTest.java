@@ -55,7 +55,7 @@ public class EndToEndIntegrationTest {
 
         System.out.println("sleeping");
         try {
-            Thread.sleep(30000);
+            Thread.sleep(10000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

@@ -32,4 +32,9 @@ public class UnifiedJavaVirtualMachine extends AbstractJavaVirtualMachine {
         }
         return false;
     }
+
+    @Override
+    public boolean isUnifiedLogging() {
+        return true;
+    }
 }

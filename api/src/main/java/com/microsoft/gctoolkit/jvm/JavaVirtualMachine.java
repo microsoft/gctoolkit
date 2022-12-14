@@ -29,6 +29,12 @@ public interface JavaVirtualMachine {
     boolean accepts(DataSource dataSource);
 
     /**
+     *
+     */
+
+    boolean isUnifiedLogging();
+
+    /**
      * Return {@code true} if the JVM was using G1GC.
      * @return {@code true} if the GC is G1GC.
      */

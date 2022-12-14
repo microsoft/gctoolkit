@@ -40,6 +40,11 @@ public class PreUnifiedJavaVirtualMachine extends AbstractJavaVirtualMachine {
     }
 
     @Override
+    public boolean isUnifiedLogging() {
+        return false;
+    }
+
+    @Override
     public boolean isZGC() {
         return false;
     }

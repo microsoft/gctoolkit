@@ -5,6 +5,7 @@ package com.microsoft.gctoolkit.aggregator;
 import com.microsoft.gctoolkit.event.jvm.JVMEvent;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
@@ -64,7 +65,7 @@ public class JVMEventDispatcher {
      */
     @SuppressWarnings("unchecked")
     public <R extends JVMEvent> void register(Class<R> eventClass, Consumer<? super R> process) {
-        eventConsumers.put(eventClass, eventConsumers.get(eventClass));
+        eventConsumers.put(eventClass, (Consumer<JVMEvent>)process);
     }
 
     /**
