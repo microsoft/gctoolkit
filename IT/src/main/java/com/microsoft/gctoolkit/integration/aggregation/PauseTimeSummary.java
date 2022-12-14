@@ -41,8 +41,4 @@ public class PauseTimeSummary extends PauseTimeAggregation {
         return (totalPauseTime / super.getRuntimeDuration()) * 100.0D;
     }
 
-    /**
-     *
-     */
-    public double getRuntime() { return super.getRuntimeDuration(); }
 }

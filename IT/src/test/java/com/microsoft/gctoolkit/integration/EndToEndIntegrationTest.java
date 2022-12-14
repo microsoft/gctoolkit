@@ -91,8 +91,7 @@ public class EndToEndIntegrationTest {
         // Retrieves the Aggregation for PauseTimeSummary. This is a com.microsoft.gctoolkit.sample.aggregation.RuntimeAggregation.
         machine.getAggregation(PauseTimeSummary.class).ifPresent(pauseTimeSummary -> {
             Assertions.assertEquals( 208922, (int)(pauseTimeSummary.getTotalPauseTime() * 1000.0d), "Total Pause Time");
-            Assertions.assertEquals( 608797894, (int)(pauseTimeSummary.getRuntimeDuration() * 1000.0d), "Runtime duration");
-            Assertions.assertEquals(608800.079d, pauseTimeSummary.getRuntime(), "runtime");
+            Assertions.assertEquals( 608800087, (int)(pauseTimeSummary.getRuntimeDuration() * 1000.0d), "Runtime duration");
             Assertions.assertEquals( 34, (int)(pauseTimeSummary.getPercentPaused() * 1000d), "percent paused");
         });
 

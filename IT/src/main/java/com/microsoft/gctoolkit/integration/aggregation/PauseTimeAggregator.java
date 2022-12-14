@@ -1,6 +1,7 @@
 package com.microsoft.gctoolkit.integration.aggregation;
 
 import com.microsoft.gctoolkit.aggregator.Aggregates;
+import com.microsoft.gctoolkit.aggregator.Aggregator;
 import com.microsoft.gctoolkit.aggregator.EventSource;
 import com.microsoft.gctoolkit.event.g1gc.G1RealPause;
 import com.microsoft.gctoolkit.event.generational.GenerationalGCPauseEvent;
@@ -10,7 +11,7 @@ import com.microsoft.gctoolkit.event.jvm.JVMTermination;
  * An Aggregator that extracts pause time.
  */
 @Aggregates({EventSource.G1GC, EventSource.GENERATIONAL})
-public class PauseTimeAggregator extends RuntimeAggregator<PauseTimeAggregation> {
+public class PauseTimeAggregator extends Aggregator<PauseTimeAggregation> {
 
     public PauseTimeAggregator(PauseTimeAggregation aggregation) {
         super(aggregation);
