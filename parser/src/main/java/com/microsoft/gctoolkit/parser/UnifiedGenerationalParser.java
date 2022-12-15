@@ -114,17 +114,14 @@ public class UnifiedGenerationalParser extends UnifiedGCLogParser implements Uni
                 .map(rule -> new AbstractMap.SimpleEntry<>(rule, rule.parse(line)))
                 .filter(tuple -> tuple.getValue() != null)
                 .findFirst();
-        if (!ruleToApply.isPresent()) {
-            log(line);
-            return;
-        }
-
         try {
-            parseRules.get(ruleToApply.get().getKey()).accept(ruleToApply.get().getValue(), line);
+            if (ruleToApply.isPresent())
+                parseRules.get(ruleToApply.get().getKey()).accept(ruleToApply.get().getValue(), line);
+            else
+                LOGGER.log(Level.FINE, "Missed: {0}", line);
         } catch (Throwable t) {
             LOGGER.throwing(this.getName(), "process", t);
         }
-        log(line);
     }
 
     /*************
@@ -135,10 +132,6 @@ public class UnifiedGenerationalParser extends UnifiedGCLogParser implements Uni
     private GenerationalForwardReference concurrentCyclePauseEvent = null;
     private GenerationalForwardReference concurrentEvent = null;
     private boolean inConcurrentPhase = false;
-
-//    private boolean isCMS;
-//    private boolean isParallel;
-//    private boolean isSerial;
 
     private void tag(GCLogTrace trace, String line) {
         noop();
@@ -539,15 +532,6 @@ public class UnifiedGenerationalParser extends UnifiedGCLogParser implements Uni
         if (line.contains("workers")) return true;
         if (line.contains("Heap address")) return true;
         return line.contains("Desired") || line.contains("Age table") || line.contains("- age ");
-    }
-
-
-    private void log(String line) {
-        if (debugging)
-            LOGGER.fine("Missed: " + line);
-
-        LOGGER.log(Level.FINE, "Missed: {0}", line);
-
     }
 
     @Override
