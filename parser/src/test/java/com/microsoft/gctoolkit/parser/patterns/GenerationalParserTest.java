@@ -14,6 +14,8 @@ import com.microsoft.gctoolkit.event.generational.ParNewPromotionFailed;
 import com.microsoft.gctoolkit.event.generational.SystemGC;
 import com.microsoft.gctoolkit.event.jvm.JVMEvent;
 import com.microsoft.gctoolkit.io.GCLogFile;
+import com.microsoft.gctoolkit.jvm.Diarizer;
+import com.microsoft.gctoolkit.parser.GCLogParser;
 import com.microsoft.gctoolkit.parser.GenerationalHeapParser;
 import com.microsoft.gctoolkit.parser.jvm.PreUnifiedDiarizer;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,15 +30,13 @@ public class GenerationalParserTest extends ParserTest {
 
     private static final String END_OF_DATA_SENTINEL = GCLogFile.END_OF_DATA_SENTINEL;
 
-    private ParserTestSupportChannel channel;
-    private GenerationalHeapParser parser;
-    private List<JVMEvent> collection;
+    protected Diarizer diarizer() {
+        return new PreUnifiedDiarizer();
+    };
 
-    @BeforeEach
-    public void setUp() {
-        parser = new GenerationalHeapParser();
-        collection = super.setup(parser, new PreUnifiedDiarizer().getDiary()).events();
-    }
+    protected GCLogParser parser() {
+        return new GenerationalHeapParser();
+    };
 
     @Test
     public void testDefNewDetails() {
@@ -46,9 +46,9 @@ public class GenerationalParserTest extends ParserTest {
                 END_OF_DATA_SENTINEL
         };
 
-        feedParser(parser, lines);
+        List<JVMEvent> jvmEvents = feedParser(lines);
 
-        DefNew defNew = (DefNew) collection.get(0);
+        DefNew defNew = (DefNew) jvmEvents.get(0);
 
         // occupancy before(size before)->occupancy after(size)
         assertMemoryPoolValues(defNew.getHeap(), 502104, 2044800, 102148, 2044800);
@@ -77,24 +77,24 @@ public class GenerationalParserTest extends ParserTest {
                 END_OF_DATA_SENTINEL
         };
 
-        feedParser(parser, lines);
+        List<JVMEvent> jvmEvents = feedParser(lines);
 
-        ParNew parNew = (ParNew) collection.get(0);
+        ParNew parNew = (ParNew) jvmEvents.get(0);
         assertMemoryPoolValues(parNew.getHeap(), 16000, 81280, 1725, 81280);
         assertMemoryPoolValues(parNew.getYoung(), 16000, 18624, 1725, 18624);
         assertMemoryPoolValues(parNew.getTenured(), 0, 81280 - 18624, 0, 81280 - 18624);
         assertEquals(0.0167922, parNew.getDuration());
 
-        SystemGC full = (SystemGC) collection.get(1);
+        SystemGC full = (SystemGC) jvmEvents.get(1);
         assertMemoryPoolValues(full.getHeap(), 4654, 81280, 1602, 81280);
         assertMemoryPoolValues(full.getYoung(), 4654, 81280 - 62656, 0, 81280 - 62656);
         assertMemoryPoolValues(full.getTenured(), 0, 81280 - 18624, 1602, 62656);
         assertEquals(0.0712086, full.getDuration());
 
-        parNew = (ParNew) collection.get(2);
+        parNew = (ParNew) jvmEvents.get(2);
         assertEquals(81280, parNew.getHeap().getSizeAfterCollection());
 
-        parNew = (ParNew) collection.get(3);
+        parNew = (ParNew) jvmEvents.get(3);
         assertEquals(81280, parNew.getHeap().getSizeAfterCollection());
     }
 
@@ -119,11 +119,11 @@ public class GenerationalParserTest extends ParserTest {
         };
 
 
-        feedParser(parser, lines);
+        List<JVMEvent> jvmEvents = feedParser(lines);
 
-        InitialMark initialMark = (InitialMark) collection.get(0);
-        ParNewPromotionFailed parNewPromotionFailed = (ParNewPromotionFailed) collection.get(1);
-        ConcurrentModeFailure concurrentModeFailure = (ConcurrentModeFailure) collection.get(2);
+        InitialMark initialMark = (InitialMark) jvmEvents.get(0);
+        ParNewPromotionFailed parNewPromotionFailed = (ParNewPromotionFailed) jvmEvents.get(1);
+        ConcurrentModeFailure concurrentModeFailure = (ConcurrentModeFailure) jvmEvents.get(2);
     }
 
     @Test
@@ -136,16 +136,16 @@ public class GenerationalParserTest extends ParserTest {
                 END_OF_DATA_SENTINEL
         };
 
-        feedParser(parser, lines);
+        List<JVMEvent> jvmEvents = feedParser(lines);
 
-        PSYoungGen psYoungGen = (PSYoungGen) collection.get(0);
+        PSYoungGen psYoungGen = (PSYoungGen) jvmEvents.get(0);
         assertSame(psYoungGen.getGCCause(), GCCause.ALLOCATION_FAILURE);
         assertEquals(0.0485326, psYoungGen.getDuration());
         assertMemoryPoolValues(psYoungGen.getHeap(), 610571, 819712, 581588, 819712);
         assertMemoryPoolValues(psYoungGen.getTenured(), 610571 - 232960, 819712 - 232960, 581588 - 116224, 819712 - 232960);
         assertMemoryPoolValues(psYoungGen.getYoung(), 232960, 232960, 116224, 232960);
 
-        FullGC fullGC = (FullGC) collection.get(1);
+        FullGC fullGC = (FullGC) jvmEvents.get(1);
         assertSame(fullGC.getGCCause(), GCCause.ADAPTIVE_SIZE_POLICY);
         assertEquals(0.0449697, fullGC.getDuration());
         // todo: value of heap size before collection is 808448 should be 819712.
@@ -174,19 +174,19 @@ public class GenerationalParserTest extends ParserTest {
                 END_OF_DATA_SENTINEL
         };
 
-        feedParser(parser, lines);
+        List<JVMEvent> jvmEvents = feedParser(lines);
 
-        ParNew parNew = (ParNew) collection.get(0);
+        ParNew parNew = (ParNew) jvmEvents.get(0);
         assertSame(parNew.getGCCause(), GCCause.GC_LOCKER);
         assertMemoryPoolValues(parNew.getHeap(), 35230, 354944, 38078, 354944);
         assertMemoryPoolValues(parNew.getYoung(), 32671, 349568, 35386, 349568);
         assertMemoryPoolValues(parNew.getTenured(), 35230 - 32671, 354944 - 349568, 38078 - 35386, 354944 - 349568);
         assertEquals(0.0082790, parNew.getDuration());
 
-        InitialMark initialMark = (InitialMark) collection.get(1);
+        InitialMark initialMark = (InitialMark) jvmEvents.get(1);
         assertSame(initialMark.getGCCause(), GCCause.CMS_INITIAL_MARK);
 
-        CMSRemark cmsRemark = (CMSRemark) collection.get(2);
+        CMSRemark cmsRemark = (CMSRemark) jvmEvents.get(2);
         assertSame(cmsRemark.getGCCause(), GCCause.CMS_FINAL_REMARK);
         assertEquals(0.0699640, cmsRemark.getDuration());
     }
@@ -210,18 +210,18 @@ public class GenerationalParserTest extends ParserTest {
                 END_OF_DATA_SENTINEL
         };
 
-        feedParser(parser, lines);
+        List<JVMEvent> jvmEvents = feedParser(lines);
 
-        ParNew parNew = (ParNew) collection.get(0);
+        ParNew parNew = (ParNew) jvmEvents.get(0);
         assertMemoryPoolValues(parNew.getHeap(), 1856305, 1965056, 851287, 1965056);
         assertMemoryPoolValues(parNew.getYoung(), 1143174, 1188864, 132096, 1188864);
         assertMemoryPoolValues(parNew.getTenured(), 1856305 - 1143174, 1965056 - 1188864, 851287 - 132096, 1965056 - 1188864);
         assertEquals(0.1554100, parNew.getDuration());
 
-        InitialMark initialMark = (InitialMark) collection.get(1);
+        InitialMark initialMark = (InitialMark) jvmEvents.get(1);
         assertEquals(0.1976100, initialMark.getDuration());
 
-        CMSRemark cmsRemark = (CMSRemark) collection.get(2);
+        CMSRemark cmsRemark = (CMSRemark) jvmEvents.get(2);
         assertEquals(0.6306470, cmsRemark.getDuration());
     }
 }

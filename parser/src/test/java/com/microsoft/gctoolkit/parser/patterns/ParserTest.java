@@ -5,11 +5,12 @@ package com.microsoft.gctoolkit.parser.patterns;
 
 import com.microsoft.gctoolkit.event.MemoryPoolSummary;
 import com.microsoft.gctoolkit.event.jvm.JVMEvent;
-import com.microsoft.gctoolkit.jvm.Diary;
+import com.microsoft.gctoolkit.jvm.Diarizer;
 import com.microsoft.gctoolkit.message.Channels;
 import com.microsoft.gctoolkit.message.JVMEventChannel;
 import com.microsoft.gctoolkit.message.JVMEventChannelListener;
 import com.microsoft.gctoolkit.parser.GCLogParser;
+import org.junit.jupiter.api.BeforeEach;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,24 +18,48 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class ParserTest {
+public abstract class ParserTest {
 
-    protected ParserTestSupportChannel setup(GCLogParser parser, Diary diary) {
-        ParserTestSupportChannel  channel = new ParserTestSupportChannel();
-        parser.publishTo(channel);
-        parser.diary(diary);
-        return channel;
+    private Diarizer diarizer;
+    private GCLogParser parser;
+
+    @BeforeEach
+    public void setUp() {
+        parser = parser();
+        diarizer = diarizer();
     }
 
+    /**
+     * The test provides an instance of a Diarizer appropriate to the gc log or lines being parsed.
+     * @return A Diarizer appropriate to the gc log or lines being parsed
+     */
+    protected abstract Diarizer diarizer();
 
     /**
-     * Parser runs in it's own thread so start one for it and then feed it the lines to be parsed
-     *
-     * @param parser
-     * @param lines
+     * The test provides an instance of a GCLogParser appropriate to the gc log or lines being parsed.
+     * @return A GCLogParser appropriate to the gc log or lines being parsed
      */
-    protected void feedParser(GCLogParser parser, String[] lines) {
+    protected abstract GCLogParser parser();
+
+    /**
+     * Parser runs in its own thread so start one for it and then feed it the lines to be parsed
+     *
+     * @param lines
+     * @return
+     */
+    protected List<JVMEvent> feedParser(String[] lines) {
+        Diarizer diarizer = diarizer();
+        GCLogParser parser = parser();
+
+        Arrays.stream(lines).forEach(diarizer::diarize);
+        parser.diary(diarizer.getDiary());
+
+        ParserTestSupportChannel  channel = new ParserTestSupportChannel();
+        parser.publishTo(channel);
+
         Arrays.stream(lines).map(String::trim).forEach(parser::receive);
+
+        return channel.events();
     }
 
     /**
