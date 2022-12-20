@@ -48,9 +48,6 @@ public abstract class ParserTest {
      * @return
      */
     protected List<JVMEvent> feedParser(String[] lines) {
-        Diarizer diarizer = diarizer();
-        GCLogParser parser = parser();
-
         Arrays.stream(lines).forEach(diarizer::diarize);
         parser.diary(diarizer.getDiary());
 
