@@ -22,11 +22,14 @@ public abstract class ParserTest {
 
     private Diarizer diarizer;
     private GCLogParser parser;
+    private ParserTestSupportChannel  channel;
 
     @BeforeEach
     public void setUp() {
-        parser = parser();
+        channel = new ParserTestSupportChannel();
         diarizer = diarizer();
+        parser = parser();
+        parser.publishTo(channel);
     }
 
     /**
@@ -44,15 +47,12 @@ public abstract class ParserTest {
     /**
      * Parser runs in its own thread so start one for it and then feed it the lines to be parsed
      *
-     * @param lines
-     * @return
+     * @param lines The GC log lines to be fed to the parser.
+     * @return The list of JVMEvents from the parsed lines.
      */
     protected List<JVMEvent> feedParser(String[] lines) {
         Arrays.stream(lines).forEach(diarizer::diarize);
         parser.diary(diarizer.getDiary());
-
-        ParserTestSupportChannel  channel = new ParserTestSupportChannel();
-        parser.publishTo(channel);
 
         Arrays.stream(lines).map(String::trim).forEach(parser::receive);
 
