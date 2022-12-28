@@ -5,7 +5,6 @@ package com.microsoft.gctoolkit.aggregator;
 import com.microsoft.gctoolkit.event.jvm.JVMEvent;
 
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
