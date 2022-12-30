@@ -15,7 +15,7 @@ public class CollectionCycleCountsSummary implements CollectionCycleCountsAggreg
         collectionCycleCounts.computeIfAbsent(gcType, key -> new AtomicInteger()).incrementAndGet();
     }
 
-    private static final String FORMAT = "%s : %s%s";
+    private static final String FORMAT = "%s : %s%n";
     public void printOn(PrintStream printStream) {
         collectionCycleCounts.forEach((k, v) -> printStream.printf(FORMAT, k, v));
     }
