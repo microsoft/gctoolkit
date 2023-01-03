@@ -12,6 +12,7 @@ import com.microsoft.gctoolkit.io.RotatingGCLogFile;
 import com.microsoft.gctoolkit.io.SingleGCLogFile;
 import com.microsoft.gctoolkit.jvm.Diarizer;
 import com.microsoft.gctoolkit.message.Channels;
+import com.microsoft.gctoolkit.message.JVMEventChannel;
 import com.microsoft.gctoolkit.message.JVMEventChannelListener;
 import com.microsoft.gctoolkit.parser.GCLogParser;
 import com.microsoft.gctoolkit.parser.GenerationalHeapParser;
@@ -115,50 +116,55 @@ public abstract class ParserTest {
     }
     
     TestResults testGenerationalRotatingLogFile(Path path) throws IOException {
-        TestResults testResults = new TestResults();
         GCLogFile logfile = loadLogFile(path, true);
         Diarizer jvmConfiguration = getJVMConfiguration(logfile);
         GenerationalHeapParser generationalHeapParser = new GenerationalHeapParser();
+        TestResults testResults = new TestResults();
+        generationalHeapParser.publishTo(testResults);
         generationalHeapParser.diary(jvmConfiguration.getDiary());
         logfile.stream().map(String::trim).forEach(generationalHeapParser::receive);
         return testResults;
     }
 
     TestResults testGenerationalSingleLogFile(Path path) throws IOException {
-        TestResults testResults = new TestResults();
         GCLogFile logfile = loadLogFile(path, false);
         Diarizer jvmConfiguration = getJVMConfiguration(logfile);
         GCLogParser generationalHeapParser = (jvmConfiguration.getDiary().isUnifiedLogging()) ? new UnifiedGenerationalParser() : new GenerationalHeapParser();
+        TestResults testResults = new TestResults();
+        generationalHeapParser.publishTo(testResults);
         generationalHeapParser.diary(jvmConfiguration.getDiary());
         logfile.stream().map(String::trim).forEach(generationalHeapParser::receive);
         return testResults;
     }
 
     TestResults testUnifiedG1GCSingleFile(Path path) throws IOException {
-        TestResults testResults = new TestResults();
         SingleGCLogFile logfile = new SingleGCLogFile(path);
         UnifiedDiarizer unifiedJVMConfiguration = new UnifiedDiarizer();
         UnifiedG1GCParser parser = new UnifiedG1GCParser();
+        TestResults testResults = new TestResults();
+        parser.publishTo(testResults);
         parser.diary(unifiedJVMConfiguration.getDiary());
         logfile.stream().map(String::trim).forEach(parser::receive);
         return testResults;
     }
 
     TestResults testRegionalRotatingLogFile(Path path) throws IOException {
-        TestResults testResults = new TestResults();
         GCLogFile logfile = loadLogFile(path, true);
         Diarizer jvmConfiguration = getJVMConfiguration(logfile);
         PreUnifiedG1GCParser parser = new PreUnifiedG1GCParser();
+        TestResults testResults = new TestResults();
+        parser.publishTo(testResults);
         parser.diary(jvmConfiguration.getDiary());
         logfile.stream().map(String::trim).forEach(parser::receive);
         return testResults;
     }
 
     TestResults testRegionalSingleLogFile(Path path) throws IOException {
-        TestResults testResults = new TestResults();
         GCLogFile logfile = loadLogFile(path, false);
         Diarizer jvmConfiguration = getJVMConfiguration(logfile);
         PreUnifiedG1GCParser parser = new PreUnifiedG1GCParser();
+        TestResults testResults = new TestResults();
+        parser.publishTo(testResults);
         parser.diary(jvmConfiguration.getDiary());
         logfile.stream().map(String::trim).forEach(parser::receive);
         return testResults;
@@ -167,7 +173,7 @@ public abstract class ParserTest {
     /**
      * Setups an array of counts that is indexed by the type of GC event.
      */
-    class TestResults implements JVMEventChannelListener {
+    class TestResults implements JVMEventChannel {
 
         private final int[] counts = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 , 0, 0, 0, 0, 0};
         private int metaSpaceRecordCount = 0;
@@ -189,8 +195,8 @@ public abstract class ParserTest {
         }
 
         @Override
-        public Channels channel() {
-            return null;
+        public void registerListener(JVMEventChannelListener listener) {
+            throw new IllegalStateException("Listener not used for testing");
         }
 
         /**
@@ -198,7 +204,7 @@ public abstract class ParserTest {
          * @param event
          */
         @Override
-        public void receive(JVMEvent event) {
+        public void publish(Channels channel, JVMEvent event) {
             if (!(event instanceof JVMTermination)) {
                 GCEvent gcEvent = (GCEvent) event;
                 int index = collectorNameMapping.get(gcEvent.getGarbageCollectionType());
