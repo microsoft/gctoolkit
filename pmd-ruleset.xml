@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!--
-   - Code quality rule set for use with the PCGen Java code.
    - See https://pmd.github.io/latest/pmd_rules_java.html
    - for descriptions of the rules applied.
  -->
 <ruleset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         name="PCGen Code Rules"
+         name="GCToolkit Code Rules"
          xmlns="http://pmd.sourceforge.net/ruleset/2.0.0"
          xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 http://pmd.sourceforge.net/ruleset_2_0_0.xsd">
     <description>
