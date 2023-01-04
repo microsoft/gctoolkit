@@ -10,10 +10,10 @@
          xmlns="http://pmd.sourceforge.net/ruleset/2.0.0"
          xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 http://pmd.sourceforge.net/ruleset_2_0_0.xsd">
     <description>
-        PMD rules customised for PCGen's code.
+        PMD rules customised for gctoolkit code.
     </description>
+    <!-- TODO - this list was pulled in randomly and needs to be built from scratch -->
     <rule ref="category/java/bestpractices.xml">
-        <!-- there is nothing wrong with such abstract classes without abstract methods-->
         <exclude name="AbstractClassWithoutAbstractMethod"/>
         <exclude name="AccessorClassGeneration"/>
         <exclude name="AccessorMethodGeneration"/>
@@ -22,11 +22,9 @@
         <exclude name="AvoidStringBufferField"/>
         <exclude name="ForLoopCanBeForeach"/>
         <exclude name="GuardLogStatement"/>
-        <!-- its better to throw a NPE and add explicit checks. Nulls should be rare -->
         <exclude name="LiteralsFirstInComparisons"/>
         <exclude name="LooseCoupling"/>
         <exclude name="MethodReturnsInternalArray"/>
-        <!-- its better to throw a NPE and add explicit checks. Nulls should be rare -->
         <exclude name="PositionLiteralsFirstInCaseInsensitiveComparisons"/>
         <exclude name="SwitchStmtsShouldHaveDefault"/>
         <exclude name="SystemPrintln"/>
@@ -34,10 +32,8 @@
         <exclude name="UnusedFormalParameter"/>
         <exclude name="UnusedPrivateField"/>
         <exclude name="UnusedPrivateMethod"/>
-        <!-- it's a tradeoff: it creates a warning to use it, which then has to be addressed -->
         <exclude name="UseVarargs"/>
         <exclude name="JUnitAssertionsShouldIncludeMessage"/>
-        <!-- no networking code, but has false positives -->
         <exclude name="AvoidUsingHardCodedIP"/>
         <exclude name="UseAssertTrueInsteadOfAssertEquals"/>
         <exclude name="UseAssertEqualsInsteadOfAssertTrue"/>
@@ -46,57 +42,39 @@
         <exclude name="AvoidReassigningLoopVariables"/>
     </rule>
     <rule ref="category/java/codestyle.xml">
-        <!-- deprecated -->
         <exclude name="AbstractNaming"/>
-        <!-- flags classes that rely on default ctor -->
         <exclude name="AtLeastOneConstructor"/>
-        <!-- we don't use them, but don't disallow them -->
         <exclude name="AvoidFinalLocalVariable"/>
-        <!-- deprecated -->
         <exclude name="AvoidPrefixingMethodParameters"/>
         <exclude name="AvoidProtectedFieldInFinalClass"/>
         <exclude name="AvoidProtectedMethodInFinalClassNotExtending"/>
-        <!-- we have enough exceptions as to make this noise -->
         <exclude name="BooleanGetMethodName"/>
         <exclude name="CallSuperInConstructor"/>
         <exclude name="ClassNamingConventions"/>
-        <!-- adding comment to address Java's poor choice is noisy and not checkable -->
         <exclude name="CommentDefaultAccessModifier"/>
         <exclude name="ConfusingTernary"/>
-        <!-- we want minimal access. -->
         <exclude name="DefaultPackage"/>
-        <!-- default "do nothing" behavior is reasonable -->
         <exclude name="EmptyMethodInAbstractClassShouldBeAbstract"/>
         <exclude name="FieldDeclarationsShouldBeAtStartOfClass"/>
         <exclude name="ForLoopShouldBeWhileLoop"/>
-        <!-- we use longer names (e.g. 'IDT') -->
         <exclude name="GenericsNaming"/>
-        <!-- Generates "noise pollution" around the usage of final, our semantic usage is as a trigger it is necessary, not when it's possible -->
         <exclude name="LocalVariableCouldBeFinal"/>
         <exclude name="LongVariable"/>
-        <!-- generates "noise pollution" around the usage of final, our semantic usage is as a trigger it is necessary, not when it's possible -->
         <exclude name="MethodArgumentCouldBeFinal"/>
         <exclude name="MethodNamingConventions"/>
-        <!-- bad rule leading to confusing code -->
         <exclude name="OnlyOneReturn"/>
         <exclude name="PrematureDeclaration"/>
         <exclude name="ShortClassName"/>
         <exclude name="ShortVariable"/>
-        <!-- Deprecated -->
         <exclude name="SuspiciousConstantFieldName"/>
         <exclude name="UnnecessaryConstructor"/>
         <exclude name="UnnecessaryFullyQualifiedName"/>
         <exclude name="UnnecessaryLocalBeforeReturn"/>
-        <!-- This is excluded because we use "public" in Interfaces almost universally (as a semantic hint as to its real behavior) -->
         <exclude name="UnnecessaryModifier"/>
         <exclude name="UnnecessaryReturn"/>
-        <!-- Underscores not required for readability -->
         <exclude name="UseUnderscoresInNumericLiterals" />
-        <!-- This is excluded because we use "useless" parenthesis for readability -->
         <exclude name="UselessParentheses"/>
-        <!-- not our style -->
         <exclude name="UselessQualifiedThis"/>
-        <!-- Deprecated -->
         <exclude name="VariableNamingConventions"/>
         <exclude name="FieldNamingConventions"/>
         <exclude name="LinguisticNaming" />
@@ -114,7 +92,6 @@
         <exclude name="CognitiveComplexity"/>
         <exclude name="CollapsibleIfStatements"/>
         <exclude name="CouplingBetweenObjects"/>
-        <!-- useless metric -->
         <exclude name="CyclomaticComplexity"/>
         <exclude name="DataClass"/>
         <exclude name="ExcessiveClassLength"/>
@@ -128,9 +105,7 @@
         <exclude name="LawOfDemeter"/>
         <exclude name="LogicInversion"/>
         <exclude name="LoosePackageCoupling"/>
-        <!-- Deprecated -->
         <exclude name="NcssCount"/>
-        <!-- Deprecated -->
         <exclude name="NPathComplexity"/>
         <exclude name="SignatureDeclareThrowsException"/>
         <exclude name="SimplifyBooleanReturns"/>
@@ -153,8 +128,7 @@
         <exclude name="AvoidFieldNameMatchingMethodName"/>
         <exclude name="AvoidFieldNameMatchingTypeName"/>
         <exclude name="AvoidLiteralsInIfCondition"/>
-        <!-- we don't use serialization -->
-        <exclude name="BeanMembersShouldSerialize"/>
+        <exclude name="NonSerializableClass"/>
         <exclude name="CloneThrowsCloneNotSupportedException"/>
         <exclude name="CompareObjectsWithEquals"/>
         <exclude name="ConstructorCallsOverridableMethod"/>
@@ -167,7 +141,6 @@
         <exclude name="ImportFromSamePackage"/>
         <exclude name="InstantiationToGetClass"/>
         <exclude name="LoggerIsNotStaticFinal"/>
-        <!-- we don't use serialization -->
         <exclude name="MissingSerialVersionUID"/>
         <exclude name="NullAssignment"/>
         <exclude name="OverrideBothEqualsAndHashcode"/>
@@ -191,14 +164,11 @@
         <exclude name="AvoidFileStream"/>
         <exclude name="AvoidInstantiatingObjectsInLoops"/>
         <exclude name="StringInstantiation"/>
-        <!-- This is excluded because it's a micro-optimization (JIT compilation would eliminate the performance penalty) and enforcing it encourages writing less readable code -->
         <exclude name="ConsecutiveAppendsShouldReuse"/>
         <exclude name="ConsecutiveLiteralAppends"/>
         <exclude name="InefficientEmptyStringCheck"/>
         <exclude name="InefficientStringBuffering"/>
         <exclude name="InsufficientStringBufferDeclaration"/>
-        <!-- Excluded due to minimal perf gain and loss of code
-             clarity (added length check)-->
         <exclude name="SimplifyStartsWith"/>
         <exclude name="RedundantFieldInitializer"/>
         <exclude name="StringToString"/>
