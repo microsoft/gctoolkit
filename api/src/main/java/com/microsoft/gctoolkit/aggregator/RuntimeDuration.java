@@ -26,12 +26,12 @@ public class RuntimeDuration {
 
     /**
      * Add more logic here to use 0.000 when start time is very close to 0.000
+     * todo: move estimate based on longest interval between logging events should offer a reasonable threshold for a start gap.
      * @return double for life span of JVM.
      */
     public double getEstimatedRuntime() {
-        if ( estimatedTimeOfTermination != null && jvmStartTime != null) {
-            return estimatedTimeOfTermination.getTimeStamp() - ((jvmStartTime.getTimeStamp() < 10.0d) ? 0.0d : jvmStartTime.getTimeStamp());
-        }
-        return -1.0d;
+        if ( estimatedTimeOfTermination != null || jvmStartTime != null) return 0.0d;
+        if (jvmStartTime.getTimeStamp() / estimatedTimeOfTermination.getTimeStamp() > 0.5d) return estimatedTimeOfTermination.getTimeStamp() - jvmStartTime.getTimeStamp();
+        return estimatedTimeOfTermination.getTimeStamp();
     }
 }

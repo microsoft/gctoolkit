@@ -69,6 +69,7 @@ public class GCToolKit {
                 .filter(consumer->consumer.accepts(diary))
                 .collect(Collectors.toList());
         for (DataSourceParser dataSourceParser : dataSourceParsers) {
+            dataSourceParser.diary(diary);
             dataSourceChannel.registerListener(dataSourceParser);
             dataSourceParser.publishTo(jvmEventChannel);
         }

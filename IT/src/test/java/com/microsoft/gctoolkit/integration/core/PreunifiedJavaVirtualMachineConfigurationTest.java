@@ -1,6 +1,12 @@
 package com.microsoft.gctoolkit.integration.core;
 
 import com.microsoft.gctoolkit.GCToolKit;
+import com.microsoft.gctoolkit.aggregator.Aggregates;
+import com.microsoft.gctoolkit.aggregator.Aggregation;
+import com.microsoft.gctoolkit.aggregator.Aggregator;
+import com.microsoft.gctoolkit.aggregator.Collates;
+import com.microsoft.gctoolkit.aggregator.EventSource;
+import com.microsoft.gctoolkit.aggregator.RuntimeDuration;
 import com.microsoft.gctoolkit.integration.io.TestLogFile;
 import com.microsoft.gctoolkit.io.GCLogFile;
 import com.microsoft.gctoolkit.io.SingleGCLogFile;
@@ -26,15 +32,52 @@ public class PreunifiedJavaVirtualMachineConfigurationTest {
     private void test(GCLogFile log, int[] endStartTimes ) {
         GCToolKit gcToolKit = new GCToolKit();
         gcToolKit.loadAggregationsFromServiceLoader();
+        TestTimeAggregation aggregation = new TestTimeAggregation();
+        gcToolKit.registerAggregation(aggregation);
         JavaVirtualMachine machine = null;
+        RuntimeDuration runtime = null;
         try {
             machine = gcToolKit.analyze(log);
+            aggregation = machine.getAggregation(aggregation.getClass()).get();
+            runtime = aggregation.getRuntimeDurationDetails();
         } catch (IOException e) {
             fail(e.getMessage());
         }
+
         Assertions.assertEquals( endStartTimes[0], (int)(machine.getEstimatedJVMStartTime().getTimeStamp() * 1000.0d));
-        Assertions.assertEquals( endStartTimes[1], (int)(machine.getTimeOfFirstEvent().getTimeStamp() * 1000.0d));
-        Assertions.assertEquals( endStartTimes[2], (int)(machine.getJVMTerminationTime().getTimeStamp() * 1000.0d));
-        Assertions.assertEquals( endStartTimes[3], (int)(machine.getRuntimeDuration() * 1000.0d));
+        Assertions.assertEquals( endStartTimes[1], (int)(runtime.getJVMStartTime().getTimeStamp() * 1000.0d));
+        Assertions.assertEquals( endStartTimes[2], (int)(runtime.getEstimatedTimeOfTermination().getTimeStamp() * 1000.0d));
+        Assertions.assertEquals( endStartTimes[3], (int)(runtime.getEstimatedRuntime() * 1000.0d));
+    }
+
+    @Aggregates({EventSource.G1GC,EventSource.GENERATIONAL,EventSource.ZGC,EventSource.SHENANDOAH})
+    public class TestTimeAggregator extends Aggregator<TestTimeAggregation> {
+
+        /**
+         * Subclass only.
+         *
+         * @param aggregation The Aggregation that {@literal @}Collates this Aggregator
+         * @see Collates
+         * @see Aggregation
+         */
+        public TestTimeAggregator(TestTimeAggregation aggregation) {
+            super(aggregation);
+        }
+    }
+
+    @Collates(TestTimeAggregator.class)
+    public class TestTimeAggregation implements Aggregation {
+
+        public TestTimeAggregation() {}
+
+        @Override
+        public boolean hasWarning() {
+            return false;
+        }
+
+        @Override
+        public boolean isEmpty() {
+            return false;
+        }
     }
 }

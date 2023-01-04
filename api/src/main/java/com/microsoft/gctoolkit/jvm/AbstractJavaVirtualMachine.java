@@ -142,7 +142,6 @@ public abstract class AbstractJavaVirtualMachine implements JavaVirtualMachine {
 
     @Override
     public void analyze(List<Aggregation> registeredAggregations, JVMEventChannel eventBus, DataSourceChannel dataSourceBus) {
-
         try {
             Set<EventSource> generatedEvents = diary.generatesEvents();
             for (Aggregation aggregation : registeredAggregations) {
@@ -161,6 +160,13 @@ public abstract class AbstractJavaVirtualMachine implements JavaVirtualMachine {
             dataSourceBus.publish(Channels.DATA_SOURCE, dataSource.endOfData());
             dataSourceBus.close();
             eventBus.close();
+            try {
+                Thread.sleep(2000L);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            Aggregation aggregation = aggregatedData.values().stream().findFirst().get();
+            timeOfLastEvent = aggregation.getRuntimeDurationDetails().getEstimatedTimeOfTermination();
 
         } catch (IOException | ClassCastException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
             LOGGER.log(Level.WARNING, e.getMessage(), e);

@@ -20,7 +20,7 @@ public class EndToEndIntegrationTest {
 
     @Test
     public void testMain() {
-            String gcLogFile = System.getProperty("gcLogFile");
+                String gcLogFile = System.getProperty("gcLogFile");
             analyze(gcLogFile);
             Assertions.assertEquals(26, getInitialMarkCount());
             Assertions.assertEquals(26, getRemarkCount());
