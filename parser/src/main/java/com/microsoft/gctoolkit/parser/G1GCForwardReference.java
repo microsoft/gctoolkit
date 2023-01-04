@@ -412,7 +412,7 @@ public class G1GCForwardReference extends ForwardReference {
         this.youngCollectionPhases[PRE_EVACUATE_COLLECTION_SET] = duration;
     }
 
-    public void recordPreEvacuateCSetPhaseDuration(String phase, double duration) {
+    public void postPreEvacuateCSetPhaseDuration(String phase, double duration) {
         preEvacuateCSetPhaseDurations.put(phase, duration);
     }
 
@@ -428,7 +428,7 @@ public class G1GCForwardReference extends ForwardReference {
         this.youngCollectionPhases[EVACUATE_COLLECTION_SET] = duration;
     }
 
-    public void recordEvacuateCSetPhaseDuration(String phase, UnifiedStatisticalSummary stats) {
+    public void postEvacuateCSetPhaseDuration(String phase, UnifiedStatisticalSummary stats) {
         evacuateCSetPhaseDurations.put(phase, stats);
     }
 
@@ -444,7 +444,7 @@ public class G1GCForwardReference extends ForwardReference {
         this.youngCollectionPhases[POST_EVACUATE_COLLECTION_SET] = duration;
     }
 
-    public void recordPostEvacuateCSetPhaseDuration(String phase, double duration) {
+    public void postPostEvacuateCSetPhaseDuration(String phase, double duration) {
         postEvacuateCSetPhaseDurations.put(phase, duration);
     }
 

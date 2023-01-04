@@ -9,7 +9,7 @@ import com.microsoft.gctoolkit.message.JVMEventChannelListener;
 import com.microsoft.gctoolkit.vertx.io.JVMEventCodec;
 import io.vertx.core.eventbus.DeliveryOptions;
 
-public class VertxJVMEventChannel extends AbstractVertxChannel implements JVMEventChannel {
+public class VertxJVMEventChannel extends VertxChannel implements JVMEventChannel {
 
     final private DeliveryOptions options = new DeliveryOptions().setCodecName(JVMEventCodec.NAME);
 
@@ -24,6 +24,11 @@ public class VertxJVMEventChannel extends AbstractVertxChannel implements JVMEve
         } catch(Exception ex) {
             System.out.println(ex.getCause());
         }
+    }
+
+    @Override
+    public void close() {
+
     }
 
     @Override

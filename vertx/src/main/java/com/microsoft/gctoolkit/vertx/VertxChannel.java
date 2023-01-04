@@ -2,11 +2,11 @@ package com.microsoft.gctoolkit.vertx;
 
 import io.vertx.core.Vertx;
 
-public class AbstractVertxChannel {
+public class VertxChannel {
 
     private static Vertx vertx = Vertx.vertx();
 
-    protected AbstractVertxChannel() {
+    protected VertxChannel() {
     }
 
     protected Vertx vertx() {

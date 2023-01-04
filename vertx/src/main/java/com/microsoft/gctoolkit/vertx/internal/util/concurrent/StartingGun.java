@@ -21,8 +21,7 @@ public class StartingGun {
      * Synchronization control For StartingGun.
      * Uses AQS state to represent count.
      */
-    private static final class Sync extends
-            AbstractQueuedSynchronizer {
+    private static final class Sync extends AbstractQueuedSynchronizer {
         private static final long serialVersionUID = 1L;
 
         protected int tryAcquireShared(int unused) {

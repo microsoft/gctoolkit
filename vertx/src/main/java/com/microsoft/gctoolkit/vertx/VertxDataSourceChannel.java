@@ -6,7 +6,7 @@ import com.microsoft.gctoolkit.message.Channels;
 import com.microsoft.gctoolkit.message.DataSourceChannel;
 import com.microsoft.gctoolkit.message.DataSourceParser;
 
-public class VertxDataSourceChannel extends AbstractVertxChannel implements DataSourceChannel {
+public class VertxDataSourceChannel extends VertxChannel implements DataSourceChannel {
 
     public VertxDataSourceChannel() {
         super();
@@ -21,5 +21,10 @@ public class VertxDataSourceChannel extends AbstractVertxChannel implements Data
     @Override
     public void publish(Channels channel, String message) {
         vertx().eventBus().publish(channel.getName(),message);
+    }
+
+    @Override
+    public void close() {
+
     }
 }

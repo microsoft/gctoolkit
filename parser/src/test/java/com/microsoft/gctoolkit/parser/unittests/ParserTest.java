@@ -215,5 +215,10 @@ public abstract class ParserTest {
                 }
             }
         }
+
+        @Override
+        public void close() {
+
+        }
     }
 }

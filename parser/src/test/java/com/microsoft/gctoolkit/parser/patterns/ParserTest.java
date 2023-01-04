@@ -88,6 +88,11 @@ public abstract class ParserTest {
             events.add(message);
         }
 
+        @Override
+        public void close() {
+
+        }
+
         public List<JVMEvent> events() {
             return events;
         }

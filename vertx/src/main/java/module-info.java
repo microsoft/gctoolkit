@@ -7,12 +7,8 @@
  */
 module com.microsoft.gctoolkit.vertx {
     requires com.microsoft.gctoolkit.api;
-    requires com.microsoft.gctoolkit.parser;
     requires io.vertx.core;
     requires java.logging;
-
-    exports com.microsoft.gctoolkit.vertx.jvm to
-            com.microsoft.gctoolkit.api;
 
     provides com.microsoft.gctoolkit.message.DataSourceChannel with com.microsoft.gctoolkit.vertx.VertxDataSourceChannel;
     provides com.microsoft.gctoolkit.message.JVMEventChannel with com.microsoft.gctoolkit.vertx.VertxJVMEventChannel;

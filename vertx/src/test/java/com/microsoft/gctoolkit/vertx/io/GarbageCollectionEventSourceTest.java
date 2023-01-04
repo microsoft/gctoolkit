@@ -8,10 +8,12 @@ import com.microsoft.gctoolkit.event.generational.DefNew;
 import com.microsoft.gctoolkit.io.GCLogFile;
 import com.microsoft.gctoolkit.io.RotatingGCLogFile;
 import com.microsoft.gctoolkit.io.SingleGCLogFile;
+import com.microsoft.gctoolkit.jvm.Diary;
+import com.microsoft.gctoolkit.message.Channels;
+import com.microsoft.gctoolkit.message.DataSourceParser;
+import com.microsoft.gctoolkit.message.JVMEventChannel;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
-import com.microsoft.gctoolkit.vertx.JVMEventSource;
-import io.vertx.core.AbstractVerticle;
-import io.vertx.core.Vertx;
+import com.microsoft.gctoolkit.vertx.VertxDataSourceChannel;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -23,7 +25,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class GarbageCollectionEventSourceTest {
 
-    private static final String TEST_CHANNEL = "TEST";
     private static final String END_OF_DATA_SENTINEL = GCLogFile.END_OF_DATA_SENTINEL;
 
     private GCLogFile loadLogFile(Path path, boolean rotating) throws IOException {
@@ -105,32 +106,49 @@ public class GarbageCollectionEventSourceTest {
     }
 
     private void assertExpectedLineCountInLog(int expectedNumberOfLines, GCLogFile logFile) {
-        CountDownLatch consumerStarted = new CountDownLatch(2);
+        //CountDownLatch consumerStarted = new CountDownLatch(2);
         disableCaching();
-        Vertx vertx = Vertx.vertx();
 
         GCLogConsumer consumer = new GCLogConsumer();
-        vertx.deployVerticle(consumer, asyncResult -> consumerStarted.countDown());
+        VertxDataSourceChannel channel = new VertxDataSourceChannel();
+        channel.registerListener(consumer);
+        //vertx.deployVerticle(consumer, asyncResult -> consumerStarted.countDown());
 
         //todo: this just completely broke this test :-/ JVMEventSource garbageCollectionLogSource = new JVMEventSource(TEST_CHANNEL);
-        JVMEventSource garbageCollectionLogSource = new JVMEventSource();
-        vertx.deployVerticle(garbageCollectionLogSource, asyncResult -> consumerStarted.countDown());
+        //JVMEventSource garbageCollectionLogSource = new JVMEventSource();
+        //vertx.deployVerticle(garbageCollectionLogSource, asyncResult -> consumerStarted.countDown());
 
         try {
-            consumerStarted.await();
-            garbageCollectionLogSource.publishGCDataSource(logFile);
+            logFile.stream().forEach(message -> {
+                System.out.println(message);
+                channel.publish(Channels.DATA_SOURCE, message);
+            });
+            //consumerStarted.await();
             consumer.awaitEOF();
-            vertx.undeploy(garbageCollectionLogSource.deploymentID());
-        } catch (IOException | InterruptedException e) {
+            //vertx.undeploy(garbageCollectionLogSource.deploymentID());
+        } catch (IOException e) {
+        //} catch (IOException | InterruptedException e) {
             fail(e.getMessage());
         }
         assertEquals(expectedNumberOfLines, consumer.getEventCount());
     }
 
-    private static class GCLogConsumer extends AbstractVerticle {
+    private static class GCLogConsumer implements DataSourceParser {
 
         private final CountDownLatch eof = new CountDownLatch(1);
         private int eventCount = 0;
+
+        @Override
+        public Channels channel() {
+            return Channels.DATA_SOURCE;
+        }
+
+        @Override
+        public void receive(String payload) {
+            eventCount++;
+            if ( END_OF_DATA_SENTINEL.equals(payload))
+                eof.countDown();
+        }
 
         GCLogConsumer() {
         }
@@ -143,17 +161,23 @@ public class GarbageCollectionEventSourceTest {
             }
         }
 
-        @Override
-        public void start() {
-            vertx.eventBus().consumer(TEST_CHANNEL, message -> {
-                eventCount++;
-                if (message.body().toString().equals(END_OF_DATA_SENTINEL))
-                    eof.countDown();
-            });
-        }
-
         int getEventCount() {
             return eventCount;
+        }
+
+        @Override
+        public void publishTo(JVMEventChannel channel) {
+            throw new IllegalStateException();
+        }
+
+        @Override
+        public void diary(Diary diary) {
+            throw new IllegalStateException();
+        }
+
+        @Override
+        public boolean accepts(Diary diary) {
+            return false;
         }
     }
 
