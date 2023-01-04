@@ -158,6 +158,9 @@ public abstract class AbstractJavaVirtualMachine implements JavaVirtualMachine {
             }
 
             dataSource.stream().forEach(message -> dataSourceBus.publish(Channels.DATA_SOURCE, message));
+            dataSourceBus.publish(Channels.DATA_SOURCE, dataSource.endOfData());
+            dataSourceBus.close();
+            eventBus.close();
 
         } catch (IOException | ClassCastException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
             LOGGER.log(Level.WARNING, e.getMessage(), e);

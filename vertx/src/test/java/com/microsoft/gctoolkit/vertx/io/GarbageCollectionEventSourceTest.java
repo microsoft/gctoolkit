@@ -120,9 +120,9 @@ public class GarbageCollectionEventSourceTest {
 
         try {
             logFile.stream().forEach(message -> {
-                System.out.println(message);
                 channel.publish(Channels.DATA_SOURCE, message);
             });
+            channel.publish(Channels.DATA_SOURCE, END_OF_DATA_SENTINEL);
             //consumerStarted.await();
             consumer.awaitEOF();
             //vertx.undeploy(garbageCollectionLogSource.deploymentID());
