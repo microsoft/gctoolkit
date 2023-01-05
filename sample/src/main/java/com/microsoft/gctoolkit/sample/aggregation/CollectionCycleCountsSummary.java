@@ -8,14 +8,15 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class CollectionCycleCountsSummary implements CollectionCycleCountsAggregation {
-
     private final Map<GarbageCollectionTypes, AtomicInteger> collectionCycleCounts = new ConcurrentHashMap<>();
+
     @Override
     public void count(GarbageCollectionTypes gcType) {
         collectionCycleCounts.computeIfAbsent(gcType, key -> new AtomicInteger()).incrementAndGet();
     }
 
     private static final String FORMAT = "%s : %s%n";
+
     public void printOn(PrintStream printStream) {
         collectionCycleCounts.forEach((k, v) -> printStream.printf(FORMAT, k, v));
     }
