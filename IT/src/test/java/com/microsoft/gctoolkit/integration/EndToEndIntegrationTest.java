@@ -53,12 +53,12 @@ public class EndToEndIntegrationTest {
             fail(e.getMessage());
         }
 
-        System.out.println("sleeping");
-        try {
-            Thread.sleep(10000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+//        System.out.println("sleeping");
+//        try {
+//            Thread.sleep(10000);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
 
         // Retrieves the Aggregation for HeapOccupancyAfterCollectionSummary. This is a time-series aggregation.
         String message = "The XYDataSet for %s contains %s items.\n";
@@ -91,7 +91,7 @@ public class EndToEndIntegrationTest {
         // Retrieves the Aggregation for PauseTimeSummary. This is a com.microsoft.gctoolkit.sample.aggregation.RuntimeAggregation.
         machine.getAggregation(PauseTimeSummary.class).ifPresent(pauseTimeSummary -> {
             Assertions.assertEquals( 208922, (int)(pauseTimeSummary.getTotalPauseTime() * 1000.0d), "Total Pause Time");
-            Assertions.assertEquals( 608800087, (int)(pauseTimeSummary.getRuntimeDuration() * 1000.0d), "Runtime duration");
+            Assertions.assertEquals( 608800087, (int)(pauseTimeSummary.estimatedRuntime() * 1000.0d), "Runtime duration");
             Assertions.assertEquals( 34, (int)(pauseTimeSummary.getPercentPaused() * 1000d), "percent paused");
         });
 

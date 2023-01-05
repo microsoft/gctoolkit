@@ -35,4 +35,36 @@ public class JVMTermination extends JVMEvent {
         return super.getDateTimeStamp().minus(timeOfFirstEvent);
     }
 
+    /**
+     * If the first event if far from 0.000, then the first event becomes the start time
+     * Otherwise, the create a new start time by offsetting the captured start time by
+     * the time of the first event. This will ensure the date is correct if it has been
+     * captured.
+     *
+     * todo: move estimate based on longest interval between logging events should offer a reasonable threshold for a start gap.
+     *
+     * @return DateTimeStamp
+     */
+    public DateTimeStamp getEstimatedStartTime() {
+        if (timeOfFirstEvent.getTimeStamp() / getDateTimeStamp().getTimeStamp() > 0.5d) {
+            return timeOfFirstEvent;
+        }
+        return timeOfFirstEvent.minus(timeOfFirstEvent.getTimeStamp());
+    }
+
+    public DateTimeStamp getEstimatedTimeOfTermination() {
+        return super.getDateTimeStamp();
+    }
+
+    /**
+     * @return double for life span of JVM.
+     */
+    public double getEstimatedRuntime() {
+        return getEstimatedTimeOfTermination().getTimeStamp() - getEstimatedStartTime().getTimeStamp();
+    }
+
+    public String toString() {
+        return this.getClass().toString() + ":" + super.getDateTimeStamp().toString();
+    }
+
 }

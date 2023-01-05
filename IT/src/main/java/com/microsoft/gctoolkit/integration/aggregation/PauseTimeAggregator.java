@@ -5,7 +5,6 @@ import com.microsoft.gctoolkit.aggregator.Aggregator;
 import com.microsoft.gctoolkit.aggregator.EventSource;
 import com.microsoft.gctoolkit.event.g1gc.G1RealPause;
 import com.microsoft.gctoolkit.event.generational.GenerationalGCPauseEvent;
-import com.microsoft.gctoolkit.event.jvm.JVMTermination;
 
 /**
  * An Aggregator that extracts pause time.

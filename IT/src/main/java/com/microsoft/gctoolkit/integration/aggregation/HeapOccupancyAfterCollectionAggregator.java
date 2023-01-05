@@ -5,18 +5,24 @@ import com.microsoft.gctoolkit.aggregator.Aggregator;
 import com.microsoft.gctoolkit.aggregator.EventSource;
 import com.microsoft.gctoolkit.event.g1gc.G1GCPauseEvent;
 import com.microsoft.gctoolkit.event.generational.GenerationalGCPauseEvent;
+import com.microsoft.gctoolkit.event.jvm.JVMTermination;
 import com.microsoft.gctoolkit.event.shenandoah.ShenandoahCycle;
 import com.microsoft.gctoolkit.event.zgc.ZGCCycle;
 
 @Aggregates({EventSource.G1GC,EventSource.GENERATIONAL,EventSource.ZGC,EventSource.SHENANDOAH})
-public class HeapOccupancyAfterCollection extends Aggregator<HeapOccupancyAfterCollectionAggregation> {
+public class HeapOccupancyAfterCollectionAggregator extends Aggregator<HeapOccupancyAfterCollectionAggregation> {
 
-    public HeapOccupancyAfterCollection(HeapOccupancyAfterCollectionAggregation results) {
+    public HeapOccupancyAfterCollectionAggregator(HeapOccupancyAfterCollectionAggregation results) {
         super(results);
         register(GenerationalGCPauseEvent.class, this::extractHeapOccupancy);
         register(G1GCPauseEvent.class, this::extractHeapOccupancy);
         register(ZGCCycle.class,this::extractHeapOccupancy);
         register(ShenandoahCycle.class,this::extractHeapOccupancy);
+        register(JVMTermination.class,this::process);
+    }
+
+    private void process(JVMTermination event) {
+        System.out.println(event.toString());
     }
 
     private void extractHeapOccupancy(GenerationalGCPauseEvent event) {

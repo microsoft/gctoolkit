@@ -115,9 +115,13 @@ public abstract class Aggregator<A extends Aggregation> {
      * @param < E> the type of JVMEvent
      */
     public void receive(JVMEvent event) {
-        aggregation().updateTime(event.getDateTimeStamp(), event.getDuration());
+        if (event instanceof JVMTermination) {
+            done = true;
+            aggregation().estimatedStartTime(((JVMTermination)event).getEstimatedStartTime());
+            aggregation().estimatedTerminationTime(((JVMTermination)event).getEstimatedTimeOfTermination());
+            aggregation().estimatedRuntime(((JVMTermination)event).getEstimatedRuntime());
+        }
         jvmEventDispatcher.dispatch(event);
-        if (event instanceof JVMTermination) done = true;
     }
 
     /**

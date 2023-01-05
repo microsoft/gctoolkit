@@ -5,6 +5,8 @@ package com.microsoft.gctoolkit.aggregator;
 import com.microsoft.gctoolkit.jvm.JavaVirtualMachine;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
 
+import java.util.Date;
+
 /**
  * An {@code Aggregation} collates data from an {@link Aggregator} and may be thought of as a view
  * of the data. An {@code Aggregation} might collate data into a time series for plotting, or it might
@@ -86,38 +88,59 @@ import com.microsoft.gctoolkit.time.DateTimeStamp;
  * @see JavaVirtualMachine#getAggregation(Class)
  * @see Collates
  */
-public interface Aggregation {
+public abstract class Aggregation {
+
+    private DateTimeStamp estimatedStartTime = null;
+    private DateTimeStamp estimatedTerminationTime = new DateTimeStamp(0.0d);
+    private double estimatedRuntime = -1.0d;
+
+    protected Aggregation() {}
+
+    /**
+     * Interface to record the time span of the log
+     * Estimate based on information carried in the JVMTermination event.
+     * @param startTime - estimate start time of the log.
+     */
+
+    public void estimatedStartTime(DateTimeStamp startTime) {
+        this.estimatedStartTime = startTime;
+    }
+    public DateTimeStamp estimatedStartTime() {
+        return this.estimatedStartTime;
+    }
+    public void estimatedRuntime(double estimatedUpTime) {
+        this.estimatedRuntime = estimatedUpTime;
+    }
+    public double estimatedRuntime() {
+        return estimatedRuntime;
+    }
+
+    public void estimatedTerminationTime(DateTimeStamp terminationTime) {
+        this.estimatedTerminationTime = terminationTime;
+
+    }
+    public DateTimeStamp estimatedTerminationTime() {
+        return estimatedTerminationTime;
+    }
 
     /**
      * Return true if the Aggregation contains a warning. For example, an Aggregation that
      * looks at GC Cause might return {@code true} if it finds a System.gc() call.
      * @return {@code true} if the Aggregation contains a warning.
      */
-    boolean hasWarning();
+    abstract public boolean hasWarning();
 
     /**
      * Return {@code true} if there is no data in the Aggregation.
-     * @return {@code true} if there is no data in the Aggregation.
+     * @return {@ncode true} if there is no data in the Aggregation.
      */
-    boolean isEmpty();
+    abstract public boolean isEmpty();
 
-    RuntimeDuration runtimeDuration = new RuntimeDuration();
-
-    default void updateTime(DateTimeStamp eventTime, double eventDuration) {
-        runtimeDuration.update(eventTime, eventDuration);
-    }
-
-    default RuntimeDuration getRuntimeDurationDetails() {
-        return runtimeDuration;
-    }
-
-    default double getRuntimeDuration() {
-        return runtimeDuration.getEstimatedRuntime();
-    }
-
-    //todo: add method to process termination. Should be processed irregardless of any user defined handler
-
-    default Class<? extends Aggregator<?>> collates() {
+    /**
+     * Sort if a given Aggregator collates for this aggregation.
+      * @return aggregator
+     */
+    public Class<? extends Aggregator<?>> collates() {
         return collates(getClass());
     }
 
@@ -144,5 +167,4 @@ public interface Aggregation {
         }
         return null;
     }
-    
 }

@@ -40,6 +40,7 @@ public abstract class AbstractJavaVirtualMachine implements JavaVirtualMachine {
     private GCLogFile dataSource;
     private Diary diary;
     private DateTimeStamp timeOfLastEvent;
+    private double logDuration = -1.0d;
     private final Map<Class<? extends Aggregation>, Aggregation> aggregatedData = new ConcurrentHashMap<>();
 
     public void setDataSource(DataSource logFile) throws IOException {
@@ -119,9 +120,17 @@ public abstract class AbstractJavaVirtualMachine implements JavaVirtualMachine {
         return timeOfLastEvent;
     }
 
+    private void setJVMTerminationTime(DateTimeStamp terminationTime) {
+        timeOfLastEvent = terminationTime;
+    }
+
     @Override
     public double getRuntimeDuration() {
-        return getJVMTerminationTime().minus(getEstimatedJVMStartTime());
+        return logDuration;
+    }
+
+    private void setRuntimeDuration(double duration) {
+        this.logDuration = duration;
     }
 
     @Override
@@ -158,16 +167,19 @@ public abstract class AbstractJavaVirtualMachine implements JavaVirtualMachine {
 
             dataSource.stream().forEach(message -> dataSourceBus.publish(Channels.DATA_SOURCE, message));
             dataSourceBus.publish(Channels.DATA_SOURCE, dataSource.endOfData());
-            dataSourceBus.close();
-            eventBus.close();
             try {
-                Thread.sleep(2000L);
+                Thread.sleep(10000L);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            Aggregation aggregation = aggregatedData.values().stream().findFirst().get();
-            timeOfLastEvent = aggregation.getRuntimeDurationDetails().getEstimatedTimeOfTermination();
-
+            dataSourceBus.close();
+            eventBus.close();
+            //todo: revisit this
+            Optional<Aggregation> aggregation = aggregatedData.values().stream().findFirst();
+            aggregation.ifPresent(terminationRecord -> {
+                setJVMTerminationTime(terminationRecord.estimatedTerminationTime());
+                setRuntimeDuration(terminationRecord.estimatedRuntime());
+            });
         } catch (IOException | ClassCastException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
             LOGGER.log(Level.WARNING, e.getMessage(), e);
         }
