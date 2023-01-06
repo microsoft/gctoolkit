@@ -75,6 +75,6 @@ public class UnifiedSurvivorMemoryPoolParser extends UnifiedGCLogParser implemen
     }
 
     private void publish(JVMEvent event) {
-        consumer.publish(Channels.SURVIVOR_MEMORY_POOL_PARSER_OUTBOX, event);
+        super.publish(Channels.SURVIVOR_MEMORY_POOL_PARSER_OUTBOX, event);
     }
 }

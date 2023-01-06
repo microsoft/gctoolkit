@@ -276,7 +276,7 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
     }
 
     public void publish(JVMEvent event) {
-        consumer.publish(Channels.ZGC_PARSER_OUTBOX, event);
+        super.publish(Channels.ZGC_PARSER_OUTBOX, event);
         forwardReference = null;
     }
 

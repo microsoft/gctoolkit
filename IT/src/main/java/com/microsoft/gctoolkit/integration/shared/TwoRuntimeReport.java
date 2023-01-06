@@ -7,7 +7,7 @@ import com.microsoft.gctoolkit.integration.shared.SharedAggregation;
 
 @Collates(TwoRuntimeAggregator.class)
 
-public class TwoRuntimeReport extends SharedAggregation implements Aggregation {
+public class TwoRuntimeReport extends SharedAggregation {
 
 
     @Override

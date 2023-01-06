@@ -165,6 +165,6 @@ public class JVMEventParser extends PreUnifiedGCLogParser implements JVMPatterns
     }
 
     private void publish(JVMEvent event) {
-        consumer.publish(Channels.JVM_EVENT_PARSER_OUTBOX, event);
+        super.publish(Channels.JVM_EVENT_PARSER_OUTBOX, event);
     }
 }

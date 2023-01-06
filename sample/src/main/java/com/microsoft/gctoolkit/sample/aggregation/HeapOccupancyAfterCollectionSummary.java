@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Collates(HeapOccupancyAfterCollection.class)
-public class HeapOccupancyAfterCollectionSummary implements HeapOccupancyAfterCollectionAggregation {
+public class HeapOccupancyAfterCollectionSummary extends HeapOccupancyAfterCollectionAggregation {
 
     private final Map<GarbageCollectionTypes, XYDataSet> aggregations = new ConcurrentHashMap<>();
 

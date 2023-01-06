@@ -5,6 +5,7 @@ package com.microsoft.gctoolkit.parser;
 import com.microsoft.gctoolkit.event.CPUSummary;
 import com.microsoft.gctoolkit.event.MemoryPoolSummary;
 import com.microsoft.gctoolkit.event.ReferenceGCSummary;
+import com.microsoft.gctoolkit.event.jvm.JVMEvent;
 import com.microsoft.gctoolkit.event.jvm.MetaspaceRecord;
 import com.microsoft.gctoolkit.event.jvm.PermGenSummary;
 import com.microsoft.gctoolkit.io.GCLogFile;
@@ -23,7 +24,7 @@ public abstract class GCLogParser implements DataSourceParser, SharedPatterns {
     public static final String END_OF_DATA_SENTINEL = GCLogFile.END_OF_DATA_SENTINEL;
 
     public static final GCParseRule GCID_COUNTER = new GCParseRule("GCID_COUNTER", " GC\\((\\d+)\\) ");
-    protected JVMEventChannel consumer;
+    private JVMEventChannel consumer;
     protected Diary diary;
     private DateTimeStamp clock = new DateTimeStamp(0.0d);
 
@@ -63,6 +64,16 @@ public abstract class GCLogParser implements DataSourceParser, SharedPatterns {
         }
         //todo: should preserve date in cases where statements do not respect PrintDateStamp (eg. ergonomics)
         setClock(now);
+    }
+
+    /**
+     * The clock is advanced to the time at the end of the event.
+     * @param channel
+     * @param event
+     */
+    public void publish(Channels channel, JVMEvent event) {
+        consumer.publish(channel,event);
+        advanceClock(getClock().add(event.getDuration()));
     }
 
     public void receive(String trace) {

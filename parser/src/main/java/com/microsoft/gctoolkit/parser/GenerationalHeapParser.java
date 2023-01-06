@@ -2017,7 +2017,7 @@ public class GenerationalHeapParser extends PreUnifiedGCLogParser implements Sim
     }
 
     public void publish(JVMEvent event, boolean clear) {
-        consumer.publish(Channels.GENERATIONAL_HEAP_PARSER_OUTBOX, event);
+        super.publish(Channels.GENERATIONAL_HEAP_PARSER_OUTBOX, event);
         if (clear) {
             garbageCollectionTypeForwardReference = null;
             gcCauseForwardReference = GCCause.UNKNOWN_GCCAUSE;

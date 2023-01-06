@@ -96,7 +96,7 @@ public class ShenandoahParser extends UnifiedGCLogParser implements ShenandoahPa
     }
 
     public void publish(JVMEvent event) {
-        consumer.publish(Channels.SHENANDOAH_PARSER_OUTBOX, event);
+        super.publish(Channels.SHENANDOAH_PARSER_OUTBOX, event);
         forwardReference = null;
     }
 

@@ -53,10 +53,7 @@ import com.microsoft.gctoolkit.time.DateTimeStamp;
  * </code></pre>
 
  */
-public class RuntimeAggregation  implements Aggregation {
-
-    private volatile DateTimeStamp timeOfFirstEvent = null;
-    private volatile DateTimeStamp timeOfLastEvent = new DateTimeStamp(0d);
+public class RuntimeAggregation  extends Aggregation {
 
     /**
      * This class is meant to be extended.
@@ -69,47 +66,6 @@ public class RuntimeAggregation  implements Aggregation {
      * @param duration The duration of the JVMEvent.
      */
     public void publish(DateTimeStamp eventTime, double duration) {
-
-        if (timeOfFirstEvent == null && eventTime != null) {
-            timeOfFirstEvent = eventTime;
-        }
-
-        double eventDuration = !Double.isNaN(duration) ? duration : 0d;
-
-        DateTimeStamp now = eventTime != null
-                ? eventTime.add(eventDuration)
-                : timeOfLastEvent.add(eventDuration);
-
-        if (now.after(timeOfLastEvent)) {
-            timeOfLastEvent = now;
-        }
-    }
-
-    /**
-     * Return the time of the first event of the GC log.
-     * @return The time of the first event.
-     */
-    public DateTimeStamp getTimeOfFirstEvent() {
-        return timeOfFirstEvent != null ? timeOfFirstEvent : new DateTimeStamp(0.0);
-    }
-
-    /**
-     * Return the time of the last event of the GC log.
-     * Note well! The time of the last event is not the start time of the event, but is the
-     * time the event ended (event start time plus the event duration).
-     * @return The time of the last event.
-     */
-    public DateTimeStamp getTimeOfLastEvent() {
-        return timeOfLastEvent != null ? timeOfLastEvent : getTimeOfFirstEvent();
-    }
-
-    /**
-     * Return the duration of the GC log. Fundamentally, this is the difference between the
-     * time of the last event and the time of the first event.
-     * @return The duration of the JVM runtime represented by the log.
-     */
-    public double getRuntimeDuration() {
-        return getTimeOfLastEvent().minus(getTimeOfFirstEvent());
     }
 
     @Override

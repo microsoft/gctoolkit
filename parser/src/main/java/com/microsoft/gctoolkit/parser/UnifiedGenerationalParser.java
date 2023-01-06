@@ -323,7 +323,7 @@ public class UnifiedGenerationalParser extends UnifiedGCLogParser implements Uni
     }
 
     private void jvmExit(GCLogTrace trace, String line) {
-        consumer.publish(Channels.GENERATIONAL_HEAP_PARSER_OUTBOX,  new JVMTermination(getClock(),diary.getTimeOfFirstEvent()));
+        super.publish(Channels.GENERATIONAL_HEAP_PARSER_OUTBOX,  new JVMTermination(getClock(),diary.getTimeOfFirstEvent()));
     }
 
     /**
@@ -545,6 +545,6 @@ public class UnifiedGenerationalParser extends UnifiedGCLogParser implements Uni
     }
 
     private void publish(GenerationalGCEvent event) {
-        consumer.publish(Channels.GENERATIONAL_HEAP_PARSER_OUTBOX, event);
+        super.publish(Channels.GENERATIONAL_HEAP_PARSER_OUTBOX, event);
     }
 }

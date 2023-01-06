@@ -773,6 +773,6 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
     }
 
     private void publish(JVMEvent event) {
-        consumer.publish(Channels.G1GC_PARSER_OUTBOX,event);
+        super.publish(Channels.G1GC_PARSER_OUTBOX,event);
     }
 }
