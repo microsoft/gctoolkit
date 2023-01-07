@@ -139,9 +139,9 @@ public class DateTimeStamp implements Comparable<DateTimeStamp> {
     public DateTimeStamp(ZonedDateTime dateTime, double timeStamp) {
         this.dateTime = dateTime;
         if ( ! (timeStamp < 0.00d))
-            this.timeStamp = timeStamp;
+            this.timeStamp = Math.floor(timeStamp * 1000.0d) / 1000.0d;
         else if (dateTime != null)
-            this.timeStamp = dateTime.toEpochSecond() + dateTime.getNano() / 1_000_000_000d;
+            this.timeStamp = Math.floor((dateTime.toEpochSecond() + dateTime.getNano() / 1_000_000_000d) * 1000.0d) / 1000.0d;
         else
             this.timeStamp = TIMESTAMP_NOT_SET;
     }
@@ -286,7 +286,8 @@ public class DateTimeStamp implements Comparable<DateTimeStamp> {
         double offset = (Double.isNaN(offsetInDecimalSeconds)) ? 0.000d : offsetInDecimalSeconds;
         if (getDateTime() != null) {
             int seconds = (int) offset;
-            long nanos = (long) ((offset % 1) * 1_000_000_000L);
+            long nanos = ((long) ((offset % 1) * 1_000L)) * 1_000_000L;
+            //long nanos = (long) ((offset % 1) * 1_000_000_000L);
             now = new DateTimeStamp(dateTime.plusSeconds(seconds).plusNanos(nanos), timeStamp + offset);
         } else
             now = new DateTimeStamp(getTimeStamp() + offset);
