@@ -58,6 +58,8 @@ public abstract class GCLogParser implements DataSourceParser, SharedPatterns {
         if (now == null)
             return;
             // now can be the same but it can't be less than
+        if ( getClock().getTimeStamp() == 330275.696)
+            System.out.println("here");
         else if (now.before(getClock())) {
             if ( ! now.equals(getClock()))
                 LOGGER.log(Level.WARNING, "Thread: {0}, abort GC log parsing. Time traveled backwards from {1} to {2}", new Object[]{Thread.currentThread().getName(), getClock().toString(), now.toString()});
@@ -73,7 +75,7 @@ public abstract class GCLogParser implements DataSourceParser, SharedPatterns {
      */
     public void publish(Channels channel, JVMEvent event) {
         consumer.publish(channel,event);
-        advanceClock(getClock().add(event.getDuration()));
+        advanceClock(event.getDateTimeStamp().add(event.getDuration()));
     }
 
     public void receive(String trace) {

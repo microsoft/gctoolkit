@@ -97,7 +97,7 @@ public class GCLogFileZipSegment implements LogFileSegment {
             ageOfJVMAtLogStart();
             if ( startTime.hasTimeStamp())
                 return startTime.getTimeStamp();
-            else if ( startTime.hasDateTime())
+            else if ( startTime.hasDateStamp())
                 return startTime.toEpochInMillis();
             else
                 return Double.MAX_VALUE;
@@ -112,7 +112,7 @@ public class GCLogFileZipSegment implements LogFileSegment {
             ageOfJVMAtLogEnd();
             if ( endTime.hasTimeStamp())
                 return endTime.getTimeStamp();
-            else if ( endTime.hasDateTime())
+            else if ( endTime.hasDateStamp())
                 return endTime.toEpochInMillis();
             else
                 return Double.MAX_VALUE;

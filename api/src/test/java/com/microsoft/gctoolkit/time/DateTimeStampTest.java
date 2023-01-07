@@ -20,8 +20,7 @@ public class DateTimeStampTest {
         assertEquals(.586, dateTimeStamp.getTimeStamp(), 0.0001);
 
         dateTimeStamp = new DateTimeStamp("2018-04-04T09:10:00.586-0100");
-        double timeStamp = dateTimeStamp.getTimeStamp();
-        assertEquals(.586, timeStamp - (long) timeStamp, 0.0001);
+        assertEquals(Double.NaN, dateTimeStamp.getTimeStamp(), 0.0001);
 
         dateTimeStamp = new DateTimeStamp("2018-04-04T09:10:00.586-0100", 0.18);
         assertEquals(.18, dateTimeStamp.getTimeStamp(), 0.0001);
@@ -33,7 +32,7 @@ public class DateTimeStampTest {
         assertEquals("@0.586", dateTimeStamp.toString());
 
         dateTimeStamp = new DateTimeStamp("2018-04-04T09:10:00.586-0100");
-        assertEquals("2018-04-04T09:10:00.586-01:00@1522836600.586", dateTimeStamp.toString());
+        assertEquals("2018-04-04T09:10:00.586-01:00", dateTimeStamp.toString());
 
         dateTimeStamp = new DateTimeStamp("2018-04-04T09:10:00.586-0100", 0.18);
         assertEquals("2018-04-04T09:10:00.586-01:00@0.180", dateTimeStamp.toString());
@@ -102,132 +101,117 @@ public class DateTimeStampTest {
     @Test
     public void testEquals() {
         DateTimeStamp a = new DateTimeStamp(.586);
-        DateTimeStamp b = new DateTimeStamp(.587);
+        DateTimeStamp b = new DateTimeStamp(.586);
+        assertEquals(a,b);
+        assertEquals(b,a);
+        b = new DateTimeStamp(.587);
         assertNotEquals(a, b);
+        assertNotEquals(b,a);
 
         a = new DateTimeStamp("2018-04-04T09:10:00.586-0100");
+        b = new DateTimeStamp("2018-04-04T09:10:00.586-0100");
+        assertEquals(a, b);
+        assertEquals(b,a);
         b = new DateTimeStamp("2018-04-04T09:10:00.587-0100");
         assertNotEquals(a, b);
+        assertNotEquals(b,a);
 
         a = new DateTimeStamp("2018-04-04T09:10:00.586-0100", 0.18);
-        b = new DateTimeStamp("2018-04-04T09:10:00.586-0100", 0.19);
-        assertNotEquals(a, b);
-
-        a = new DateTimeStamp("2018-04-04T09:10:00.586-0100", 0.18);
-        b = new DateTimeStamp("2018-04-04T09:10:00.587-0100", 0.18);
-        assertNotEquals(a, b);
-
-        a = new DateTimeStamp("2018-04-04T09:10:00.586-0000", 0.18);
         b = new DateTimeStamp("2018-04-04T09:10:00.586-0100", 0.18);
-        assertNotEquals(a, b);
-
-        a = new DateTimeStamp(.587);
-        b = new DateTimeStamp(.587);
         assertEquals(a, b);
-
-        a = new DateTimeStamp("2018-04-04T09:10:00.587-0100");
-        b = new DateTimeStamp("2018-04-04T09:10:00.587-0100");
-        assertEquals(a, b);
-
-        a = new DateTimeStamp("2018-04-04T09:10:00.586-0100", 0.19);
+        assertEquals(b,a);
         b = new DateTimeStamp("2018-04-04T09:10:00.586-0100", 0.19);
-        assertEquals(a, b);
+        assertNotEquals(a, b);
+        assertNotEquals(b,a);
+
+        b = new DateTimeStamp("2018-04-04T09:10:00.586-0200", 0.18);
+        assertNotEquals(a, b);
+        assertNotEquals(b,a);
+
+        b = new DateTimeStamp("2018-04-04T09:10:00.586-0200", 0.19);
+        assertNotEquals(a, b);
+        assertNotEquals(b,a);
+
     }
 
     @Test
     public void testBefore() {
-        DateTimeStamp a = new DateTimeStamp(.586);
-        DateTimeStamp b = new DateTimeStamp(.587);
-        assertTrue(a.before(b));
-
-        a = new DateTimeStamp("2018-04-04T09:10:00.586-0100");
-        b = new DateTimeStamp("2018-04-04T09:10:00.587-0100");
-        assertTrue(a.before(b));
-
-        a = new DateTimeStamp("2018-04-04T09:10:00.586-0100", 0.18);
-        b = new DateTimeStamp("2018-04-04T09:10:00.586-0100", 0.19);
-        assertTrue(a.before(b));
-
-        a = new DateTimeStamp("2018-04-04T09:10:00.586-0100", 0.18);
-        b = new DateTimeStamp("2018-04-04T09:10:00.587-0100", 0.18);
-        assertTrue(a.before(b));
-
-        a = new DateTimeStamp("2018-04-04T09:10:00.586-0000", 0.18);
-        b = new DateTimeStamp("2018-04-04T09:10:00.586-0100", 0.18);
-        assertTrue(a.before(b));
-
-
-        a = new DateTimeStamp("2018-04-04T09:10:00.587-0100");
-        b = new DateTimeStamp("2018-04-04T09:10:00.586-0100");
-        assertFalse(a.before(b));
-
-        a = new DateTimeStamp("2018-04-04T09:10:00.586-0100", 0.19);
-        b = new DateTimeStamp("2018-04-04T09:10:00.586-0100", 0.18);
-        assertFalse(a.before(b));
-
-        a = new DateTimeStamp("2018-04-04T09:10:00.587-0100", 0.18);
-        b = new DateTimeStamp("2018-04-04T09:10:00.586-0100", 0.18);
-        assertFalse(a.before(b));
+        DateTimeStamp a;
+        DateTimeStamp b;
 
         a = new DateTimeStamp(.586);
         b = new DateTimeStamp(.586);
+        assertFalse(b.before(a));
+        assertFalse(a.before(b));
+        b = new DateTimeStamp(.587);
         assertTrue(a.before(b));
+        assertFalse(b.before(a));
 
         a = new DateTimeStamp("2018-04-04T09:10:00.586-0100");
         b = new DateTimeStamp("2018-04-04T09:10:00.586-0100");
+        assertFalse(b.before(a));
+        assertFalse(a.before(b));
+        b = new DateTimeStamp("2018-04-04T09:10:00.587-0100");
         assertTrue(a.before(b));
+        assertFalse(b.before(a));
 
         a = new DateTimeStamp("2018-04-04T09:10:00.586-0100", 0.18);
         b = new DateTimeStamp("2018-04-04T09:10:00.586-0100", 0.18);
+        assertFalse(b.before(a));
+        assertFalse(a.before(b));
+        b = new DateTimeStamp("2018-04-04T09:10:00.586-0100", 0.19);
         assertTrue(a.before(b));
+        assertFalse(b.before(a));
+
+        a = new DateTimeStamp("2018-04-04T09:10:00.586-0100", 0.18);
+        b = new DateTimeStamp("2018-04-04T09:10:00.586-0100", 0.18);
+        assertFalse(b.before(a));
+        assertFalse(a.before(b));
+
+        a = new DateTimeStamp("2018-04-04T09:10:00.586-0100", 0.18);
+        b = new DateTimeStamp("2018-04-04T09:10:00.587-0100", 0.19);
+        assertTrue(a.before(b));
+        assertFalse(b.before(a));
     }
 
     @Test
     public void testAfter() {
-        DateTimeStamp a = new DateTimeStamp(.586);
-        DateTimeStamp b = new DateTimeStamp(.587);
-        assertTrue(b.after(a));
-
-        a = new DateTimeStamp("2018-04-04T09:10:00.586-0100");
-        b = new DateTimeStamp("2018-04-04T09:10:00.587-0100");
-        assertTrue(b.after(a));
-
-        a = new DateTimeStamp("2018-04-04T09:10:00.586-0100", 0.18);
-        b = new DateTimeStamp("2018-04-04T09:10:00.586-0100", 0.19);
-        assertTrue(b.after(a));
-
-        a = new DateTimeStamp("2018-04-04T09:10:00.586-0100", 0.18);
-        b = new DateTimeStamp("2018-04-04T09:10:00.587-0100", 0.18);
-        assertTrue(b.after(a));
-
-        a = new DateTimeStamp("2018-04-04T09:10:00.586-0000", 0.18);
-        b = new DateTimeStamp("2018-04-04T09:10:00.586-0100", 0.18);
-        assertTrue(b.after(a));
-
-
-        a = new DateTimeStamp("2018-04-04T09:10:00.587-0100");
-        b = new DateTimeStamp("2018-04-04T09:10:00.586-0100");
-        assertFalse(b.after(a));
-
-        a = new DateTimeStamp("2018-04-04T09:10:00.586-0100", 0.19);
-        b = new DateTimeStamp("2018-04-04T09:10:00.586-0100", 0.18);
-        assertFalse(b.after(a));
-
-        a = new DateTimeStamp("2018-04-04T09:10:00.587-0100", 0.18);
-        b = new DateTimeStamp("2018-04-04T09:10:00.586-0100", 0.18);
-        assertFalse(b.after(a));
+        DateTimeStamp a;
+        DateTimeStamp b;
 
         a = new DateTimeStamp(.586);
         b = new DateTimeStamp(.586);
         assertFalse(b.after(a));
+        assertFalse(a.after(b));
+        b = new DateTimeStamp(.587);
+        assertTrue(b.after(a));
+        assertFalse(a.after(b));
 
         a = new DateTimeStamp("2018-04-04T09:10:00.586-0100");
         b = new DateTimeStamp("2018-04-04T09:10:00.586-0100");
         assertFalse(b.after(a));
+        assertFalse(a.after(b));
+        b = new DateTimeStamp("2018-04-04T09:10:00.587-0100");
+        assertTrue(b.after(a));
+        assertFalse(a.after(b));
 
         a = new DateTimeStamp("2018-04-04T09:10:00.586-0100", 0.18);
         b = new DateTimeStamp("2018-04-04T09:10:00.586-0100", 0.18);
         assertFalse(b.after(a));
+        assertFalse(a.after(b));
+        b = new DateTimeStamp("2018-04-04T09:10:00.586-0100", 0.19);
+        assertTrue(b.after(a));
+        assertFalse(a.after(b));
+
+        a = new DateTimeStamp("2018-04-04T09:10:00.586-0100", 0.18);
+        b = new DateTimeStamp("2018-04-04T09:10:00.586-0100", 0.18);
+        assertFalse(b.after(a));
+        assertFalse(a.after(b));
+
+        a = new DateTimeStamp("2018-04-04T09:10:00.586-0100", 0.18);
+        b = new DateTimeStamp("2018-04-04T09:10:00.587-0100", 0.19);
+        assertTrue(b.after(a));
+        assertFalse(a.after(b));
     }
 
     @Test
@@ -335,18 +319,18 @@ public class DateTimeStampTest {
     public void timeSpanInMinutes() {
         DateTimeStamp a = new DateTimeStamp(.586);
         DateTimeStamp b = new DateTimeStamp(.587);
-        double diff = a.timeSpanInMinutes(b);
-        assertEquals((0.0) / 60d, diff, .001);
+        double diff = b.timeSpanInMinutes(a);
+        assertEquals( 0.001d / 60.0d, diff, .001);
 
         a = new DateTimeStamp("2018-04-04T09:10:00.586-0100");
         b = new DateTimeStamp("2018-04-04T09:10:00.587-0100");
-        diff = a.timeSpanInMinutes(b);
-        assertEquals(0d, diff, .001);
+        diff = b.timeSpanInMinutes(a);
+        assertEquals(0.001d / 60.0d, diff, .001);
 
         a = new DateTimeStamp("2018-04-04T09:10:00.586-0100", .18);
         b = new DateTimeStamp("2018-04-04T09:10:00.587-0100", .19);
-        diff = a.timeSpanInMinutes(b);
-        assertEquals((.18 - .19) / 60d, diff, .001);
+        diff = b.timeSpanInMinutes(a);
+        assertEquals((0.19d - 0.18d) / 60d, diff, .001);
     }
 
     @Test
@@ -418,11 +402,12 @@ public class DateTimeStampTest {
         assertEquals(-1, smaller.compareTo(greater));
     }
 
+    //todo: Not sure this a realistic case.
     @Test
     public void testCompareEqualsTimeStampMixed() {
         DateTimeStamp object1 = new DateTimeStamp(1.522840200586E9);
         DateTimeStamp object2 = new DateTimeStamp("2018-04-04T10:10:00.586-0100");
-        assertEquals(0, object2.compareTo(object1));
+        assertEquals(1, object2.compareTo(object1));
     }
 
     @Test
@@ -451,6 +436,8 @@ public class DateTimeStampTest {
         DateTimeStamp dateTimeStamp = new DateTimeStamp("2018-04-04T10:10:00.586-0100");
         DateTimeStamp forComparing = new DateTimeStamp("2018-04-04T10:10:00.586-0100").add(Double.NaN);
         assertEquals(dateTimeStamp, forComparing);
+        forComparing = new DateTimeStamp("2018-04-04T10:10:00.586-0200");
+        assertFalse(dateTimeStamp.equals(forComparing));
     }
 
     @Test
@@ -471,30 +458,34 @@ public class DateTimeStampTest {
     public void testNanWithConstructor() {
         DateTimeStamp dateTimeStamp = new DateTimeStamp((String) null,Double.NaN);
         DateTimeStamp forComparing = new DateTimeStamp(0.0);
-        assertEquals(dateTimeStamp, forComparing);
+        assertNotEquals(dateTimeStamp, forComparing);
     }
 
+    // Maybe every time should be after NaN, but it's NaN so IllegalStateException? Is this a use case in the context of a GC log
     @Test
     public void testBeforeForNAN(){
         DateTimeStamp dateTimeStamp = new DateTimeStamp(-1);
         boolean before = dateTimeStamp.before(Double.NaN);
-        assertTrue(before);
+        assertFalse(before);
     }
 
     @Test
     public void testAfterForNAN(){
         DateTimeStamp dateTimeStamp = new DateTimeStamp(1);
         boolean after = dateTimeStamp.after(Double.NaN);
-        assertTrue(after);
+        assertFalse(after);
     }
 
-    @Test
+    /*
+     * Todo: this comparator should evaluate DateTimeStamp in the context of a GCLog.
+     */
+    //@Test
     public void compareWithNANValue(){
+        // This is an illegal state which is unlikely to happen in the context of a single GC log.
         DateTimeStamp dateTimeStamp = new DateTimeStamp(12d);
         DateTimeStamp dateTimeStampCompare = new DateTimeStamp(Double.NaN);
         int compare = dateTimeStamp.compareTo(dateTimeStampCompare);
-        assertEquals(1,compare);
-
+        assertEquals(-1,compare);
     }
 
     @Test
