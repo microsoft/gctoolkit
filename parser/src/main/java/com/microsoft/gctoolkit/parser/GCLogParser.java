@@ -27,6 +27,7 @@ public abstract class GCLogParser implements DataSourceParser, SharedPatterns {
     private JVMEventChannel consumer;
     protected Diary diary;
     private DateTimeStamp clock = new DateTimeStamp(0.0d);
+    private double lastDuration = 0.0d;
 
 
     public GCLogParser() {}
@@ -67,17 +68,27 @@ public abstract class GCLogParser implements DataSourceParser, SharedPatterns {
 
     /**
      * The clock is advanced to the time at the end of the event.
+     * The times reported in the GCLog file are "noisy" at best. This
+     * hyperactives the clock rollback detection which doesn't allow
+     * for slop. To minimize this, the clock only records when a time
+     * stamp is presented and isn't advanced to the end of the event
+     * except in the case of EOF where the time of JVM termination has
+     * not been recorded. In this case, JVMTermination time should advanced
+     * to after the previous event has ended.
+     *
      * @param channel
      * @param event
      */
     public void publish(Channels channel, JVMEvent event) {
+        lastDuration = event.getDuration();
         consumer.publish(channel,event);
-        advanceClock(event.getDateTimeStamp().add(event.getDuration()));
     }
 
     public void receive(String trace) {
         if (!trace.equals(END_OF_DATA_SENTINEL))
             advanceClock(trace);
+        else
+            advanceClock(getClock().add(lastDuration));
         process(trace);
     }
 

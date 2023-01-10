@@ -138,12 +138,10 @@ public class DateTimeStamp implements Comparable<DateTimeStamp> {
      */
     public DateTimeStamp(ZonedDateTime dateTime, double timeStamp) {
         this.dateTime = dateTime;
-        if ( ! (timeStamp < 0.00d))
-            this.timeStamp = Math.floor(timeStamp * 1000.0d) / 1000.0d;
-        else if (dateTime != null)
-            this.timeStamp = Math.floor((dateTime.toEpochSecond() + dateTime.getNano() / 1_000_000_000d) * 1000.0d) / 1000.0d;
-        else
+        if ( (timeStamp < 0.00d) || Double.isNaN(timeStamp))
             this.timeStamp = TIMESTAMP_NOT_SET;
+        else
+            this.timeStamp = Math.round(timeStamp * 1000.0d) / 1000.0d;
     }
 
     /**
@@ -202,7 +200,7 @@ public class DateTimeStamp implements Comparable<DateTimeStamp> {
         if (hasDateStamp())
             buffer.append(getDateTime().toString());
         if (hasTimeStamp())
-            buffer.append("@").append(String.format(Locale.US, "%.3f", timeStamp));
+            buffer.append("@").append(String.format(Locale.US,"%.3f",timeStamp));
         return buffer.toString();
     }
 
@@ -281,16 +279,26 @@ public class DateTimeStamp implements Comparable<DateTimeStamp> {
      * @return A new {@code DateTimeStamp}, {@code offsetInDecimalSeconds} from this.
      */
     public DateTimeStamp add(double offsetInDecimalSeconds) {
+        if (Double.isNaN(offsetInDecimalSeconds))
+            throw new IllegalArgumentException("Cannot add " + Double.NaN);
+
         DateTimeStamp now;
-        // if passed value is NAN then consider offset seconds as 0.0d
-        double offset = (Double.isNaN(offsetInDecimalSeconds)) ? 0.000d : offsetInDecimalSeconds;
+        double adjustedTimeStamp = Double.NaN;
+        if ( ! Double.isNaN(getTimeStamp())) {
+            adjustedTimeStamp = getTimeStamp() + offsetInDecimalSeconds;
+        }
+
         if (getDateTime() != null) {
+            double offset = (Double.isNaN(offsetInDecimalSeconds)) ? 0.000d : offsetInDecimalSeconds;
             int seconds = (int) offset;
             long nanos = ((long) ((offset % 1) * 1_000L)) * 1_000_000L;
-            //long nanos = (long) ((offset % 1) * 1_000_000_000L);
-            now = new DateTimeStamp(dateTime.plusSeconds(seconds).plusNanos(nanos), timeStamp + offset);
+            ZonedDateTime adjustedDateStamp = dateTime.plusSeconds(seconds).plusNanos(nanos);
+            if ( Double.isNaN(getTimeStamp()))
+                now = new DateTimeStamp(adjustedDateStamp);
+            else
+                now = new DateTimeStamp(adjustedDateStamp, adjustedTimeStamp);
         } else
-            now = new DateTimeStamp(getTimeStamp() + offset);
+            now = new DateTimeStamp(adjustedTimeStamp);
 
         return now;
     }
@@ -346,6 +354,7 @@ public class DateTimeStamp implements Comparable<DateTimeStamp> {
 
     private static  Comparator<DateTimeStamp> getComparator(){
         // compare with dateTime field, if null then it will go to last
+        // need a check to make sure these are comparable
         return nullsLast((o1, o2) -> {
             Comparator<DateTimeStamp> dateTimeStampComparator = compareDateTimeStamp(o1, o2);
             return dateTimeStampComparator.compare(o1,o2);
@@ -353,18 +362,21 @@ public class DateTimeStamp implements Comparable<DateTimeStamp> {
     }
 
     private static Comparator<DateTimeStamp> compareDateTimeStamp(DateTimeStamp o1, DateTimeStamp o2) {
+        if ( (o1.hasTimeStamp() && o2.hasTimeStamp()) || (o1.hasDateStamp() && o2.hasDateStamp()))
         return comparingDouble(DateTimeStamp::getTimeStamp)
                 .thenComparing(DateTimeStamp::getDateTime,
                         (dtsA, dtsB) -> {
                             if (dtsA == null || dtsB == null) return 0;
                             else return dtsA.compareTo(dtsB);
                         });
+        else
+            throw new IllegalStateException("DateTimeStamp parameters cannot be compared as either timestamp or datestamp must be set.");
     }
 
     public double toEpochInMillis() {
         if ( dateTime != null) {
             return (double)(dateTime.toEpochSecond() * 1000) + (((double)dateTime.getNano()) / 1000000.0d);
         } // todo: a reasonable response here might be????
-        return -1.0d;
+        return Double.NaN;
     }
 }

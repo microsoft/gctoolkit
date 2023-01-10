@@ -77,20 +77,19 @@ public class ZGCParserTest extends ParserTest {
 
             assertEquals(zgc.getGcId(), 2L);
 
-            assertEquals(toInt(0.0719d,1000), toInt(zgc.getDuration(),1000));
+            assertEquals(0.0710d, zgc.getDuration(),0.001d);
             assertEquals(toInt(32.121d, 1000), toInt(zgc.getDateTimeStamp().getTimeStamp(), 1000));
             assertEquals("Metadata GC Threshold", zgc.getGCCause().getLabel());
-
             // Durations
-            assertEquals(toInt(32.120977d, 1000), toInt(zgc.getPauseMarkStartTimeStamp().getTimeStamp(), 1000));
-            assertEquals(toInt(32.121377d, 1000), toInt(zgc.getConcurrentMarkTimeStamp().getTimeStamp(), 1000));
-            assertEquals(toInt(32.165999d, 1000), toInt(zgc.getConcurrentMarkFreeTimeStamp().getTimeStamp(), 1000));
-            assertEquals(toInt(32.165971d, 1000), toInt(zgc.getPauseMarkEndTimeStamp().getTimeStamp(), 1000));
-            assertEquals(toInt(32.166203d, 1000), toInt(zgc.getConcurrentProcessNonStrongReferencesTimeStamp().getTimeStamp(), 1000));
-            assertEquals(toInt(32.171988d, 1000), toInt(zgc.getConcurrentResetRelocationSetTimeStamp().getTimeStamp(), 1000));
-            assertEquals(toInt(32.171554d, 1000), toInt(zgc.getConcurrentSelectRelocationSetTimeStamp().getTimeStamp(), 1000));
-            assertEquals(toInt(32.178976d, 1000), toInt(zgc.getPauseRelocateStartTimeStamp().getTimeStamp(), 1000));
-            assertEquals(toInt(32.178987d, 1000), toInt(zgc.getConcurrentRelocateTimeStamp().getTimeStamp(), 1000));
+            assertEquals(32.121d, zgc.getPauseMarkStartTimeStamp().getTimeStamp(),  0.001d);
+            assertEquals(32.122d, zgc.getConcurrentMarkTimeStamp().getTimeStamp(), 0.001d);
+            assertEquals(32.166d, zgc.getConcurrentMarkFreeTimeStamp().getTimeStamp(), 0.001d);
+            assertEquals(32.166d, zgc.getPauseMarkEndTimeStamp().getTimeStamp(), 0.001d);
+            assertEquals(32.167d, zgc.getConcurrentProcessNonStrongReferencesTimeStamp().getTimeStamp(), 0.002d);
+            assertEquals(32.172d, zgc.getConcurrentResetRelocationSetTimeStamp().getTimeStamp(), 0.001d);
+            assertEquals(32.172d, zgc.getConcurrentSelectRelocationSetTimeStamp().getTimeStamp(), 0.001d);
+            assertEquals(32.179d, zgc.getPauseRelocateStartTimeStamp().getTimeStamp(), 0.001d);
+            assertEquals(32.179d, zgc.getConcurrentRelocateTimeStamp().getTimeStamp(), 0.001d);
 
             assertEquals(toInt(0.023d, 1000), toInt(zgc.getPauseMarkStartDuration(), 1000));
             assertEquals(toInt(44.623d, 1000), toInt(zgc.getConcurrentMarkDuration(), 1000));

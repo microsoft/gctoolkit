@@ -4,6 +4,7 @@ import com.microsoft.gctoolkit.GCToolKit;
 import com.microsoft.gctoolkit.integration.aggregation.CollectionCycleCountsSummary;
 import com.microsoft.gctoolkit.integration.aggregation.HeapOccupancyAfterCollectionSummary;
 import com.microsoft.gctoolkit.integration.aggregation.PauseTimeSummary;
+import com.microsoft.gctoolkit.integration.io.TestLogFile;
 import com.microsoft.gctoolkit.io.GCLogFile;
 import com.microsoft.gctoolkit.io.SingleGCLogFile;
 import com.microsoft.gctoolkit.jvm.JavaVirtualMachine;
@@ -20,11 +21,13 @@ public class EndToEndIntegrationTest {
 
     @Test
     public void testMain() {
-                String gcLogFile = System.getProperty("gcLogFile");
-            analyze(gcLogFile);
-            Assertions.assertEquals(26, getInitialMarkCount());
-            Assertions.assertEquals(26, getRemarkCount());
-            Assertions.assertEquals(19114, getDefNewCount());
+        Path path = new TestLogFile("cms/defnew/details/defnew.log").getFile().toPath();
+        ///Users/chpepper/Projects/github/gctoolkit/gclogs/preunified/cms/defnew/details/defnew.log
+        String gcLogFile = System.getProperty("gcLogFile");
+        analyze(gcLogFile);
+        Assertions.assertEquals(26, getInitialMarkCount());
+        Assertions.assertEquals(26, getRemarkCount());
+        Assertions.assertEquals(19114, getDefNewCount());
     }
 
     public void analyze(String gcLogFile) {
@@ -90,8 +93,8 @@ public class EndToEndIntegrationTest {
         Optional<CollectionCycleCountsSummary> summary = machine.getAggregation(CollectionCycleCountsSummary.class);
         // Retrieves the Aggregation for PauseTimeSummary. This is a com.microsoft.gctoolkit.sample.aggregation.RuntimeAggregation.
         machine.getAggregation(PauseTimeSummary.class).ifPresent(pauseTimeSummary -> {
-            Assertions.assertEquals( 208922, (int)(pauseTimeSummary.getTotalPauseTime() * 1000.0d), "Total Pause Time");
-            Assertions.assertEquals( 608800087, (int)(pauseTimeSummary.estimatedRuntime() * 1000.0d), "Runtime duration");
+            Assertions.assertEquals( 208.922, pauseTimeSummary.getTotalPauseTime(), 0.001d, "Total Pause Time");
+            Assertions.assertEquals( 608800.087, pauseTimeSummary.estimatedRuntime(),0.001d, "Runtime duration");
             Assertions.assertEquals( 34, (int)(pauseTimeSummary.getPercentPaused() * 1000d), "percent paused");
         });
 

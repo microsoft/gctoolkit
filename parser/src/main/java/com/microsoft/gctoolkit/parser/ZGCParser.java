@@ -115,7 +115,7 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
     }
 
     private void pausePhase(GCLogTrace trace, String s) {
-        DateTimeStamp startTime = getClock().minus(trace.getDuration() / 1000.00d);
+        DateTimeStamp startTime = getClock().minus(Math.round(trace.getDuration()) / 1000.00d);
         if ("Mark Start".equals(trace.getGroup(1))) {
             forwardReference.setPauseMarkStartDuration(trace.getDuration());
             forwardReference.setPauseMarkStart(startTime);
@@ -130,7 +130,7 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
     }
 
     private void concurrentPhase(GCLogTrace trace, String s) {
-        DateTimeStamp startTime = getClock().minus(trace.getDuration() / 1000.0d);
+        DateTimeStamp startTime = getClock().minus(Math.round(trace.getDuration()) / 1000.0d);
         if ("Mark".equals(trace.getGroup(1))) {
             forwardReference.setConcurrentMarkDuration(trace.getDuration());
             forwardReference.setConcurrentMarkStart(startTime);

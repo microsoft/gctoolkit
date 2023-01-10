@@ -402,55 +402,36 @@ public class DateTimeStampTest {
         assertEquals(-1, smaller.compareTo(greater));
     }
 
-    //todo: Not sure this a realistic case.
-    @Test
-    public void testCompareEqualsTimeStampMixed() {
-        DateTimeStamp object1 = new DateTimeStamp(1.522840200586E9);
-        DateTimeStamp object2 = new DateTimeStamp("2018-04-04T10:10:00.586-0100");
-        assertEquals(1, object2.compareTo(object1));
-    }
-
-    @Test
-    public void testCompareGreaterTimeStampMixed() {
-        DateTimeStamp smaller = new DateTimeStamp(122);
-        DateTimeStamp greater = new DateTimeStamp("2018-04-04T10:10:00.586-0100");
-        assertEquals(1, greater.compareTo(smaller));
-    }
-
+    /**
+     * This tests a case that can't happen in context of a GC log. Todo: Should this throw an IllegalStateException?
+     */
     @Test
     public void testCompareSmallerTimeStampMixed() {
         DateTimeStamp smaller = new DateTimeStamp(123);
         DateTimeStamp greater = new DateTimeStamp("2018-04-04T10:10:00.586-0100");
-        assertEquals(-1, smaller.compareTo(greater));
+        assertThrows(IllegalStateException.class,
+                () -> { smaller.compareTo(greater); },
+                "IllegalStateException Not Thrown");
     }
 
     @Test
-    public void testNanWithZero() {
-        DateTimeStamp dateTimeStamp = new DateTimeStamp(0.0);
-        DateTimeStamp forComparing = new DateTimeStamp(0.0).add(Double.NaN);
-        assertEquals(dateTimeStamp, forComparing);
-    }
-
-    @Test
-    public void testNanWithNonZero() {
-        DateTimeStamp dateTimeStamp = new DateTimeStamp("2018-04-04T10:10:00.586-0100");
-        DateTimeStamp forComparing = new DateTimeStamp("2018-04-04T10:10:00.586-0100").add(Double.NaN);
-        assertEquals(dateTimeStamp, forComparing);
-        forComparing = new DateTimeStamp("2018-04-04T10:10:00.586-0200");
-        assertFalse(dateTimeStamp.equals(forComparing));
+    public void testAddingNaN() {
+        assertThrows(IllegalArgumentException.class,
+                () -> { new DateTimeStamp("2018-04-04T10:10:00.586-0100").add(Double.NaN); },
+                "IllegalAccess Not Thrown");
     }
 
     @Test
     public void testNanWithMinusNonZero() {
-        DateTimeStamp dateTimeStamp = new DateTimeStamp("2018-04-04T10:10:00.586-0100");
-        DateTimeStamp forComparing = new DateTimeStamp("2018-04-04T10:10:00.586-0100").minus(Double.NaN);
-        assertEquals(dateTimeStamp, forComparing);
+        assertThrows(IllegalArgumentException.class,
+                () -> { new DateTimeStamp("2018-04-04T10:10:00.586-0100").minus(Double.NaN); },
+                "IllegalAccess Not Thrown");
     }
 
     @Test
     public void testNanWithMinus() {
         DateTimeStamp dateTimeStamp = new DateTimeStamp("2018-04-04T10:09:59.586-0100");
-        DateTimeStamp forComparing = new DateTimeStamp("2018-04-04T10:10:00.586-0100").minus(1);
+        DateTimeStamp forComparing = new DateTimeStamp("2018-04-04T10:10:00.586-0100").minus(1.0d);
         assertEquals(dateTimeStamp, forComparing);
     }
 
@@ -479,13 +460,14 @@ public class DateTimeStampTest {
     /*
      * Todo: this comparator should evaluate DateTimeStamp in the context of a GCLog.
      */
-    //@Test
+    @Test
     public void compareWithNANValue(){
         // This is an illegal state which is unlikely to happen in the context of a single GC log.
         DateTimeStamp dateTimeStamp = new DateTimeStamp(12d);
         DateTimeStamp dateTimeStampCompare = new DateTimeStamp(Double.NaN);
-        int compare = dateTimeStamp.compareTo(dateTimeStampCompare);
-        assertEquals(-1,compare);
+        assertThrows(IllegalStateException.class,
+                () -> { dateTimeStamp.compareTo(dateTimeStampCompare); },
+                "IllegalStateException Not Thrown");
     }
 
     @Test

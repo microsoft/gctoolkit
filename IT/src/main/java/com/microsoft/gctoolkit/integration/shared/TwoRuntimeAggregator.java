@@ -23,8 +23,6 @@ public class TwoRuntimeAggregator extends Aggregator<TwoRuntimeReport> {
         System.out.println("sleeping: " + termination.toString());
         try {
             Thread.sleep(1000);
-            StackTraceElement[] threadDump = Thread.currentThread().getStackTrace();
-            Arrays.stream(threadDump).forEach(System.out::println);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
