@@ -47,7 +47,7 @@ public class SurvivorMemoryPoolParser extends PreUnifiedGCLogParser implements T
 
     @Override
     public boolean accepts(Diary diary) {
-        return diary.isTenuringDistribution();
+        return diary.isTenuringDistribution() && ! diary.isUnifiedLogging();
     }
 
     @Override

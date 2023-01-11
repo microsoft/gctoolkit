@@ -58,9 +58,10 @@ public class SingleGCLogFile extends GCLogFile {
         }
         if ( stream == null)
             throw new IOException("Unable to read " + path.toString());
-        return stream.filter(Objects::nonNull)
+        return Stream.concat(stream.filter(Objects::nonNull)
                 .map(String::trim)
-                .filter(s -> s.length() > 0);
+                .filter(s -> s.length() > 0),
+                Stream.of(endOfData()));
     }
 
     private static Stream<String> streamZipFile(Path path) throws IOException {

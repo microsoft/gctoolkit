@@ -14,7 +14,9 @@ public class VertxJVMEventChannel extends VertxChannel implements JVMEventChanne
     final private DeliveryOptions options = new DeliveryOptions().setCodecName(JVMEventCodec.NAME);
 
     public VertxJVMEventChannel() {
-        vertx().eventBus().registerDefaultCodec(JVMEvent.class, new JVMEventCodec());
+        try {
+            vertx().eventBus().registerDefaultCodec(JVMEvent.class, new JVMEventCodec());
+        } catch (Throwable t) {} //todo: testing only
     }
 
     @Override
@@ -22,13 +24,19 @@ public class VertxJVMEventChannel extends VertxChannel implements JVMEventChanne
         try {
             vertx().eventBus().publish(channel.getName(), message, options);
         } catch(Exception ex) {
-            System.out.println(ex.getCause());
+            ex.printStackTrace();
+            System.out.println(message);
         }
     }
 
     @Override
     public void close() {
-
+//        try {
+            vertx().eventBus().unregisterDefaultCodec(JVMEvent.class);
+//            vertx().close();
+//        } catch(IllegalStateException ise) {
+//            //Yes, I am intentionally ignoring this exception because I can.
+//        }
     }
 
     @Override

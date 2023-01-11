@@ -4,7 +4,13 @@ import io.vertx.core.Vertx;
 
 public class VertxChannel {
 
-    private static Vertx vertx = Vertx.vertx();
+    private static Vertx vertx;
+
+    static {
+        System.setProperty("vertx.disableFileCPResolving", "true");
+        System.setProperty("vertx.disableFileCaching", "true");
+        vertx = Vertx.vertx();
+    }
 
     protected VertxChannel() {
     }

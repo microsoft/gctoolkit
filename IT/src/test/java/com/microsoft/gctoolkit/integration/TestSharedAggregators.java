@@ -2,7 +2,6 @@ package com.microsoft.gctoolkit.integration;
 
 import com.microsoft.gctoolkit.GCToolKit;
 import com.microsoft.gctoolkit.integration.io.TestLogFile;
-import com.microsoft.gctoolkit.integration.shared.OneRuntimeAggregator;
 import com.microsoft.gctoolkit.integration.shared.OneRuntimeReport;
 import com.microsoft.gctoolkit.integration.shared.TwoRuntimeReport;
 import com.microsoft.gctoolkit.io.GCLogFile;

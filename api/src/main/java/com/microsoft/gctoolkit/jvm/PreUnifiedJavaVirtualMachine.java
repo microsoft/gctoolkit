@@ -2,12 +2,10 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.jvm;
 
-import com.microsoft.gctoolkit.aggregator.Aggregation;
 import com.microsoft.gctoolkit.io.DataSource;
 import com.microsoft.gctoolkit.io.GCLogFile;
 
 import java.io.IOException;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 

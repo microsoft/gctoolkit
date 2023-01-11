@@ -26,7 +26,7 @@ public class StreamGarbageCollectionLogFileTest {
             Path path = new TestLogFile("streaming/gc.log").getFile().toPath();
             GCLogFile logFile = createLogFile(path,false);
             assertEquals(1,logFile.getMetaData().getNumberOfFiles(),"file count mismatch");
-            assertExpectedLineCount(431603, logFile);
+            assertExpectedLineCount(431604, logFile);
         } catch (IOException ioe) {
             fail(ioe);
         }
@@ -38,7 +38,7 @@ public class StreamGarbageCollectionLogFileTest {
             Path path = new TestLogFile("streaming/gc.log.gz").getFile().toPath();
             GCLogFile logFile = createLogFile(path,false);
             assertEquals(1,logFile.getMetaData().getNumberOfFiles(),"file count mismatch");
-            assertExpectedLineCount(18304, logFile);
+            assertExpectedLineCount(18305, logFile);
         } catch (IOException ioe) {
             fail(ioe);
         }
@@ -50,7 +50,7 @@ public class StreamGarbageCollectionLogFileTest {
             Path path = new TestLogFile("streaming/gc.log.tar.gz").getFile().toPath();
             GCLogFile logFile = createLogFile(path,false);
             assertEquals(1,logFile.getMetaData().getNumberOfFiles(),"file count mismatch");
-            assertExpectedLineCount(410054, logFile);
+            assertExpectedLineCount(410055, logFile);
         } catch (IOException ioe) {
             fail(ioe);
         }
@@ -62,7 +62,7 @@ public class StreamGarbageCollectionLogFileTest {
             Path path = new TestLogFile("streaming/gc.log.zip").getFile().toPath();
             GCLogFile logFile = createLogFile(path,false);
             assertEquals(1,logFile.getMetaData().getNumberOfFiles(),"file count mismatch");
-            assertExpectedLineCount(431603, logFile);
+            assertExpectedLineCount(431604, logFile);
         } catch (IOException ioe) {
             fail(ioe);
         }
@@ -74,7 +74,7 @@ public class StreamGarbageCollectionLogFileTest {
             Path path = new TestLogFile("rotating.zip").getFile().toPath();
             GCLogFile logFile = createLogFile(path,true);
             assertEquals(2,logFile.getMetaData().getNumberOfFiles(),"file count mismatch");
-            assertExpectedLineCount(72209, logFile);
+            assertExpectedLineCount(72210, logFile);
         } catch (IOException ioe) {
             fail(ioe);
         }
@@ -86,7 +86,7 @@ public class StreamGarbageCollectionLogFileTest {
             Path path = new TestLogFile("rotating_directory").getFile().toPath();
             GCLogFile logFile = createLogFile(path, true);
             assertEquals(2, logFile.getMetaData().getNumberOfFiles(), "file count mismatch");
-            assertExpectedLineCount(72209, logFile);
+            assertExpectedLineCount(72210, logFile);
         } catch (IOException ioe) {
             assertEquals(ioe.getClass(), IOException.class);
         }
@@ -98,7 +98,7 @@ public class StreamGarbageCollectionLogFileTest {
             Path path = new TestLogFile("rotating_directory.zip").getFile().toPath();
             GCLogFile logFile = createLogFile(path, true);
             assertEquals(2, logFile.getMetaData().getNumberOfFiles(), "file count mismatch");
-            assertExpectedLineCount(72209, logFile);
+            assertExpectedLineCount(72210, logFile);
         } catch (IOException ioe) {
             fail(ioe);
         }

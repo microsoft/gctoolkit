@@ -30,7 +30,6 @@ public class JVMTermination extends JVMEvent {
         return this.timeOfFirstEvent;
     }
 
-    @Deprecated
     public double getEstimatedRuntimeDuration() {
         return super.getDateTimeStamp().minus(timeOfFirstEvent);
     }

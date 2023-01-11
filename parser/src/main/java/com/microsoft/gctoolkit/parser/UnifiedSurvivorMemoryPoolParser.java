@@ -66,7 +66,7 @@ public class UnifiedSurvivorMemoryPoolParser extends UnifiedGCLogParser implemen
 
     @Override
     public boolean accepts(Diary diary) {
-        return (diary.isTLABData() || diary.isApplicationStoppedTime() || diary.isApplicationRunningTime()) && diary.isUnifiedLogging();
+        return diary.isTenuringDistribution() && diary.isUnifiedLogging();
     }
 
     @Override

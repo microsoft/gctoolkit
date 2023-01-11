@@ -763,7 +763,7 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
 
     @Override
     public boolean accepts(Diary diary) {
-        return (diary.isGenerational() || diary.isCMS() ) && diary.isUnifiedLogging();
+        return diary.isG1GC() && diary.isUnifiedLogging();
     }
 
     @Override

@@ -22,9 +22,7 @@ public class EndToEndIntegrationTest {
     @Test
     public void testMain() {
         Path path = new TestLogFile("cms/defnew/details/defnew.log").getFile().toPath();
-        ///Users/chpepper/Projects/github/gctoolkit/gclogs/preunified/cms/defnew/details/defnew.log
-        String gcLogFile = System.getProperty("gcLogFile");
-        analyze(gcLogFile);
+        analyze(path.toString());
         Assertions.assertEquals(26, getInitialMarkCount());
         Assertions.assertEquals(26, getRemarkCount());
         Assertions.assertEquals(19114, getDefNewCount());

@@ -27,18 +27,15 @@ public class GarbageCollectionEventSourceTest {
 
     private static final String END_OF_DATA_SENTINEL = GCLogFile.END_OF_DATA_SENTINEL;
 
-    private GCLogFile loadLogFile(Path path, boolean rotating) throws IOException {
+    private GCLogFile loadLogFile(Path path, boolean rotating) {
         return rotating ? new RotatingGCLogFile(path) : new SingleGCLogFile(path);
     }
     
     @Test
     public void testRotatingLogDirectory() {
         Path path = new TestLogFile("rotating_directory").getFile().toPath();
-        try {
-            assertExpectedLineCountInLog(72210, loadLogFile(path, true));
-        } catch (IOException e) {
-            fail(e);
-        }
+        assertExpectedLineCountInLog(72210, loadLogFile(path, true));
+
     }
 
     @Test
@@ -49,42 +46,26 @@ public class GarbageCollectionEventSourceTest {
 
     @Test
     public void testGZipTarFileLineCount() {
-        try {
-            Path path = new TestLogFile("streaming/gc.log.tar.gz").getFile().toPath();
-            assertExpectedLineCountInLog(410055, loadLogFile(path, false));
-        } catch (IOException ioe) {
-            fail(ioe);
-        }
+        Path path = new TestLogFile("streaming/gc.log.tar.gz").getFile().toPath();
+        assertExpectedLineCountInLog(410055, loadLogFile(path, false));
     }
 
     @Test
     public void testSingleLogInZipLineCount() {
-        try {
-            Path path = new TestLogFile("streaming/gc.log.zip").getFile().toPath();
-            assertExpectedLineCountInLog(431604, loadLogFile(path, false));
-        } catch (IOException ioe) {
-            fail(ioe);
-        }
+        Path path = new TestLogFile("streaming/gc.log.zip").getFile().toPath();
+        assertExpectedLineCountInLog(431604, loadLogFile(path, false));
     }
 
     @Test
     public void testRotatingLogsLineCount() {
-        try {
-            Path path = new TestLogFile("rotating.zip").getFile().toPath();
-            assertExpectedLineCountInLog(72210, loadLogFile(path, true));
-        } catch (IOException ioe) {
-            fail(ioe);
-        }
+        Path path = new TestLogFile("rotating.zip").getFile().toPath();
+        assertExpectedLineCountInLog(72210, loadLogFile(path, true));
     }
 
     @Test
     public void testRotatingLogsRotatingLineCount() {
-        try {
-            Path path = new TestLogFile("rotating.zip").getFile().toPath();
-            assertExpectedLineCountInLog(72210, loadLogFile(path, true));
-        } catch (IOException ioe) {
-            fail(ioe);
-        }
+        Path path = new TestLogFile("rotating.zip").getFile().toPath();
+        assertExpectedLineCountInLog(72210, loadLogFile(path, true));
     }
 
     /*
@@ -92,12 +73,8 @@ public class GarbageCollectionEventSourceTest {
      */
     @Test
     public void testZippedDirectoryWithRotatingLogRotatingLineCount() {
-        try {
-            Path path = new TestLogFile("streaming/rotating_directory.zip").getFile().toPath();
-            assertExpectedLineCountInLog(72209+1, loadLogFile(path, true));
-        } catch (IOException ioe) {
-            fail(ioe);
-        }
+        Path path = new TestLogFile("streaming/rotating_directory.zip").getFile().toPath();
+        assertExpectedLineCountInLog(72209 + 1, loadLogFile(path, true));
     }
 
     private static void disableCaching() {
@@ -106,30 +83,18 @@ public class GarbageCollectionEventSourceTest {
     }
 
     private void assertExpectedLineCountInLog(int expectedNumberOfLines, GCLogFile logFile) {
-        //CountDownLatch consumerStarted = new CountDownLatch(2);
         disableCaching();
-
         GCLogConsumer consumer = new GCLogConsumer();
         VertxDataSourceChannel channel = new VertxDataSourceChannel();
         channel.registerListener(consumer);
-        //vertx.deployVerticle(consumer, asyncResult -> consumerStarted.countDown());
-
-        //todo: this just completely broke this test :-/ JVMEventSource garbageCollectionLogSource = new JVMEventSource(TEST_CHANNEL);
-        //JVMEventSource garbageCollectionLogSource = new JVMEventSource();
-        //vertx.deployVerticle(garbageCollectionLogSource, asyncResult -> consumerStarted.countDown());
-
         try {
             logFile.stream().forEach(message -> {
                 channel.publish(Channels.DATA_SOURCE, message);
             });
-            channel.publish(Channels.DATA_SOURCE, END_OF_DATA_SENTINEL);
-            //consumerStarted.await();
-            consumer.awaitEOF();
-            //vertx.undeploy(garbageCollectionLogSource.deploymentID());
         } catch (IOException e) {
-        //} catch (IOException | InterruptedException e) {
             fail(e.getMessage());
         }
+        consumer.awaitEOF();
         assertEquals(expectedNumberOfLines, consumer.getEventCount());
     }
 
@@ -150,15 +115,13 @@ public class GarbageCollectionEventSourceTest {
                 eof.countDown();
         }
 
-        GCLogConsumer() {
-        }
-
         public void awaitEOF() {
             try {
                 eof.await();
-            } catch (InterruptedException e) {
-                fail(e.getMessage());
-            }
+            } catch (InterruptedException e) {}
+        }
+
+        GCLogConsumer() {
         }
 
         int getEventCount() {

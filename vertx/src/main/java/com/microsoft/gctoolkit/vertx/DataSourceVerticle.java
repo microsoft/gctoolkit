@@ -29,8 +29,8 @@ public class DataSourceVerticle extends AbstractVerticle {
                 processor.receive(message.body());
                 if (GCLogFile.END_OF_DATA_SENTINEL.equals(message.body())) {
                     vertx.undeploy(id);
-                    if (vertx.deploymentIDs().size() == 0)
-                        vertx.close();
+//                    if (vertx.deploymentIDs().size() == 0)
+//                        vertx.close();
                 }
             });
             promise.complete();

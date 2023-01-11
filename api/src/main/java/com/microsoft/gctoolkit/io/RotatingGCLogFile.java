@@ -49,13 +49,15 @@ public class RotatingGCLogFile extends GCLogFile {
     @Override
     public Stream<String> stream() throws IOException {
         if ( getMetaData().isDirectory() || getMetaData().isPlainText() || getMetaData().isZip())
-            return getMetaData().logFiles()
+            return Stream.concat(
+                    getMetaData().logFiles()
                     .flatMap(segment -> segment.stream())
                     .filter(Objects::nonNull)
                     .map(String::trim)
-                    .filter(s -> s.length() > 0);
+                    .filter(s -> s.length() > 0),
+                    Stream.of(endOfData()));
         else // yes, this is returning an empty stream.
-            return new ArrayList<String>().stream();
+            return Stream.of(endOfData());
     }
 
     private Stream<String> stream(LogFileMetadata metadata, LinkedList<GCLogFileSegment> segments) throws IOException {

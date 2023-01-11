@@ -10,7 +10,6 @@ import com.microsoft.gctoolkit.message.DataSourceChannel;
 import com.microsoft.gctoolkit.message.JVMEventChannel;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 

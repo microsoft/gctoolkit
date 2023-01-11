@@ -1,6 +1,7 @@
 package com.microsoft.gctoolkit.integration.io;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Arrays;
 
 public class TestLogFile {
@@ -19,6 +20,7 @@ public class TestLogFile {
     };
 
     public TestLogFile(String fileName) {
+        File cwd = new File(".");
         logFile = Arrays.stream(relativePaths)
                 .flatMap(path -> Arrays.stream(new String[]{
                         "./" + path,

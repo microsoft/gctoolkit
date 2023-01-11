@@ -20,12 +20,6 @@ public class TwoRuntimeAggregator extends Aggregator<TwoRuntimeReport> {
     }
 
     public void publish(JVMTermination termination) {
-        System.out.println("sleeping: " + termination.toString());
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
         aggregation().terminate(termination.getEstimatedRuntimeDuration());
     }
 }

@@ -6,6 +6,9 @@ import com.microsoft.gctoolkit.event.jvm.JVMEvent;
 import com.microsoft.gctoolkit.event.jvm.JVMTermination;
 
 import java.util.Arrays;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.function.Consumer;
 
 /**
@@ -63,7 +66,6 @@ public abstract class Aggregator<A extends Aggregation> {
 
     /// JVMEventDispatcher manages all of the registered events and event consumers
     private final JVMEventDispatcher jvmEventDispatcher = new JVMEventDispatcher();
-    private volatile boolean done = false;
 
     /**
      * Subclass only.
@@ -108,6 +110,20 @@ public abstract class Aggregator<A extends Aggregation> {
         jvmEventDispatcher.register(eventClass, process);
     }
 
+    Runnable task;
+    public void onCompletion(Runnable task) {
+        this.task = task;
+    }
+
+    private void complete() {
+        System.out.println(this);
+        Runnable t = task;
+        this.task = null;
+        if (t != null)
+            Executors.newSingleThreadExecutor().execute(t);
+
+    }
+
     /**
      * This method consumes a JVMEvent and dispatches it to the
      * {@link #register(Class, Consumer) registered consumer}.
@@ -116,20 +132,12 @@ public abstract class Aggregator<A extends Aggregation> {
      */
     public void receive(JVMEvent event) {
         if (event instanceof JVMTermination) {
-            done = true;
             aggregation().estimatedStartTime(((JVMTermination)event).getEstimatedStartTime());
             aggregation().estimatedTerminationTime(((JVMTermination)event).getEstimatedTimeOfTermination());
             aggregation().estimatedRuntime(((JVMTermination)event).getEstimatedRuntime());
+            complete();
         }
         jvmEventDispatcher.dispatch(event);
-    }
-
-    /**
-     * Whether all events have been processed by the Aggregator.
-     * @return {@code true} if this Aggregator is done processing events.
-     */
-    public boolean isDone() {
-        return done;
     }
 
     public boolean aggregates(EventSource eventSource) {

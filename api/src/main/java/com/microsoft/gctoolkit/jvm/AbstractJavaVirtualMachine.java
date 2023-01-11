@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Phaser;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -151,30 +152,34 @@ public abstract class AbstractJavaVirtualMachine implements JavaVirtualMachine {
 
     @Override
     public void analyze(List<Aggregation> registeredAggregations, JVMEventChannel eventBus, DataSourceChannel dataSourceBus) {
+        Phaser phaser = new Phaser();
         try {
             Set<EventSource> generatedEvents = diary.generatesEvents();
             for (Aggregation aggregation : registeredAggregations) {
+                System.out.println("processing -> " + aggregation.getClass().toString());
                 Constructor<? extends Aggregator<?>> constructor = constructor(aggregation.collates());
                 if ( constructor == null) continue;
                 Aggregator aggregator = constructor.newInstance(aggregation);
                 aggregatedData.put(aggregation.getClass(), aggregation);
                 Optional<EventSource> source = generatedEvents.stream().filter(event -> aggregator.aggregates(event)).findFirst();
                 if (source.isPresent()) {
+                    System.out.println("registering -> " + aggregation.getClass().toString());
+                    phaser.register();
+                    aggregator.onCompletion(() -> { phaser.arriveAndDeregister();
+                        System.out.println("onCompletion --> " + aggregator.getClass().toString());});
                     JVMEventChannelAggregator eventChannelAggregator = new JVMEventChannelAggregator(source.get().toChannel(), aggregator);
                     eventBus.registerListener(eventChannelAggregator);
                 }
             }
 
+            // wait for Vert.x to get started.... before streaming data
             dataSource.stream().forEach(message -> dataSourceBus.publish(Channels.DATA_SOURCE, message));
-            dataSourceBus.publish(Channels.DATA_SOURCE, dataSource.endOfData());
-            try {
-                Thread.sleep(10000L);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            //dataSourceBus.publish(Channels.DATA_SOURCE, dataSource.endOfData());
+            phaser.awaitAdvance(0);
             dataSourceBus.close();
             eventBus.close();
-            //todo: revisit this
+
+            // Fill in termination info.
             Optional<Aggregation> aggregation = aggregatedData.values().stream().findFirst();
             aggregation.ifPresent(terminationRecord -> {
                 setJVMTerminationTime(terminationRecord.estimatedTerminationTime());

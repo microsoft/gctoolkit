@@ -18,11 +18,6 @@ public class HeapOccupancyAfterCollectionAggregator extends Aggregator<HeapOccup
         register(G1GCPauseEvent.class, this::extractHeapOccupancy);
         register(ZGCCycle.class,this::extractHeapOccupancy);
         register(ShenandoahCycle.class,this::extractHeapOccupancy);
-        register(JVMTermination.class,this::process);
-    }
-
-    private void process(JVMTermination event) {
-        System.out.println(event.toString());
     }
 
     private void extractHeapOccupancy(GenerationalGCPauseEvent event) {

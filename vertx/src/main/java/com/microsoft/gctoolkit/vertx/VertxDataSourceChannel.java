@@ -5,6 +5,7 @@ package com.microsoft.gctoolkit.vertx;
 import com.microsoft.gctoolkit.message.Channels;
 import com.microsoft.gctoolkit.message.DataSourceChannel;
 import com.microsoft.gctoolkit.message.DataSourceParser;
+import io.vertx.core.Future;
 
 public class VertxDataSourceChannel extends VertxChannel implements DataSourceChannel {
 
@@ -25,6 +26,10 @@ public class VertxDataSourceChannel extends VertxChannel implements DataSourceCh
 
     @Override
     public void close() {
-
+//        try {
+//            vertx().close();
+//        } catch(IllegalStateException ise) {
+//            //Yes, I am intentionally ignoring this exception because I can.
+//        }
     }
 }

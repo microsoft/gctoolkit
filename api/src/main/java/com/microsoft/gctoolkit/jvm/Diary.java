@@ -3,12 +3,10 @@
 package com.microsoft.gctoolkit.jvm;
 
 import com.microsoft.gctoolkit.aggregator.EventSource;
-import com.microsoft.gctoolkit.event.jvm.ApplicationStoppedTime;
 import com.microsoft.gctoolkit.parser.datatype.TripleState;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
 
 import java.util.Arrays;
-import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -17,6 +15,8 @@ import static com.microsoft.gctoolkit.aggregator.EventSource.SURVIVOR;
 import static com.microsoft.gctoolkit.jvm.SupportedFlags.*;
 
 /*
+    Index guide
+
     APPLICATION_STOPPED_TIME,                   //  0
     APPLICATION_CONCURRENT_TIME,                //  1
 

@@ -6,7 +6,6 @@ import com.microsoft.gctoolkit.message.JVMEventChannelListener;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
-import io.vertx.core.eventbus.MessageConsumer;
 
 public class JVMEventVerticle extends AbstractVerticle {
 
@@ -29,12 +28,11 @@ public class JVMEventVerticle extends AbstractVerticle {
         try {
             vertx.eventBus().<JVMEvent>consumer(inbox, message -> {
                 JVMEvent event = message.body();
-                //System.out.println("JVMEvent receive : " + event.toString());
                 processor.receive(event);
                 if ( event instanceof JVMTermination) {
                     vertx.undeploy(id);
-                    if (vertx.deploymentIDs().size() == 0)
-                        vertx.close();
+//                    if (vertx.deploymentIDs().size() == 0)
+//                        vertx.close();
                 }
             });
             promise.complete();
