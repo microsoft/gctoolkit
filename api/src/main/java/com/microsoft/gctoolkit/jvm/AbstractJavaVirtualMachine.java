@@ -156,17 +156,14 @@ public abstract class AbstractJavaVirtualMachine implements JavaVirtualMachine {
         try {
             Set<EventSource> generatedEvents = diary.generatesEvents();
             for (Aggregation aggregation : registeredAggregations) {
-                System.out.println("processing -> " + aggregation.getClass().toString());
                 Constructor<? extends Aggregator<?>> constructor = constructor(aggregation.collates());
                 if ( constructor == null) continue;
                 Aggregator aggregator = constructor.newInstance(aggregation);
                 aggregatedData.put(aggregation.getClass(), aggregation);
-                Optional<EventSource> source = generatedEvents.stream().filter(event -> aggregator.aggregates(event)).findFirst();
+                Optional<EventSource> source = generatedEvents.stream().filter(aggregator::aggregates).findFirst();
                 if (source.isPresent()) {
-                    System.out.println("registering -> " + aggregation.getClass().toString());
                     phaser.register();
-                    aggregator.onCompletion(() -> { phaser.arriveAndDeregister();
-                        System.out.println("onCompletion --> " + aggregator.getClass().toString());});
+                    aggregator.onCompletion(phaser::arriveAndDeregister);
                     JVMEventChannelAggregator eventChannelAggregator = new JVMEventChannelAggregator(source.get().toChannel(), aggregator);
                     eventBus.registerListener(eventChannelAggregator);
                 }
