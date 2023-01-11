@@ -7,8 +7,12 @@ import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 public class JVMEventVerticle extends AbstractVerticle {
 
+    private static final Logger LOGGER = Logger.getLogger(JVMEventVerticle.class.getName());
     final private Vertx vertx;
     final private String inbox;
     final private JVMEventChannelListener processor;
@@ -31,13 +35,11 @@ public class JVMEventVerticle extends AbstractVerticle {
                 processor.receive(event);
                 if ( event instanceof JVMTermination) {
                     vertx.undeploy(id);
-//                    if (vertx.deploymentIDs().size() == 0)
-//                        vertx.close();
                 }
             });
             promise.complete();
         } catch(Throwable t) {
-            //todo: logging
+            LOGGER.log(Level.WARNING,"Vertx: processing JVMEvent failed",t);
         }
     }
 

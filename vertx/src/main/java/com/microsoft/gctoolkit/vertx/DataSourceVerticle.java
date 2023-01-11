@@ -6,7 +6,12 @@ import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 public class DataSourceVerticle extends AbstractVerticle {
+
+    private static final Logger LOGGER = Logger.getLogger(DataSourceVerticle.class.getName());
 
     final private Vertx vertx;
     final private String inbox;
@@ -29,13 +34,11 @@ public class DataSourceVerticle extends AbstractVerticle {
                 processor.receive(message.body());
                 if (GCLogFile.END_OF_DATA_SENTINEL.equals(message.body())) {
                     vertx.undeploy(id);
-//                    if (vertx.deploymentIDs().size() == 0)
-//                        vertx.close();
                 }
             });
             promise.complete();
         } catch(Throwable t) {
-            //todo: logging
+            LOGGER.log(Level.WARNING,"Vertx: processing DataSource failed",t);
         }
     }
 

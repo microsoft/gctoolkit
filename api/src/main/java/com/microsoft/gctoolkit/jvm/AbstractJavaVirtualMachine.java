@@ -171,10 +171,7 @@ public abstract class AbstractJavaVirtualMachine implements JavaVirtualMachine {
                     eventBus.registerListener(eventChannelAggregator);
                 }
             }
-
-            // wait for Vert.x to get started.... before streaming data
             dataSource.stream().forEach(message -> dataSourceBus.publish(Channels.DATA_SOURCE, message));
-            //dataSourceBus.publish(Channels.DATA_SOURCE, dataSource.endOfData());
             phaser.awaitAdvance(0);
             dataSourceBus.close();
             eventBus.close();
