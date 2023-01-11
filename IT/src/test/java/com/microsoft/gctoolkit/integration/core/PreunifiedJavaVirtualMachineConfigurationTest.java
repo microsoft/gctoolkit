@@ -22,7 +22,7 @@ public class PreunifiedJavaVirtualMachineConfigurationTest {
     private String logFile = "preunified/g1gc/details/tenuring/180/g1gc.log";
     private int[] times = { 0, 1028, 945481, 945481};
 
-    //@Test
+    @Test
     public void testSingle() {
         TestLogFile log = new TestLogFile(logFile);
         test(new SingleGCLogFile(log.getFile().toPath()), times);
@@ -36,7 +36,7 @@ public class PreunifiedJavaVirtualMachineConfigurationTest {
         JavaVirtualMachine machine = null;
         try {
             machine = gcToolKit.analyze(log);
-            aggregation = machine.getAggregation(TestTimeAggregation.class).get(); // todo: this isn't being registered
+            aggregation = machine.getAggregation(PreunifiedJavaVirtualMachineConfigurationTest.TestTimeAggregation.class).get(); // todo: this isn't being registered
         } catch (IOException e) {
             fail(e.getMessage());
         }
@@ -60,7 +60,7 @@ public class PreunifiedJavaVirtualMachineConfigurationTest {
     }
 
     @Aggregates({EventSource.G1GC,EventSource.GENERATIONAL,EventSource.ZGC,EventSource.SHENANDOAH})
-    public class TestTimeAggregator extends Aggregator<TestTimeAggregation> {
+    public static class TestTimeAggregator extends Aggregator<TestTimeAggregation> {
 
         /**
          * Subclass only.
@@ -75,7 +75,7 @@ public class PreunifiedJavaVirtualMachineConfigurationTest {
     }
 
     @Collates(TestTimeAggregator.class)
-    public class TestTimeAggregation extends Aggregation {
+    public static class TestTimeAggregation extends Aggregation {
 
         public TestTimeAggregation() {}
 

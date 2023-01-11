@@ -13,11 +13,7 @@ public class VertxJVMEventChannel extends VertxChannel implements JVMEventChanne
 
     final private DeliveryOptions options = new DeliveryOptions().setCodecName(JVMEventCodec.NAME);
 
-    public VertxJVMEventChannel() {
-        try {
-            vertx().eventBus().registerDefaultCodec(JVMEvent.class, new JVMEventCodec());
-        } catch (Throwable t) {} //todo: testing only
-    }
+    public VertxJVMEventChannel() {}
 
     @Override
     public void publish(Channels channel, JVMEvent message) {
@@ -30,14 +26,7 @@ public class VertxJVMEventChannel extends VertxChannel implements JVMEventChanne
     }
 
     @Override
-    public void close() {
-//        try {
-            vertx().eventBus().unregisterDefaultCodec(JVMEvent.class);
-//            vertx().close();
-//        } catch(IllegalStateException ise) {
-//            //Yes, I am intentionally ignoring this exception because I can.
-//        }
-    }
+    public void close() {}
 
     @Override
     public void registerListener(JVMEventChannelListener listener) {

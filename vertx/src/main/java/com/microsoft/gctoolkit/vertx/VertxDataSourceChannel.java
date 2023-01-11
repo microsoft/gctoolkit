@@ -25,11 +25,5 @@ public class VertxDataSourceChannel extends VertxChannel implements DataSourceCh
     }
 
     @Override
-    public void close() {
-//        try {
-//            vertx().close();
-//        } catch(IllegalStateException ise) {
-//            //Yes, I am intentionally ignoring this exception because I can.
-//        }
-    }
+    public void close() {}
 }
