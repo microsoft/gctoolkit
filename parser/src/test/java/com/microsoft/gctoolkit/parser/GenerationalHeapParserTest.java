@@ -2,12 +2,9 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.parser;
 
-import com.microsoft.gctoolkit.event.generational.FullGC;
 import com.microsoft.gctoolkit.jvm.Diary;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class GenerationalHeapParserTest {

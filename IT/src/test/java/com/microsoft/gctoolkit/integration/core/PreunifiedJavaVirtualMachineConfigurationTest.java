@@ -47,10 +47,7 @@ public class PreunifiedJavaVirtualMachineConfigurationTest {
             aggregation.estimatedTerminationTime().getTimeStamp();
             aggregation.estimatedRuntime();
         } catch(Throwable t) {
-            System.out.println("======================================================");
-            System.out.println(t.getMessage());
-            t.printStackTrace();
-            System.out.println("======================================================");
+            fail("Failed to extract runtime timing information",t);
         }
 
         Assertions.assertEquals( endStartTimes[0], (int)(machine.getEstimatedJVMStartTime().getTimeStamp() * 1000.0d));

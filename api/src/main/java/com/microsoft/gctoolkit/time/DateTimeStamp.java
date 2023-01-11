@@ -11,7 +11,8 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static java.util.Comparator.*;
+import static java.util.Comparator.comparingDouble;
+import static java.util.Comparator.nullsLast;
 
 
 /**

@@ -5,7 +5,6 @@ package com.microsoft.gctoolkit.vertx;
 import com.microsoft.gctoolkit.message.Channels;
 import com.microsoft.gctoolkit.message.DataSourceChannel;
 import com.microsoft.gctoolkit.message.DataSourceParser;
-import io.vertx.core.Future;
 
 public class VertxDataSourceChannel extends VertxChannel implements DataSourceChannel {
 

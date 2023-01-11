@@ -5,6 +5,7 @@ package com.microsoft.gctoolkit.integration.io;
 import com.microsoft.gctoolkit.io.LogFileSegment;
 import com.microsoft.gctoolkit.io.RotatingGCLogFile;
 import org.junit.jupiter.api.Test;
+
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;

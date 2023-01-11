@@ -18,7 +18,6 @@ import com.microsoft.gctoolkit.jvm.Diarizer;
 import com.microsoft.gctoolkit.parser.GCLogParser;
 import com.microsoft.gctoolkit.parser.GenerationalHeapParser;
 import com.microsoft.gctoolkit.parser.jvm.PreUnifiedDiarizer;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

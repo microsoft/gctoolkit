@@ -1,7 +1,6 @@
 package com.microsoft.gctoolkit.integration.io;
 
 import java.io.File;
-import java.nio.file.Path;
 import java.util.Arrays;
 
 public class TestLogFile {

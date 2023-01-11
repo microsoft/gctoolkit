@@ -54,13 +54,6 @@ public class EndToEndIntegrationTest {
             fail(e.getMessage());
         }
 
-//        System.out.println("sleeping");
-//        try {
-//            Thread.sleep(10000);
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
-
         // Retrieves the Aggregation for HeapOccupancyAfterCollectionSummary. This is a time-series aggregation.
         String message = "The XYDataSet for %s contains %s items.\n";
         machine.getAggregation(HeapOccupancyAfterCollectionSummary.class)

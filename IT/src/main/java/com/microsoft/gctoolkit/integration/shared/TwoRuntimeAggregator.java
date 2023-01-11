@@ -5,8 +5,6 @@ import com.microsoft.gctoolkit.aggregator.Aggregator;
 import com.microsoft.gctoolkit.aggregator.EventSource;
 import com.microsoft.gctoolkit.event.jvm.JVMTermination;
 
-import java.util.Arrays;
-
 @Aggregates({EventSource.G1GC,EventSource.GENERATIONAL,EventSource.SHENANDOAH,EventSource.ZGC})
 public class TwoRuntimeAggregator extends Aggregator<TwoRuntimeReport> {
     /**

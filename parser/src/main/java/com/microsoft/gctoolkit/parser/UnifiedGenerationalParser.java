@@ -23,7 +23,6 @@ import com.microsoft.gctoolkit.event.generational.ParNew;
 import com.microsoft.gctoolkit.event.generational.YoungGC;
 import com.microsoft.gctoolkit.event.jvm.JVMTermination;
 import com.microsoft.gctoolkit.jvm.Diary;
-import com.microsoft.gctoolkit.message.Channel;
 import com.microsoft.gctoolkit.message.Channels;
 import com.microsoft.gctoolkit.message.JVMEventChannel;
 import com.microsoft.gctoolkit.parser.collection.RuleSet;

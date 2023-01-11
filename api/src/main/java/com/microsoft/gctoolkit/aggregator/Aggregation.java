@@ -5,8 +5,6 @@ package com.microsoft.gctoolkit.aggregator;
 import com.microsoft.gctoolkit.jvm.JavaVirtualMachine;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
 
-import java.util.concurrent.Executors;
-
 /**
  * An {@code Aggregation} collates data from an {@link Aggregator} and may be thought of as a view
  * of the data. An {@code Aggregation} might collate data into a time series for plotting, or it might
