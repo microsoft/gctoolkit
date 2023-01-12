@@ -19,7 +19,6 @@ public class G1GCMetaspaceTest extends ParserTest {
         for (String name : details) {
             try {
                 Path path = new TestLogFile("g1gc/details/" + name).getFile().toPath();
-                System.out.println(path.toString());
                 TestResults testResults = testRegionalSingleLogFile(path);
                 assertEquals(permGenMetaspaceCounts[i++], testResults.getMetaSpaceRecordCount(), "Meta or Perm space record count mismatch: ");
             } catch (IOException ioe) {

@@ -53,6 +53,7 @@ module com.microsoft.gctoolkit.api {
     uses com.microsoft.gctoolkit.message.JVMEventChannel;
     uses com.microsoft.gctoolkit.message.JVMEventChannelListener;
 
+    // todo: no need to load with SPI
     provides com.microsoft.gctoolkit.jvm.JavaVirtualMachine with
             PreUnifiedJavaVirtualMachine,
             UnifiedJavaVirtualMachine;

@@ -9,19 +9,19 @@ module com.microsoft.gctoolkit.parser {
     requires java.logging;
 
     exports com.microsoft.gctoolkit.parser to
-            com.microsoft.gctoolkit.vertx;
+            com.microsoft.gctoolkit.api;
 
     exports com.microsoft.gctoolkit.parser.io to
-            com.microsoft.gctoolkit.vertx;
+            com.microsoft.gctoolkit.api;
 
     exports com.microsoft.gctoolkit.parser.jvm to
-            com.microsoft.gctoolkit.vertx, com.microsoft.gctoolkit.api;
+            com.microsoft.gctoolkit.api;
 
     exports com.microsoft.gctoolkit.parser.unified to
-            com.microsoft.gctoolkit.vertx;
+            com.microsoft.gctoolkit.api;
 
     exports com.microsoft.gctoolkit.parser.vmops to
-            com.microsoft.gctoolkit.vertx;
+            com.microsoft.gctoolkit.api;
 
     provides com.microsoft.gctoolkit.jvm.Diarizer with
             com.microsoft.gctoolkit.parser.jvm.PreUnifiedDiarizer,

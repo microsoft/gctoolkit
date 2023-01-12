@@ -19,7 +19,7 @@ public class TestLogFile {
     };
 
     public TestLogFile(String fileName) {
-        File cwd = new File(".");
+        //todo: do remove this code
         logFile = Arrays.stream(relativePaths)
                 .flatMap(path -> Arrays.stream(new String[]{
                         "./" + path,

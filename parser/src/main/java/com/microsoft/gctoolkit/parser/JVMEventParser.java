@@ -55,7 +55,6 @@ public class JVMEventParser extends PreUnifiedGCLogParser implements JVMPatterns
                     publish(new ApplicationStoppedTime(trace.getDateTimeStamp(), trace.getDoubleGroup(3), lastEventWasGC));
                 }
             } else if ((trace = APPLICATION_STOP_TIME_WITH_STOPPING_TIME.parse(line)) != null) {
-                System.out.println(line);
                 publish(new ApplicationStoppedTime(trace.getDateTimeStamp(), trace.getDoubleGroup(3), trace.getDoubleGroup(4), lastEventWasGC));
                 lastEventWasGC = false;
                 gcPauseTime = GCPAUSE_TIME_NOT_SET;
@@ -76,7 +75,6 @@ public class JVMEventParser extends PreUnifiedGCLogParser implements JVMPatterns
             } else if ((trace = TLAB_TOTALS.parse(line)) != null) {
                 extractTLABSummary(trace);
             } else if (line.equals(END_OF_DATA_SENTINEL)) {
-                System.out.println(line);
                 // TODO: #154  else if (line.equals(END_OF_DATA_SENTINEL)|| (JVM_EXIT.parse(line) != null)) {
                 // if we see "^heap" then we're at the end of the log
                 // at issue is if logs have been concatenated then we're not at the end and we

@@ -61,6 +61,7 @@ import java.util.function.Consumer;
 public abstract class Aggregator<A extends Aggregation> {
 
     private final A aggregation;
+    private Runnable task;
 
     /// JVMEventDispatcher manages all of the registered events and event consumers
     private final JVMEventDispatcher jvmEventDispatcher = new JVMEventDispatcher();
@@ -108,13 +109,11 @@ public abstract class Aggregator<A extends Aggregation> {
         jvmEventDispatcher.register(eventClass, process);
     }
 
-    Runnable task;
     public void onCompletion(Runnable task) {
         this.task = task;
     }
 
     private void complete() {
-        System.out.println(this);
         Runnable t = task;
         this.task = null;
         if (t != null)

@@ -158,7 +158,8 @@ public abstract class AbstractJavaVirtualMachine implements JavaVirtualMachine {
             for (Aggregation aggregation : registeredAggregations) {
                 Constructor<? extends Aggregator<?>> constructor = constructor(aggregation.collates());
                 if ( constructor == null) continue;
-                Aggregator aggregator = constructor.newInstance(aggregation);
+                Aggregator aggregator = null;
+                aggregator = constructor.newInstance(aggregation);
                 aggregatedData.put(aggregation.getClass(), aggregation);
                 Optional<EventSource> source = generatedEvents.stream().filter(aggregator::aggregates).findFirst();
                 if (source.isPresent()) {
