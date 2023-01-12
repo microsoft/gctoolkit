@@ -1,6 +1,5 @@
 package com.microsoft.gctoolkit.sample.aggregation;
 
-import com.microsoft.gctoolkit.aggregator.Collates;
 import com.microsoft.gctoolkit.event.GarbageCollectionTypes;
 import com.microsoft.gctoolkit.sample.collections.XYDataSet;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
@@ -8,10 +7,11 @@ import com.microsoft.gctoolkit.time.DateTimeStamp;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-@Collates(HeapOccupancyAfterCollection.class)
 public class HeapOccupancyAfterCollectionSummary extends HeapOccupancyAfterCollectionAggregation {
 
     private final Map<GarbageCollectionTypes, XYDataSet> aggregations = new ConcurrentHashMap<>();
+
+    public HeapOccupancyAfterCollectionSummary() {}
 
     public void addDataPoint(GarbageCollectionTypes gcType, DateTimeStamp timeStamp, long heapOccupancy) {
         aggregations.computeIfAbsent(gcType, key -> new XYDataSet()).add(timeStamp.getTimeStamp(),heapOccupancy);

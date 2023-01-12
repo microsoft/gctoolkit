@@ -7,7 +7,7 @@ import com.microsoft.gctoolkit.aggregator.Collates;
  * API for an Aggregation that records pause time duration. A
  * PauseTimeAggregation gets its data from a PauseTimeAggregator.
  */
-@Collates(ConcurrentTimeAggregator.class)
+@Collates(PauseTimeAggregator.class)
 public abstract class PauseTimeAggregation extends Aggregation {
     /**
      * Record the duration of a pause event. This method is called from PauseTimeAggregator.
