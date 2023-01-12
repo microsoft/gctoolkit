@@ -14,6 +14,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Vector;
+import java.util.function.Predicate;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -50,7 +51,7 @@ public class RotatingGCLogFile extends GCLogFile {
         if ( getMetaData().isDirectory() || getMetaData().isPlainText() || getMetaData().isZip())
             return Stream.concat(
                     getMetaData().logFiles()
-                    .flatMap(segment -> segment.stream())
+                    .flatMap(LogFileSegment::stream)
                     .filter(Objects::nonNull)
                     .map(String::trim)
                     .filter(s -> s.length() > 0),

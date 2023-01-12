@@ -140,12 +140,14 @@ public abstract class AbstractJavaVirtualMachine implements JavaVirtualMachine {
         return Optional.ofNullable((T) aggregatedData.get(aggregationClass));
     }
 
-    private Constructor<? extends Aggregator<?>> constructor(Class targetClazz) {
-        Constructor[] constructors = targetClazz.getConstructors();
-        for ( Constructor constructor : constructors) {
+    @SuppressWarnings("unchecked")
+    private Constructor<? extends Aggregator<?>> constructor(Aggregation aggregation) {
+        Class<? extends Aggregator<?>> targetClazz = aggregation.collates();
+        Constructor<?>[] constructors = targetClazz.getConstructors();
+        for ( Constructor<?> constructor : constructors) {
             Parameter[] parameters = constructor.getParameters();
             if ( parameters.length == 1 && Aggregation.class.isAssignableFrom(parameters[0].getType()))
-                return constructor;
+                return (Constructor<? extends Aggregator<?>>)constructor;
         }
         return null;
     }
@@ -156,10 +158,9 @@ public abstract class AbstractJavaVirtualMachine implements JavaVirtualMachine {
         try {
             Set<EventSource> generatedEvents = diary.generatesEvents();
             for (Aggregation aggregation : registeredAggregations) {
-                Constructor<? extends Aggregator<?>> constructor = constructor(aggregation.collates());
+                Constructor<? extends Aggregator<?>> constructor = constructor(aggregation);
                 if ( constructor == null) continue;
-                Aggregator aggregator = null;
-                aggregator = constructor.newInstance(aggregation);
+                Aggregator<? extends Aggregation> aggregator = constructor.newInstance(aggregation);
                 aggregatedData.put(aggregation.getClass(), aggregation);
                 Optional<EventSource> source = generatedEvents.stream().filter(aggregator::aggregates).findFirst();
                 if (source.isPresent()) {

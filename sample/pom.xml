@@ -24,6 +24,14 @@
             <artifactId>gctoolkit-api</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.microsoft.gctoolkit</groupId>
+            <artifactId>gctoolkit-parser</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.microsoft.gctoolkit</groupId>
+            <artifactId>gctoolkit-vertx</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
             <scope>test</scope>
