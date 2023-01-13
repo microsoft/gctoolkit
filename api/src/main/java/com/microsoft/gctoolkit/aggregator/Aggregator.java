@@ -61,9 +61,9 @@ import java.util.function.Consumer;
 public abstract class Aggregator<A extends Aggregation> {
 
     private final A aggregation;
-    private Runnable task;
+    private Runnable completionTask;
 
-    /// JVMEventDispatcher manages all of the registered events and event consumers
+    /// JVMEventDispatcher manages all the registered events and event consumers
     private final JVMEventDispatcher jvmEventDispatcher = new JVMEventDispatcher();
 
     /**
@@ -110,12 +110,12 @@ public abstract class Aggregator<A extends Aggregation> {
     }
 
     public void onCompletion(Runnable task) {
-        this.task = task;
+        this.completionTask = task;
     }
 
     private void complete() {
-        Runnable t = task;
-        this.task = null;
+        Runnable t = completionTask;
+        this.completionTask = null;
         if (t != null)
             Executors.newSingleThreadExecutor().execute(t);
 
@@ -125,7 +125,6 @@ public abstract class Aggregator<A extends Aggregation> {
      * This method consumes a JVMEvent and dispatches it to the
      * {@link #register(Class, Consumer) registered consumer}.
      * @param event an event to be processed
-     * @param < E> the type of JVMEvent
      */
     public void receive(JVMEvent event) {
         if (event instanceof JVMTermination) {
@@ -147,7 +146,7 @@ public abstract class Aggregator<A extends Aggregation> {
             if (clazz.isAnnotationPresent(Aggregates.class)) {
                 Aggregates aggregates = clazz.getAnnotation(Aggregates.class);
                 if (aggregates != null) {
-                    if (Arrays.stream(aggregates.value()).anyMatch(eventSource -> eventSource.equals(targetEventSource)))
+                    if (Arrays.asList(aggregates.value()).contains(targetEventSource))
                         return true;
                 }
             }
@@ -157,7 +156,7 @@ public abstract class Aggregator<A extends Aggregation> {
 
             Class<?>[] interfaces = clazz.getInterfaces();
             for (Class<?> iface : interfaces) {
-                if ( aggregates(iface, targetEventSource))
+                if (aggregates(iface, targetEventSource))
                     return true;
             }
         }

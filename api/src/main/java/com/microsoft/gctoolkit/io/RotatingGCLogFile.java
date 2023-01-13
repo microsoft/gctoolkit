@@ -50,7 +50,7 @@ public class RotatingGCLogFile extends GCLogFile {
         if ( getMetaData().isDirectory() || getMetaData().isPlainText() || getMetaData().isZip())
             return Stream.concat(
                     getMetaData().logFiles()
-                    .flatMap(segment -> segment.stream())
+                    .flatMap(LogFileSegment::stream)
                     .filter(Objects::nonNull)
                     .map(String::trim)
                     .filter(s -> s.length() > 0),

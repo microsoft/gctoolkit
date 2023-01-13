@@ -49,7 +49,7 @@ public class GCToolKit {
                 .stream()
                 .map(ServiceLoader.Provider::get)
                 .findFirst()
-                .orElseThrow(() -> new ServiceConfigurationError("No suitable DataSourceBus implementation found"));
+                .orElseThrow(() -> new ServiceConfigurationError("Internal Error - No suitable DataSourceBus implementation found"));
 
     }
 
@@ -58,7 +58,7 @@ public class GCToolKit {
                 .stream()
                 .map(ServiceLoader.Provider::get)
                 .findFirst()
-                .orElseThrow(() -> new ServiceConfigurationError("No suitable JVMEventBus implementation found"));
+                .orElseThrow(() -> new ServiceConfigurationError("Internal Error - No suitable JVMEventBus implementation found"));
 
     }
 
