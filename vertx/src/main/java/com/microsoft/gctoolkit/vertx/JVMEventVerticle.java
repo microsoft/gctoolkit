@@ -17,6 +17,8 @@ public class JVMEventVerticle extends AbstractVerticle {
     final private String inbox;
     final private JVMEventChannelListener processor;
     private String id;
+
+
     public JVMEventVerticle(Vertx vertx, String channelName, JVMEventChannelListener listener) {
         this.vertx = vertx;
         this.inbox = channelName;
@@ -29,18 +31,19 @@ public class JVMEventVerticle extends AbstractVerticle {
 
     @Override
     public void start(Promise<Void> promise) {
-        try {
-            vertx.eventBus().<JVMEvent>consumer(inbox, message -> {
-                JVMEvent event = message.body();
+        vertx.eventBus().<JVMEvent>consumer(inbox, message -> {
+            JVMEvent event = message.body();
+            try {
                 processor.receive(event);
-                if ( event instanceof JVMTermination) {
-                    vertx.undeploy(id);
-                }
-            });
-            promise.complete();
-        } catch(Throwable t) {
-            LOGGER.log(Level.WARNING,"Vertx: processing JVMEvent failed",t);
-        }
+            } catch (Throwable t) {
+                // Throwable is caught because we don't want the processor to blow up the message bus.
+                LOGGER.log(Level.WARNING, "Vertx: processing JVMEvent failed", t);
+            }
+            if (event instanceof JVMTermination) {
+                vertx.undeploy(id);
+            }
+        });
+        promise.complete();
     }
 
     @Override

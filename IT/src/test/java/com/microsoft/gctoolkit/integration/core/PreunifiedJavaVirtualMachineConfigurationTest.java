@@ -36,7 +36,7 @@ public class PreunifiedJavaVirtualMachineConfigurationTest {
         JavaVirtualMachine machine = null;
         try {
             machine = gcToolKit.analyze(log);
-            aggregation = machine.getAggregation(PreunifiedJavaVirtualMachineConfigurationTest.TestTimeAggregation.class).get(); // todo: this isn't being registered
+            aggregation = machine.getAggregation(PreunifiedJavaVirtualMachineConfigurationTest.TestTimeAggregation.class).get();
         } catch (IOException e) {
             fail(e.getMessage());
         }
@@ -44,7 +44,7 @@ public class PreunifiedJavaVirtualMachineConfigurationTest {
         try {
             machine.getEstimatedJVMStartTime();
             machine.getTimeOfFirstEvent().getTimeStamp();
-            aggregation.estimatedTerminationTime().getTimeStamp();
+            aggregation.timeOfTerminationEvent().getTimeStamp();
             aggregation.estimatedRuntime();
         } catch(Throwable t) {
             fail("Failed to extract runtime timing information",t);
@@ -52,7 +52,7 @@ public class PreunifiedJavaVirtualMachineConfigurationTest {
 
         Assertions.assertEquals( endStartTimes[0], (int)(machine.getEstimatedJVMStartTime().getTimeStamp() * 1000.0d));
         Assertions.assertEquals( endStartTimes[1], (int)(machine.getTimeOfFirstEvent().getTimeStamp() * 1000.0d));
-        Assertions.assertEquals( endStartTimes[2], (int)(aggregation.estimatedTerminationTime().getTimeStamp() * 1000.0d));
+        Assertions.assertEquals( endStartTimes[2], (int)(aggregation.timeOfTerminationEvent().getTimeStamp() * 1000.0d));
         Assertions.assertEquals( endStartTimes[3], (int)(aggregation.estimatedRuntime() * 1000.0d));
     }
 

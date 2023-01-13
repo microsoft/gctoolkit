@@ -17,6 +17,8 @@ public class DataSourceVerticle extends AbstractVerticle {
     final private String inbox;
     private String id;
     final private DataSourceChannelListener processor;
+
+
     public DataSourceVerticle(Vertx vertx, String channelName, DataSourceChannelListener listener) {
         this.vertx = vertx;
         this.inbox = channelName;

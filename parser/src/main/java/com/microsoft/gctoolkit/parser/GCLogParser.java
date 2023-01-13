@@ -60,7 +60,7 @@ public abstract class GCLogParser implements DataSourceParser, SharedPatterns {
             return;
         // now can be the same but it can't be less than
         else if (now.before(getClock())) {
-            LOGGER.log(Level.WARNING, "Thread: {0}, abort GC log parsing. Time traveled backwards from {1} to {2}", new Object[]{Thread.currentThread().getName(), getClock().toString(), now.toString()});
+            LOGGER.log(Level.WARNING, "Log File may be Corrupted: Time traveled backwards from {0} to {1}", new Object[]{getClock().toString(), now.toString()});
         }
         //todo: should preserve date in cases where statements do not respect PrintDateStamp (eg. ergonomics)
         setClock(now);

@@ -14,10 +14,5 @@ public class OneRuntimeAggregator extends Aggregator<OneRuntimeReport> {
      */
     public OneRuntimeAggregator(OneRuntimeReport aggregation) {
         super(aggregation);
-        register(JVMTermination.class,this::publish);
-    }
-
-    public void publish(JVMTermination termination) {
-        aggregation().terminate(termination.getEstimatedRuntimeDuration());
     }
 }

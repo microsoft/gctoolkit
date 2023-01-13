@@ -40,6 +40,7 @@ public abstract class AbstractJavaVirtualMachine implements JavaVirtualMachine {
 
     private GCLogFile dataSource;
     private Diary diary;
+    private DateTimeStamp estimatedStartTime;
     private DateTimeStamp timeOfLastEvent;
     private double logDuration = -1.0d;
     private final Map<Class<? extends Aggregation>, Aggregation> aggregatedData = new ConcurrentHashMap<>();
@@ -110,6 +111,10 @@ public abstract class AbstractJavaVirtualMachine implements JavaVirtualMachine {
         }
     }
 
+    public void setEstimatedJVMStartTime(DateTimeStamp estimatedStartTime) {
+        this.estimatedStartTime = estimatedStartTime;
+    }
+
     /**
      * JVM termination time will be one of either, the time stamp in the termination event if present or, the
      * time of the last event + that events duration.
@@ -178,8 +183,9 @@ public abstract class AbstractJavaVirtualMachine implements JavaVirtualMachine {
             // Fill in termination info.
             Optional<Aggregation> aggregation = aggregatedData.values().stream().findFirst();
             aggregation.ifPresent(terminationRecord -> {
-                setJVMTerminationTime(terminationRecord.estimatedTerminationTime());
+                setJVMTerminationTime(terminationRecord.timeOfTerminationEvent());
                 setRuntimeDuration(terminationRecord.estimatedRuntime());
+                setEstimatedJVMStartTime(terminationRecord.estimatedStartTime());
             });
         } catch (IOException | ClassCastException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
             LOGGER.log(Level.WARNING, e.getMessage(), e);

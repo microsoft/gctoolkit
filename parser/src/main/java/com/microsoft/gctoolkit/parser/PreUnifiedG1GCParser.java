@@ -1168,6 +1168,7 @@ public class PreUnifiedG1GCParser extends PreUnifiedGCLogParser implements G1GCP
     }
 
     public void publish(G1GCConcurrentEvent concurrentEvent) {
+        super.publish(Channels.G1GC_PARSER_OUTBOX,concurrentEvent);
         drainBacklog();
     }
 

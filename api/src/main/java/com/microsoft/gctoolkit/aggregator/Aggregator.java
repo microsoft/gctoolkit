@@ -128,9 +128,8 @@ public abstract class Aggregator<A extends Aggregation> {
      */
     public void receive(JVMEvent event) {
         if (event instanceof JVMTermination) {
-            aggregation().estimatedStartTime(((JVMTermination)event).getEstimatedStartTime());
-            aggregation().estimatedTerminationTime(((JVMTermination)event).getEstimatedTimeOfTermination());
-            aggregation().estimatedRuntime(((JVMTermination)event).getEstimatedRuntime());
+            aggregation().timeOfTerminationEvent(((JVMTermination) event).getTimeOfTerminationEvent());
+            aggregation().timeOfFirstEvent(((JVMTermination)event).getTimeOfFirstEvent());
             complete();
         }
         jvmEventDispatcher.dispatch(event);

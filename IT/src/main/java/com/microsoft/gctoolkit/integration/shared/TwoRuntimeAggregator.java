@@ -14,10 +14,5 @@ public class TwoRuntimeAggregator extends Aggregator<TwoRuntimeReport> {
      */
     public TwoRuntimeAggregator(TwoRuntimeReport aggregation) {
         super(aggregation);
-        register(JVMTermination.class,this::publish);
-    }
-
-    public void publish(JVMTermination termination) {
-        aggregation().terminate(termination.getEstimatedRuntimeDuration());
     }
 }

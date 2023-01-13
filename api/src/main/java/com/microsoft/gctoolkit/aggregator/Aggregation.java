@@ -88,37 +88,66 @@ import com.microsoft.gctoolkit.time.DateTimeStamp;
  */
 public abstract class Aggregation {
 
-    private DateTimeStamp estimatedStartTime = null;
-    private DateTimeStamp estimatedTerminationTime = new DateTimeStamp(0.0d);
-    private double estimatedRuntime = -1.0d;
+    private DateTimeStamp timeOfFirstEvent = null;
+    private DateTimeStamp timeOfTermination = new DateTimeStamp(0.0d);
 
     protected Aggregation() {}
 
     /**
+     * If the first event if far from 0.000, then the first event becomes the start time
+     * Otherwise, the create a new start time by offsetting the captured start time by
+     * the time of the first event. This will ensure the date is correct if it has been
+     * captured.
+     *
+     * todo: move estimate based on longest interval between logging events should offer a reasonable threshold for a start gap.
+     *
+     * @return DateTimeStamp
+     */
+    /**
      * Interface to record the time span of the log
      * Estimate based on information carried in the JVMTermination event.
-     * @param startTime - estimate start time of the log.
+     * @param eventTime - estimate start time of the log.
      */
 
-    public void estimatedStartTime(DateTimeStamp startTime) {
-        this.estimatedStartTime = startTime;
+    public void timeOfFirstEvent(DateTimeStamp eventTime) {
+        this.timeOfFirstEvent = eventTime;
     }
+
+    public DateTimeStamp timeOfFirstEvent() {
+        return this.timeOfFirstEvent;
+    }
+
+    public void timeOfTerminationEvent(DateTimeStamp eventTime) {
+        this.timeOfTermination = eventTime;
+    }
+
+    public DateTimeStamp timeOfTerminationEvent() {
+        return this.timeOfTermination;
+    }
+
+    /**
+     * the 0.25 is a guess as to how far the first event should be from 0.000 seconds before the time of the
+     * first event will be considered to be the beginning of the log file.
+     *
+     * todo: The better way to do this is to calculate the variance in GC frequency and if the gap between 0.000 and
+     * the first event exceeds the variance, then the first event would be considered the beginning of the log file.
+     * otherwise, the time of the first event should be the time of the first event - the variance.
+     *
+     * @return
+     */
     public DateTimeStamp estimatedStartTime() {
-        return this.estimatedStartTime;
+        if (timeOfFirstEvent.getTimeStamp() / timeOfTermination.getTimeStamp() > 0.25d) {
+            return timeOfFirstEvent;
+        }
+
+        if ( ! timeOfFirstEvent.hasDateStamp())
+            return new DateTimeStamp(0.0d);
+        else // this looks after adjusting the date stamp.
+            return timeOfFirstEvent.minus(timeOfFirstEvent.getTimeStamp());
     }
-    public void estimatedRuntime(double estimatedUpTime) {
-        this.estimatedRuntime = estimatedUpTime;
-    }
+
     public double estimatedRuntime() {
-        return estimatedRuntime;
-    }
-
-    public void estimatedTerminationTime(DateTimeStamp terminationTime) {
-        this.estimatedTerminationTime = terminationTime;
-
-    }
-    public DateTimeStamp estimatedTerminationTime() {
-        return estimatedTerminationTime;
+        return timeOfTermination.minus(estimatedStartTime());
     }
 
     /**

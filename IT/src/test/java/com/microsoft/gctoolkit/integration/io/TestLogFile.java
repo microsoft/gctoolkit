@@ -19,7 +19,6 @@ public class TestLogFile {
     };
 
     public TestLogFile(String fileName) {
-        //todo: do remove this code
         logFile = Arrays.stream(relativePaths)
                 .flatMap(path -> Arrays.stream(new String[]{
                         "./" + path,
