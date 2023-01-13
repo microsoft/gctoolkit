@@ -19,6 +19,7 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.concurrent.CountDownLatch;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -89,6 +90,7 @@ public class GarbageCollectionEventSourceTest {
         channel.registerListener(consumer);
         try {
             logFile.stream().forEach(message -> {
+                System.out.println(message);
                 channel.publish(Channels.DATA_SOURCE, message);
             });
         } catch (IOException e) {
@@ -108,11 +110,23 @@ public class GarbageCollectionEventSourceTest {
             return Channels.DATA_SOURCE;
         }
 
+        volatile boolean eofed = false;
+        ArrayList<String> messages = new ArrayList<>();
         @Override
         public void receive(String payload) {
             eventCount++;
-            if ( END_OF_DATA_SENTINEL.equals(payload))
+            if ( eofed == true)
+                messages.add(payload);
+            if ( END_OF_DATA_SENTINEL.equals(payload)) {
+                eofed = true;
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
                 eof.countDown();
+                System.out.println(messages.size() + " collected after EOF");
+            }
         }
 
         public void awaitEOF() {
