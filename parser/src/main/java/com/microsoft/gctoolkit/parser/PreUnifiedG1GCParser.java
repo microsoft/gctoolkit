@@ -1160,22 +1160,15 @@ public class PreUnifiedG1GCParser extends PreUnifiedGCLogParser implements G1GCP
     /**
      * Maintain time ordering of records. Concurrent phases are recorded at start time and thus
      * other phases may mix in.
-     *
-     * @throws InterruptedException
      */
-    private void drainBacklog() throws InterruptedException {
+    private void drainBacklog() {
         if (backlog.size() > 0)
             for (JVMEvent event : backlog)
                 super.publish(Channels.G1GC_PARSER_OUTBOX,event);
     }
 
     public void publish(G1GCConcurrentEvent concurrentEvent) {
-        try {
-            super.publish(Channels.G1GC_PARSER_OUTBOX, concurrentEvent);
-            drainBacklog();
-        } catch (InterruptedException e) {
-            LOGGER.log(Level.INFO, e.getMessage(), e);
-        }
+        drainBacklog();
     }
 
     private void recordCPUSummary(GCLogTrace trace, String line) {

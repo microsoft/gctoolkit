@@ -101,7 +101,7 @@ public class GarbageCollectionEventSourceTest {
     private static class GCLogConsumer implements DataSourceParser {
 
         private final CountDownLatch eof = new CountDownLatch(1);
-        private int eventCount = 0;
+        private volatile int eventCount = 0;
 
         @Override
         public Channels channel() {
@@ -118,7 +118,10 @@ public class GarbageCollectionEventSourceTest {
         public void awaitEOF() {
             try {
                 eof.await();
-            } catch (InterruptedException e) {}
+            } catch (InterruptedException e) {
+                Thread.interrupted();
+                fail(e);
+            }
         }
 
         GCLogConsumer() {

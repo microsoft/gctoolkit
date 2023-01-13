@@ -9,6 +9,7 @@ unifiedrules.txt
 gctoolkit-testdata-*.zip
 
 # Maven
+.mvn
 target/
 pom.xml.tag
 pom.xml.releaseBackup
