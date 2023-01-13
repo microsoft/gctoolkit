@@ -90,7 +90,6 @@ public class GarbageCollectionEventSourceTest {
         channel.registerListener(consumer);
         try {
             logFile.stream().forEach(message -> {
-                System.out.println(message);
                 channel.publish(Channels.DATA_SOURCE, message);
             });
         } catch (IOException e) {
