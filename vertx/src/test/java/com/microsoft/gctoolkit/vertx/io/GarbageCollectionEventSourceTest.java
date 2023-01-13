@@ -21,6 +21,8 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -118,13 +120,15 @@ public class GarbageCollectionEventSourceTest {
                 messages.add(payload);
             if ( END_OF_DATA_SENTINEL.equals(payload)) {
                 eofed = true;
-                try {
-                    Thread.sleep(2000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                eof.countDown();
-                System.out.println(messages.size() + " collected after EOF");
+                ExecutorService es = Executors.newSingleThreadExecutor();
+                es.submit(() -> {
+                    try {
+                        Thread.sleep(2000);
+                    } catch (InterruptedException e) {
+                    }
+                    eof.countDown();
+                    System.out.println(messages.size() + " collected after EOF");
+                });
             }
         }
 
