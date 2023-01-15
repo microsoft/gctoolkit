@@ -47,7 +47,7 @@ public class GarbageCollectionEventSourceTest {
     @Test
     public void testGZipTarFileLineCount() {
         Path path = new TestLogFile("streaming/gc.log.tar.gz").getFile().toPath();
-        //assertExpectedLineCountInLog(410055, loadLogFile(path, false));
+        assertExpectedLineCountInLog(410055, loadLogFile(path, false));
     }
 
     @Test
@@ -98,7 +98,7 @@ public class GarbageCollectionEventSourceTest {
         assertEquals(expectedNumberOfLines, consumer.getEventCount());
     }
 
-    private static class GCLogConsumer implements DataSourceParser {
+    private class GCLogConsumer implements DataSourceParser {
 
         private final CountDownLatch eof = new CountDownLatch(1);
         private volatile int eventCount = 0;
@@ -108,14 +108,9 @@ public class GarbageCollectionEventSourceTest {
             return Channels.DATA_SOURCE;
         }
 
-        //volatile boolean print = false;
         @Override
         public void receive(String payload) {
             eventCount++;
-//            if (payload.startsWith("2017-07-27T08:38:57.692-0600: 27205.802"))
-//                print = true;
-//            if (print)
-//                System.out.println(payload);
             if ( END_OF_DATA_SENTINEL.equals(payload)) {
                     eof.countDown();
             }
