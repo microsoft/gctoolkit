@@ -17,12 +17,14 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Parameter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Phaser;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.CancellationException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -159,9 +161,9 @@ public abstract class AbstractJavaVirtualMachine implements JavaVirtualMachine {
 
     @Override
     public void analyze(List<Aggregation> registeredAggregations, JVMEventChannel eventBus, DataSourceChannel dataSourceBus) {
-        Phaser phaser = new Phaser();
         try {
             Set<EventSource> generatedEvents = diary.generatesEvents();
+            List<Aggregator<? extends Aggregation>> aggregatorsToComplete = new ArrayList<>();
             for (Aggregation aggregation : registeredAggregations) {
                 Constructor<? extends Aggregator<?>> constructor = constructor(aggregation);
                 if ( constructor == null) continue;
@@ -169,14 +171,21 @@ public abstract class AbstractJavaVirtualMachine implements JavaVirtualMachine {
                 aggregatedData.put(aggregation.getClass(), aggregation);
                 Optional<EventSource> source = generatedEvents.stream().filter(aggregator::aggregates).findFirst();
                 if (source.isPresent()) {
-                    phaser.register();
-                    aggregator.onCompletion(phaser::arriveAndDeregister);
+                    aggregatorsToComplete.add(aggregator);
                     JVMEventChannelAggregator eventChannelAggregator = new JVMEventChannelAggregator(source.get().toChannel(), aggregator);
                     eventBus.registerListener(eventChannelAggregator);
                 }
             }
+            CountDownLatch latch = new CountDownLatch(aggregatorsToComplete.size());
+            for (Aggregator<? extends Aggregation> aggregator : aggregatorsToComplete) {
+                aggregator.onCompletion(latch::countDown);
+            }
             dataSource.stream().forEach(message -> dataSourceBus.publish(Channels.DATA_SOURCE, message));
-            phaser.awaitAdvance(0);
+            try {
+                latch.await();
+            } catch (InterruptedException e) {
+                throw new CancellationException("interrupted");
+            }
             dataSourceBus.close();
             eventBus.close();
 
