@@ -42,8 +42,7 @@ public class JVMEventVerticle extends AbstractVerticle {
             if (event instanceof JVMTermination) {
                 vertx.undeploy(id);
             }
-        });
-        promise.complete();
+        }).completionHandler(result -> {promise.complete();});
     }
 
     @Override

@@ -9,6 +9,7 @@ import com.microsoft.gctoolkit.message.JVMEventChannelListener;
 import com.microsoft.gctoolkit.vertx.io.JVMEventCodec;
 import io.vertx.core.eventbus.DeliveryOptions;
 
+import java.util.concurrent.CountDownLatch;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -33,7 +34,17 @@ public class VertxJVMEventChannel extends VertxChannel implements JVMEventChanne
 
     @Override
     public void registerListener(JVMEventChannelListener listener) {
-        JVMEventVerticle processor = new JVMEventVerticle(vertx(), listener.channel().getName(), listener);
-        vertx().deployVerticle(processor, state -> processor.setID((state.succeeded()) ? state.result() : ""));
+        final JVMEventVerticle processor = new JVMEventVerticle(vertx(), listener.channel().getName(), listener);
+        CountDownLatch cdl = new CountDownLatch(1);
+        vertx().deployVerticle(processor, state -> {
+            processor.setID((state.succeeded()) ? state.result() : "");
+            cdl.countDown();
+        });
+
+        try {
+            cdl.await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 }
