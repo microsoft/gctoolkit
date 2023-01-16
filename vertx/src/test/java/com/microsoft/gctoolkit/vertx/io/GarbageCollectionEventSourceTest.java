@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.concurrent.CountDownLatch;
+import java.util.function.Consumer;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -87,6 +88,11 @@ public class GarbageCollectionEventSourceTest {
         GCLogConsumer consumer = new GCLogConsumer();
         VertxDataSourceChannel channel = new VertxDataSourceChannel();
         channel.registerListener(consumer);
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         long[] observedNumberOfLines = {0L};
         try {
             logFile.stream().forEach(message -> {

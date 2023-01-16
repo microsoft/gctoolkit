@@ -6,6 +6,8 @@ import com.microsoft.gctoolkit.message.Channels;
 import com.microsoft.gctoolkit.message.DataSourceChannel;
 import com.microsoft.gctoolkit.message.DataSourceParser;
 
+import java.util.concurrent.CountDownLatch;
+
 public class VertxDataSourceChannel extends VertxChannel implements DataSourceChannel {
 
     public VertxDataSourceChannel() {
@@ -15,7 +17,16 @@ public class VertxDataSourceChannel extends VertxChannel implements DataSourceCh
     @Override
     public void registerListener(DataSourceParser listener) {
         final DataSourceVerticle processor = new DataSourceVerticle(vertx(), listener.channel().getName(), listener);
-        vertx().deployVerticle(processor, state -> processor.setID((state.succeeded()) ? state.result() : ""));
+        CountDownLatch cdl = new CountDownLatch(1);
+        vertx().deployVerticle(processor, state -> {
+            processor.setID((state.succeeded()) ? state.result() : "");
+            cdl.countDown();
+        });
+        try {
+            cdl.await();
+        } catch (InterruptedException e) {
+            Thread.interrupted();
+        }
     }
 
     @Override

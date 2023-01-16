@@ -37,8 +37,7 @@ public class DataSourceVerticle extends AbstractVerticle {
                 if (GCLogFile.END_OF_DATA_SENTINEL.equals(message.body())) {
                     vertx.undeploy(id);
                 }
-            });
-            promise.complete();
+            }).completionHandler(result -> {promise.complete();});
         } catch(Throwable t) {
             LOGGER.log(Level.WARNING,"Vertx: processing DataSource failed",t);
         }
