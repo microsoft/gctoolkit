@@ -12,6 +12,8 @@ on:
     branches: [ main ]
     paths-ignore:
       - '**.md'
+env: 
+  CACHE: true
 
 jobs:
   build:
@@ -25,6 +27,14 @@ jobs:
 
     - name: Set up JDK ${{ matrix.java }}
       uses: actions/setup-java@v2
+      if: ${{!CACHE}}
+      with:
+        java-version: ${{ matrix.java }}
+        distribution: 'adopt'
+
+    - name: Set up JDK ${{ matrix.java }}
+      uses: actions/setup-java@v2
+      if: ${{CACHE}}
       with:
         java-version: ${{ matrix.java }}
         distribution: 'adopt'

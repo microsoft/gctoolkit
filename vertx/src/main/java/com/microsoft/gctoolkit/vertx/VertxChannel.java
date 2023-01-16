@@ -9,7 +9,7 @@ public class VertxChannel {
     private static Vertx vertx;
 
     static {
-        // Properties that will override -D settings. todo: Why we disable should be investigated in the future
+        //Disable unused Vert.x functionality
         System.setProperty("vertx.disableFileCPResolving", "true");
         System.setProperty("vertx.disableFileCaching", "true");
         vertx = Vertx.vertx();
