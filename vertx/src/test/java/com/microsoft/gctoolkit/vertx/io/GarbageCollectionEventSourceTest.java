@@ -87,14 +87,17 @@ public class GarbageCollectionEventSourceTest {
         GCLogConsumer consumer = new GCLogConsumer();
         VertxDataSourceChannel channel = new VertxDataSourceChannel();
         channel.registerListener(consumer);
+        long[] observedNumberOfLines = {0L};
         try {
             logFile.stream().forEach(message -> {
+                observedNumberOfLines[0]++;
                 channel.publish(Channels.DATA_SOURCE, message);
             });
         } catch (IOException e) {
             fail(e.getMessage());
         }
         consumer.awaitEOF();
+        assertEquals(expectedNumberOfLines, observedNumberOfLines[0]);
         assertEquals(expectedNumberOfLines, consumer.getEventCount());
     }
 
