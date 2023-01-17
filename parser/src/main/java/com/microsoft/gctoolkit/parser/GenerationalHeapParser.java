@@ -23,7 +23,7 @@ import com.microsoft.gctoolkit.event.generational.YoungGC;
 import com.microsoft.gctoolkit.event.jvm.JVMEvent;
 import com.microsoft.gctoolkit.event.jvm.JVMTermination;
 import com.microsoft.gctoolkit.jvm.Diary;
-import com.microsoft.gctoolkit.message.Channels;
+import com.microsoft.gctoolkit.message.ChannelName;
 import com.microsoft.gctoolkit.message.JVMEventChannel;
 import com.microsoft.gctoolkit.parser.collection.MRUQueue;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
@@ -2017,7 +2017,7 @@ public class GenerationalHeapParser extends PreUnifiedGCLogParser implements Sim
     }
 
     public void publish(JVMEvent event, boolean clear) {
-        super.publish(Channels.GENERATIONAL_HEAP_PARSER_OUTBOX, event);
+        super.publish(ChannelName.GENERATIONAL_HEAP_PARSER_OUTBOX, event);
         if (clear) {
             garbageCollectionTypeForwardReference = null;
             gcCauseForwardReference = GCCause.UNKNOWN_GCCAUSE;

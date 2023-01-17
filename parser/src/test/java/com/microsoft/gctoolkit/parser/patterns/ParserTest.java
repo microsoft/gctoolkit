@@ -6,7 +6,7 @@ package com.microsoft.gctoolkit.parser.patterns;
 import com.microsoft.gctoolkit.event.MemoryPoolSummary;
 import com.microsoft.gctoolkit.event.jvm.JVMEvent;
 import com.microsoft.gctoolkit.jvm.Diarizer;
-import com.microsoft.gctoolkit.message.Channels;
+import com.microsoft.gctoolkit.message.ChannelName;
 import com.microsoft.gctoolkit.message.JVMEventChannel;
 import com.microsoft.gctoolkit.message.JVMEventChannelListener;
 import com.microsoft.gctoolkit.parser.GCLogParser;
@@ -84,7 +84,7 @@ public abstract class ParserTest {
         }
 
         @Override
-        public void publish(Channels channel, JVMEvent message) {
+        public void publish(ChannelName channel, JVMEvent message) {
             events.add(message);
         }
 

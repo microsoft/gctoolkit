@@ -11,7 +11,7 @@ import com.microsoft.gctoolkit.event.zgc.ZGCCycle;
 import com.microsoft.gctoolkit.event.zgc.ZGCMemoryPoolSummary;
 import com.microsoft.gctoolkit.event.zgc.ZGCMetaspaceSummary;
 import com.microsoft.gctoolkit.jvm.Diary;
-import com.microsoft.gctoolkit.message.Channels;
+import com.microsoft.gctoolkit.message.ChannelName;
 import com.microsoft.gctoolkit.message.JVMEventChannel;
 import com.microsoft.gctoolkit.parser.collection.MRUQueue;
 import com.microsoft.gctoolkit.parser.unified.ZGCPatterns;
@@ -276,7 +276,7 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
     }
 
     public void publish(JVMEvent event) {
-        super.publish(Channels.ZGC_PARSER_OUTBOX, event);
+        super.publish(ChannelName.ZGC_PARSER_OUTBOX, event);
         forwardReference = null;
     }
 

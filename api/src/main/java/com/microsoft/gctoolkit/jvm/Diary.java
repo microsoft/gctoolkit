@@ -409,8 +409,8 @@ public class Diary {
         if (isUnifiedLogging())
             evaluate(generatedEvents, CMS, EventSource.CMS_UNIFIED);
         else
-            evaluate(generatedEvents, CMS, EventSource.CMS8);
-        evaluate(generatedEvents, ICMS, EventSource.CMS8);
+            evaluate(generatedEvents, CMS, EventSource.CMS_PREUNIFIED);
+        evaluate(generatedEvents, ICMS, EventSource.CMS_PREUNIFIED);
         evaluate(generatedEvents, PARALLELGC, EventSource.GENERATIONAL);
         evaluate(generatedEvents, PARALLELOLDGC, EventSource.GENERATIONAL);
         evaluate(generatedEvents, SERIAL, EventSource.GENERATIONAL);

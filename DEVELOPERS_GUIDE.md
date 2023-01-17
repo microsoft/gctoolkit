@@ -15,9 +15,10 @@ Fig 1. GCToolKit Component Map
 
 ### Vert.x Message Bus and Verticles
 
-GCToolkit contains 2 different configurations of a Vert.x event bus. The first configuration supports the publishing of log lines. The second supports the publishing of JVMEvent objects. [JVMEvent objects](#JVMEvent) are covered later on in this document.
+A new messaging API has been added to the gctoolkit-api module. This api breaks the direct dependency of GCToolKit on Vert.x. The gctoolkit-vertx module has been refactored to provide an implementation of this new api. The new api supports the two different message channels, one for gc log entries and the other for JVMEvent objects. 
+[JVMEvent objects](#JVMEvent) are covered later on in this document.
 
-A second feature of Vert.x that GCToolkit is dependent on is the construct of a Verticle. A verticle acts as a container to encapsulate a component designed to process events. In GCToolkit vertices are used to encapsulate the DataSource, parsers, and aggregators. Vert.x takes care of many of the concerns that one has when distributing the processing events. In addition, verticals are a covenant abstraction that nicely supports strong separation of concerns.
+The gctoolkit-vertx module retains the implementation support for messaging for gc log entries and JVMEvent objects. It also retains the use of verticles as part of the implementation. The verticles are used to encapulate listener behaviour.
 
  
 ### Data Source 
@@ -28,7 +29,7 @@ Another role of the DataSource is to provide a Diary (or summary) of important f
 
 An example of this would be an analytic that looked at System.gc() behaviour. One of the things that this analytic would attempt to determine is if there was a constant interval between System.gc() calls. If the interval was 60 minutes, then it it likely the call was due to RMI. In JDK 1.7.0_40 the logs stopped reporting user triggered collections unless a new flag (PrintGCCause) was enabled. This left the analytic blind to these events. In JDK 1.8.0, this new flag was automatically turned on when the PrintGCDetails flag was set. Making the analytics aware of the JDK version allowed them to calculate when System.gc() was likely being called thus enabling the analysis when the cause was missing in the log.
 
-###Parsers
+### Parsers
 
 The parsers extract information from the log files and use it to generate JVMEvents. All JVMEvents share the same 3 characteristics; the type of the event (as can be seen in the implementation), the time of the event, and the duration of the event. These properties are immutable and as such, the creation of a JVMEvent is delayed until they are known.
 
@@ -58,11 +59,11 @@ String INTEGER = "\\d+";
 
 Since many lines contain either a pause or concurrent time, defining these “tokens” eases the complexity of creating and debugging the parse rules.
 
-####Testing
+#### Testing
 
 There are two main types of tests that are used to QA parsers and rules. The first is known as a rules capture test. In this test the rule is exposed to everything that it is likely to encounter. The test passes if the rule captures everything it should capture and doesn’t capture anything else. In the former test, the parser is configured to send generated events to the test. The test the counts each of the different types of events. The test passes if the counts for each event type reach the expected value.
 
-There is a third type of test that has, unfortunately, not bee applied to all parsers as of yet. In this test, the parsers will parse a log fragment to produce a well known event. The test passes if all of the attributes of that event match the expected value.
+There is a third type of test that has, unfortunately, not been applied to all parsers as of yet. In this test, the parsers will parse a log fragment to produce a well known event. The test passes if all of the attributes of that event match the expected value.
 
 
 For historical reasons, SurvivorSpace is treated as a JVMEvent even though in reality, it’s an attribute of a young generational collection. This record is created by a parser that is specialized to parse the log and extract out the survivor information.
@@ -141,7 +142,7 @@ public class Main {
 
 ```
 @Collates(HeapOccupancyAfterCollection.class)
-public class HeapOccupancyAfterCollectionSummary implements HeapOccupancyAfterCollectionAggregation {
+public class HeapOccupancyAfterCollectionSummary extends HeapOccupancyAfterCollectionAggregation {
 
     private final Map<GarbageCollectionTypes, XYDataSet> aggregations = new ConcurrentHashMap<>();
 

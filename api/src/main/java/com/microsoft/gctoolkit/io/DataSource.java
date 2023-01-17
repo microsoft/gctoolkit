@@ -15,7 +15,7 @@ public interface DataSource<T> {
 
     /**
      * Return meta data for the data source
-     * @return A value used as a sentinel to mark the end of data.
+     * @return diary contains log file metadata
      */
     Diary diary() throws IOException;
 

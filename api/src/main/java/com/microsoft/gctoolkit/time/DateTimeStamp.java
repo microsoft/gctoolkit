@@ -142,6 +142,7 @@ public class DateTimeStamp implements Comparable<DateTimeStamp> {
         if ( (timeStamp < 0.00d) || Double.isNaN(timeStamp))
             this.timeStamp = TIMESTAMP_NOT_SET;
         else
+            // the time stamps in the log have 3 significant digits after the decimal. This corrects for that.
             this.timeStamp = Math.round(timeStamp * 1000.0d) / 1000.0d;
     }
 
@@ -289,6 +290,7 @@ public class DateTimeStamp implements Comparable<DateTimeStamp> {
             adjustedTimeStamp = getTimeStamp() + offsetInDecimalSeconds;
         }
 
+        // Need to scale the values from ZonedDateTime
         if (getDateTime() != null) {
             double offset = (Double.isNaN(offsetInDecimalSeconds)) ? 0.000d : offsetInDecimalSeconds;
             int seconds = (int) offset;
@@ -325,8 +327,8 @@ public class DateTimeStamp implements Comparable<DateTimeStamp> {
         if (hasTimeStamp() && other.hasTimeStamp())
             return getTimeStamp() - other.getTimeStamp();
         if (hasDateStamp() && other.hasDateStamp()) {
-            double thisInSeconds = (double)getDateTime().toEpochSecond() + ((double)(getDateTime().getNano() / 1000000)) / 1000.0d;
-            double otherInSeconds = (double)other.getDateTime().toEpochSecond() + ((double)(other.getDateTime().getNano() / 1000000)) / 1000.0d;
+            double thisInSeconds = (double)getDateTime().toEpochSecond() + ((double)(getDateTime().getNano() / 1_000_000)) / 1000.0d;
+            double otherInSeconds = (double)other.getDateTime().toEpochSecond() + ((double)(other.getDateTime().getNano() / 1_000_000)) / 1000.0d;
             return thisInSeconds - otherInSeconds;
         }
         return Double.NaN;
@@ -376,8 +378,8 @@ public class DateTimeStamp implements Comparable<DateTimeStamp> {
 
     public double toEpochInMillis() {
         if ( dateTime != null) {
-            return (double)(dateTime.toEpochSecond() * 1000) + (((double)dateTime.getNano()) / 1000000.0d);
-        } // todo: a reasonable response here might be????
+            return (double)(dateTime.toEpochSecond() * 1000) + (((double)dateTime.getNano()) / 1_000_000.0d);
+        }
         return Double.NaN;
     }
 }

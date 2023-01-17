@@ -93,22 +93,6 @@ public abstract class Aggregation {
 
     protected Aggregation() {}
 
-    /**
-     * If the first event if far from 0.000, then the first event becomes the start time
-     * Otherwise, the create a new start time by offsetting the captured start time by
-     * the time of the first event. This will ensure the date is correct if it has been
-     * captured.
-     *
-     * todo: move estimate based on longest interval between logging events should offer a reasonable threshold for a start gap.
-     *
-     * @return DateTimeStamp
-     */
-    /**
-     * Interface to record the time span of the log
-     * Estimate based on information carried in the JVMTermination event.
-     * @param eventTime - estimate start time of the log.
-     */
-
     public void timeOfFirstEvent(DateTimeStamp eventTime) {
         this.timeOfFirstEvent = eventTime;
     }
@@ -117,6 +101,11 @@ public abstract class Aggregation {
         return this.timeOfFirstEvent;
     }
 
+    /**
+     * Interface to record the time span of the log
+     * Estimate based on information carried in the JVMTermination event.
+     * @param eventTime - estimate start time of the log.
+     */
     public void timeOfTerminationEvent(DateTimeStamp eventTime) {
         this.timeOfTermination = eventTime;
     }
@@ -159,7 +148,7 @@ public abstract class Aggregation {
 
     /**
      * Return {@code true} if there is no data in the Aggregation.
-     * @return {@ncode true} if there is no data in the Aggregation.
+     * @return {@code true} if there is no data in the Aggregation.
      */
     abstract public boolean isEmpty();
 

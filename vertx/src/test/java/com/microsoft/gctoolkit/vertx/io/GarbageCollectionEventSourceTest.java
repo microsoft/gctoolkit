@@ -9,7 +9,7 @@ import com.microsoft.gctoolkit.io.GCLogFile;
 import com.microsoft.gctoolkit.io.RotatingGCLogFile;
 import com.microsoft.gctoolkit.io.SingleGCLogFile;
 import com.microsoft.gctoolkit.jvm.Diary;
-import com.microsoft.gctoolkit.message.Channels;
+import com.microsoft.gctoolkit.message.ChannelName;
 import com.microsoft.gctoolkit.message.DataSourceParser;
 import com.microsoft.gctoolkit.message.JVMEventChannel;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
@@ -91,7 +91,7 @@ public class GarbageCollectionEventSourceTest {
         try {
             logFile.stream().forEach(message -> {
                 observedNumberOfLines[0]++;
-                channel.publish(Channels.DATA_SOURCE, message);
+                channel.publish(ChannelName.DATA_SOURCE, message);
             });
         } catch (IOException e) {
             fail(e.getMessage());
@@ -107,8 +107,8 @@ public class GarbageCollectionEventSourceTest {
         private volatile int eventCount = 0;
 
         @Override
-        public Channels channel() {
-            return Channels.DATA_SOURCE;
+        public ChannelName channel() {
+            return ChannelName.DATA_SOURCE;
         }
 
         @Override

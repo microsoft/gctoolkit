@@ -7,7 +7,7 @@ import com.microsoft.gctoolkit.event.jvm.ApplicationStoppedTime;
 import com.microsoft.gctoolkit.event.jvm.JVMEvent;
 import com.microsoft.gctoolkit.event.jvm.JVMTermination;
 import com.microsoft.gctoolkit.jvm.Diary;
-import com.microsoft.gctoolkit.message.Channels;
+import com.microsoft.gctoolkit.message.ChannelName;
 import com.microsoft.gctoolkit.message.JVMEventChannel;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
 
@@ -83,6 +83,6 @@ public class UnifiedJVMEventParser extends UnifiedGCLogParser implements JVMPatt
     }
 
     private void publish(JVMEvent event) {
-        super.publish(Channels.JVM_EVENT_PARSER_OUTBOX, event);
+        super.publish(ChannelName.JVM_EVENT_PARSER_OUTBOX, event);
     }
 }

@@ -10,7 +10,7 @@ import com.microsoft.gctoolkit.event.jvm.MetaspaceRecord;
 import com.microsoft.gctoolkit.event.jvm.PermGenSummary;
 import com.microsoft.gctoolkit.io.GCLogFile;
 import com.microsoft.gctoolkit.jvm.Diary;
-import com.microsoft.gctoolkit.message.Channels;
+import com.microsoft.gctoolkit.message.ChannelName;
 import com.microsoft.gctoolkit.message.DataSourceParser;
 import com.microsoft.gctoolkit.message.JVMEventChannel;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
@@ -79,7 +79,7 @@ public abstract class GCLogParser implements DataSourceParser, SharedPatterns {
      * @param channel
      * @param event
      */
-    public void publish(Channels channel, JVMEvent event) {
+    public void publish(ChannelName channel, JVMEvent event) {
         lastDuration = event.getDuration();
         consumer.publish(channel,event);
     }
@@ -206,7 +206,7 @@ public abstract class GCLogParser implements DataSourceParser, SharedPatterns {
     }
 
     @Override
-    public Channels channel() {
-        return Channels.DATA_SOURCE;
+    public ChannelName channel() {
+        return ChannelName.DATA_SOURCE;
     }
 }

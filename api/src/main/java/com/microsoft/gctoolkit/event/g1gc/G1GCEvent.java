@@ -17,7 +17,6 @@ public abstract class G1GCEvent extends GCEvent {
         this(timeStamp, GarbageCollectionTypes.Unknown, GCCause.UNKNOWN_GCCAUSE, duration);
     }
 
-
     public G1GCEvent(DateTimeStamp timeStamp, GCCause cause, double duration) {
         this(timeStamp, GarbageCollectionTypes.Unknown, cause, duration);
     }

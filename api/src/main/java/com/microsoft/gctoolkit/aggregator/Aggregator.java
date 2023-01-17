@@ -113,6 +113,9 @@ public abstract class Aggregator<A extends Aggregation> {
         this.completionTask = task;
     }
 
+    /**
+     * Call a callback when aggregation is completed.
+     */
     private void complete() {
         Runnable t = completionTask;
         this.completionTask = null;

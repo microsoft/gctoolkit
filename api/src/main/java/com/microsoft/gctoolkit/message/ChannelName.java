@@ -1,7 +1,9 @@
 package com.microsoft.gctoolkit.message;
 
-public enum Channels {
-
+/**
+ * A list of all of the channel names that are available for publishing on.
+ */
+public enum ChannelName {
 
     DATA_SOURCE("DataSource"),
     PARSER_INBOX("PARSER"),
@@ -15,7 +17,7 @@ public enum Channels {
 
     private final String name;
 
-    Channels(String channelName) {
+    ChannelName(String channelName) {
         this.name = channelName;
     }
 

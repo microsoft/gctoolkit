@@ -14,7 +14,7 @@ import com.microsoft.gctoolkit.event.generational.GenerationalGCEvent;
 import com.microsoft.gctoolkit.event.generational.InitialMark;
 import com.microsoft.gctoolkit.event.jvm.JVMTermination;
 import com.microsoft.gctoolkit.jvm.Diary;
-import com.microsoft.gctoolkit.message.Channels;
+import com.microsoft.gctoolkit.message.ChannelName;
 import com.microsoft.gctoolkit.message.JVMEventChannel;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
 
@@ -29,7 +29,7 @@ public class CMSTenuredPoolParser extends PreUnifiedGCLogParser implements Simpl
     public CMSTenuredPoolParser() {}
 
     public String getName() {
-        return Channels.CMS_TENURED_POOL_PARSER_OUTBOX.toString();
+        return ChannelName.CMS_TENURED_POOL_PARSER_OUTBOX.toString();
     }
 
     @Override
@@ -55,7 +55,7 @@ public class CMSTenuredPoolParser extends PreUnifiedGCLogParser implements Simpl
         else if ((trace = SPLIT_REMARK.parse(line)) != null)
             startOfPhase = getClock();
         else if ((trace = EndOfFile.parse(line)) != null) {
-            super.publish(Channels.CMS_TENURED_POOL_PARSER_OUTBOX, new JVMTermination(getClock(), diary.getTimeOfFirstEvent()));
+            super.publish(ChannelName.CMS_TENURED_POOL_PARSER_OUTBOX, new JVMTermination(getClock(), diary.getTimeOfFirstEvent()));
         }
 
     }
@@ -156,7 +156,7 @@ public class CMSTenuredPoolParser extends PreUnifiedGCLogParser implements Simpl
     }
 
     private void publish(GenerationalGCEvent event) {
-        super.publish(Channels.CMS_TENURED_POOL_PARSER_OUTBOX, event);
+        super.publish(ChannelName.CMS_TENURED_POOL_PARSER_OUTBOX, event);
     }
 
     @Override

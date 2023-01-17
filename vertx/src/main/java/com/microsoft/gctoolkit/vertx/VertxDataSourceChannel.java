@@ -2,7 +2,7 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.vertx;
 
-import com.microsoft.gctoolkit.message.Channels;
+import com.microsoft.gctoolkit.message.ChannelName;
 import com.microsoft.gctoolkit.message.DataSourceChannel;
 import com.microsoft.gctoolkit.message.DataSourceParser;
 
@@ -30,7 +30,7 @@ public class VertxDataSourceChannel extends VertxChannel implements DataSourceCh
     }
 
     @Override
-    public void publish(Channels channel, String message) {
+    public void publish(ChannelName channel, String message) {
         vertx().eventBus().publish(channel.getName(),message);
     }
 

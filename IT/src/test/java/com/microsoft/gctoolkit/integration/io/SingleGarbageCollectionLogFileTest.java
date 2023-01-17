@@ -19,7 +19,13 @@ public class SingleGarbageCollectionLogFileTest {
     private boolean[] logIsZipped = { false, false, true, false};
     private boolean[] logIsGZipped = { false, false, false, true};
 
-    private void logTest(String log, boolean unified, boolean zipped, boolean gzipped) {
+    @Test
+    public void unifiedLog() {
+        for (int index = 0; index < unifiedLogs.length; index++)
+            logStreamingTest(unifiedLogs[index], logIsUnified[index], logIsZipped[index], logIsGZipped[index]);
+    }
+
+    private void logStreamingTest(String log, boolean unified, boolean zipped, boolean gzipped) {
         Path path = new TestLogFile(log).getFile().toPath();
         SingleGCLogFile gcLogFile = new SingleGCLogFile(path);
         assertEquals(unified, gcLogFile.isUnified(), "Expected unified but failed");
@@ -54,11 +60,5 @@ public class SingleGarbageCollectionLogFileTest {
         } catch (IOException ioe) {
             fail(ioe);
         }
-    }
-
-    @Test
-    public void unifiedLog() {
-        for (int index = 0; index < unifiedLogs.length; index++)
-            logTest(unifiedLogs[index], logIsUnified[index], logIsZipped[index], logIsGZipped[index]);
     }
 }

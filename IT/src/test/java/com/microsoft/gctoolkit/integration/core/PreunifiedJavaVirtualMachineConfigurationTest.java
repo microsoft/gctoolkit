@@ -25,10 +25,10 @@ public class PreunifiedJavaVirtualMachineConfigurationTest {
     @Test
     public void testSingle() {
         TestLogFile log = new TestLogFile(logFile);
-        test(new SingleGCLogFile(log.getFile().toPath()), times);
+        smokeTest(new SingleGCLogFile(log.getFile().toPath()), times);
     }
 
-    private void test(GCLogFile log, int[] endStartTimes ) {
+    private void smokeTest(GCLogFile log, int[] endStartTimes ) {
         GCToolKit gcToolKit = new GCToolKit();
         gcToolKit.loadAggregationsFromServiceLoader();
         TestTimeAggregation aggregation = new TestTimeAggregation();

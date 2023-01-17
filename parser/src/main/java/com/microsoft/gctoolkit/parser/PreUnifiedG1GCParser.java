@@ -27,7 +27,7 @@ import com.microsoft.gctoolkit.event.g1gc.G1YoungInitialMark;
 import com.microsoft.gctoolkit.event.jvm.JVMEvent;
 import com.microsoft.gctoolkit.event.jvm.JVMTermination;
 import com.microsoft.gctoolkit.jvm.Diary;
-import com.microsoft.gctoolkit.message.Channels;
+import com.microsoft.gctoolkit.message.ChannelName;
 import com.microsoft.gctoolkit.message.JVMEventChannel;
 import com.microsoft.gctoolkit.parser.collection.MRUQueue;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
@@ -268,7 +268,7 @@ public class PreUnifiedG1GCParser extends PreUnifiedGCLogParser implements G1GCP
     }
 
     public void endOfFile(GCLogTrace trace, String line) {
-        super.publish(Channels.G1GC_PARSER_OUTBOX, new JVMTermination(getClock(),diary.getTimeOfFirstEvent()));
+        super.publish(ChannelName.G1GC_PARSER_OUTBOX, new JVMTermination(getClock(),diary.getTimeOfFirstEvent()));
     }
 
     //18.298: [G1Ergonomics (CSet Construction) add young regions to CSet, eden: 512 regions, survivors: 0 regions, predicted young region time: 7833.33 ms]
@@ -1164,11 +1164,11 @@ public class PreUnifiedG1GCParser extends PreUnifiedGCLogParser implements G1GCP
     private void drainBacklog() {
         if (backlog.size() > 0)
             for (JVMEvent event : backlog)
-                super.publish(Channels.G1GC_PARSER_OUTBOX,event);
+                super.publish(ChannelName.G1GC_PARSER_OUTBOX,event);
     }
 
     public void publish(G1GCConcurrentEvent concurrentEvent) {
-        super.publish(Channels.G1GC_PARSER_OUTBOX,concurrentEvent);
+        super.publish(ChannelName.G1GC_PARSER_OUTBOX,concurrentEvent);
         drainBacklog();
     }
 
@@ -1188,7 +1188,7 @@ public class PreUnifiedG1GCParser extends PreUnifiedGCLogParser implements G1GCP
         if ((collection.getCpuSummary() == null) && (diary == null || diary.isPrintGCDetails())) {
             forwardReference = collection;
         } else {
-            super.publish(Channels.G1GC_PARSER_OUTBOX, collection);
+            super.publish(ChannelName.G1GC_PARSER_OUTBOX, collection);
             forwardReference = trap;
             collectionTypeForwardReference = null;
             referenceGCForwardReferenceSummary = null;

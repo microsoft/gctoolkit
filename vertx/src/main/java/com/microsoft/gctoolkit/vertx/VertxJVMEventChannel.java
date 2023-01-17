@@ -3,7 +3,7 @@
 package com.microsoft.gctoolkit.vertx;
 
 import com.microsoft.gctoolkit.event.jvm.JVMEvent;
-import com.microsoft.gctoolkit.message.Channels;
+import com.microsoft.gctoolkit.message.ChannelName;
 import com.microsoft.gctoolkit.message.JVMEventChannel;
 import com.microsoft.gctoolkit.message.JVMEventChannelListener;
 import com.microsoft.gctoolkit.vertx.io.JVMEventCodec;
@@ -37,7 +37,7 @@ public class VertxJVMEventChannel extends VertxChannel implements JVMEventChanne
     }
 
     @Override
-    public void publish(Channels channel, JVMEvent message) {
+    public void publish(ChannelName channel, JVMEvent message) {
         try {
             vertx().eventBus().publish(channel.getName(), message, options);
         } catch(Exception ex) {

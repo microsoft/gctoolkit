@@ -403,7 +403,7 @@ public class DateTimeStampTest {
     }
 
     /**
-     * This tests a case that can't happen in context of a GC log. Todo: Should this throw an IllegalStateException?
+     * This tests a case that can't happen in context of a GC log.
      */
     @Test
     public void testCompareSmallerTimeStampMixed() {
@@ -458,7 +458,7 @@ public class DateTimeStampTest {
     }
 
     /*
-     * Todo: this comparator should evaluate DateTimeStamp in the context of a GCLog.
+     *
      */
     @Test
     public void compareWithNANValue(){

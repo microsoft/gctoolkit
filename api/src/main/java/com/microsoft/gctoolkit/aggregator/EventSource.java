@@ -2,9 +2,9 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.aggregator;
 
-import com.microsoft.gctoolkit.message.Channels;
+import com.microsoft.gctoolkit.message.ChannelName;
 
-import static com.microsoft.gctoolkit.message.Channels.*;
+import static com.microsoft.gctoolkit.message.ChannelName.*;
 
 /**
  * EventSource indicates to the source of the GC events
@@ -17,7 +17,7 @@ public enum EventSource {
      */
     GENERATIONAL(GENERATIONAL_HEAP_PARSER_OUTBOX),
     CMS_UNIFIED(GENERATIONAL_HEAP_PARSER_OUTBOX),
-    CMS8(CMS_TENURED_POOL_PARSER_OUTBOX),
+    CMS_PREUNIFIED(CMS_TENURED_POOL_PARSER_OUTBOX),
     /**
      * Events come from the G1 collector.
      */
@@ -47,13 +47,13 @@ public enum EventSource {
      */
     JVM(JVM_EVENT_PARSER_OUTBOX);
 
-    Channels channel;
+    ChannelName channel;
 
-    EventSource(Channels channel) {
+    EventSource(ChannelName channel) {
         this.channel = channel;
     }
 
-    public Channels toChannel() {
+    public ChannelName toChannel() {
         return channel;
     }
 }

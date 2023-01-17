@@ -5,16 +5,16 @@ import com.microsoft.gctoolkit.event.jvm.JVMEvent;
 
 public class JVMEventChannelAggregator implements JVMEventChannelListener {
 
-    private Channels channel;
+    private ChannelName channel;
     private Aggregator aggregator;
 
-    public JVMEventChannelAggregator(Channels channel, Aggregator aggregator) {
+    public JVMEventChannelAggregator(ChannelName channel, Aggregator aggregator) {
         this.channel = channel;
         this.aggregator = aggregator;
     }
 
     @Override
-    public Channels channel() {
+    public ChannelName channel() {
         return channel;
     }
 

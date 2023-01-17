@@ -23,7 +23,7 @@ import com.microsoft.gctoolkit.event.generational.ParNew;
 import com.microsoft.gctoolkit.event.generational.YoungGC;
 import com.microsoft.gctoolkit.event.jvm.JVMTermination;
 import com.microsoft.gctoolkit.jvm.Diary;
-import com.microsoft.gctoolkit.message.Channels;
+import com.microsoft.gctoolkit.message.ChannelName;
 import com.microsoft.gctoolkit.message.JVMEventChannel;
 import com.microsoft.gctoolkit.parser.collection.RuleSet;
 import com.microsoft.gctoolkit.parser.jvm.Decorators;
@@ -322,7 +322,7 @@ public class UnifiedGenerationalParser extends UnifiedGCLogParser implements Uni
     }
 
     private void jvmExit(GCLogTrace trace, String line) {
-        super.publish(Channels.GENERATIONAL_HEAP_PARSER_OUTBOX,  new JVMTermination(getClock(),diary.getTimeOfFirstEvent()));
+        super.publish(ChannelName.GENERATIONAL_HEAP_PARSER_OUTBOX,  new JVMTermination(getClock(),diary.getTimeOfFirstEvent()));
     }
 
     /**
@@ -544,6 +544,6 @@ public class UnifiedGenerationalParser extends UnifiedGCLogParser implements Uni
     }
 
     private void publish(GenerationalGCEvent event) {
-        super.publish(Channels.GENERATIONAL_HEAP_PARSER_OUTBOX, event);
+        super.publish(ChannelName.GENERATIONAL_HEAP_PARSER_OUTBOX, event);
     }
 }

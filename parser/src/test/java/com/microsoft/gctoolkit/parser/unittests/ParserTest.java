@@ -11,7 +11,7 @@ import com.microsoft.gctoolkit.io.GCLogFile;
 import com.microsoft.gctoolkit.io.RotatingGCLogFile;
 import com.microsoft.gctoolkit.io.SingleGCLogFile;
 import com.microsoft.gctoolkit.jvm.Diarizer;
-import com.microsoft.gctoolkit.message.Channels;
+import com.microsoft.gctoolkit.message.ChannelName;
 import com.microsoft.gctoolkit.message.JVMEventChannel;
 import com.microsoft.gctoolkit.message.JVMEventChannelListener;
 import com.microsoft.gctoolkit.parser.GCLogParser;
@@ -204,7 +204,7 @@ public abstract class ParserTest {
          * @param event
          */
         @Override
-        public void publish(Channels channel, JVMEvent event) {
+        public void publish(ChannelName channel, JVMEvent event) {
             if (!(event instanceof JVMTermination)) {
                 GCEvent gcEvent = (GCEvent) event;
                 int index = collectorNameMapping.get(gcEvent.getGarbageCollectionType());

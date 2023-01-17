@@ -5,7 +5,7 @@ package com.microsoft.gctoolkit.parser;
 import com.microsoft.gctoolkit.event.jvm.JVMEvent;
 import com.microsoft.gctoolkit.event.jvm.JVMTermination;
 import com.microsoft.gctoolkit.jvm.Diary;
-import com.microsoft.gctoolkit.message.Channels;
+import com.microsoft.gctoolkit.message.ChannelName;
 import com.microsoft.gctoolkit.message.JVMEventChannel;
 import com.microsoft.gctoolkit.parser.collection.MRUQueue;
 import com.microsoft.gctoolkit.parser.unified.ShenandoahPatterns;
@@ -96,7 +96,7 @@ public class ShenandoahParser extends UnifiedGCLogParser implements ShenandoahPa
     }
 
     public void publish(JVMEvent event) {
-        super.publish(Channels.SHENANDOAH_PARSER_OUTBOX, event);
+        super.publish(ChannelName.SHENANDOAH_PARSER_OUTBOX, event);
         forwardReference = null;
     }
 
