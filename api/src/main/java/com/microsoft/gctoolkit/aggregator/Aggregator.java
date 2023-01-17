@@ -130,9 +130,11 @@ public abstract class Aggregator<A extends Aggregation> {
         if (event instanceof JVMTermination) {
             aggregation().timeOfTerminationEvent(((JVMTermination) event).getTimeOfTerminationEvent());
             aggregation().timeOfFirstEvent(((JVMTermination)event).getTimeOfFirstEvent());
-            complete();
         }
         jvmEventDispatcher.dispatch(event);
+        if (event instanceof JVMTermination) {
+            complete();
+        }
     }
 
     public boolean aggregates(EventSource eventSource) {

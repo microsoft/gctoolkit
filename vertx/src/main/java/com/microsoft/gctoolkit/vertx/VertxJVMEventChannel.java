@@ -21,6 +21,22 @@ public class VertxJVMEventChannel extends VertxChannel implements JVMEventChanne
     public VertxJVMEventChannel() {}
 
     @Override
+    public void registerListener(JVMEventChannelListener listener) {
+        final JVMEventVerticle processor = new JVMEventVerticle(vertx(), listener.channel().getName(), listener);
+        CountDownLatch latch = new CountDownLatch(1);
+        vertx().deployVerticle(processor, state -> {
+            processor.setID((state.succeeded()) ? state.result() : "");
+            latch.countDown();
+        });
+
+        try {
+            latch.await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
     public void publish(Channels channel, JVMEvent message) {
         try {
             vertx().eventBus().publish(channel.getName(), message, options);
@@ -31,20 +47,4 @@ public class VertxJVMEventChannel extends VertxChannel implements JVMEventChanne
 
     @Override
     public void close() {}
-
-    @Override
-    public void registerListener(JVMEventChannelListener listener) {
-        final JVMEventVerticle processor = new JVMEventVerticle(vertx(), listener.channel().getName(), listener);
-        CountDownLatch cdl = new CountDownLatch(1);
-        vertx().deployVerticle(processor, state -> {
-            processor.setID((state.succeeded()) ? state.result() : "");
-            cdl.countDown();
-        });
-
-        try {
-            cdl.await();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
 }

@@ -17,13 +17,13 @@ public class VertxDataSourceChannel extends VertxChannel implements DataSourceCh
     @Override
     public void registerListener(DataSourceParser listener) {
         final DataSourceVerticle processor = new DataSourceVerticle(vertx(), listener.channel().getName(), listener);
-        CountDownLatch cdl = new CountDownLatch(1);
+        CountDownLatch latch = new CountDownLatch(1);
         vertx().deployVerticle(processor, state -> {
             processor.setID((state.succeeded()) ? state.result() : "");
-            cdl.countDown();
+            latch.countDown();
         });
         try {
-            cdl.await();
+            latch.await();
         } catch (InterruptedException e) {
             Thread.interrupted();
         }

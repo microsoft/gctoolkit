@@ -25,6 +25,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.CancellationException;
+import java.util.concurrent.Phaser;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -161,9 +162,9 @@ public abstract class AbstractJavaVirtualMachine implements JavaVirtualMachine {
 
     @Override
     public void analyze(List<Aggregation> registeredAggregations, JVMEventChannel eventBus, DataSourceChannel dataSourceBus) {
+        Phaser finishLine = new Phaser();
         try {
             Set<EventSource> generatedEvents = diary.generatesEvents();
-            List<Aggregator<? extends Aggregation>> aggregatorsToComplete = new ArrayList<>();
             for (Aggregation aggregation : registeredAggregations) {
                 Constructor<? extends Aggregator<?>> constructor = constructor(aggregation);
                 if ( constructor == null) continue;
@@ -171,21 +172,14 @@ public abstract class AbstractJavaVirtualMachine implements JavaVirtualMachine {
                 aggregatedData.put(aggregation.getClass(), aggregation);
                 Optional<EventSource> source = generatedEvents.stream().filter(aggregator::aggregates).findFirst();
                 if (source.isPresent()) {
-                    aggregatorsToComplete.add(aggregator);
+                    finishLine.register();
+                    aggregator.onCompletion(finishLine::arriveAndDeregister);
                     JVMEventChannelAggregator eventChannelAggregator = new JVMEventChannelAggregator(source.get().toChannel(), aggregator);
                     eventBus.registerListener(eventChannelAggregator);
                 }
             }
-            CountDownLatch latch = new CountDownLatch(aggregatorsToComplete.size());
-            for (Aggregator<? extends Aggregation> aggregator : aggregatorsToComplete) {
-                aggregator.onCompletion(latch::countDown);
-            }
             dataSource.stream().forEach(message -> dataSourceBus.publish(Channels.DATA_SOURCE, message));
-            try {
-                latch.await();
-            } catch (InterruptedException e) {
-                throw new CancellationException("interrupted");
-            }
+            finishLine.awaitAdvance(0);
             dataSourceBus.close();
             eventBus.close();
 
