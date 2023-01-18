@@ -22,7 +22,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class CMSTenuredParserTest extends ParserTest {
+public class PreUnifiedCMSTenuredParserTest extends ParserTest {
     
     protected Diarizer diarizer() {
         return new PreUnifiedDiarizer();

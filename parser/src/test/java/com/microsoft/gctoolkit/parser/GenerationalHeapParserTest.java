@@ -9,6 +9,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class GenerationalHeapParserTest {
 
+    //todo: reactivate this code.
 
     @Test
     public void canParseLFSFullGC() {

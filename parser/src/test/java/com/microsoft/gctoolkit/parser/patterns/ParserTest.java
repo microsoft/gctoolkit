@@ -88,6 +88,9 @@ public abstract class ParserTest {
             events.add(message);
         }
 
+        /**
+         * Unfortunately needs to be implemented but doesn't need to do anything
+         */
         @Override
         public void close() {
 

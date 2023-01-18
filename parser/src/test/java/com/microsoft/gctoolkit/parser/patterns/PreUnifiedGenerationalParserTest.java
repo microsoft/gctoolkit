@@ -25,7 +25,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
-public class GenerationalParserTest extends ParserTest {
+public class PreUnifiedGenerationalParserTest extends ParserTest {
 
     private static final String END_OF_DATA_SENTINEL = GCLogFile.END_OF_DATA_SENTINEL;
 

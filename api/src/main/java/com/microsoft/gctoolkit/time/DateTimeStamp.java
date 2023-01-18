@@ -3,6 +3,7 @@
 package com.microsoft.gctoolkit.time;
 
 import java.time.ZonedDateTime;
+import java.time.chrono.ChronoZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
 import java.util.Comparator;
@@ -11,8 +12,7 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static java.util.Comparator.comparingDouble;
-import static java.util.Comparator.nullsLast;
+import static java.util.Comparator.*;
 
 
 /**
@@ -365,13 +365,10 @@ public class DateTimeStamp implements Comparable<DateTimeStamp> {
     }
 
     private static Comparator<DateTimeStamp> compareDateTimeStamp(DateTimeStamp o1, DateTimeStamp o2) {
-        if ( (o1.hasTimeStamp() && o2.hasTimeStamp()) || (o1.hasDateStamp() && o2.hasDateStamp()))
-        return comparingDouble(DateTimeStamp::getTimeStamp)
-                .thenComparing(DateTimeStamp::getDateTime,
-                        (dtsA, dtsB) -> {
-                            if (dtsA == null || dtsB == null) return 0;
-                            else return dtsA.compareTo(dtsB);
-                        });
+        if (o1.hasTimeStamp() && o2.hasTimeStamp())
+            return comparingDouble(DateTimeStamp::getTimeStamp);
+        else if (o1.hasDateStamp() && o2.hasDateStamp())
+            return comparing(DateTimeStamp::getDateTime, ChronoZonedDateTime::compareTo);
         else
             throw new IllegalStateException("DateTimeStamp parameters cannot be compared as either timestamp or datestamp must be set.");
     }

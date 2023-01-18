@@ -32,7 +32,8 @@ public class VertxJVMEventChannel extends VertxChannel implements JVMEventChanne
         try {
             latch.await();
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            Thread.interrupted();
+            LOGGER.log(Level.SEVERE, "Vert.x: Latch.await interrupted: " + e.getLocalizedMessage(), e);
         }
     }
 
