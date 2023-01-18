@@ -41,7 +41,7 @@ import static com.microsoft.gctoolkit.event.GarbageCollectionTypes.fromLabel;
  * - type of GC triggered
  * - from, to, configured
  * - pause time if it is reported or can be calculated
- * todo: method post should be some variant of publish... refactor
+ * todo: me
  */
 public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GCPatterns {
 
