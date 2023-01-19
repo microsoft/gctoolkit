@@ -17,31 +17,27 @@ import com.microsoft.gctoolkit.event.generational.PSFullGC;
 import com.microsoft.gctoolkit.event.generational.PSYoungGen;
 import com.microsoft.gctoolkit.event.generational.ParNew;
 import com.microsoft.gctoolkit.event.jvm.JVMEvent;
-import com.microsoft.gctoolkit.jvm.Diary;
+import com.microsoft.gctoolkit.jvm.Diarizer;
+import com.microsoft.gctoolkit.parser.GCLogParser;
 import com.microsoft.gctoolkit.parser.UnifiedGenerationalParser;
 import com.microsoft.gctoolkit.parser.jvm.UnifiedDiarizer;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 
 public class UnifiedGenerationalEventsTest extends ParserTest {
 
-    private ArrayList<JVMEvent> jvmEvents;
-
-    private Diary getDiary(String[] input) {
-        UnifiedDiarizer configuration = new UnifiedDiarizer();
-        Arrays.stream(input).forEach(configuration::diarize);
-        return configuration.getDiary();
+    @Override
+    protected Diarizer diarizer() {
+        return new UnifiedDiarizer();
     }
 
-    @BeforeEach
-    public void setUp() {
-        jvmEvents = new ArrayList<>();
+    @Override
+    protected GCLogParser parser() {
+        return new UnifiedGenerationalParser();
     }
 
     @Test
@@ -59,7 +55,7 @@ public class UnifiedGenerationalEventsTest extends ParserTest {
                 "[10.026s][info ][gc           ] GC(0) Pause Young (Allocation Failure) 16M->4M(61M) 5.423ms",
                 "[10.026s][info ][gc,cpu       ] GC(0) User=0.02s Sys=0.01s Real=0.00s",
         };
-        feedParser(new UnifiedGenerationalParser(getDiary(lines), event -> jvmEvents.add(event)), lines);
+        List<JVMEvent> jvmEvents = feedParser(lines);
         try {
             assertEquals(1, jvmEvents.size(), "Should be 1 event... ");
             PSYoungGen youngGen = (PSYoungGen) jvmEvents.get(0);
@@ -118,7 +114,7 @@ public class UnifiedGenerationalEventsTest extends ParserTest {
                 "[10.130s][info ][gc             ] GC(25) Pause Full (Ergonomics) 55M->7M(42M) 14.092ms",
                 "[10.130s][info ][gc,cpu         ] GC(25) User=0.04s Sys=0.00s Real=0.02s"
         };
-        feedParser(new UnifiedGenerationalParser(getDiary(lines), event -> jvmEvents.add(event)), lines);
+        List<JVMEvent> jvmEvents = feedParser(lines);
         try {
             assertEquals(1, jvmEvents.size(), "Should be 1 event... ");
             PSFullGC full = (PSFullGC) jvmEvents.get(0);
@@ -146,7 +142,7 @@ public class UnifiedGenerationalEventsTest extends ParserTest {
                 "[31.193s][info ][gc,cpu       ] GC(17) User=0.01s Sys=0.00s Real=0.00s"
         };
 
-        feedParser(new UnifiedGenerationalParser(getDiary(lines), event -> jvmEvents.add(event)), lines);
+        List<JVMEvent> jvmEvents = feedParser(lines);
         try {
             assertEquals(1, jvmEvents.size());
             ParNew collection = (ParNew) jvmEvents.get(0);
@@ -210,7 +206,7 @@ public class UnifiedGenerationalEventsTest extends ParserTest {
                 "[31.276s][info ][gc           ] GC(29) Concurrent Reset 2.716ms",
                 "[31.276s][info ][gc,cpu       ] GC(29) User=0.01s Sys=0.00s Real=0.00s"
         };
-        feedParser(new UnifiedGenerationalParser(getDiary(lines), event -> jvmEvents.add(event)), lines);
+        List<JVMEvent> jvmEvents = feedParser(lines);
         try {
             assertEquals(7, jvmEvents.size());
             InitialMark initialMark = (InitialMark) jvmEvents.get(0);
@@ -252,7 +248,7 @@ public class UnifiedGenerationalEventsTest extends ParserTest {
                 "[11.910s][info ][gc           ] GC(0) Pause Young (Allocation Failure) 16M->3M(61M) 10.585ms",
                 "[11.910s][info ][gc,cpu       ] GC(0) User=0.01s Sys=0.00s Real=0.01s"
         };
-        feedParser(new UnifiedGenerationalParser(getDiary(lines), event -> jvmEvents.add(event)), lines);
+        List<JVMEvent> jvmEvents = feedParser(lines);
         try {
             assertEquals(1, jvmEvents.size());
             DefNew collection = (DefNew) jvmEvents.get(0);
@@ -308,7 +304,7 @@ public class UnifiedGenerationalEventsTest extends ParserTest {
                 "[12.199s][info ][gc             ] GC(112) Pause Young (Allocation Failure) 61M->6M(61M) 10.878ms",
                 "[12.199s][info ][gc,cpu         ] GC(112) User=0.02s Sys=0.00s Real=0.01s"
         };
-        feedParser(new UnifiedGenerationalParser(getDiary(lines), event -> jvmEvents.add(event)), lines);
+        List<JVMEvent> jvmEvents = feedParser(lines);
         try {
             assertEquals(1, jvmEvents.size());
             FullGC collection = (FullGC) jvmEvents.get(0);
@@ -331,7 +327,7 @@ public class UnifiedGenerationalEventsTest extends ParserTest {
                 "[0.694s][info][gc           ] GC(2) Pause Young (Allocation Failure) 116M->115M(171M) 131.613ms",
                 "[0.694s][info][gc,cpu       ] GC(2) User=0.33s Sys=0.02s Real=0.13s"
         };
-        feedParser(new UnifiedGenerationalParser(getDiary(lines), event -> jvmEvents.add(event)), lines);
+        List<JVMEvent> jvmEvents = feedParser(lines);
         try {
             assertEquals(1, jvmEvents.size());
             PSYoungGen collection = (PSYoungGen) jvmEvents.get(0);
@@ -361,6 +357,4 @@ public class UnifiedGenerationalEventsTest extends ParserTest {
             fail(cce.getMessage());
         }
     }
-
-
 }

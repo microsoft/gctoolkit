@@ -5,25 +5,33 @@ package com.microsoft.gctoolkit.jvm;
 
 import com.microsoft.gctoolkit.GCToolKit;
 import com.microsoft.gctoolkit.aggregator.Aggregation;
-import com.microsoft.gctoolkit.io.GCLogFile;
+import com.microsoft.gctoolkit.io.DataSource;
+import com.microsoft.gctoolkit.message.DataSourceChannel;
+import com.microsoft.gctoolkit.message.JVMEventChannel;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
 
+import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 /**
  * JavaVirtualMachine is a representation of the JVM state obtained by analyzing a GC log file.
- * An instance of JavaVirtualMachine is created by calling {@link GCToolKit#analyze(GCLogFile)}
+ * An instance of JavaVirtualMachine is created by calling {@link GCToolKit#analyze(DataSource<?>)}
  */
 public interface JavaVirtualMachine {
 
     /**
-     * @param logFile the log to be considered.
+     * @param dataSource the log to be considered.
      * Return {@code true} if the JavaVirtualMachine implementation can work with the GC log.
      * @return {@code true} if the JavaVirtualMachine implementation can work with the GC Log.
      */
 
-    boolean accepts(GCLogFile logFile);
+    boolean accepts(DataSource dataSource);
+
+    /**
+     *
+     */
+
+    boolean isUnifiedLogging();
 
     /**
      * Return {@code true} if the JVM was using G1GC.
@@ -107,4 +115,5 @@ public interface JavaVirtualMachine {
      */
     <T extends Aggregation> Optional<T> getAggregation(Class<T> aggregationClass);
 
+    void analyze(List<Aggregation> registeredAggregations, JVMEventChannel eventBus, DataSourceChannel dataSourceBus);
 }

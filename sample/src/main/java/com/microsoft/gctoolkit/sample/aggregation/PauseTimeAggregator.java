@@ -1,27 +1,23 @@
 package com.microsoft.gctoolkit.sample.aggregation;
 
 import com.microsoft.gctoolkit.aggregator.Aggregates;
+import com.microsoft.gctoolkit.aggregator.Aggregator;
 import com.microsoft.gctoolkit.aggregator.EventSource;
-import com.microsoft.gctoolkit.event.g1gc.G1RealPause;
-import com.microsoft.gctoolkit.event.generational.GenerationalGCPauseEvent;
+import com.microsoft.gctoolkit.event.g1gc.G1GCConcurrentEvent;
+import com.microsoft.gctoolkit.event.g1gc.G1GCPauseEvent;
 
 /**
  * An Aggregator that extracts pause time.
  */
-@Aggregates({EventSource.G1GC, EventSource.GENERATIONAL})
-public class PauseTimeAggregator extends RuntimeAggregator<PauseTimeAggregation> {
+@Aggregates({EventSource.G1GC})
+public class PauseTimeAggregator extends Aggregator<PauseTimeAggregation> {
 
     public PauseTimeAggregator(PauseTimeAggregation aggregation) {
         super(aggregation);
-        register(G1RealPause.class, this::process);
-        register(GenerationalGCPauseEvent.class, this::record);
+        register(G1GCPauseEvent.class, this::process);
     }
 
-    private void record(GenerationalGCPauseEvent event) {
-        aggregation().recordPauseDuration(event.getDuration());
-    }
-
-    private void process(G1RealPause event) {
+    private void process(G1GCPauseEvent event) {
         aggregation().recordPauseDuration(event.getDuration());
     }
 }

@@ -14,6 +14,7 @@ import com.microsoft.gctoolkit.event.generational.ConcurrentReset;
 import com.microsoft.gctoolkit.event.generational.ConcurrentSweep;
 import com.microsoft.gctoolkit.event.generational.DefNew;
 import com.microsoft.gctoolkit.event.generational.FullGC;
+import com.microsoft.gctoolkit.event.generational.GenerationalGCEvent;
 import com.microsoft.gctoolkit.event.generational.GenerationalGCPauseEvent;
 import com.microsoft.gctoolkit.event.generational.InitialMark;
 import com.microsoft.gctoolkit.event.generational.PSFullGC;
@@ -22,6 +23,8 @@ import com.microsoft.gctoolkit.event.generational.ParNew;
 import com.microsoft.gctoolkit.event.generational.YoungGC;
 import com.microsoft.gctoolkit.event.jvm.JVMTermination;
 import com.microsoft.gctoolkit.jvm.Diary;
+import com.microsoft.gctoolkit.message.ChannelName;
+import com.microsoft.gctoolkit.message.JVMEventChannel;
 import com.microsoft.gctoolkit.parser.collection.RuleSet;
 import com.microsoft.gctoolkit.parser.jvm.Decorators;
 import com.microsoft.gctoolkit.parser.unified.UnifiedGenerationalPatterns;
@@ -94,8 +97,7 @@ public class UnifiedGenerationalParser extends UnifiedGCLogParser implements Uni
             "Reset", Concurrent_Reset
     );
 
-    public UnifiedGenerationalParser(Diary diary, JVMEventConsumer consumer) {
-        super(diary, consumer);
+    public UnifiedGenerationalParser() {
     }
 
     public String getName() {
@@ -111,17 +113,14 @@ public class UnifiedGenerationalParser extends UnifiedGCLogParser implements Uni
                 .map(rule -> new AbstractMap.SimpleEntry<>(rule, rule.parse(line)))
                 .filter(tuple -> tuple.getValue() != null)
                 .findFirst();
-        if (!ruleToApply.isPresent()) {
-            log(line);
-            return;
-        }
-
         try {
-            parseRules.get(ruleToApply.get().getKey()).accept(ruleToApply.get().getValue(), line);
+            if (ruleToApply.isPresent())
+                parseRules.get(ruleToApply.get().getKey()).accept(ruleToApply.get().getValue(), line);
+            else
+                LOGGER.log(Level.FINE, "Missed: {0}", line);
         } catch (Throwable t) {
             LOGGER.throwing(this.getName(), "process", t);
         }
-        log(line);
     }
 
     /*************
@@ -132,10 +131,6 @@ public class UnifiedGenerationalParser extends UnifiedGCLogParser implements Uni
     private GenerationalForwardReference concurrentCyclePauseEvent = null;
     private GenerationalForwardReference concurrentEvent = null;
     private boolean inConcurrentPhase = false;
-
-//    private boolean isCMS;
-//    private boolean isParallel;
-//    private boolean isSerial;
 
     private void tag(GCLogTrace trace, String line) {
         noop();
@@ -327,7 +322,7 @@ public class UnifiedGenerationalParser extends UnifiedGCLogParser implements Uni
     }
 
     private void jvmExit(GCLogTrace trace, String line) {
-        consumer.record(new JVMTermination(getClock(),diary.getTimeOfFirstEvent()));
+        super.publish(ChannelName.GENERATIONAL_HEAP_PARSER_OUTBOX,  new JVMTermination(getClock(),diary.getTimeOfFirstEvent()));
     }
 
     /**
@@ -356,19 +351,19 @@ public class UnifiedGenerationalParser extends UnifiedGCLogParser implements Uni
                 if (inConcurrentPhase) {
                     cache.add(buildPauseEvent((pauseEvent)));
                 } else {
-                    consumer.record(buildPauseEvent(pauseEvent));
+                    publish(buildPauseEvent(pauseEvent));
                 }
                 pauseEvent = null;
             } else if (concurrentCyclePauseEvent != null && concurrentCyclePauseEvent.getGcID() == gcid) {
                 concurrentCyclePauseEvent.add(cpuSummary);
-                consumer.record(buildPauseEvent(concurrentCyclePauseEvent));
+                publish(buildPauseEvent(concurrentCyclePauseEvent));
                 concurrentCyclePauseEvent = null;
             } else if ((concurrentEvent != null) && (concurrentEvent.getGcID() == gcid)) {
                 concurrentEvent.add(cpuSummary);
-                consumer.record(buildConcurrentPhase(concurrentEvent));
+                publish(buildConcurrentPhase(concurrentEvent));
                 concurrentEvent = null;
                 inConcurrentPhase = false;
-                cache.forEach(consumer::record);
+                cache.forEach(this::publish);
                 cache.clear();
             }
         }
@@ -538,12 +533,17 @@ public class UnifiedGenerationalParser extends UnifiedGCLogParser implements Uni
         return line.contains("Desired") || line.contains("Age table") || line.contains("- age ");
     }
 
+    @Override
+    public boolean accepts(Diary diary) {
+        return (diary.isGenerational() || diary.isCMS() ) && diary.isUnifiedLogging();
+    }
 
-    private void log(String line) {
-        if (debugging)
-            LOGGER.fine("Missed: " + line);
+    @Override
+    public void publishTo(JVMEventChannel bus) {
+        super.publishTo(bus);
+    }
 
-        LOGGER.log(Level.FINE, "Missed: {0}", line);
-
+    private void publish(GenerationalGCEvent event) {
+        super.publish(ChannelName.GENERATIONAL_HEAP_PARSER_OUTBOX, event);
     }
 }

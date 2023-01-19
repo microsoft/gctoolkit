@@ -38,7 +38,6 @@ public abstract class JVMEvent {
         return duration;
     }
 
-
     @Override
     public String toString() {
         StringBuilder string = new StringBuilder(getClass().getSimpleName()).append("@");

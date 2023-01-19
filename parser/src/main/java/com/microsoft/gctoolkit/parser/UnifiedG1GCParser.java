@@ -11,8 +11,11 @@ import com.microsoft.gctoolkit.event.g1gc.G1ConcurrentUndoCycle;
 import com.microsoft.gctoolkit.event.g1gc.G1GCConcurrentEvent;
 import com.microsoft.gctoolkit.event.g1gc.G1GCEvent;
 import com.microsoft.gctoolkit.event.g1gc.G1GCPauseEvent;
+import com.microsoft.gctoolkit.event.jvm.JVMEvent;
 import com.microsoft.gctoolkit.event.jvm.JVMTermination;
 import com.microsoft.gctoolkit.jvm.Diary;
+import com.microsoft.gctoolkit.message.ChannelName;
+import com.microsoft.gctoolkit.message.JVMEventChannel;
 import com.microsoft.gctoolkit.parser.collection.RuleSet;
 import com.microsoft.gctoolkit.parser.jvm.Decorators;
 import com.microsoft.gctoolkit.parser.unified.UnifiedG1GCPatterns;
@@ -38,6 +41,7 @@ import static com.microsoft.gctoolkit.event.GarbageCollectionTypes.fromLabel;
  * - type of GC triggered
  * - from, to, configured
  * - pause time if it is reported or can be calculated
+ * todo: me
  */
 public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GCPatterns {
 
@@ -150,8 +154,7 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
         parseRules.put(RESIZE_TLAB, this::noop);
     }
 
-    public UnifiedG1GCParser(Diary diary, JVMEventConsumer consumer) {
-        super(diary, consumer);
+    public UnifiedG1GCParser() {
     }
 
     public String getName() {
@@ -210,10 +213,7 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
         CPUSummary cpuSummary = new CPUSummary(trace.getDoubleGroup(1), trace.getDoubleGroup(2), trace.getDoubleGroup(3));
         forwardReference.setCPUSummary(cpuSummary);
         try {
-            if (!forwardReference.isConcurrentCycle())
-                record(forwardReference.buildEvent());
-            else
-                recordPausePhaseInConcurrentCycle(forwardReference.buildEvent());
+            publishPauseEvent(forwardReference.buildEvent());
         } catch (MalformedEvent malformedEvent) {
             LOGGER.warning(malformedEvent.getMessage());
         }
@@ -222,8 +222,7 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
     // todo: need to drain the queues before terminating...
     // Just in case there isn't a JVM termination event in the log.
     public void endOfFile(GCLogTrace trace, String line) {
-        consumer.record(new JVMTermination((jvmTerminationEventTime.getTimeStamp() < 0.0d)
-                ? getClock() : jvmTerminationEventTime,diary.getTimeOfFirstEvent()));
+        publish(new JVMTermination((jvmTerminationEventTime.getTimeStamp() < 0.0d) ? getClock() : jvmTerminationEventTime,diary.getTimeOfFirstEvent()));
     }
 
 
@@ -414,15 +413,15 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
     }
 
     private void preEvacuateCSetPhaseDuration(GCLogTrace trace, String line) {
-        forwardReference.recordPreEvacuateCSetPhaseDuration(trace.getGroup(1), trace.getDurationInSeconds());
+        forwardReference.postPreEvacuateCSetPhaseDuration(trace.getGroup(1), trace.getDurationInSeconds());
     }
 
     public void evacuateCSetPhase(GCLogTrace trace, String line) {
-        forwardReference.recordEvacuateCSetPhaseDuration(trace.getGroup(1), trace.getUnifiedStatisticalSummary());
+        forwardReference.postEvacuateCSetPhaseDuration(trace.getGroup(1), trace.getUnifiedStatisticalSummary());
     }
 
     public void postEvacuatePhaseDuration(GCLogTrace trace, String line) {
-        forwardReference.recordPostEvacuateCSetPhaseDuration(trace.getGroup(1), trace.getDurationInSeconds());
+        forwardReference.postPostEvacuateCSetPhaseDuration(trace.getGroup(1), trace.getDurationInSeconds());
     }
 
     public void toSpaceExhausted(GCLogTrace trace, String line) {
@@ -545,8 +544,7 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
     //todo: need support for JDK 17 undo concurrent cycle event.. started here, commented out for a future PR.
     private void concurrentUndoCycleEnd(GCLogTrace trace, String line) {
         forwardReference.setDuration(trace.getDurationInSeconds());
-        recordUndoCycle((G1ConcurrentUndoCycle) forwardReference.buildConcurrentUndoCycleEvent());
-        //record(forwardReference.buildConcurrentUndoCycleEvent());
+        publishUndoCycle((G1ConcurrentUndoCycle) forwardReference.buildConcurrentUndoCycleEvent());
         removeForwardReference(forwardReference);
     }
 
@@ -558,12 +556,12 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
 
     private void concurrentMarkEnd(GCLogTrace trace, String line) {
         forwardReference.setDuration(trace.getDurationInSeconds());
-        record(forwardReference.buildConcurrentPhaseEvent());
+        publishConcurrentEvent(forwardReference.buildConcurrentPhaseEvent());
     }
 
     private void concurrentPhaseDuration(GCLogTrace trace, String line) {
         forwardReference.setDuration(trace.getDurationInSeconds());
-        record(forwardReference.buildConcurrentPhaseEvent());
+        publishConcurrentEvent(forwardReference.buildConcurrentPhaseEvent());
     }
 
     /**
@@ -594,7 +592,7 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
 
     private void concurrentMarkAborted(GCLogTrace trace, String line) {
         forwardReference.abortConcurrentMark();
-        record(forwardReference.buildConcurrentPhaseEvent());
+        publishConcurrentEvent(forwardReference.buildConcurrentPhaseEvent());
     }
 
     private void remarkStart(GCLogTrace trace, String line) {
@@ -658,44 +656,30 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
     }
 
     /**
-     * publishes a concurrent phase of a concurrent cycle. After the event has been published, all other events
-     * that occurred during the concurrent event will be published.
+     * records a concurrent phase of a concurrent cycle. After the event has been recorded, all other events
+     * that occurred during the concurrent event will be recorded.
      * The exception is the Concurrent Undo cycle which causes all concurrent phases to be queued until the
      * undo cycle ends.
      * @param event
      */
-    private void record(G1GCConcurrentEvent event) {
+    private void publishConcurrentEvent(G1GCConcurrentEvent event) {
         if ( event == null) return;
 
         if ( forwardReference.getGcType() != GarbageCollectionTypes.G1GCConcurrentUndoCycle) {
-            consumer.record(event);
+            publish(event);
             concurrentPhaseActive = false;
-            eventQueue.stream().forEach(consumer::record);
+            eventQueue.stream().forEach(this::publish);
             eventQueue.clear();
         } else {
             eventQueue.add(event);
         }
     }
 
-    private void recordUndoCycle(G1ConcurrentUndoCycle cycle) {
+    private void publishUndoCycle(G1ConcurrentUndoCycle cycle) {
         concurrentPhaseActive = false;
-        consumer.record(cycle);
-        eventQueue.stream().forEach(consumer::record);
+        publish(cycle);
+        eventQueue.stream().forEach(this::publish);
         eventQueue.clear();
-    }
-
-    /**
-     * Remark pause phase is in the middle of a concurrent mark. Since the concurrent mark started first,
-     * the remark pause will be reported when the concurrent mark finishes.
-     * The pause for cleanup will be published as it's occurs outside of a concurrent phase.
-     * @param event
-     */
-    private void recordPausePhaseInConcurrentCycle(G1GCPauseEvent event) {
-        if ( concurrentPhaseActive)
-            eventQueue.add(event);
-        else {
-            consumer.record(event);
-        }
     }
 
     private final Queue<G1GCEvent> eventQueue = new LinkedList<>();
@@ -706,13 +690,13 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
      * published, it corresponding forward reference is released.
      * @param event
      */
-    private void record(G1GCPauseEvent event) {
+    private void publishPauseEvent(G1GCPauseEvent event) {
         if (event == null) return;
         if ( concurrentPhaseActive) {
             eventQueue.add(event);
             removeForwardReference(forwardReference);
         } else {
-            consumer.record(event);
+            publish(event);
             if ( ! forwardReference.isConcurrentCycle())
                 removeForwardReference(forwardReference);
         }
@@ -757,5 +741,19 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
                 LOGGER.fine("Missed: " + line);
             LOGGER.log(Level.FINE, "Missed: {0}", line);
         }
+    }
+
+    @Override
+    public boolean accepts(Diary diary) {
+        return diary.isG1GC() && diary.isUnifiedLogging();
+    }
+
+    @Override
+    public void publishTo(JVMEventChannel bus) {
+        super.publishTo(bus);
+    }
+
+    private void publish(JVMEvent event) {
+        super.publish(ChannelName.G1GC_PARSER_OUTBOX,event);
     }
 }

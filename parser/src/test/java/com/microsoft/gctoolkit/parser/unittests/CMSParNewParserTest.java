@@ -7,13 +7,10 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.logging.Logger;
 
 import static org.junit.jupiter.api.Assertions.fail;
 
 public class CMSParNewParserTest extends ParserTest {
-
-    private static final Logger LOGGER = Logger.getLogger(CMSParNewParserTest.class.getName());
 
     @Test
     public void testForSimpleLogs() {

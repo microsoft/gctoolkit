@@ -8,8 +8,8 @@ import com.microsoft.gctoolkit.time.DateTimeStamp;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-@Collates(HeapOccupancyAfterCollection.class)
-public class HeapOccupancyAfterCollectionSummary implements HeapOccupancyAfterCollectionAggregation {
+@Collates(HeapOccupancyAfterCollectionAggregator.class)
+public class HeapOccupancyAfterCollectionSummary extends HeapOccupancyAfterCollectionAggregation {
 
     private final Map<GarbageCollectionTypes, XYDataSet> aggregations = new ConcurrentHashMap<>();
 

@@ -2,6 +2,8 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.io;
 
+import com.microsoft.gctoolkit.jvm.Diary;
+
 import java.io.IOException;
 import java.util.stream.Stream;
 
@@ -10,6 +12,12 @@ import java.util.stream.Stream;
  * @param <T> The type of data returned in the stream.
  */
 public interface DataSource<T> {
+
+    /**
+     * Return meta data for the data source
+     * @return diary contains log file metadata
+     */
+    Diary diary() throws IOException;
 
     /**
      * Return a stream of the data.

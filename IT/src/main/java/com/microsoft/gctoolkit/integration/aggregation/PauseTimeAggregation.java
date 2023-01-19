@@ -1,5 +1,6 @@
 package com.microsoft.gctoolkit.integration.aggregation;
 
+import com.microsoft.gctoolkit.aggregator.Aggregation;
 import com.microsoft.gctoolkit.aggregator.Collates;
 
 /**
@@ -7,12 +8,11 @@ import com.microsoft.gctoolkit.aggregator.Collates;
  * PauseTimeAggregation gets its data from a PauseTimeAggregator.
  */
 @Collates(PauseTimeAggregator.class)
-public abstract class PauseTimeAggregation extends RuntimeAggregation {
+public abstract class PauseTimeAggregation extends Aggregation {
     /**
      * Record the duration of a pause event. This method is called from PauseTimeAggregator.
      * @param duration The duration (in decimal seconds) of a GC pause.
      */
     public abstract void recordPauseDuration(double duration);
 
-    public abstract void recordRuntime(double runtime);
 }

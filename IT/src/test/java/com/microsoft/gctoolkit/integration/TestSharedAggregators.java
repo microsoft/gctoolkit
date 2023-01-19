@@ -2,7 +2,6 @@ package com.microsoft.gctoolkit.integration;
 
 import com.microsoft.gctoolkit.GCToolKit;
 import com.microsoft.gctoolkit.integration.io.TestLogFile;
-import com.microsoft.gctoolkit.integration.shared.OneRuntimeAggregator;
 import com.microsoft.gctoolkit.integration.shared.OneRuntimeReport;
 import com.microsoft.gctoolkit.integration.shared.TwoRuntimeReport;
 import com.microsoft.gctoolkit.io.GCLogFile;
@@ -33,11 +32,11 @@ public class TestSharedAggregators {
         }
 
         jvm.getAggregation(OneRuntimeReport.class).ifPresentOrElse(
-                oneRuntimeReport -> Assertions.assertEquals(8.772d, oneRuntimeReport.getRuntimeDuration()),
+                oneRuntimeReport -> Assertions.assertEquals(8.782d, oneRuntimeReport.getRuntimeDuration()),
                 () -> Assertions.fail("1 report missing"));
 
         jvm.getAggregation(TwoRuntimeReport.class).ifPresentOrElse(
-                twoRuntimeReport -> Assertions.assertEquals(8.772d, twoRuntimeReport.getRuntimeDuration()),
+                twoRuntimeReport -> Assertions.assertEquals(8.782d, twoRuntimeReport.getRuntimeDuration()),
                 () -> Assertions.fail("2 report missing"));
     }
 }

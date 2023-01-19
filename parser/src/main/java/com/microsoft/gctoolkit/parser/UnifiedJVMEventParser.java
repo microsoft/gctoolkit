@@ -4,8 +4,11 @@ package com.microsoft.gctoolkit.parser;
 
 import com.microsoft.gctoolkit.event.jvm.ApplicationConcurrentTime;
 import com.microsoft.gctoolkit.event.jvm.ApplicationStoppedTime;
+import com.microsoft.gctoolkit.event.jvm.JVMEvent;
 import com.microsoft.gctoolkit.event.jvm.JVMTermination;
 import com.microsoft.gctoolkit.jvm.Diary;
+import com.microsoft.gctoolkit.message.ChannelName;
+import com.microsoft.gctoolkit.message.JVMEventChannel;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
 
 import java.util.logging.Level;
@@ -20,9 +23,7 @@ public class UnifiedJVMEventParser extends UnifiedGCLogParser implements JVMPatt
     private ApplicationStoppedTime.VMOperations safePointReason = null;
     private boolean gcPause = false;
 
-    public UnifiedJVMEventParser(Diary diary, JVMEventConsumer consumer) {
-        super(diary, consumer);
-    }
+    public UnifiedJVMEventParser() {}
 
     public String getName() {
         return "JavaEventParser";
@@ -37,9 +38,9 @@ public class UnifiedJVMEventParser extends UnifiedGCLogParser implements JVMPatt
 
             if ((trace = UNIFIED_LOGGING_APPLICATION_STOP_TIME_WITH_STOPPING_TIME.parse(line)) != null) {
                 if (safePointReason != null)
-                    consumer.record(new ApplicationStoppedTime(timeStamp, trace.getDoubleGroup(1), trace.getDoubleGroup(2), safePointReason));
+                    publish(new ApplicationStoppedTime(timeStamp, trace.getDoubleGroup(1), trace.getDoubleGroup(2), safePointReason));
                 else
-                    consumer.record(new ApplicationStoppedTime(timeStamp, trace.getDoubleGroup(1), trace.getDoubleGroup(2), gcPause));
+                    publish(new ApplicationStoppedTime(timeStamp, trace.getDoubleGroup(1), trace.getDoubleGroup(2), gcPause));
                 safePointReason = null;
                 gcPause = false;
             } else if (GC_PAUSE_CLAUSE.parse(line) != null) {
@@ -51,9 +52,9 @@ public class UnifiedJVMEventParser extends UnifiedGCLogParser implements JVMPatt
             } //noop this one.
 
             else if ((trace = UNIFIED_LOGGING_APPLICATION_TIME.parse(line)) != null) {
-                consumer.record(new ApplicationConcurrentTime(getClock(), trace.getDoubleGroup(1)));
+                publish(new ApplicationConcurrentTime(getClock(), trace.getDoubleGroup(1)));
             } else if (line.equals(END_OF_DATA_SENTINEL) || (JVM_EXIT.parse(line) != null)) {
-                consumer.record(new JVMTermination(getClock(),diary.getTimeOfFirstEvent()));
+                publish(new JVMTermination(getClock(),diary.getTimeOfFirstEvent()));
             } else if (getClock().getTimeStamp() > timeStamp.getTimeStamp()) {
                 if (isGCPause(line)) gcPause = true;
                 timeStamp = getClock();
@@ -69,5 +70,19 @@ public class UnifiedJVMEventParser extends UnifiedGCLogParser implements JVMPatt
                 (line.contains(" Remark ")) ||
                 (line.contains(" Pause Young ")) ||
                 (line.contains(" Full ")));
+    }
+
+    @Override
+    public boolean accepts(Diary diary) {
+        return (diary.isApplicationStoppedTime() || diary.isApplicationRunningTime()) && diary.isUnifiedLogging();
+    }
+
+    @Override
+    public void publishTo(JVMEventChannel bus) {
+        super.publishTo(bus);
+    }
+
+    private void publish(JVMEvent event) {
+        super.publish(ChannelName.JVM_EVENT_PARSER_OUTBOX, event);
     }
 }

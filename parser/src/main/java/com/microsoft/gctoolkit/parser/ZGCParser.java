@@ -11,6 +11,8 @@ import com.microsoft.gctoolkit.event.zgc.ZGCCycle;
 import com.microsoft.gctoolkit.event.zgc.ZGCMemoryPoolSummary;
 import com.microsoft.gctoolkit.event.zgc.ZGCMetaspaceSummary;
 import com.microsoft.gctoolkit.jvm.Diary;
+import com.microsoft.gctoolkit.message.ChannelName;
+import com.microsoft.gctoolkit.message.JVMEventChannel;
 import com.microsoft.gctoolkit.parser.collection.MRUQueue;
 import com.microsoft.gctoolkit.parser.unified.ZGCPatterns;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
@@ -68,9 +70,9 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
         parseRules.put(MEMORY_SUMMARY, this::memorySummary);
         parseRules.put(END_OF_FILE, this::endOfFile);
     }
-    public ZGCParser(Diary diary, JVMEventConsumer consumer) {
-        super(diary, consumer);
-    }
+
+
+    public ZGCParser() {}
 
     @Override
     public String getName() {
@@ -105,7 +107,7 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
     }
 
     public void endOfFile(GCLogTrace trace, String line) {
-        record(new JVMTermination(getClock(), diary.getTimeOfFirstEvent()));
+        publish(new JVMTermination(getClock(), diary.getTimeOfFirstEvent()));
     }
 
     private void cycleStart(GCLogTrace trace, String s) {
@@ -113,7 +115,7 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
     }
 
     private void pausePhase(GCLogTrace trace, String s) {
-        DateTimeStamp startTime = getClock().minus(trace.getDuration() / 1000.00d);
+        DateTimeStamp startTime = getClock().minus(Math.round(trace.getDuration()) / 1000.00d);
         if ("Mark Start".equals(trace.getGroup(1))) {
             forwardReference.setPauseMarkStartDuration(trace.getDuration());
             forwardReference.setPauseMarkStart(startTime);
@@ -128,7 +130,7 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
     }
 
     private void concurrentPhase(GCLogTrace trace, String s) {
-        DateTimeStamp startTime = getClock().minus(trace.getDuration() / 1000.0d);
+        DateTimeStamp startTime = getClock().minus(Math.round(trace.getDuration()) / 1000.0d);
         if ("Mark".equals(trace.getGroup(1))) {
             forwardReference.setConcurrentMarkDuration(trace.getDuration());
             forwardReference.setConcurrentMarkStart(startTime);
@@ -255,7 +257,7 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
                         trace.toKBytes(5)
                 )
         );
-        record();
+        publish();
     }
 
     private void log(String line) {
@@ -269,12 +271,12 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
         LOGGER.log(Level.WARNING, "Missing initial record for: {0}", line);
     }
 
-    public void record() {
-        record(forwardReference.toZGCCycle(getClock()));
+    public void publish() {
+        publish(forwardReference.toZGCCycle(getClock()));
     }
 
-    public void record(JVMEvent event) {
-        consumer.record(event);
+    public void publish(JVMEvent event) {
+        super.publish(ChannelName.ZGC_PARSER_OUTBOX, event);
         forwardReference = null;
     }
 
@@ -473,5 +475,15 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
         public void setMMU(double[] mmu) {
             this.mmu = mmu;
         }
+    }
+
+    @Override
+    public boolean accepts(Diary diary) {
+        return diary.isZGC();
+    }
+
+    @Override
+    public void publishTo(JVMEventChannel bus) {
+        super.publishTo(bus);
     }
 }

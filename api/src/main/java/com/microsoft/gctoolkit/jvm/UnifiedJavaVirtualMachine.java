@@ -1,12 +1,12 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
-package com.microsoft.gctoolkit.vertx.jvm;
+package com.microsoft.gctoolkit.jvm;
 
-import com.microsoft.gctoolkit.aggregator.Aggregation;
+import com.microsoft.gctoolkit.io.DataSource;
 import com.microsoft.gctoolkit.io.GCLogFile;
-import com.microsoft.gctoolkit.jvm.Diary;
 
-import java.util.Set;
+import java.io.IOException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -21,13 +21,20 @@ public class UnifiedJavaVirtualMachine extends AbstractJavaVirtualMachine {
     private static final Logger LOGGER = Logger.getLogger(UnifiedJavaVirtualMachine.class.getName());
 
     @Override
-    public boolean accepts(GCLogFile logFile) {
-        return logFile.isUnified();
+    public boolean accepts(DataSource logFile) {
+        try {
+            if (((GCLogFile) logFile).isUnified()) {
+                super.setDataSource(logFile);
+                return true;
+            }
+        } catch(IOException ioe) {
+            LOGGER.log(Level.WARNING, ioe.getMessage());
+        }
+        return false;
     }
 
     @Override
-    GCToolkitVertxParameters getParameters(Set<Class<? extends Aggregation>> registeredAggregations, Diary diary) {
-        return new GCToolkitVertxParametersForUnifiedLogs(registeredAggregations, diary);
+    public boolean isUnifiedLogging() {
+        return true;
     }
-
 }

@@ -11,29 +11,26 @@ import com.microsoft.gctoolkit.event.generational.ConcurrentReset;
 import com.microsoft.gctoolkit.event.generational.ConcurrentSweep;
 import com.microsoft.gctoolkit.event.generational.InitialMark;
 import com.microsoft.gctoolkit.event.jvm.JVMEvent;
+import com.microsoft.gctoolkit.jvm.Diarizer;
 import com.microsoft.gctoolkit.parser.CMSTenuredPoolParser;
 import com.microsoft.gctoolkit.parser.GCLogParser;
 import com.microsoft.gctoolkit.parser.jvm.PreUnifiedDiarizer;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class CMSTenuredParserTest extends ParserTest {
+public class PreUnifiedCMSTenuredParserTest extends ParserTest {
+    
+    protected Diarizer diarizer() {
+        return new PreUnifiedDiarizer();
+    }
 
-    private CMSTenuredPoolParser parser;
-
-    private ArrayList<JVMEvent> jvmEvents;
-
-    @BeforeEach
-    public void setUp() {
-
-        jvmEvents = new ArrayList<>();
-
-        parser = new CMSTenuredPoolParser(new PreUnifiedDiarizer().getDiary(), event -> jvmEvents.add(event));
+    @Override
+    protected GCLogParser parser() {
+        return new CMSTenuredPoolParser();
     }
 
     @Test
@@ -56,7 +53,7 @@ public class CMSTenuredParserTest extends ParserTest {
                 GCLogParser.END_OF_DATA_SENTINEL
         };
 
-        feedParser(parser, lines);
+        List<JVMEvent> jvmEvents = feedParser(lines);
 
         try {
             InitialMark initialMark = (InitialMark) jvmEvents.get(0);
@@ -87,7 +84,7 @@ public class CMSTenuredParserTest extends ParserTest {
                 GCLogParser.END_OF_DATA_SENTINEL
         };
 
-        feedParser(parser, lines);
+        List<JVMEvent> jvmEvents = feedParser(lines);
 
         try {
             InitialMark initialMark = (InitialMark) jvmEvents.get(0);
@@ -123,7 +120,7 @@ public class CMSTenuredParserTest extends ParserTest {
                 GCLogParser.END_OF_DATA_SENTINEL
         };
 
-        feedParser(parser, lines);
+        List<JVMEvent> jvmEvents = feedParser(lines);
 
         try {
             InitialMark initialMark = (InitialMark) jvmEvents.get(0);
@@ -165,7 +162,7 @@ public class CMSTenuredParserTest extends ParserTest {
                 "2020-03-27T17:40:46.829+0000: 62609.842: [CMS-concurrent-abortable-preclean: 2.855/3.180 secs] [Times: user=25.14 sys=1.51, real=3.18 secs] "
         };
         
-        feedParser(parser, lines);
+        List<JVMEvent> jvmEvents = feedParser(lines);
 
         try {
             ConcurrentMark concurrentMark = (ConcurrentMark) jvmEvents.get(0);

@@ -12,17 +12,17 @@ import java.util.function.Consumer;
  * This is a utility class that supports the {@link Aggregator#register(Class, Consumer)} method.
  */
 public class JVMEventDispatcher {
-    private final Map<Class<? extends JVMEvent>, Consumer<JVMEvent>> eventConsumers = new ConcurrentHashMap<>();
 
-    private final Consumer<JVMEvent> nopConsumer = (evt) -> {
-    };
+    private final Map<Class<? extends JVMEvent>, Consumer<? super JVMEvent>> eventConsumers = new ConcurrentHashMap<>();
+
+    private final Consumer<? super JVMEvent> nopConsumer = (evt) -> {};
 
     @SuppressWarnings("unchecked")
-    private <R extends JVMEvent> Consumer<JVMEvent> getConsumerForClass(Class<R> eventClass) {
+    private <R extends JVMEvent> Consumer<? super JVMEvent> getConsumerForClass(Class<R> eventClass) {
         Class<? extends JVMEvent> clazz = eventClass;
 
         //Fast path that should hit after the event has been seen for the first time
-        Consumer<JVMEvent> eventConsumer = eventConsumers.get(clazz);
+        Consumer<? super JVMEvent> eventConsumer = eventConsumers.get(clazz);
         if (eventConsumer != null) {
             return eventConsumer;
         }
@@ -64,11 +64,12 @@ public class JVMEventDispatcher {
      */
     @SuppressWarnings("unchecked")
     public <R extends JVMEvent> void register(Class<R> eventClass, Consumer<? super R> process) {
-        eventConsumers.put(eventClass, (Consumer<JVMEvent>)process); // unchecked cast
+        eventConsumers.put(eventClass, (Consumer<JVMEvent>)process);
     }
 
     /**
-     * Called from {@link Aggregator#consume(JVMEvent)}, this invokes the process method that was
+     * todo: fix comment for the link below.
+     * Called from {@link Aggregator# consume(JVMEvent)}, this invokes the process method that was
      * {@link #register(Class, Consumer) registered}.
      * @param event An event from the parser.
      * @param <R> the type of JVMEvent.
@@ -76,4 +77,5 @@ public class JVMEventDispatcher {
     public <R extends JVMEvent> void dispatch(R event) {
         getConsumerForClass(event.getClass()).accept(event);
     }
+
 }

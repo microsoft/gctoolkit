@@ -16,12 +16,12 @@ public class ForwardReference {
     private GCCause gcCause = GCCause.UNKNOWN_GCCAUSE;
     private CPUSummary cpuSummary = null;
 
-    public ForwardReference(Decorators decorators, int id) {
+    ForwardReference(Decorators decorators, int id) {
         this.gcID = id;
         this.decorators = decorators;
     }
 
-    public int getGcID() {
+    int getGcID() {
         return gcID;
     }
 

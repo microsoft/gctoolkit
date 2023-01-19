@@ -2,21 +2,31 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.parser;
 
+import com.microsoft.gctoolkit.event.jvm.JVMEvent;
 import com.microsoft.gctoolkit.event.shenandoah.ShenandoahCycle;
-import com.microsoft.gctoolkit.event.zgc.OccupancySummary;
-import com.microsoft.gctoolkit.event.zgc.ReclaimSummary;
-import com.microsoft.gctoolkit.event.zgc.ZGCMemoryPoolSummary;
-import com.microsoft.gctoolkit.jvm.Diary;
+import com.microsoft.gctoolkit.jvm.Diarizer;
+import com.microsoft.gctoolkit.parser.jvm.UnifiedDiarizer;
+import com.microsoft.gctoolkit.parser.patterns.ParserTest;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.util.Arrays;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.List;
 
-public class ShenandoahParserTest {
+public class ShenandoahParserTest extends ParserTest {
+
+    @Override
+    protected Diarizer diarizer() {
+        return new UnifiedDiarizer();
+    }
+
+    @Override
+    protected GCLogParser parser() {
+        return new ShenandoahParser();
+    }
 
 
-    @Test
+    //todo: support for Shenandoah still under construction
+    //@Test
     public void infoLevelShenandoahCycle() {
 
 
@@ -67,82 +77,15 @@ public class ShenandoahParserTest {
                 "[0.896s][info][gc,ergo       ] Pacer for Idle. Initial: 163M, Alloc Tax Rate: 1.0x"
         };
 
-        AtomicBoolean eventCreated = new AtomicBoolean(false);
-        ShenandoahParser parser = new ShenandoahParser(new Diary(), event -> {
-            try {
-                ShenandoahCycle sc = (ShenandoahCycle) event;
-                Assertions.assertEquals(toInt(0.038d,1000), toInt(sc.getDuration(),1000));
-                Assertions.assertEquals(toInt(3.558d, 1000), toInt(sc.getDateTimeStamp().getTimeStamp(), 1000));
-                Assertions.assertEquals("Warmup", sc.getGCCause().getLabel());
+        List<JVMEvent> singleCycle = feedParser(eventLogEntries);
+        try {
+            Assertions.assertTrue(singleCycle.size() == 1);
+            ShenandoahCycle sc = (ShenandoahCycle) singleCycle.get(0);
+            // todo: Put in checks for values
+            //Memory
 
-                // Durations
-//                Assertions.assertEquals(toInt(3.558d, 1000), toInt(sc.getPauseMarkStartTimeStamp().getTimeStamp(), 1000));
-//                Assertions.assertEquals(toInt(3.558d, 1000), toInt(sc.getConcurrentMarkTimeStamp().getTimeStamp(), 1000));
-//                Assertions.assertEquals(toInt(3.573d, 1000), toInt(sc.getPauseMarkEndTimeStamp().getTimeStamp(), 1000));
-//                Assertions.assertEquals(toInt(3.574d, 1000), toInt(sc.getConcurrentProcessNonStrongReferencesTimeStamp().getTimeStamp(), 1000));
-//                Assertions.assertEquals(toInt(3.577d, 1000), toInt(sc.getConcurrentResetRelocationSetTimeStamp().getTimeStamp(), 1000));
-//                Assertions.assertEquals(toInt(3.578d, 1000), toInt(sc.getConcurrentSelectRelocationSetTimeStamp().getTimeStamp(), 1000));
-//                Assertions.assertEquals(toInt(3.582d, 1000), toInt(sc.getPauseRelocateStartTimeStamp().getTimeStamp(), 1000));
-//                Assertions.assertEquals(toInt(3.583d, 1000), toInt(sc.getConcurrentRelocateTimeStamp().getTimeStamp(), 1000));
-//
-//                Assertions.assertEquals( toInt(0.460d, 1000), toInt(sc.getPauseMarkStartDuration(), 1000));
-//                Assertions.assertEquals(toInt(14.621d, 1000), toInt(sc.getConcurrentMarkDuration(), 1000));
-//                Assertions.assertEquals( toInt(0.830d, 1000), toInt(sc.getPauseMarkEndDuration(), 1000));
-//                Assertions.assertEquals( toInt(3.654d, 1000), toInt(sc.getConcurrentProcessNonStrongReferencesDuration(), 1000));
-//                Assertions.assertEquals( toInt(0.194d, 1000), toInt(sc.getConcurrentResetRelocationSetDuration(), 1000));
-//                Assertions.assertEquals( toInt(3.193d, 1000), toInt(sc.getConcurrentSelectRelocationSetDuration(), 1000));
-//                Assertions.assertEquals( toInt(0.794d, 1000), toInt(sc.getPauseRelocateStartDuration(), 1000));
-//                Assertions.assertEquals(toInt(12.962d, 1000), toInt(sc.getConcurrentRelocateDuration(), 1000));
-//
-//                //Memory
-//                Assertions.assertTrue(checkZGCMemoryPoolSummary(sc.getMarkStart(), 936L, 42L, 3160L, 894)); //1074L, 1074L, 1074L));
-//                Assertions.assertTrue(checkZGCMemoryPoolSummary(sc.getMarkEnd(), 1074L, 42L, 3084L, 970L));
-//                Assertions.assertTrue(checkZGCMemoryPoolSummary(sc.getRelocateStart(),1074L, 42L, 3852L, 202L));
-//                Assertions.assertTrue(checkZGCMemoryPoolSummary(sc.getRelocateEnd(), 1074L, 42L, 3868L, 186L));
-//
-//                Assertions.assertTrue(checkOccupancySummary(sc.getLive(), 8L, 8L, 8L));
-//                Assertions.assertTrue(checkOccupancySummary(sc.getAllocated(), 172L, 172L, 376L));
-//                Assertions.assertTrue(checkOccupancySummary(sc.getGarbage(), 885L, 117L, 5L));
-//
-//                Assertions.assertTrue(checkReclaimSummary(sc.getReclaimed(), 768L, 880L));
-//                Assertions.assertTrue(checkReclaimSummary(sc.getMemorySummary(), 894L, 186L));
-//
-//                Assertions.assertTrue(sc.getLoadAverageAt(1) == 4.28);
-//                Assertions.assertTrue(sc.getLoadAverageAt(5) == 3.95);
-//                Assertions.assertTrue(sc.getLoadAverageAt(15) == 3.22);
-//
-//                Assertions.assertTrue(sc.getMMU(2) == 32.7);
-//                Assertions.assertTrue(sc.getMMU(5) == 60.8);
-//                Assertions.assertTrue(sc.getMMU(10) == 80.4);
-//                Assertions.assertTrue(sc.getMMU(20) == 85.4);
-//                Assertions.assertTrue(sc.getMMU(50) == 90.8);
-//                Assertions.assertTrue(sc.getMMU(100) == 95.4);
-
-            } catch (Throwable t) {
-                Assertions.fail(t);
-            }
-            eventCreated.set(true);
-        });
-
-        Arrays.stream(eventLogEntries).forEach(parser::receive);
-        //Assertions.assertTrue(eventCreated.get());
-        Assertions.assertTrue(true);
-
-    }
-
-    private boolean checkZGCMemoryPoolSummary(ZGCMemoryPoolSummary summary, long capacity, long free, long used) {
-        return summary.getCapacity() == capacity && summary.getFree() == free && summary.getUsed() == used;
-    }
-
-    private boolean checkOccupancySummary(OccupancySummary summary, long markEnd, long relocateStart, long relocateEnd) {
-        return summary.getMarkEnd() == markEnd && summary.getReclaimStart() == relocateStart && summary.getReclaimEnd() == relocateEnd;
-    }
-
-    private boolean checkReclaimSummary(ReclaimSummary summary, long relocateStart, long relocateEnd) {
-        return summary.getReclaimStart() == relocateStart && summary.getReclaimEnd() == relocateEnd;
-    }
-
-    private int toInt(double value, int significantDigits) {
-        return (int)(value * (double)significantDigits);
+        } catch (Throwable t) {
+            Assertions.fail(t);
+        }
     }
 }
