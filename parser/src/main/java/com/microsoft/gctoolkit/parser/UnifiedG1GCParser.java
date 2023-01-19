@@ -213,10 +213,7 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
         CPUSummary cpuSummary = new CPUSummary(trace.getDoubleGroup(1), trace.getDoubleGroup(2), trace.getDoubleGroup(3));
         forwardReference.setCPUSummary(cpuSummary);
         try {
-            if (!forwardReference.isConcurrentCycle())
-                post(forwardReference.buildEvent());
-            else
-                post(forwardReference.buildEvent());
+            publishPauseEvent(forwardReference.buildEvent());
         } catch (MalformedEvent malformedEvent) {
             LOGGER.warning(malformedEvent.getMessage());
         }
@@ -547,8 +544,7 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
     //todo: need support for JDK 17 undo concurrent cycle event.. started here, commented out for a future PR.
     private void concurrentUndoCycleEnd(GCLogTrace trace, String line) {
         forwardReference.setDuration(trace.getDurationInSeconds());
-        postUndoCycle((G1ConcurrentUndoCycle) forwardReference.buildConcurrentUndoCycleEvent());
-        //post(forwardReference.buildConcurrentUndoCycleEvent());
+        publishUndoCycle((G1ConcurrentUndoCycle) forwardReference.buildConcurrentUndoCycleEvent());
         removeForwardReference(forwardReference);
     }
 
@@ -560,12 +556,12 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
 
     private void concurrentMarkEnd(GCLogTrace trace, String line) {
         forwardReference.setDuration(trace.getDurationInSeconds());
-        post(forwardReference.buildConcurrentPhaseEvent());
+        publishConcurrentEvent(forwardReference.buildConcurrentPhaseEvent());
     }
 
     private void concurrentPhaseDuration(GCLogTrace trace, String line) {
         forwardReference.setDuration(trace.getDurationInSeconds());
-        post(forwardReference.buildConcurrentPhaseEvent());
+        publishConcurrentEvent(forwardReference.buildConcurrentPhaseEvent());
     }
 
     /**
@@ -596,7 +592,7 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
 
     private void concurrentMarkAborted(GCLogTrace trace, String line) {
         forwardReference.abortConcurrentMark();
-        post(forwardReference.buildConcurrentPhaseEvent());
+        publishConcurrentEvent(forwardReference.buildConcurrentPhaseEvent());
     }
 
     private void remarkStart(GCLogTrace trace, String line) {
@@ -666,7 +662,7 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
      * undo cycle ends.
      * @param event
      */
-    private void post(G1GCConcurrentEvent event) {
+    private void publishConcurrentEvent(G1GCConcurrentEvent event) {
         if ( event == null) return;
 
         if ( forwardReference.getGcType() != GarbageCollectionTypes.G1GCConcurrentUndoCycle) {
@@ -679,25 +675,11 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
         }
     }
 
-    private void postUndoCycle(G1ConcurrentUndoCycle cycle) {
+    private void publishUndoCycle(G1ConcurrentUndoCycle cycle) {
         concurrentPhaseActive = false;
         publish(cycle);
         eventQueue.stream().forEach(this::publish);
         eventQueue.clear();
-    }
-
-    /**
-     * Remark pause phase is in the middle of a concurrent mark. Since the concurrent mark started first,
-     * the remark pause will be reported when the concurrent mark finishes.
-     * The pause for cleanup will be published as it's occurs outside of a concurrent phase.
-     * @param event
-     */
-    private void postPausePhaseInConcurrentCycle(G1GCPauseEvent event) {
-        if ( concurrentPhaseActive)
-            eventQueue.add(event);
-        else {
-            publish(event);
-        }
     }
 
     private final Queue<G1GCEvent> eventQueue = new LinkedList<>();
@@ -708,7 +690,7 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
      * published, it corresponding forward reference is released.
      * @param event
      */
-    private void post(G1GCPauseEvent event) {
+    private void publishPauseEvent(G1GCPauseEvent event) {
         if (event == null) return;
         if ( concurrentPhaseActive) {
             eventQueue.add(event);
