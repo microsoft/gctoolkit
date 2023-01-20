@@ -91,12 +91,21 @@ public abstract class Aggregation {
     private DateTimeStamp timeOfFirstEvent = null;
     private DateTimeStamp timeOfTermination = new DateTimeStamp(0.0d);
 
+    /**
+     * Constructor for the module SPI
+     */
     protected Aggregation() {}
 
+    /**
+     * @param eventTime of first event seen
+     */
     public void timeOfFirstEvent(DateTimeStamp eventTime) {
         this.timeOfFirstEvent = eventTime;
     }
 
+    /**
+     * @return time of first event seen
+     */
     public DateTimeStamp timeOfFirstEvent() {
         return this.timeOfFirstEvent;
     }
@@ -110,6 +119,9 @@ public abstract class Aggregation {
         this.timeOfTermination = eventTime;
     }
 
+    /**
+     * @return the timestamp reported by the JVM termination record if present otherwise the end of the last event.
+     */
     public DateTimeStamp timeOfTerminationEvent() {
         return this.timeOfTermination;
     }
@@ -122,7 +134,7 @@ public abstract class Aggregation {
      * the first event exceeds the variance, then the first event would be considered the beginning of the log file.
      * otherwise, the time of the first event should be the time of the first event - the variance.
      *
-     * @return
+     * @return estimate of the start of the log using the data presented (most likely is 0.000s)
      */
     public DateTimeStamp estimatedStartTime() {
         if (timeOfFirstEvent.getTimeStamp() / timeOfTermination.getTimeStamp() > 0.25d) {
@@ -135,6 +147,9 @@ public abstract class Aggregation {
             return timeOfFirstEvent.minus(timeOfFirstEvent.getTimeStamp());
     }
 
+    /**
+     * @return estimate time span represented by the data presented.
+     */
     public double estimatedRuntime() {
         return timeOfTermination.minus(estimatedStartTime());
     }
@@ -160,6 +175,11 @@ public abstract class Aggregation {
         return collates(getClass());
     }
 
+    /**
+     * Calculates the aggregator for this aggregation.
+     * @param clazz this Aggregation
+     * @return the Aggregator
+     */
     private Class<? extends Aggregator<?>> collates(Class<?> clazz) {
         Class<? extends Aggregator<?>> target;
         if (clazz != null && clazz != Aggregation.class) {

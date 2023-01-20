@@ -18,8 +18,8 @@ public class JVMTermination extends JVMEvent {
      * The start variable is the timeOfFirstEvent on the first event seen in the data source.
      * Not starting from 0.000 secs should not add much noise to any of the subsequent calculations.
      *
-     * @param estimatedTimeOfJVMTermination
-     * @param timeOfFirstEvent
+     * @param estimatedTimeOfJVMTermination time of JVM termination message or end of last event seen
+     * @param timeOfFirstEvent time of first message in the GC log.
      */
     public JVMTermination(DateTimeStamp estimatedTimeOfJVMTermination, DateTimeStamp timeOfFirstEvent) {
         super(estimatedTimeOfJVMTermination, 0.0d);

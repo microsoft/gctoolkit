@@ -4,7 +4,7 @@
 import com.microsoft.gctoolkit.jvm.PreUnifiedJavaVirtualMachine;
 import com.microsoft.gctoolkit.jvm.UnifiedJavaVirtualMachine;
 
-/**
+/*
  * Contains the core API for the Microsoft, Java Garbage Collection Toolkit.
  * The toolkit is a GC log parser and a framework for consuming and extracting data from
  * GC log events.
@@ -24,7 +24,8 @@ import com.microsoft.gctoolkit.jvm.UnifiedJavaVirtualMachine;
  * <dt>{@link com.microsoft.gctoolkit.aggregator.Aggregation}</dt>
  * <dd>An Aggregation works with an Aggregator to collect and analyze data from JVMEvents.</dd>
  * </dl>
- *
+ */
+ /**
  * @uses com.microsoft.gctoolkit.jvm.JavaVirtualMachine
  * @uses com.microsoft.gctoolkit.aggregator.Aggregator
  */
