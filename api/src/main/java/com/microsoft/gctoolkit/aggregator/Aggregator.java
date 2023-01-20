@@ -109,6 +109,10 @@ public abstract class Aggregator<A extends Aggregation> {
         jvmEventDispatcher.register(eventClass, process);
     }
 
+    /**
+     * Call back to be run when the JVMTermination event has been
+     * @param task to be executed
+     */
     public void onCompletion(Runnable task) {
         this.completionTask = task;
     }
@@ -140,10 +144,21 @@ public abstract class Aggregator<A extends Aggregation> {
         }
     }
 
+    /**
+     * Calculates if this Aggregator aggregates the given event source
+     * @param eventSource to be checked.
+     * @return true is the aggregator aggregates the event source
+     */
     public boolean aggregates(EventSource eventSource) {
         return (eventSource != null) && aggregates(getClass(), eventSource);
     }
 
+    /**
+     * Calculates if this Aggregator aggregates the given event source.
+     * @param clazz the aggregator
+     * @param targetEventSource the event source to check
+     * @return true is the aggregator aggregates the event source
+     */
     private boolean aggregates(Class<?> clazz, EventSource targetEventSource) {
         if (clazz != null && clazz != Aggregator.class) {
 

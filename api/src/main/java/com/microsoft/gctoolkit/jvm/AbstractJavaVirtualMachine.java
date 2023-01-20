@@ -42,6 +42,11 @@ public abstract class AbstractJavaVirtualMachine implements JavaVirtualMachine {
     private double logDuration = -1.0d;
     private final Map<Class<? extends Aggregation>, Aggregation> aggregatedData = new ConcurrentHashMap<>();
 
+    /**
+     * Sets the data source
+     * @param logFile is the source of GC logging data
+     * @throws IOException if there is any issues reading from the data source.
+     */
     public void setDataSource(DataSource logFile) throws IOException {
         this.dataSource = (GCLogFile) logFile;
         this.diary = logFile.diary();
@@ -93,7 +98,7 @@ public abstract class AbstractJavaVirtualMachine implements JavaVirtualMachine {
      * Try to estimate the time at which the JVM started. For log fragments, this will be the time
      * of the first event in the log. Otherwise it will be 0.000 seconds.
      *
-     * @return DateTimeStamp
+     * @return DateTimeStamp as estimated start time.
      */
     @Override
     public DateTimeStamp getEstimatedJVMStartTime() {
@@ -107,6 +112,10 @@ public abstract class AbstractJavaVirtualMachine implements JavaVirtualMachine {
         }
     }
 
+    /**
+     * Sets the estimated start time as calculated by the Aggregation class
+     * @param estimatedStartTime as calculated from observations of the event timing in the gc log.
+     */
     public void setEstimatedJVMStartTime(DateTimeStamp estimatedStartTime) {
         this.estimatedStartTime = estimatedStartTime;
     }
@@ -161,9 +170,9 @@ public abstract class AbstractJavaVirtualMachine implements JavaVirtualMachine {
      * 4. Wait until all the aggregators have completed
      * 5. Set the start and end times
      * 6. Return to the caller
-     * @param registeredAggregations
-     * @param eventBus
-     * @param dataSourceBus
+     * @param registeredAggregations all of the aggregations loaded by the module SPI
+     * @param eventBus the bus to publish events on
+     * @param dataSourceBus the bus that raw log lines are published on
      */
     @Override
     public void analyze(List<Aggregation> registeredAggregations, JVMEventChannel eventBus, DataSourceChannel dataSourceBus) {

@@ -141,6 +141,7 @@ public class GCToolKit {
      *                   {@link RotatingGCLogFile}.
      * @return a representation of the state of the Java Virtual Machine resulting
      * from the analysis of the GC log file.
+     * @throws IOException when something goes wrong reading the data source
      */
     public JavaVirtualMachine analyze(DataSource<?> dataSource) throws IOException  {
         /*

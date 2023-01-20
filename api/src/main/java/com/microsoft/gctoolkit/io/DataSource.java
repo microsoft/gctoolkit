@@ -16,6 +16,7 @@ public interface DataSource<T> {
     /**
      * Return meta data for the data source
      * @return diary contains log file metadata
+     * @throws IOException if there is an issue generating the diary
      */
     Diary diary() throws IOException;
 

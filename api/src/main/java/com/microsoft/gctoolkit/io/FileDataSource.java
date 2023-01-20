@@ -41,6 +41,7 @@ public abstract class FileDataSource<T> implements DataSource<T> {
     /**
      * Return meta data about the file.
      * @return Meta data about the file.
+     * @throws IOException when there is an issue generating the diary
      */
     public abstract LogFileMetadata getMetaData() throws IOException;
 
