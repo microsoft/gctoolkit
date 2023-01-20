@@ -69,7 +69,7 @@ public class JVMEventDispatcher {
 
     /**
      * todo: fix comment for the link below.
-     * Called from {@link Aggregator# consume(JVMEvent)}, this invokes the process method that was
+     * Called from {@link Aggregator#receive(JVMEvent)}, this invokes the process method that was
      * {@link #register(Class, Consumer) registered}.
      * @param event An event from the parser.
      * @param <R> the type of JVMEvent.

@@ -15,7 +15,7 @@ import java.util.Optional;
 
 /**
  * JavaVirtualMachine is a representation of the JVM state obtained by analyzing a GC log file.
- * An instance of JavaVirtualMachine is created by calling {@link GCToolKit#analyze(DataSource<?>)}
+ * An instance of JavaVirtualMachine is created by calling {@link GCToolKit#analyze(DataSource)}
  */
 public interface JavaVirtualMachine {
 
@@ -28,7 +28,8 @@ public interface JavaVirtualMachine {
     boolean accepts(DataSource dataSource);
 
     /**
-     *
+     * True if the log is unified or false for preunified
+     * @return true is the log is from JDK 9+
      */
 
     boolean isUnifiedLogging();
@@ -115,5 +116,11 @@ public interface JavaVirtualMachine {
      */
     <T extends Aggregation> Optional<T> getAggregation(Class<T> aggregationClass);
 
-    void analyze(List<Aggregation> registeredAggregations, JVMEventChannel eventBus, DataSourceChannel dataSourceBus);
+    /**
+     * Interface to trigger the analysis of a gc log.
+     * @param registeredAggregations all aggregations supplied by the module SPI
+     * @param eventChannel JVMEvent message channel
+     * @param dataSourceChannel GC logging data channel
+     */
+    void analyze(List<Aggregation> registeredAggregations, JVMEventChannel eventChannel, DataSourceChannel dataSourceChannel);
 }

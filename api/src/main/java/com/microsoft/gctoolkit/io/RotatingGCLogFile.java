@@ -116,6 +116,7 @@ public class RotatingGCLogFile extends GCLogFile {
      * log file segments are included. Therefore, the number of log file segments may be less than
      * the files that match the rotating pattern.
      * @return The log file segments in rotating order.
+     * @throws IOException when there is an IO exception
      */
     public List<LogFileSegment> getOrderedGarbageCollectionLogFiles() throws IOException {
         return getMetaData().logFiles().collect(Collectors.toList());
