@@ -197,8 +197,11 @@ public abstract class AbstractJavaVirtualMachine implements JavaVirtualMachine {
             if ( finishLine.getRegisteredParties() > 0) {
                 dataSource.stream().forEach(message -> dataSourceBus.publish(ChannelName.DATA_SOURCE, message));
                 finishLine.awaitAdvance(0);
-            } else
-                LOGGER.log(Level.INFO, "No Aggregations have been registered");
+            } else {
+                LOGGER.log(Level.INFO, "No Aggregations have been registered, DataSource will not be analysed.");
+                LOGGER.log(Level.INFO, "Is there a module containing Aggregation classes on the module-path");
+                LOGGER.log(Level.INFO,"Is GCToolKit::loadAggregationsFromServiceLoader() or GCToolKit::loadAggregation(Aggregation) being invoked?");
+            }
             dataSourceBus.close();
             eventBus.close();
 
