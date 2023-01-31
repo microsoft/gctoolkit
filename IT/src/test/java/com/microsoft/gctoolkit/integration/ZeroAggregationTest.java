@@ -34,7 +34,7 @@ public class ZeroAggregationTest {
          */
         GCLogFile logFile = new SingleGCLogFile(path);
         GCToolKit gcToolKit = new GCToolKit();
-        /* Do not call GCToolKit::loadAggregationsFromServiceLoader */
+        // Do not call GCToolKit::loadAggregationsFromServiceLoader
         JavaVirtualMachine machine = null;
         try {
             machine = gcToolKit.analyze(logFile);
