@@ -57,7 +57,7 @@ public class ZeroAggregationTest {
          */
         GCLogFile logFile = new SingleGCLogFile(path);
         GCToolKit gcToolKit = new GCToolKit();
-        /* Load our local Aggregation that will not registered for the given log file */
+        // Load our local Aggregation that will not registered for the given log file
         gcToolKit.registerAggregation(new ZeroAggregationTest.TestAggregation());
         JavaVirtualMachine machine = null;
         try {
