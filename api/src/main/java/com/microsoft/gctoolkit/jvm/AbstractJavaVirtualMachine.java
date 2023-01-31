@@ -186,14 +186,19 @@ public abstract class AbstractJavaVirtualMachine implements JavaVirtualMachine {
                 aggregatedData.put(aggregation.getClass(), aggregation);
                 Optional<EventSource> source = generatedEvents.stream().filter(aggregator::aggregates).findFirst();
                 if (source.isPresent()) {
+                    LOGGER.log(Level.FINE, "Registering: " + aggregation.getClass().getName());
                     finishLine.register();
                     aggregator.onCompletion(finishLine::arriveAndDeregister);
                     JVMEventChannelAggregator eventChannelAggregator = new JVMEventChannelAggregator(source.get().toChannel(), aggregator);
                     eventBus.registerListener(eventChannelAggregator);
                 }
             }
-            dataSource.stream().forEach(message -> dataSourceBus.publish(ChannelName.DATA_SOURCE, message));
-            finishLine.awaitAdvance(0);
+
+            if ( finishLine.getRegisteredParties() > 0) {
+                dataSource.stream().forEach(message -> dataSourceBus.publish(ChannelName.DATA_SOURCE, message));
+                finishLine.awaitAdvance(0);
+            } else
+                LOGGER.log(Level.INFO, "No Aggregations have been registered");
             dataSourceBus.close();
             eventBus.close();
 
