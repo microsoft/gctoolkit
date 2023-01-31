@@ -50,11 +50,6 @@ public class ZeroAggregationTest {
     @Test
     public void testSuppliedAggregation() {
         Path path = new TestLogFile("cms/defnew/details/defnew.log").getFile().toPath();
-        /*
-         * GC log files can come in  one of two types: single or series of rolling logs.
-         * In this sample, we load a single log file.
-         * The log files can be either in text, zip, or gzip format.
-         */
         GCLogFile logFile = new SingleGCLogFile(path);
         GCToolKit gcToolKit = new GCToolKit();
         // Load our local Aggregation that will not registered for the given log file
