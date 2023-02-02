@@ -8,7 +8,6 @@ import com.microsoft.gctoolkit.aggregator.Collates;
 import com.microsoft.gctoolkit.aggregator.EventSource;
 import com.microsoft.gctoolkit.integration.aggregation.CollectionCycleCountsSummary;
 import com.microsoft.gctoolkit.integration.aggregation.HeapOccupancyAfterCollectionSummary;
-import com.microsoft.gctoolkit.integration.aggregation.PauseTimeSummary;
 import com.microsoft.gctoolkit.integration.io.TestLogFile;
 import com.microsoft.gctoolkit.io.GCLogFile;
 import com.microsoft.gctoolkit.io.SingleGCLogFile;
@@ -18,7 +17,6 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -57,8 +55,8 @@ public class ZeroAggregationTest {
          */
         GCLogFile logFile = new SingleGCLogFile(path);
         GCToolKit gcToolKit = new GCToolKit();
-        // Load our local Aggregation that will not registered for the given log file
-        gcToolKit.registerAggregation(new ZeroAggregationTest.TestAggregation());
+        /* Load our local Aggregation that will not registered for the given log file */
+        gcToolKit.loadAggregation(new ZeroAggregationTest.TestAggregation());
         JavaVirtualMachine machine = null;
         try {
             machine = gcToolKit.analyze(logFile);
