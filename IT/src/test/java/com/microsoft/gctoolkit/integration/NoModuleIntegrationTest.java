@@ -14,6 +14,7 @@ import com.microsoft.gctoolkit.vertx.VertxDataSourceChannel;
 import com.microsoft.gctoolkit.vertx.VertxJVMEventChannel;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Tag;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -23,6 +24,9 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 public class NoModuleIntegrationTest {
 
+    //Todo: turn on this test once mvn has been configured to run it with all of the supporting bits
+    // on the classpath and not the module-path
+    //@Tag("classPath")
     //@Test
     public void testMain() {
         Path path = new TestLogFile("cms/defnew/details/defnew.log").getFile().toPath();

@@ -11,6 +11,7 @@ import com.microsoft.gctoolkit.io.GCLogFile;
 import com.microsoft.gctoolkit.io.SingleGCLogFile;
 import com.microsoft.gctoolkit.jvm.JavaVirtualMachine;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -22,6 +23,7 @@ public class PreunifiedJavaVirtualMachineConfigurationTest {
     private String logFile = "preunified/g1gc/details/tenuring/180/g1gc.log";
     private int[] times = { 0, 1028, 945481, 945481};
 
+    @Tag("modulePath")
     @Test
     public void testSingle() {
         TestLogFile log = new TestLogFile(logFile);

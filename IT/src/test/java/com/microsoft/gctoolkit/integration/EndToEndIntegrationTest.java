@@ -9,6 +9,7 @@ import com.microsoft.gctoolkit.io.GCLogFile;
 import com.microsoft.gctoolkit.io.SingleGCLogFile;
 import com.microsoft.gctoolkit.jvm.JavaVirtualMachine;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -19,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 public class EndToEndIntegrationTest {
 
+    @Tag("modulePath")
     @Test
     public void testMain() {
         Path path = new TestLogFile("cms/defnew/details/defnew.log").getFile().toPath();
