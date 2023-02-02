@@ -2017,7 +2017,6 @@ public class GenerationalHeapParser extends PreUnifiedGCLogParser implements Sim
     }
 
     public void publish(JVMEvent event, boolean clear) {
-        super.publish(ChannelName.GENERATIONAL_HEAP_PARSER_OUTBOX, event);
         if (clear) {
             garbageCollectionTypeForwardReference = null;
             gcCauseForwardReference = GCCause.UNKNOWN_GCCAUSE;
@@ -2035,6 +2034,7 @@ public class GenerationalHeapParser extends PreUnifiedGCLogParser implements Sim
             averageBlockSizeForwardReference = 0;
             treeHeightForwardReference = 0;
         }
+        super.publish(ChannelName.GENERATIONAL_HEAP_PARSER_OUTBOX, event);
     }
 
     public void publish(JVMEvent event) {

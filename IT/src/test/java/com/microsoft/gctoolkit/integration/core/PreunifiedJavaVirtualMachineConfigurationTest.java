@@ -32,7 +32,7 @@ public class PreunifiedJavaVirtualMachineConfigurationTest {
         GCToolKit gcToolKit = new GCToolKit();
         gcToolKit.loadAggregationsFromServiceLoader();
         TestTimeAggregation aggregation = new TestTimeAggregation();
-        gcToolKit.registerAggregation(aggregation);
+        gcToolKit.loadAggregation(aggregation);
         JavaVirtualMachine machine = null;
         try {
             machine = gcToolKit.analyze(log);
