@@ -200,15 +200,7 @@ public abstract class AbstractJavaVirtualMachine implements JavaVirtualMachine {
             } else {
                 LOGGER.log(Level.INFO, "No Aggregations have been registered, DataSource will not be analysed.");
                 LOGGER.log(Level.INFO, "Is there a module containing Aggregation classes on the module-path");
-<<<<<<< HEAD
-<<<<<<< HEAD
                 LOGGER.log(Level.INFO, "Is GCToolKit::loadAggregationsFromServiceLoader() or GCToolKit::loadAggregation(Aggregation) being invoked?");
-=======
-                LOGGER.log(Level.INFO,"Is GCToolKit::loadAggregationsFromServiceLoader() or GCToolKit::loadAggregation(Aggregation) being invoked?");
->>>>>>> b92789f (bug: Add in code and logging to guard against no Aggergation classes being registered. Issue #265)
-=======
-                LOGGER.log(Level.INFO, "Is GCToolKit::loadAggregationsFromServiceLoader() or GCToolKit::loadAggregation(Aggregation) being invoked?");
->>>>>>> ba62592 (Update api/src/main/java/com/microsoft/gctoolkit/jvm/AbstractJavaVirtualMachine.java)
             }
             dataSourceBus.close();
             eventBus.close();
