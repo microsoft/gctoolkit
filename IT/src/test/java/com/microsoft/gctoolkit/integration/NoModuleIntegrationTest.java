@@ -26,8 +26,8 @@ public class NoModuleIntegrationTest {
 
     //Todo: turn on this test once mvn has been configured to run it with all of the supporting bits
     // on the classpath and not the module-path
-    //@Tag("classPath")
-    //@Test
+    @Tag("classPath")
+    @Test
     public void testMain() {
         Path path = new TestLogFile("cms/defnew/details/defnew.log").getFile().toPath();
         analyze(path.toString());

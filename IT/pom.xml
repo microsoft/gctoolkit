@@ -65,6 +65,7 @@
                             <value>${gcLogFile}</value>
                         </property>
                     </systemProperties>
+                    <groups>modulePath</groups>
                 </configuration>
             </plugin>
             <plugin>
