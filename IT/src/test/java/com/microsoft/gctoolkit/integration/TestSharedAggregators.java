@@ -18,7 +18,6 @@ public class TestSharedAggregators {
 
     private String testLog = "unified/cms/gc.log";
 
-    @Tag("modulePath")
     @Test
     public void compareRuntimeDurations() {
         TestLogFile logFile = new TestLogFile(testLog);

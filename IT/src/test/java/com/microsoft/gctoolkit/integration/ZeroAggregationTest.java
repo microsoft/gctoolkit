@@ -23,7 +23,6 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 public class ZeroAggregationTest {
 
-    @Tag("modulePath")
     @Test
     public void testNoAggregationRegistered() {
         Path path = new TestLogFile("cms/defnew/details/defnew.log").getFile().toPath();
@@ -47,7 +46,6 @@ public class ZeroAggregationTest {
         Assertions.assertTrue(machine.getAggregation(CollectionCycleCountsSummary.class).isEmpty());
     }
 
-    @Tag("modulePath")
     @Test
     public void testSuppliedAggregation() {
         Path path = new TestLogFile("cms/defnew/details/defnew.log").getFile().toPath();

@@ -14,7 +14,6 @@
     <url>${project.parent.url}</url>
     <name>GCToolKit Integration</name>
     <properties>
-        <maven.surefire-plugin.version>3.0.0-M7</maven.surefire-plugin.version>
         <gcLogFile>../gclogs/preunified/cms/defnew/details/defnew.log</gcLogFile>
     </properties>
 
@@ -44,61 +43,6 @@
         </dependency>
     </dependencies>
 
-    <profiles>
-        <profile>
-            <id>modulePath</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-surefire-plugin</artifactId>
-                        <version>${maven.surefire-plugin.version}</version>
-                        <configuration>
-                            <useModulePath>true</useModulePath>
-                            <!-- todo: Hack to deal with surefire deficiency -->
-                            <argLine>--add-modules=ALL-MODULE-PATH</argLine>
-                            <systemProperties>
-                                <property>
-                                    <name>gcLogFile</name>
-                                    <value>${gcLogFile}</value>
-                                </property>
-                            </systemProperties>
-                            <groups>modulePath</groups>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <id>classPath</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-surefire-plugin</artifactId>
-                        <version>${maven.surefire-plugin.version}</version>
-                        <configuration>
-                            <useModulePath>false</useModulePath>
-                            <systemProperties>
-                                <property>
-                                    <name>gcLogFile</name>
-                                    <value>${gcLogFile}</value>
-                                </property>
-                            </systemProperties>
-                            <groups>classPath</groups>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
-
     <build>
         <plugins>
             <plugin>
@@ -106,21 +50,22 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${maven.surefire-plugin.version}</version>
                 <configuration>
+                    <!-- This configuration is used with plain old 'mvn test' -->
+                    <useModulePath>true</useModulePath>
+                    <groups>!classPath</groups>
                 </configuration>
                 <executions>
                     <execution>
+                        <!-- mvn surefire:test@modulePath                  -->
+                        <!-- This execution uses the default configuration -->
+                        <!-- (above) and is only here so there is a        -->
+                        <!-- parallel to 'mvn surefire:test@classPath'     -->
                         <id>modulePath</id>
-                        <phase>test</phase>
-                        <configuration>
-                            <useModulePath>true</useModulePath>
-                            <!-- todo: Hack to deal with surefire deficiency -->
-                            <argLine>--add-modules=ALL-MODULE-PATH</argLine>
-                            <groups>modulePath</groups>
-                        </configuration>
                     </execution>
                     <execution>
+                        <!-- mvn surefire:test@classPath                   -->
+                        <!-- run tests with @Tag("classPath")              -->
                         <id>classPath</id>
-                        <phase>test</phase>
                         <configuration>
                             <useModulePath>false</useModulePath>
                             <groups>classPath</groups>

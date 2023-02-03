@@ -19,14 +19,12 @@ public class UnifiedJavaVirtualMachineConfigurationTest {
     private String logFile = "rolling/jdk14/rollinglogs/long_restart.log";
     private int[][] times = { { 0, 13, 262172, 262172}, { 259077, 259077, 262172, 3095}};
 
-    @Tag("modulePath")
     @Test
     public void testRotating() {
         TestLogFile log = new TestLogFile(logFile);
         test(new RotatingGCLogFile(log.getFile().toPath()), times[0]);
     }
 
-    @Tag("modulePath")
     @Test
     public void testSingle() {
         TestLogFile log = new TestLogFile(logFile);

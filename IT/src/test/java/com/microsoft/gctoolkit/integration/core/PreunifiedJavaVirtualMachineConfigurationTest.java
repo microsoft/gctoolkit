@@ -23,7 +23,6 @@ public class PreunifiedJavaVirtualMachineConfigurationTest {
     private String logFile = "preunified/g1gc/details/tenuring/180/g1gc.log";
     private int[] times = { 0, 1028, 945481, 945481};
 
-    @Tag("modulePath")
     @Test
     public void testSingle() {
         TestLogFile log = new TestLogFile(logFile);

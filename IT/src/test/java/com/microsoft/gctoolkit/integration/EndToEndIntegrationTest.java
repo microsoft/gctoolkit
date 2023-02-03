@@ -20,7 +20,6 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 public class EndToEndIntegrationTest {
 
-    @Tag("modulePath")
     @Test
     public void testMain() {
         Path path = new TestLogFile("cms/defnew/details/defnew.log").getFile().toPath();
