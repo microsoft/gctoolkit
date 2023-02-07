@@ -5,6 +5,8 @@ package com.microsoft.gctoolkit.aggregator;
 import com.microsoft.gctoolkit.event.jvm.JVMEvent;
 import com.microsoft.gctoolkit.event.jvm.JVMTermination;
 
+import java.util.Arrays;
+import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
 /**
@@ -23,7 +25,7 @@ import java.util.function.Consumer;
  *
  * {@literal @}Collates(GCCauseAggregator)
  * public interface GCCauseAggregation extends Aggregation {
- *     record(GarbageCollectionType type, GCCause cause);
+ *     publish(GarbageCollectionType type, GCCause cause);
  * }
  *
  * {@literal @}Aggregates(EventSource.G1GC)
@@ -38,19 +40,19 @@ import java.util.function.Consumer;
  *     }
  *
  *     private void process(G1Young collection) {
- *         aggregation().record(GarbageCollectionTypes.Young, collection.getGCCause());
+ *         aggregation().publish(GarbageCollectionTypes.Young, collection.getGCCause());
  *     }
  *
  *     private void process(G1Mixed collection) {
- *         aggregation().record(GarbageCollectionTypes.Mixed, collection.getGCCause());
+ *         aggregation().publish(GarbageCollectionTypes.Mixed, collection.getGCCause());
  *     }
  *
  *     private void process(G1YoungInitialMark collection) {
- *         aggregation().record(GarbageCollectionTypes.G1GCYoungInitialMark, collection.getGCCause());
+ *         aggregation().publish(GarbageCollectionTypes.G1GCYoungInitialMark, collection.getGCCause());
  *     }
  *
  *     private void process(G1FullGC collection) {
- *         aggregation().record(GarbageCollectionTypes.FullGC, collection.getGCCause());
+ *         aggregation().publish(GarbageCollectionTypes.FullGC, collection.getGCCause());
  *     }
  * }
  * </code></pre>
@@ -59,10 +61,10 @@ import java.util.function.Consumer;
 public abstract class Aggregator<A extends Aggregation> {
 
     private final A aggregation;
+    private Runnable completionTask;
 
-    /// JVMEventDispatcher manages all of the registered events and event consumers
+    /// JVMEventDispatcher manages all the registered events and event consumers
     private final JVMEventDispatcher jvmEventDispatcher = new JVMEventDispatcher();
-    private volatile boolean done = false;
 
     /**
      * Subclass only.
@@ -72,7 +74,6 @@ public abstract class Aggregator<A extends Aggregation> {
      */
     protected Aggregator(A aggregation) {
         this.aggregation = aggregation;
-        register(JVMTermination.class,this::terminationHandler);
     }
 
     /**
@@ -109,28 +110,75 @@ public abstract class Aggregator<A extends Aggregation> {
     }
 
     /**
+     * Call back to be run when the JVMTermination event has been
+     * @param task to be executed
+     */
+    public void onCompletion(Runnable task) {
+        this.completionTask = task;
+    }
+
+    /**
+     * Call a callback when aggregation is completed.
+     */
+    private void complete() {
+        Runnable t = completionTask;
+        this.completionTask = null;
+        if (t != null)
+            Executors.newSingleThreadExecutor().execute(t);
+
+    }
+
+    /**
      * This method consumes a JVMEvent and dispatches it to the
      * {@link #register(Class, Consumer) registered consumer}.
      * @param event an event to be processed
-     * @param <E> the type of JVMEvent
      */
-    public <E extends JVMEvent> void consume(E event) {
+    public void receive(JVMEvent event) {
+        if (event instanceof JVMTermination) {
+            aggregation().timeOfTerminationEvent(((JVMTermination) event).getTimeOfTerminationEvent());
+            aggregation().timeOfFirstEvent(((JVMTermination)event).getTimeOfFirstEvent());
+        }
         jvmEventDispatcher.dispatch(event);
+        if (event instanceof JVMTermination) {
+            complete();
+        }
     }
 
     /**
-     * The JVMTermination event signals the end of processing of a log file.
-     * @param event JVMTermination is a sentinel for the end of log processing.
+     * Calculates if this Aggregator aggregates the given event source
+     * @param eventSource to be checked.
+     * @return true is the aggregator aggregates the event source
      */
-    private void terminationHandler(JVMTermination event) {
-        done = true;
+    public boolean aggregates(EventSource eventSource) {
+        return (eventSource != null) && aggregates(getClass(), eventSource);
     }
 
     /**
-     * Whether all events have been processed by the Aggregator.
-     * @return {@code true} if this Aggregator is done processing events.
+     * Calculates if this Aggregator aggregates the given event source.
+     * @param clazz the aggregator
+     * @param targetEventSource the event source to check
+     * @return true is the aggregator aggregates the event source
      */
-    public boolean isDone() {
-        return done;
+    private boolean aggregates(Class<?> clazz, EventSource targetEventSource) {
+        if (clazz != null && clazz != Aggregator.class) {
+
+            if (clazz.isAnnotationPresent(Aggregates.class)) {
+                Aggregates aggregates = clazz.getAnnotation(Aggregates.class);
+                if (aggregates != null) {
+                    if (Arrays.asList(aggregates.value()).contains(targetEventSource))
+                        return true;
+                }
+            }
+
+            if (aggregates(clazz.getSuperclass(), targetEventSource))
+                return true;
+
+            Class<?>[] interfaces = clazz.getInterfaces();
+            for (Class<?> iface : interfaces) {
+                if (aggregates(iface, targetEventSource))
+                    return true;
+            }
+        }
+        return false;
     }
 }

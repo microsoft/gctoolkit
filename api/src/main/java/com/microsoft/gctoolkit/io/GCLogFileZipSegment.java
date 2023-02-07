@@ -35,6 +35,7 @@ public class GCLogFileZipSegment implements LogFileSegment {
     /**
      * The constructor attempts to extract the segment index from the file name.
      * @param path The path to the file.
+     * @param segmentName name of first segment in zip file
      */
     public GCLogFileZipSegment(Path path, String segmentName) {
         this.path = path;
@@ -97,7 +98,7 @@ public class GCLogFileZipSegment implements LogFileSegment {
             ageOfJVMAtLogStart();
             if ( startTime.hasTimeStamp())
                 return startTime.getTimeStamp();
-            else if ( startTime.hasDateTime())
+            else if ( startTime.hasDateStamp())
                 return startTime.toEpochInMillis();
             else
                 return Double.MAX_VALUE;
@@ -112,7 +113,7 @@ public class GCLogFileZipSegment implements LogFileSegment {
             ageOfJVMAtLogEnd();
             if ( endTime.hasTimeStamp())
                 return endTime.getTimeStamp();
-            else if ( endTime.hasDateTime())
+            else if ( endTime.hasDateStamp())
                 return endTime.toEpochInMillis();
             else
                 return Double.MAX_VALUE;

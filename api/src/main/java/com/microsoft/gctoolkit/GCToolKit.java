@@ -9,18 +9,24 @@ import com.microsoft.gctoolkit.io.RotatingGCLogFile;
 import com.microsoft.gctoolkit.io.SingleGCLogFile;
 import com.microsoft.gctoolkit.jvm.Diary;
 import com.microsoft.gctoolkit.jvm.JavaVirtualMachine;
-import com.microsoft.gctoolkit.message.DataSourceBus;
-import com.microsoft.gctoolkit.message.JVMEventBus;
-import com.microsoft.gctoolkit.message.DataSourceConsumer;
+import com.microsoft.gctoolkit.message.DataSourceChannel;
+import com.microsoft.gctoolkit.message.DataSourceParser;
+import com.microsoft.gctoolkit.message.JVMEventChannel;
 
 import java.io.IOException;
-import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
 import java.util.ServiceConfigurationError;
 import java.util.ServiceLoader;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
+
+import static java.lang.Class.forName;
 
 /**
  * The primary API for analyzing Java Garbage Collection (GC) logs.
@@ -29,49 +35,10 @@ public class GCToolKit {
 
     private static final Logger LOGGER = Logger.getLogger(GCToolKit.class.getName());
 
-    /**
-     * Load the first implementation of JavaVirtualMachine that can process
-     * the supplied DataSource, GCLog in this instance.
-     * @param logFile GCLogFile DataSource
-     * @return JavaVirtualMachine implementation.
-     */
-    private JavaVirtualMachine loadJavaVirtualMachine(GCLogFile logFile) {
-        return ServiceLoader.load(JavaVirtualMachine.class)
-                .stream()
-                .map(ServiceLoader.Provider::get)
-                .filter(jvm -> jvm.accepts(logFile))
-                .findFirst()
-                .orElseThrow(() -> new ServiceConfigurationError("No suitable JavaVirtualMachine implementation found"));
-    }
-
-    private DataSourceBus setupDataSourceBus() {
-        return ServiceLoader.load(DataSourceBus.class)
-                .stream()
-                .map(ServiceLoader.Provider::get)
-                .findFirst()
-                .orElseThrow(() -> new ServiceConfigurationError("No suitable DataSourceBus implementation found"));
-
-    }
-
-    private JVMEventBus setupJVMEventBus() {
-        return ServiceLoader.load(JVMEventBus.class)
-                .stream()
-                .map(ServiceLoader.Provider::get)
-                .findFirst()
-                .orElseThrow(() -> new ServiceConfigurationError("No suitable JVMEventBus implementation found"));
-
-    }
-
-    private void registerParsers(DataSourceBus bus, Diary diary) {
-        ServiceLoader.load(DataSourceConsumer.class)
-                .stream()
-                .map(ServiceLoader.Provider::get)
-                .filter(p->p.accepts(diary))
-                .forEach(parser->bus.register(parser));
-
-    }
-
-    private final Set<Class<? extends Aggregation>> registeredAggregations;
+    private final HashSet<DataSourceParser> registeredDataSourceParsers = new HashSet<>();
+    private List<Aggregation> registeredAggregations;
+    private JVMEventChannel jvmEventChannel = null;
+    private DataSourceChannel dataSourceChannel = null;
 
     /**
      * Instantiate a GCToolKit object. The same GCToolKit object can be used to analyze
@@ -82,7 +49,7 @@ public class GCToolKit {
     public GCToolKit() {
         // Allow for adding aggregations from source code,
         // but don't corrupt the ones loaded by the service loader
-        this.registeredAggregations = new HashSet<>();
+        this.registeredAggregations = new ArrayList<>();
     }
 
     /**
@@ -104,7 +71,6 @@ public class GCToolKit {
         ServiceLoader.load(Aggregation.class)
                 .stream()
                 .map(ServiceLoader.Provider::get)
-                .map(Aggregation::getClass)
                 .forEach(registeredAggregations::add);
         //Useful for debugging
         if ( Level.FINER.equals(LOGGER.getLevel()))
@@ -120,39 +86,158 @@ public class GCToolKit {
      * an Aggregation was registered, the {@code getAggregation} method will return
      * null if the Aggregation was not used in the analysis.
      *
-     * @param aggregationClass the Aggregation class to register.
+     * @param aggregation the Aggregation class to register.
      * @see Aggregation
      * @see JavaVirtualMachine
      */
-    public void registerAggregation(Class<? extends Aggregation> aggregationClass) {
-        registeredAggregations.add(aggregationClass);
+    public void loadAggregation(Aggregation aggregation) {
+        registeredAggregations.add(aggregation);
+    }
+
+    /**
+     * Load the first implementation of JavaVirtualMachine that can process
+     * the supplied DataSource, GCLog in this instance.
+     * @param logFile GCLogFile DataSource
+     * @return JavaVirtualMachine implementation.
+     */
+    private JavaVirtualMachine loadJavaVirtualMachine(GCLogFile logFile) {
+        return logFile.getJavaVirtualMachine();
+    }
+
+    public void loadDataSourceChannel(DataSourceChannel channel) {
+        if (dataSourceChannel == null)
+            this.dataSourceChannel = channel;
+    }
+
+    private void loadDataSourceChannel() {
+        if ( dataSourceChannel == null) {
+            ServiceLoader<DataSourceChannel> serviceLoader = ServiceLoader.load(DataSourceChannel.class);
+            if (serviceLoader.findFirst().isPresent()) {
+                loadDataSourceChannel(serviceLoader
+                        .stream()
+                        .map(ServiceLoader.Provider::get)
+                        .findFirst()
+                        .orElseThrow(() -> new ServiceConfigurationError("Internal Error - No suitable DataSourceBus implementation found")));
+            } else {
+                try {
+                    Class clazz = forName("com.microsoft.gctoolkit.vertx.VertxDataSourceChannel", true, Thread.currentThread().getContextClassLoader());
+                    loadDataSourceChannel((DataSourceChannel) clazz.getConstructors()[0].newInstance());
+                } catch (Exception e) {
+                    throw new ServiceConfigurationError("Unable to find a suitable DataSourceChannel provider");
+                }
+            }
+        }
+    }
+
+    public void loadJVMEventChannel(JVMEventChannel channel) {
+        if (jvmEventChannel == null)
+            this.jvmEventChannel = channel;
+    }
+
+    private void loadJVMEventChannel() {
+        if ( jvmEventChannel == null) {
+            ServiceLoader<JVMEventChannel> serviceLoader = ServiceLoader.load(JVMEventChannel.class);
+            if (serviceLoader.findFirst().isPresent()) {
+                loadJVMEventChannel(ServiceLoader.load(JVMEventChannel.class)
+                        .stream()
+                        .map(ServiceLoader.Provider::get)
+                        .findFirst()
+                        .orElseThrow(() -> new ServiceConfigurationError("Internal Error - No suitable JVMEventBus implementation found")));
+            } else {
+                try {
+                    Class clazz = forName("com.microsoft.gctoolkit.vertx.VertxJVMEventChannel", true, Thread.currentThread().getContextClassLoader());
+                    loadJVMEventChannel((JVMEventChannel) clazz.getConstructors()[0].newInstance());
+                } catch (Exception e) {
+                    throw new ServiceConfigurationError("Unable to find a suitable provider to create a JVMEventChannel");
+                }
+            }
+        }
+    }
+
+    public void loadDataSourceParser(DataSourceParser dataSourceParser) {
+        registeredDataSourceParsers.add(dataSourceParser);
+    }
+
+    private void loadDataSourceParsers(Diary diary) {
+        loadDataSourceChannel();
+        loadJVMEventChannel();
+        List<DataSourceParser> dataSourceParsers;
+        if (registeredDataSourceParsers.isEmpty()) {
+            dataSourceParsers = ServiceLoader.load(DataSourceParser.class)
+                    .stream()
+                    .map(ServiceLoader.Provider::get)
+                    .filter(consumer -> consumer.accepts(diary))
+                    .collect(Collectors.toList());
+        } else{
+            dataSourceParsers = new ArrayList<>();
+            dataSourceParsers.addAll(registeredDataSourceParsers);
+        }
+
+
+        if (dataSourceParsers.isEmpty()) {
+            String[] parsers = {
+                    "com.microsoft.gctoolkit.parser.CMSTenuredPoolParser",
+                    "com.microsoft.gctoolkit.parser.GenerationalHeapParser",
+                    "com.microsoft.gctoolkit.parser.JVMEventParser",
+                    "com.microsoft.gctoolkit.parser.PreUnifiedG1GCParser",
+                    "com.microsoft.gctoolkit.parser.ShenandoahParser",
+                    "com.microsoft.gctoolkit.parser.SurvivorMemoryPoolParser",
+                    "com.microsoft.gctoolkit.parser.UnifiedG1GCParser",
+                    "com.microsoft.gctoolkit.parser.UnifiedGenerationalParser",
+                    "com.microsoft.gctoolkit.parser.UnifiedJVMEventParser",
+                    "com.microsoft.gctoolkit.parser.UnifiedSurvivorMemoryPoolParser",
+                    "com.microsoft.gctoolkit.parser.ZGCParser"
+            };
+            dataSourceParsers = Arrays.stream(parsers)
+                    .map(parserName -> {
+                        try {
+                            Class<?> clazz = forName(parserName, true, Thread.currentThread().getContextClassLoader());
+                            return Optional.of(clazz.getConstructors()[0].newInstance());
+                        } catch (ClassNotFoundException
+                                | InstantiationException
+                                | IllegalAccessException
+                                | InvocationTargetException e) {
+                            return Optional.empty();
+                        }
+                    })
+                    .filter(Optional::isPresent)
+                    .map(optional -> (DataSourceParser) optional.get())
+                    .filter(consumer -> consumer.accepts(diary))
+                    .collect(Collectors.toList());
+            if (dataSourceParsers.isEmpty()) {
+                throw new ServiceConfigurationError("Unable to find a suitable provider to create a DataSourceParser");
+            }
+        }
+
+        for (DataSourceParser dataSourceParser : dataSourceParsers) {
+            dataSourceParser.diary(diary);
+            dataSourceChannel.registerListener(dataSourceParser);
+            dataSourceParser.publishTo(jvmEventChannel);
+        }
     }
 
     /**
      * Perform an analysis on a GC log file. The analysis will use the Aggregations
-     * that were {@link #registerAggregation(Class) registered}, if appropriate for
+     * that were {@link #loadAggregation(Aggregation) registered}, if appropriate for
      * the GC log file.
      *
-     * @param logFile The log to analyze, typically a
+     * @param dataSource The log to analyze, typically a
      *                   {@link SingleGCLogFile} or
      *                   {@link RotatingGCLogFile}.
      * @return a representation of the state of the Java Virtual Machine resulting
      * from the analysis of the GC log file.
+     * @throws IOException when something goes wrong reading the data source
      */
-    public JavaVirtualMachine analyze(GCLogFile logFile) throws IOException  {
-        //todo: revert this to DataSource to account for non-GC log data sources once we have a use case (maybe JFR but JFR timers drift badly ATM)
-        //setup message bus
-        //DataSourceBus dataSourceBus = setupDataSourceBus();
-        //JVMEventBus eventBus = setupJVMEventBus();
-        //registerParsers(dataSourceBus,logFile.diary());
+    public JavaVirtualMachine analyze(DataSource<?> dataSource) throws IOException  {
+        GCLogFile logFile = (GCLogFile)dataSource;
+        loadDataSourceParsers(logFile.diary());
         JavaVirtualMachine javaVirtualMachine = loadJavaVirtualMachine(logFile);
-        //todo: do we need reflection????
         try {
-            Method analyze = javaVirtualMachine.getClass().getMethod("analyze", Set.class, DataSource.class);
-            analyze.invoke(javaVirtualMachine, this.registeredAggregations, logFile);
-        } catch (ReflectiveOperationException e) {
-            LOGGER.log(Level.SEVERE, "Cannot invoke analyze method", e);
+            javaVirtualMachine.analyze(registeredAggregations, jvmEventChannel, dataSourceChannel);
+        } catch(Throwable t) {
+            LOGGER.log(Level.SEVERE, "Internal Error: Cannot invoke analyze method", t);
         }
         return javaVirtualMachine;
     }
+
 }

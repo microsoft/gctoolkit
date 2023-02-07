@@ -3,12 +3,13 @@ package com.microsoft.gctoolkit.sample.aggregation;
 import com.microsoft.gctoolkit.event.GarbageCollectionTypes;
 
 import java.io.PrintStream;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class CollectionCycleCountsSummary implements CollectionCycleCountsAggregation {
-    private final Map<GarbageCollectionTypes, AtomicInteger> collectionCycleCounts = new ConcurrentHashMap<>();
+public class CollectionCycleCountsSummary extends CollectionCycleCountsAggregation {
+
+    private final Map<GarbageCollectionTypes, AtomicInteger> collectionCycleCounts = new HashMap<>();
 
     @Override
     public void count(GarbageCollectionTypes gcType) {

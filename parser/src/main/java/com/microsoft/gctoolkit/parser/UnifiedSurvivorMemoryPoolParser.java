@@ -2,9 +2,12 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.parser;
 
+import com.microsoft.gctoolkit.event.jvm.JVMEvent;
 import com.microsoft.gctoolkit.event.jvm.JVMTermination;
 import com.microsoft.gctoolkit.event.jvm.SurvivorRecord;
 import com.microsoft.gctoolkit.jvm.Diary;
+import com.microsoft.gctoolkit.message.ChannelName;
+import com.microsoft.gctoolkit.message.JVMEventChannel;
 import com.microsoft.gctoolkit.parser.jvm.Decorators;
 
 import static com.microsoft.gctoolkit.parser.unified.UnifiedPatterns.CPU_BREAKOUT;
@@ -26,9 +29,7 @@ public class UnifiedSurvivorMemoryPoolParser extends UnifiedGCLogParser implemen
     private SurvivorRecord forwardReference = null;
     private boolean ageDataCollected = false;
 
-    public UnifiedSurvivorMemoryPoolParser(Diary diary, JVMEventConsumer consumer) {
-        super(diary, consumer);
-    }
+    public UnifiedSurvivorMemoryPoolParser() {}
 
     public String getName() {
         return "SurvivorMemoryPoolParser";
@@ -47,18 +48,32 @@ public class UnifiedSurvivorMemoryPoolParser extends UnifiedGCLogParser implemen
             ageDataCollected = true;
         } else if (entry.equals(END_OF_DATA_SENTINEL) || (JVM_EXIT.parse(entry) != null)) {
             if (forwardReference != null)
-                consumer.record(forwardReference);
-            consumer.record(new JVMTermination(getClock(),diary.getTimeOfFirstEvent()));
+                publish(forwardReference);
+            publish(new JVMTermination(getClock(),diary.getTimeOfFirstEvent()));
         } else if (forwardReference != null && ageDataCollected) {
-            consumer.record(forwardReference);
+            publish(forwardReference);
             forwardReference = null;
             ageDataCollected = false;
         } else if (CPU_BREAKOUT.parse(entry) != null) {
             if (forwardReference != null) {
-                consumer.record(forwardReference);
+                publish(forwardReference);
                 forwardReference = null;
                 ageDataCollected = false;
             }
         }
+    }
+
+    @Override
+    public boolean accepts(Diary diary) {
+        return diary.isTenuringDistribution() && diary.isUnifiedLogging();
+    }
+
+    @Override
+    public void publishTo(JVMEventChannel bus) {
+        super.publishTo(bus);
+    }
+
+    private void publish(JVMEvent event) {
+        super.publish(ChannelName.SURVIVOR_MEMORY_POOL_PARSER_OUTBOX, event);
     }
 }

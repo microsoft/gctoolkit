@@ -4,7 +4,7 @@ package com.microsoft.gctoolkit.event;
 
 public class UnifiedCountSummary {
 
-    //Min: 1, Avg: 17.4, Max: 34, Diff: 33, Sum: 139, Workers: 8
+    //example: Min: 1, Avg: 17.4, Max: 34, Diff: 33, Sum: 139, Workers: 8
 
     private final int min;
     private final double average;

@@ -14,14 +14,21 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class SingleGarbageCollectionLogFileTest {
 
-    // TODO re-enable gc-all-info log in array once we commit that file
-    private String[] unifiedLogs = { "unified/cms/gc.log", "unified/g1gc/G1-80-16gbps2.log.0"/*, "unified/g1gc/gc-all-info.log.zip"*/};
-    private boolean[] zipped = { false, false, true};
+    private String[] unifiedLogs = { "unified/cms/gc.log", "unified/g1gc/G1-80-16gbps2.log.0", "icms/details/tenuring/par.cms.wt.wd.ast.log.zip", "streaming/gc.log.gz"};
+    private boolean[] logIsUnified = { true, true, false, false};
+    private boolean[] logIsZipped = { false, false, true, false};
+    private boolean[] logIsGZipped = { false, false, false, true};
 
-    private void logTest(String log, boolean zipped) {
+    @Test
+    public void unifiedLog() {
+        for (int index = 0; index < unifiedLogs.length; index++)
+            logStreamingTest(unifiedLogs[index], logIsUnified[index], logIsZipped[index], logIsGZipped[index]);
+    }
+
+    private void logStreamingTest(String log, boolean unified, boolean zipped, boolean gzipped) {
         Path path = new TestLogFile(log).getFile().toPath();
         SingleGCLogFile gcLogFile = new SingleGCLogFile(path);
-        assertEquals(true, gcLogFile.isUnified(), "Expected unified but failed");
+        assertEquals(unified, gcLogFile.isUnified(), "Expected unified but failed");
         try {
             assertEquals(1, gcLogFile.getMetaData().getNumberOfFiles(), "Expected 1 but found " + gcLogFile.getMetaData().getNumberOfFiles());
         } catch (IOException ioe) {
@@ -38,26 +45,20 @@ public class SingleGarbageCollectionLogFileTest {
         try {
             Diary diary = gcLogFile.diary();
             assertNotEquals(null, diary, "Unable to get the diary");
-            assertTrue(diary.isUnifiedLogging());
+            assertEquals(unified, diary.isUnifiedLogging());
         } catch (IOException ioe) {
             fail(ioe);
         }
 
         try {
             LogFileMetadata metadata = gcLogFile.getMetaData();
-            assertEquals(! zipped, metadata.isPlainText());
+            assertEquals( !(zipped || gzipped), metadata.isPlainText());
             assertEquals(zipped, metadata.isZip());
-            assertFalse(metadata.isGZip());
+            assertEquals(gzipped, metadata.isGZip());
             assertFalse(metadata.isDirectory());
             assertEquals(1, metadata.getNumberOfFiles(), "Expected 1 file but " + metadata.getNumberOfFiles() + " found.");
         } catch (IOException ioe) {
             fail(ioe);
         }
-    }
-
-    @Test
-    public void unifiedLog() {
-        for (int index = 0; index < unifiedLogs.length; index++)
-            logTest(unifiedLogs[index], zipped[index]);
     }
 }

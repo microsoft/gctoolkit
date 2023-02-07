@@ -5,7 +5,7 @@ import com.microsoft.gctoolkit.event.GarbageCollectionTypes;
 import java.io.PrintStream;
 import java.util.HashMap;
 
-public class CollectionCycleCountsSummary implements CollectionCycleCountsAggregation {
+public class CollectionCycleCountsSummary extends CollectionCycleCountsAggregation {
 
     private HashMap<GarbageCollectionTypes,Integer> collectionCycleCounts = new HashMap<>();
     @Override

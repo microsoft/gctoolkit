@@ -5,8 +5,10 @@ package com.microsoft.gctoolkit.integration;
 import com.microsoft.gctoolkit.integration.collections.XYDataSet;
 import com.microsoft.gctoolkit.integration.collections.XYDataSet.Point;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
+@Tag("classPath")
 public class XYDataSetTest {
 
     @Test

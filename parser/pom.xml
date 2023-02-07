@@ -5,7 +5,7 @@
     <parent>
         <groupId>com.microsoft.gctoolkit</groupId>
         <artifactId>gctoolkit</artifactId>
-        <version>2.0.13-SNAPSHOT</version>
+        <version>3.0.2-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -38,6 +38,9 @@
                 <configuration>
                     <parallel>classes</parallel>
                     <perCoreThreadCount>true</perCoreThreadCount>
+                    <!-- Martijn, leave this alone!!!! We sometimes use this because the parser tests take a long time
+                         and always have to look this up every time it is needed. -->
+                    <!-- skipTests>true</skipTests -->
                 </configuration>
             </plugin>
         </plugins>

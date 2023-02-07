@@ -5,6 +5,7 @@ package com.microsoft.gctoolkit.integration.io;
 import com.microsoft.gctoolkit.io.LogFileSegment;
 import com.microsoft.gctoolkit.io.RotatingGCLogFile;
 import org.junit.jupiter.api.Test;
+
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
@@ -74,7 +75,7 @@ public class RotatingGarbageCollectionLogFileTest {
                             .collect(Collectors.toList());
             assertEquals(expectedOrdering, actual);
             long count = rotatingGCLogFile.stream().count();
-            assertEquals(246732,count,"Unequal line counts");
+            assertEquals(246733,count,"Unequal line counts");
         } catch (Exception badTestData) {
             fail(badTestData);
         }
@@ -95,7 +96,7 @@ public class RotatingGarbageCollectionLogFileTest {
         List<String> expected = Arrays.asList(
                 "rollover.log.3", "rollover.log.4", "rollover.log.0", "rollover.log.1", "rollover.log.2", "rollover.log"
         );
-        runRollingLogOrderingTest(path,expected, 246732);
+        runRollingLogOrderingTest(path,expected, 246733);
     }
 
     @Test
@@ -104,6 +105,6 @@ public class RotatingGarbageCollectionLogFileTest {
         List<String> expected = Arrays.asList(
                 "rollover/rollover.log.3", "rollover/rollover.log.4", "rollover/rollover.log.0", "rollover/rollover.log.1", "rollover/rollover.log.2", "rollover/rollover.log"
         );
-        runRollingLogOrderingTest(path,expected, 246732);
+        runRollingLogOrderingTest(path,expected, 246733);
     }
 }

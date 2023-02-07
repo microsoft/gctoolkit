@@ -38,6 +38,6 @@ public class PauseTimeSummary extends PauseTimeAggregation {
      * @return The percentage of time the application was paused.
      */
     public double getPercentPaused() {
-        return (totalPauseTime / getRuntimeDuration()) * 100.0D;
+        return (totalPauseTime / super.estimatedRuntime()) * 100.0D;
     }
 }

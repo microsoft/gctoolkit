@@ -10,9 +10,12 @@ import com.microsoft.gctoolkit.event.generational.ConcurrentMark;
 import com.microsoft.gctoolkit.event.generational.ConcurrentPreClean;
 import com.microsoft.gctoolkit.event.generational.ConcurrentReset;
 import com.microsoft.gctoolkit.event.generational.ConcurrentSweep;
+import com.microsoft.gctoolkit.event.generational.GenerationalGCEvent;
 import com.microsoft.gctoolkit.event.generational.InitialMark;
 import com.microsoft.gctoolkit.event.jvm.JVMTermination;
 import com.microsoft.gctoolkit.jvm.Diary;
+import com.microsoft.gctoolkit.message.ChannelName;
+import com.microsoft.gctoolkit.message.JVMEventChannel;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
 
 import java.util.logging.Logger;
@@ -23,12 +26,10 @@ public class CMSTenuredPoolParser extends PreUnifiedGCLogParser implements Simpl
     private DateTimeStamp startOfPhase = null;
     private GCParseRule EndOfFile = new GCParseRule("END_OF_DATA_SENTINEL", END_OF_DATA_SENTINEL);
 
-    public CMSTenuredPoolParser(Diary diary, JVMEventConsumer eventConsumer) {
-        super(diary, eventConsumer);
-    }
+    public CMSTenuredPoolParser() {}
 
     public String getName() {
-        return "CMSTenuredPoolParser";
+        return ChannelName.CMS_TENURED_POOL_PARSER_OUTBOX.toString();
     }
 
     @Override
@@ -54,7 +55,7 @@ public class CMSTenuredPoolParser extends PreUnifiedGCLogParser implements Simpl
         else if ((trace = SPLIT_REMARK.parse(line)) != null)
             startOfPhase = getClock();
         else if ((trace = EndOfFile.parse(line)) != null) {
-            consumer.record(new JVMTermination(getClock(),diary.getTimeOfFirstEvent()));
+            super.publish(ChannelName.CMS_TENURED_POOL_PARSER_OUTBOX, new JVMTermination(getClock(), diary.getTimeOfFirstEvent()));
         }
 
     }
@@ -69,7 +70,7 @@ public class CMSTenuredPoolParser extends PreUnifiedGCLogParser implements Simpl
         MemoryPoolSummary tenured = trace.getOccupancyBeforeAfterWithMemoryPoolSizeSummary(4);
         MemoryPoolSummary heap = trace.getOccupancyWithMemoryPoolSizeSummary(8);
         initialMark.add(heap.minus(tenured), tenured, heap);
-        consumer.record(initialMark);
+        publish(initialMark);
     }
 
     //12.987: [CMS-concurrent-mark-start]
@@ -84,7 +85,7 @@ public class CMSTenuredPoolParser extends PreUnifiedGCLogParser implements Simpl
 
     private void endConcurrentPrecleanWithReferenceProcessing(GCLogTrace trace) {
         try {
-            consumer.record(new ConcurrentPreClean(startOfPhase, trace.getDoubleGroup(14) - startOfPhase.getTimeStamp(), trace.getDoubleGroup(16), trace.getDoubleGroup(17)));
+            publish(new ConcurrentPreClean(startOfPhase, trace.getDoubleGroup(14) - startOfPhase.getTimeStamp(), trace.getDoubleGroup(16), trace.getDoubleGroup(17)));
         } catch (Throwable t) {
             LOG.warning("concurrent phase choked on " + trace.toString());
         }
@@ -96,15 +97,15 @@ public class CMSTenuredPoolParser extends PreUnifiedGCLogParser implements Simpl
         double wallTime = trace.getDoubleGroup(5);
         double duration = timeStamp.getTimeStamp() - startOfPhase.getTimeStamp();
         if ("mark".equals(phase))
-            consumer.record(new ConcurrentMark(startOfPhase, duration, cpuTime, wallTime));
+            publish(new ConcurrentMark(startOfPhase, duration, cpuTime, wallTime));
         else if ("preclean".equals(phase))
-            consumer.record(new ConcurrentPreClean(startOfPhase, duration, cpuTime, wallTime));
+            publish(new ConcurrentPreClean(startOfPhase, duration, cpuTime, wallTime));
         else if ("abortable-preclean".equals(phase))
-            consumer.record(new AbortablePreClean(startOfPhase, duration, cpuTime, wallTime, false));
+            publish( new AbortablePreClean(startOfPhase, duration, cpuTime, wallTime, false));
         else if ("sweep".equals(phase))
-            consumer.record(new ConcurrentSweep(startOfPhase, duration, cpuTime, wallTime));
+            publish( new ConcurrentSweep(startOfPhase, duration, cpuTime, wallTime));
         else if ("reset".equals(phase))
-            consumer.record(new ConcurrentReset(startOfPhase, duration, cpuTime, wallTime));
+            publish(new ConcurrentReset(startOfPhase, duration, cpuTime, wallTime));
         else
             LOG.warning("concurrent phase choked on " + trace.toString());
     }
@@ -113,20 +114,20 @@ public class CMSTenuredPoolParser extends PreUnifiedGCLogParser implements Simpl
         try {
             double cpuTime = trace.getDoubleGroup(4);
             double wallClock = trace.getDoubleGroup(5);
-            consumer.record(new AbortablePreClean(startOfPhase, trace.getDateTimeStamp().getTimeStamp() - startOfPhase.getTimeStamp(), cpuTime, wallClock, true));
+            publish(new AbortablePreClean(startOfPhase, trace.getDateTimeStamp().getTimeStamp() - startOfPhase.getTimeStamp(), cpuTime, wallClock, true));
         } catch (Exception e) {
             LOG.warning("concurrent phase end choked on " + trace);
         }
     }
 
     private void remark(GCLogTrace trace, String line) {
-        consumer.record(extractRemark(trace, line));
+        publish(extractRemark(trace, line));
     }
 
     private void remarkWithReferenceProcessing(GCLogTrace trace, String line) {
         CMSRemark remark = extractRemark(trace, line);
         remark.addReferenceGCSummary(extractPrintReferenceGC(line));
-        consumer.record(remark);
+        publish(remark);
     }
 
     private CMSRemark extractRemark(GCLogTrace trace, String line) {
@@ -152,6 +153,20 @@ public class CMSTenuredPoolParser extends PreUnifiedGCLogParser implements Simpl
             LOG.warning("Unable to properly extract data from " + trace);
         }
         return remark;
+    }
+
+    private void publish(GenerationalGCEvent event) {
+        super.publish(ChannelName.CMS_TENURED_POOL_PARSER_OUTBOX, event);
+    }
+
+    @Override
+    public boolean accepts(Diary diary) {
+        return diary.isCMS() && ! diary.isUnifiedLogging();
+    }
+
+    @Override
+    public void publishTo(JVMEventChannel bus) {
+        super.publishTo(bus);
     }
 }
 

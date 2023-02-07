@@ -4,12 +4,19 @@ package com.microsoft.gctoolkit.io;
 
 import com.microsoft.gctoolkit.jvm.Diarizer;
 import com.microsoft.gctoolkit.jvm.Diary;
+import com.microsoft.gctoolkit.jvm.JavaVirtualMachine;
+import com.microsoft.gctoolkit.jvm.PreUnifiedJavaVirtualMachine;
+import com.microsoft.gctoolkit.jvm.UnifiedJavaVirtualMachine;
 import com.microsoft.gctoolkit.parser.datatype.TripleState;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.ServiceConfigurationError;
+import java.util.ServiceLoader;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -34,6 +41,7 @@ public abstract class GCLogFile extends FileDataSource<String> {
 
     private Diary diary;
     private TripleState unifiedFormat = TripleState.UNKNOWN;
+    private JavaVirtualMachine jvm = null;
 
     /**
      * Subclass only.
@@ -41,6 +49,16 @@ public abstract class GCLogFile extends FileDataSource<String> {
      */
     protected GCLogFile(Path path) {
         super(path);
+    }
+
+    /**
+     * Return the relevant JavaVirtualMachine implementation
+     */
+    public JavaVirtualMachine getJavaVirtualMachine() {
+        if ( jvm == null)
+            jvm = (isUnified()) ? new UnifiedJavaVirtualMachine() : new PreUnifiedJavaVirtualMachine();
+        jvm.accepts(this);
+        return jvm;
     }
 
     /**
@@ -54,12 +72,23 @@ public abstract class GCLogFile extends FileDataSource<String> {
     }
 
     private Diarizer diarizer() {
-        return load(Diarizer.class)
-                .stream()
-                .map(Provider::get)
-                .filter(p -> p.isUnified() == isUnified())
-                .findFirst()
-                .orElseThrow(() -> new ServiceConfigurationError("Unable to find a suitable provider to create a diary"));
+        ServiceLoader<Diarizer> serviceLoader = load(Diarizer.class);
+        if (serviceLoader.findFirst().isPresent()) {
+            return serviceLoader
+                    .stream()
+                    .map(Provider::get)
+                    .filter(p -> p.isUnified() == isUnified())
+                    .findFirst()
+                    .orElseThrow(() -> new ServiceConfigurationError("Unable to find a suitable provider to create a diary"));
+        } else {
+            try {
+                String clazzName = (isUnified()) ? "com.microsoft.gctoolkit.parser.jvm.UnifiedDiarizer" : "com.microsoft.gctoolkit.parser.jvm.PreUnifiedDiarizer";
+                Class clazz = Class.forName(clazzName, true, Thread.currentThread().getContextClassLoader());
+                return (Diarizer) clazz.getConstructors()[0].newInstance();
+            } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
+                throw new ServiceConfigurationError("Unable to find a suitable provider to create a diary");
+            }
+        }
     }
 
     /**

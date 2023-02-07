@@ -2,12 +2,21 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.jvm;
 
+import com.microsoft.gctoolkit.aggregator.EventSource;
 import com.microsoft.gctoolkit.parser.datatype.TripleState;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
 
 import java.util.Arrays;
+import java.util.Set;
+import java.util.TreeSet;
+
+import static com.microsoft.gctoolkit.aggregator.EventSource.SAFEPOINT;
+import static com.microsoft.gctoolkit.aggregator.EventSource.SURVIVOR;
+import static com.microsoft.gctoolkit.jvm.SupportedFlags.*;
 
 /*
+    Index guide
+
     APPLICATION_STOPPED_TIME,                   //  0
     APPLICATION_CONCURRENT_TIME,                //  1
 
@@ -138,7 +147,7 @@ public class Diary {
     }
 
     public boolean isParNew() {
-        return isTrue(SupportedFlags.PARNEW);
+        return isTrue(PARNEW);
     }
 
     public boolean isCMS() {
@@ -194,11 +203,11 @@ public class Diary {
     }
 
     public boolean isApplicationStoppedTime() {
-        return isTrue(SupportedFlags.APPLICATION_STOPPED_TIME);
+        return isTrue(APPLICATION_STOPPED_TIME);
     }
 
     public boolean isApplicationRunningTime() {
-        return isTrue(SupportedFlags.APPLICATION_CONCURRENT_TIME);
+        return isTrue(APPLICATION_CONCURRENT_TIME);
     }
 
     public boolean isTLABData() {
@@ -254,7 +263,7 @@ public class Diary {
     }
 
     public boolean isParNewKnown() {
-        return isStateKnown(SupportedFlags.PARNEW);
+        return isStateKnown(PARNEW);
     }
 
     public boolean isCMSKnown() {
@@ -310,11 +319,11 @@ public class Diary {
     }
 
     public boolean isApplicationStoppedTimeKnown() {
-        return isStateKnown(SupportedFlags.APPLICATION_STOPPED_TIME);
+        return isStateKnown(APPLICATION_STOPPED_TIME);
     }
 
     public boolean isApplicationRunningTimeKnown() {
-        return isStateKnown(SupportedFlags.APPLICATION_CONCURRENT_TIME);
+        return isStateKnown(APPLICATION_CONCURRENT_TIME);
     }
 
     public boolean isJDK70Known() {
@@ -376,5 +385,40 @@ public class Diary {
 
     public DateTimeStamp getTimeOfFirstEvent() {
         return this.timeOfFirstEvent;
+    }
+/*    GENERATIONAL,
+    CMS,
+    G1GC,
+    SHENANDOAH,
+    ZGC,
+    SAFEPOINT,
+    SURVIVOR,
+    TENURED;
+
+ */
+    private void evaluate(Set<EventSource> events, SupportedFlags flag, EventSource eventSource) {
+        if ( isStateKnown(flag) & isTrue(flag))
+            events.add(eventSource);
+    }
+    public Set<EventSource> generatesEvents() {
+        Set<EventSource> generatedEvents = new TreeSet<>();
+        evaluate(generatedEvents, APPLICATION_STOPPED_TIME, SAFEPOINT);
+        evaluate(generatedEvents, APPLICATION_CONCURRENT_TIME, SAFEPOINT);
+        evaluate(generatedEvents, DEFNEW, EventSource.GENERATIONAL);
+        evaluate(generatedEvents, PARNEW, EventSource.GENERATIONAL);
+        if (isUnifiedLogging())
+            evaluate(generatedEvents, CMS, EventSource.CMS_UNIFIED);
+        else
+            evaluate(generatedEvents, CMS, EventSource.CMS_PREUNIFIED);
+        evaluate(generatedEvents, ICMS, EventSource.CMS_PREUNIFIED);
+        evaluate(generatedEvents, PARALLELGC, EventSource.GENERATIONAL);
+        evaluate(generatedEvents, PARALLELOLDGC, EventSource.GENERATIONAL);
+        evaluate(generatedEvents, SERIAL, EventSource.GENERATIONAL);
+        evaluate(generatedEvents, G1GC, EventSource.G1GC);
+        evaluate(generatedEvents, ZGC, EventSource.ZGC);
+        evaluate(generatedEvents, SHENANDOAH, EventSource.SHENANDOAH);
+        evaluate(generatedEvents, TENURING_DISTRIBUTION, SURVIVOR);
+        return generatedEvents;
+
     }
 }
