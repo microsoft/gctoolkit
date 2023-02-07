@@ -47,25 +47,35 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-deploy-plugin</artifactId>
-                <configuration>
-                    <skip>true</skip>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <useModulePath>true</useModulePath>
-                    <!-- todo: Hack to deal with surefire deficiency -->
-                    <argLine>--add-modules=ALL-MODULE-PATH</argLine>
-                    <systemProperties>
-                        <property>
-                            <name>gcLogFile</name>
-                            <value>${gcLogFile}</value>
-                        </property>
-                    </systemProperties>
-                </configuration>
+                <executions>
+                    <execution>
+                        <id>default-test</id>
+                        <configuration>
+                            <skip>true</skip>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>modulePath</id>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                        <configuration>
+                            <useModulePath>true</useModulePath>
+                            <groups>modulePath</groups>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>classPath</id>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                        <configuration>
+                            <useModulePath>false</useModulePath>
+                            <groups>classPath</groups>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <artifactId>maven-dependency-plugin</artifactId>
@@ -73,22 +83,6 @@
                     <outputDirectory>${project.build.directory}/lib</outputDirectory>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <configuration>
-                    <executable>java</executable>
-                    <arguments>
-                        <argument>- -module-path</argument>
-                        <!-- Create the modulepath using all project dependencies and project build directory -->
-                        <modulepath />
-                        <argument>- -module</argument>
-                        <argument>com.microsoft.gctoolkit.sample/com.microsoft.gctoolkit.sample.Main</argument>
-                        <argument>${gcLogFile}</argument>
-                    </arguments>
-                </configuration>
-            </plugin>
         </plugins>
     </build>
-
 </project>

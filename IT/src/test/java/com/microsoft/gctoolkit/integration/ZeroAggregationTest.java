@@ -8,20 +8,20 @@ import com.microsoft.gctoolkit.aggregator.Collates;
 import com.microsoft.gctoolkit.aggregator.EventSource;
 import com.microsoft.gctoolkit.integration.aggregation.CollectionCycleCountsSummary;
 import com.microsoft.gctoolkit.integration.aggregation.HeapOccupancyAfterCollectionSummary;
-import com.microsoft.gctoolkit.integration.aggregation.PauseTimeSummary;
 import com.microsoft.gctoolkit.integration.io.TestLogFile;
 import com.microsoft.gctoolkit.io.GCLogFile;
 import com.microsoft.gctoolkit.io.SingleGCLogFile;
 import com.microsoft.gctoolkit.jvm.JavaVirtualMachine;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.fail;
 
+@Tag("modulePath")
 public class ZeroAggregationTest {
 
     @Test
@@ -47,18 +47,14 @@ public class ZeroAggregationTest {
         Assertions.assertTrue(machine.getAggregation(CollectionCycleCountsSummary.class).isEmpty());
     }
 
+    @Tag("modulePath")
     @Test
     public void testSuppliedAggregation() {
         Path path = new TestLogFile("cms/defnew/details/defnew.log").getFile().toPath();
-        /*
-         * GC log files can come in  one of two types: single or series of rolling logs.
-         * In this sample, we load a single log file.
-         * The log files can be either in text, zip, or gzip format.
-         */
         GCLogFile logFile = new SingleGCLogFile(path);
         GCToolKit gcToolKit = new GCToolKit();
-        // Load our local Aggregation that will not registered for the given log file
-        gcToolKit.registerAggregation(new ZeroAggregationTest.TestAggregation());
+        // Load our local Aggregation that will not be registered for the given log file
+        gcToolKit.loadAggregation(new ZeroAggregationTest.TestAggregation());
         JavaVirtualMachine machine = null;
         try {
             machine = gcToolKit.analyze(logFile);

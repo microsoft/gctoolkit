@@ -8,9 +8,13 @@ import com.microsoft.gctoolkit.integration.io.TestLogFile;
 import com.microsoft.gctoolkit.io.GCLogFile;
 import com.microsoft.gctoolkit.io.SingleGCLogFile;
 import com.microsoft.gctoolkit.jvm.JavaVirtualMachine;
+import com.microsoft.gctoolkit.parser.CMSTenuredPoolParser;
+import com.microsoft.gctoolkit.parser.GenerationalHeapParser;
+import com.microsoft.gctoolkit.vertx.VertxDataSourceChannel;
+import com.microsoft.gctoolkit.vertx.VertxJVMEventChannel;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Tag;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -18,8 +22,8 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.fail;
 
-@Tag("modulePath")
-public class EndToEndIntegrationTest {
+@Tag("classPath")
+public class NoModuleIntegrationTest {
 
     @Test
     public void testMain() {
@@ -39,11 +43,13 @@ public class EndToEndIntegrationTest {
         GCLogFile logFile = new SingleGCLogFile(Path.of(gcLogFile));
         GCToolKit gcToolKit = new GCToolKit();
 
-        /**
-         * This call will load all implementations of Aggregator that have been declared in module-info.java.
-         * This mechanism makes use of Module SPI.
-         */
-        gcToolKit.loadAggregationsFromServiceLoader();
+        gcToolKit.loadDataSourceChannel(new VertxDataSourceChannel());
+        gcToolKit.loadJVMEventChannel(new VertxJVMEventChannel());
+        gcToolKit.loadDataSourceParser(new GenerationalHeapParser());
+        gcToolKit.loadDataSourceParser(new CMSTenuredPoolParser());
+
+        gcToolKit.loadAggregation(new HeapOccupancyAfterCollectionSummary());
+        gcToolKit.loadAggregation(new CollectionCycleCountsSummary());
 
         /**
          * The JavaVirtualMachine contains the aggregations as filled out by the Aggregators.
