@@ -14,11 +14,11 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.nio.file.Path;
 
+@Tag("modulePath")
 public class TestSharedAggregators {
 
     private String testLog = "unified/cms/gc.log";
 
-    @Tag("modulePath")
     @Test
     public void compareRuntimeDurations() {
         TestLogFile logFile = new TestLogFile(testLog);

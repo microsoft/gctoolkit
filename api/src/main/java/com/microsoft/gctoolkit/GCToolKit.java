@@ -14,10 +14,12 @@ import com.microsoft.gctoolkit.message.DataSourceParser;
 import com.microsoft.gctoolkit.message.JVMEventChannel;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.ServiceConfigurationError;
 import java.util.ServiceLoader;
 import java.util.logging.Level;
@@ -121,7 +123,7 @@ public class GCToolKit {
                     Class clazz = forName("com.microsoft.gctoolkit.vertx.VertxDataSourceChannel", true, Thread.currentThread().getContextClassLoader());
                     loadDataSourceChannel((DataSourceChannel) clazz.getConstructors()[0].newInstance());
                 } catch (Exception e) {
-                    throw new ServiceConfigurationError("Unable to find a suitable provider to create a diary");
+                    throw new ServiceConfigurationError("Unable to find a suitable DataSourceChannel provider");
                 }
             }
         }
@@ -166,7 +168,7 @@ public class GCToolKit {
                     .map(ServiceLoader.Provider::get)
                     .filter(consumer -> consumer.accepts(diary))
                     .collect(Collectors.toList());
-        } else {
+        } else{
             dataSourceParsers = new ArrayList<>();
             dataSourceParsers.addAll(registeredDataSourceParsers);
         }
@@ -186,28 +188,27 @@ public class GCToolKit {
                     "com.microsoft.gctoolkit.parser.UnifiedSurvivorMemoryPoolParser",
                     "com.microsoft.gctoolkit.parser.ZGCParser"
             };
-            try {
-                dataSourceParsers = Arrays.stream(parsers)
-                        .map(parserName -> {
-                            try {
-                                return forName(parserName, true, Thread.currentThread().getContextClassLoader());
-                            } catch (ClassNotFoundException e) {
-                                throw new ServiceConfigurationError("Unable to find a suitable provider to create a DataSourceParser");
-                            }
-                        })
-                        .map(clazz -> {
-                            try {
-                                return (DataSourceParser) clazz.getConstructors()[0].newInstance();
-                            } catch (Exception e) {
-                                throw new ServiceConfigurationError("Unable to find a suitable provider to create a DataSourceParser");
-                            }
-                        })
-                        .filter(consumer -> consumer.accepts(diary))
-                        .collect(Collectors.toList());
-            } catch (Exception e) {
-                e.printStackTrace();
+            dataSourceParsers = Arrays.stream(parsers)
+                    .map(parserName -> {
+                        try {
+                            Class<?> clazz = forName(parserName, true, Thread.currentThread().getContextClassLoader());
+                            return Optional.of(clazz.getConstructors()[0].newInstance());
+                        } catch (ClassNotFoundException
+                                | InstantiationException
+                                | IllegalAccessException
+                                | InvocationTargetException e) {
+                            return Optional.empty();
+                        }
+                    })
+                    .filter(Optional::isPresent)
+                    .map(optional -> (DataSourceParser) optional.get())
+                    .filter(consumer -> consumer.accepts(diary))
+                    .collect(Collectors.toList());
+            if (dataSourceParsers.isEmpty()) {
+                throw new ServiceConfigurationError("Unable to find a suitable provider to create a DataSourceParser");
             }
         }
+
         for (DataSourceParser dataSourceParser : dataSourceParsers) {
             dataSourceParser.diary(diary);
             dataSourceChannel.registerListener(dataSourceParser);

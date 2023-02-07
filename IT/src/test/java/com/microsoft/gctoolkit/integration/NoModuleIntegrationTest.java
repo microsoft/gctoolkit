@@ -22,11 +22,9 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.fail;
 
+@Tag("classPath")
 public class NoModuleIntegrationTest {
 
-    //Todo: turn on this test once mvn has been configured to run it with all of the supporting bits
-    // on the classpath and not the module-path
-    @Tag("classPath")
     @Test
     public void testMain() {
         Path path = new TestLogFile("cms/defnew/details/defnew.log").getFile().toPath();

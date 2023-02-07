@@ -21,9 +21,9 @@ import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.fail;
 
+@Tag("modulePath")
 public class ZeroAggregationTest {
 
-    @Tag("modulePath")
     @Test
     public void testNoAggregationRegistered() {
         Path path = new TestLogFile("cms/defnew/details/defnew.log").getFile().toPath();

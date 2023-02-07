@@ -8,9 +8,9 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
+@Tag("classPath")
 public class XYDataSetTest {
 
-    @Tag("classPath")
     @Test
     public void shouldScaleOnlyY_AxisDataSet() {
         var xyDataSet = new XYDataSet();
@@ -20,7 +20,6 @@ public class XYDataSetTest {
         Assertions.assertEquals(200.0, scaledPoint.getItems().get(0).getY());
     }
 
-    @Tag("classPath")
     @Test
     public void shouldReturnMaximumValueOfY_Axis() {
         var xyDataSet = new XYDataSet();
@@ -32,7 +31,6 @@ public class XYDataSetTest {
         Assertions.assertEquals(230, xyDataSet.maxOfY().getAsDouble());
     }
 
-    @Tag("classPath")
     @Test
     public void shouldReturnScaledAndTranslatedX_AxisDataSet() {
         var xyDataSet = new XYDataSet();
@@ -42,7 +40,6 @@ public class XYDataSetTest {
         Assertions.assertEquals(100, translated.getItems().get(0).getY());
     }
 
-    @Tag("classPath")
     @Test
     public void maxOnEmptyDataSet() {
         Assertions.assertTrue(new XYDataSet().maxOfY().isEmpty());
