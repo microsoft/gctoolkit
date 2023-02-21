@@ -6,9 +6,9 @@ import io.vertx.core.Vertx;
 
 public class VertxChannel {
 
-    private static Vertx vertx;
+    private Vertx vertx;
 
-    static {
+    {
         //Disable unused Vert.x functionality
         System.setProperty("vertx.disableFileCPResolving", "true");
         System.setProperty("vertx.disableFileCaching", "true");
