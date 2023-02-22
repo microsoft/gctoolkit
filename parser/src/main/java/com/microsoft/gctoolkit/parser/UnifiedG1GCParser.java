@@ -57,7 +57,6 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
     private DateTimeStamp jvmTerminationEventTime = new DateTimeStamp(-1.0d);
 
     private G1GCForwardReference forwardReference;
-    private boolean concurrentCycleActive = false;
     private boolean concurrentPhaseActive = false;
 
     private final RuleSet<GCParseRule, BiConsumer<GCLogTrace, String>> parseRules;
@@ -222,7 +221,7 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
     // todo: need to drain the queues before terminating...
     // Just in case there isn't a JVM termination event in the log.
     public void endOfFile(GCLogTrace trace, String line) {
-        publish(new JVMTermination((jvmTerminationEventTime.getTimeStamp() < 0.0d) ? getClock() : jvmTerminationEventTime,diary.getTimeOfFirstEvent()));
+        publish(new JVMTermination((jvmTerminationEventTime.hasTimeStamp()) ? jvmTerminationEventTime : getClock(),diary.getTimeOfFirstEvent()));
     }
 
 

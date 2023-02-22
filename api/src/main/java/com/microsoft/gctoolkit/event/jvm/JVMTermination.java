@@ -2,7 +2,6 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.event.jvm;
 
-
 import com.microsoft.gctoolkit.time.DateTimeStamp;
 
 public class JVMTermination extends JVMEvent {

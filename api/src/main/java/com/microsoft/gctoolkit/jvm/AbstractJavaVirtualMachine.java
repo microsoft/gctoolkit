@@ -153,11 +153,13 @@ public abstract class AbstractJavaVirtualMachine implements JavaVirtualMachine {
     @SuppressWarnings("unchecked")
     private Constructor<? extends Aggregator<?>> constructor(Aggregation aggregation) {
         Class<? extends Aggregator<?>> targetClazz = aggregation.collates();
-        Constructor<?>[] constructors = targetClazz.getConstructors();
-        for ( Constructor<?> constructor : constructors) {
-            Parameter[] parameters = constructor.getParameters();
-            if ( parameters.length == 1 && Aggregation.class.isAssignableFrom(parameters[0].getType()))
-                return (Constructor<? extends Aggregator<?>>)constructor;
+        if ( targetClazz != null) {
+            Constructor<?>[] constructors = targetClazz.getConstructors();
+            for (Constructor<?> constructor : constructors) {
+                Parameter[] parameters = constructor.getParameters();
+                if (parameters.length == 1 && Aggregation.class.isAssignableFrom(parameters[0].getType()))
+                    return (Constructor<? extends Aggregator<?>>) constructor;
+            }
         }
         return null;
     }
@@ -181,7 +183,10 @@ public abstract class AbstractJavaVirtualMachine implements JavaVirtualMachine {
             Set<EventSource> generatedEvents = diary.generatesEvents();
             for (Aggregation aggregation : registeredAggregations) {
                 Constructor<? extends Aggregator<?>> constructor = constructor(aggregation);
-                if ( constructor == null) continue;
+                if ( constructor == null) {
+                    LOGGER.log(Level.WARNING, "Cannot find one of: default constructor or @Collates annotation for " + aggregation.getClass().getName());
+                    continue;
+                }
                 Aggregator<? extends Aggregation> aggregator = constructor.newInstance(aggregation);
                 aggregatedData.put(aggregation.getClass(), aggregation);
                 Optional<EventSource> source = generatedEvents.stream().filter(aggregator::aggregates).findFirst();
