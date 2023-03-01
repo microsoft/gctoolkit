@@ -13,8 +13,8 @@ import com.microsoft.gctoolkit.parser.GenerationalHeapParser;
 import com.microsoft.gctoolkit.vertx.VertxDataSourceChannel;
 import com.microsoft.gctoolkit.vertx.VertxJVMEventChannel;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.nio.file.Path;

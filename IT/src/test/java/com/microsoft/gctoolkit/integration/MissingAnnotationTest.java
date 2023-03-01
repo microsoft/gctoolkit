@@ -6,10 +6,7 @@ import com.microsoft.gctoolkit.aggregator.Aggregation;
 import com.microsoft.gctoolkit.aggregator.Aggregator;
 import com.microsoft.gctoolkit.aggregator.Collates;
 import com.microsoft.gctoolkit.aggregator.EventSource;
-import com.microsoft.gctoolkit.integration.aggregation.CollectionCycleCountsSummary;
-import com.microsoft.gctoolkit.integration.aggregation.HeapOccupancyAfterCollectionSummary;
 import com.microsoft.gctoolkit.integration.io.TestLogFile;
-import com.microsoft.gctoolkit.io.GCLogFile;
 import com.microsoft.gctoolkit.io.SingleGCLogFile;
 import com.microsoft.gctoolkit.jvm.JavaVirtualMachine;
 import org.junit.jupiter.api.Assertions;
@@ -17,13 +14,13 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.fail;
 
 @Tag("modulePath")
 public class MissingAnnotationTest {
 
+    @SuppressWarnings("unchecked")
     private void workFlow( Aggregation aggregation, Class clazz) {
         GCToolKit gcToolKit = new GCToolKit();
         // Load our test aggregation instead of calling GCToolKit::loadAggregationsFromServiceLoader
@@ -39,13 +36,13 @@ public class MissingAnnotationTest {
 
     @Tag("modulePath")
     @Test
-    public void testNoAggregationRegistered() {
+    void testNoAggregationRegistered() {
         workFlow(new MissingAnnotationAggregation(), MissingAnnotationTest.MissingAnnotationAggregation.class);
     }
 
     @Tag("modulePath")
     @Test
-    public void testSuppliedAggregation() {
+    void testSuppliedAggregation() {
         workFlow(new MissingEventSource(), MissingAnnotationTest.MissingEventSource.class);
     }
 
@@ -63,6 +60,7 @@ public class MissingAnnotationTest {
         }
     }
 
+    @SuppressWarnings("unused")
     @Aggregates(EventSource.G1GC)
     public static class TestAggregator extends Aggregator<MissingAnnotationAggregation> {
         protected TestAggregator(MissingAnnotationAggregation aggregation) {

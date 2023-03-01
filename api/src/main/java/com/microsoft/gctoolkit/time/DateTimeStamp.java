@@ -5,7 +5,6 @@ package com.microsoft.gctoolkit.time;
 import java.time.ZonedDateTime;
 import java.time.chrono.ChronoZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.TemporalAccessor;
 import java.util.Comparator;
 import java.util.Locale;
 import java.util.Objects;

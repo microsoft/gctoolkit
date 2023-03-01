@@ -32,6 +32,8 @@ import java.util.logging.Logger;
  */
 public abstract class AbstractJavaVirtualMachine implements JavaVirtualMachine {
 
+    private boolean debugging = Boolean.getBoolean("microsoft.debug.aggregation");
+
     private static final Logger LOGGER = Logger.getLogger(AbstractJavaVirtualMachine.class.getName());
     private static final double LOG_FRAGMENT_THRESHOLD_SECONDS = 60.0d; //todo: replace magic threshold with a heuristic
 
@@ -179,15 +181,25 @@ public abstract class AbstractJavaVirtualMachine implements JavaVirtualMachine {
     @Override
     public void analyze(List<Aggregation> registeredAggregations, JVMEventChannel eventBus, DataSourceChannel dataSourceBus) {
         Phaser finishLine = new Phaser();
-        try {
             Set<EventSource> generatedEvents = diary.generatesEvents();
             for (Aggregation aggregation : registeredAggregations) {
+                if ( debugging)
+                    LOGGER.log(Level.INFO, "Evaluating: " + aggregation.toString());
                 Constructor<? extends Aggregator<?>> constructor = constructor(aggregation);
                 if ( constructor == null) {
                     LOGGER.log(Level.WARNING, "Cannot find one of: default constructor or @Collates annotation for " + aggregation.getClass().getName());
                     continue;
                 }
-                Aggregator<? extends Aggregation> aggregator = constructor.newInstance(aggregation);
+                if ( debugging)
+                    LOGGER.log(Level.INFO, "Loading   : " + aggregation.toString());
+                Aggregator<? extends Aggregation> aggregator = null;
+                try {
+                    aggregator = constructor.newInstance(aggregation);
+                } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+                    e.printStackTrace();
+                    LOGGER.log(Level.SEVERE, e.getMessage(), e);
+                    continue;
+                }
                 aggregatedData.put(aggregation.getClass(), aggregation);
                 Optional<EventSource> source = generatedEvents.stream().filter(aggregator::aggregates).findFirst();
                 if (source.isPresent()) {
@@ -199,26 +211,27 @@ public abstract class AbstractJavaVirtualMachine implements JavaVirtualMachine {
                 }
             }
 
-            if ( finishLine.getRegisteredParties() > 0) {
-                dataSource.stream().forEach(message -> dataSourceBus.publish(ChannelName.DATA_SOURCE, message));
-                finishLine.awaitAdvance(0);
-            } else {
-                LOGGER.log(Level.INFO, "No Aggregations have been registered, DataSource will not be analysed.");
-                LOGGER.log(Level.INFO, "Is there a module containing Aggregation classes on the module-path");
-                LOGGER.log(Level.INFO, "Is GCToolKit::loadAggregationsFromServiceLoader() or GCToolKit::loadAggregation(Aggregation) being invoked?");
-            }
-            dataSourceBus.close();
-            eventBus.close();
+            try {
+                if (finishLine.getRegisteredParties() > 0) {
+                    dataSource.stream().forEach(message -> dataSourceBus.publish(ChannelName.DATA_SOURCE, message));
+                    finishLine.awaitAdvance(0);
+                } else {
+                    LOGGER.log(Level.INFO, "No Aggregations have been registered, DataSource will not be analysed.");
+                    LOGGER.log(Level.INFO, "Is there a module containing Aggregation classes on the module-path");
+                    LOGGER.log(Level.INFO, "Is GCToolKit::loadAggregationsFromServiceLoader() or GCToolKit::loadAggregation(Aggregation) being invoked?");
+                }
+                dataSourceBus.close();
+                eventBus.close();
 
-            // Fill in termination info.
-            Optional<Aggregation> aggregation = aggregatedData.values().stream().findFirst();
-            aggregation.ifPresent(terminationRecord -> {
-                setJVMTerminationTime(terminationRecord.timeOfTerminationEvent());
-                setRuntimeDuration(terminationRecord.estimatedRuntime());
-                setEstimatedJVMStartTime(terminationRecord.estimatedStartTime());
-            });
-        } catch (IOException | ClassCastException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            LOGGER.log(Level.WARNING, e.getMessage(), e);
-        }
+                // Fill in termination info.
+                Optional<Aggregation> aggregation = aggregatedData.values().stream().findFirst();
+                aggregation.ifPresent(terminationRecord -> {
+                    setJVMTerminationTime(terminationRecord.timeOfTerminationEvent());
+                    setRuntimeDuration(terminationRecord.estimatedRuntime());
+                    setEstimatedJVMStartTime(terminationRecord.estimatedStartTime());
+                });
+            } catch(IOException ioe) {
+                LOGGER.log(Level.SEVERE,ioe.getMessage(),ioe);
+            }
     }
 }
