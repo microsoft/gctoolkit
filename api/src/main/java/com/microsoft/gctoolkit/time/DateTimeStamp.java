@@ -44,7 +44,7 @@ public class DateTimeStamp implements Comparable<DateTimeStamp> {
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 
     private static ZonedDateTime dateFromString(String iso8601DateTime) {
-        if ( iso8601DateTime == null)
+        if (iso8601DateTime == null)
             return null;
         return ZonedDateTime.from(formatter.parse(iso8601DateTime));
     }
