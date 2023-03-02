@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 public class MissingAnnotationTest {
 
     @SuppressWarnings("unchecked")
-    private void workFlow( Aggregation aggregation, Class clazz) {
+    private void workFlow(Aggregation aggregation, Class clazz) {
         GCToolKit gcToolKit = new GCToolKit();
         // Load our test aggregation instead of calling GCToolKit::loadAggregationsFromServiceLoader
         gcToolKit.loadAggregation(aggregation);
