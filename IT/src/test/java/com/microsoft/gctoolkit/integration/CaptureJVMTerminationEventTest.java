@@ -69,7 +69,8 @@ public class CaptureJVMTerminationEventTest {
         Assertions.assertEquals( 608800.088d, heapOccupancyAfterCollectionSummary.estimatedRuntime(),0.001d, "Runtime duration");
 
     }
-    @Aggregates({EventSource.CMS_PREUNIFIED,EventSource.CMS_UNIFIED,EventSource.G1GC,EventSource.GENERATIONAL,EventSource.JVM,EventSource.SHENANDOAH, EventSource.TENURED,EventSource.ZGC})
+   
+   @Aggregates({EventSource.CMS_PREUNIFIED,EventSource.CMS_UNIFIED,EventSource.G1GC,EventSource.GENERATIONAL,EventSource.JVM,EventSource.SHENANDOAH, EventSource.TENURED,EventSource.ZGC})
     public static class JVMEventTerminationAggregator extends Aggregator<JVMTerminationEventAggregation> {
 
         public JVMEventTerminationAggregator(JVMTerminationEventAggregation aggregation) {
