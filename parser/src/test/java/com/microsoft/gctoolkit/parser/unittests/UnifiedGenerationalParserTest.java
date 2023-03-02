@@ -40,7 +40,7 @@ public class UnifiedGenerationalParserTest extends ParserTest {
     };
 
     @Test
-    public void testCMSLogs() {
+    public void testCMSLogsMissingTimeStamps() {
         int i = 0;
         for (String name : cms) {
             try {

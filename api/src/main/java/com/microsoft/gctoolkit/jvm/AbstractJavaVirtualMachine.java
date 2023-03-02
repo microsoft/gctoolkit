@@ -196,7 +196,6 @@ public abstract class AbstractJavaVirtualMachine implements JavaVirtualMachine {
                 try {
                     aggregator = constructor.newInstance(aggregation);
                 } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                    e.printStackTrace();
                     LOGGER.log(Level.SEVERE, e.getMessage(), e);
                     continue;
                 }

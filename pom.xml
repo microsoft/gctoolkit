@@ -5,7 +5,7 @@
     <groupId>com.microsoft.gctoolkit</groupId>
     <artifactId>gctoolkit</artifactId>
     <packaging>pom</packaging>
-    <version>3.0.3</version>
+    <version>${revision}</version>
 
     <name>GCToolKit</name>
     <description>GC log parsing utilities</description>
@@ -54,16 +54,8 @@
         </repository>
     </distributionManagement>
 
-    <modules>
-        <module>gclogs</module>
-        <module>api</module>
-        <module>parser</module>
-        <module>vertx</module>
-        <module>sample</module>
-        <module>IT</module>
-    </modules>
-
     <properties>
+        <revision>3.0.3-SNAPSHOT</revision>
         <checkstyle.version>10.6.0</checkstyle.version>
         <jreleaser.plugin.version>1.3.0</jreleaser.plugin.version>
         <junit5.version>5.9.1</junit5.version>
@@ -102,6 +94,15 @@
         <repository.url>git@github.com:${project.github.repository}.git</repository.url>
         <spotbugs.version>4.7.3</spotbugs.version>
     </properties>
+
+    <modules>
+        <module>gclogs</module>
+        <module>api</module>
+        <module>parser</module>
+        <module>vertx</module>
+        <module>sample</module>
+        <module>IT</module>
+    </modules>
 
     <!-- 
         These are listed in alphabetical order according to groupId 

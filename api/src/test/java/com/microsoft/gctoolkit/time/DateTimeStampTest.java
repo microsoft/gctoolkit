@@ -461,7 +461,6 @@ public class DateTimeStampTest {
         DateTimeStamp stamp3 = new DateTimeStamp("2021-08-31T11:12:13.111-0100", 300);
         assertTrue(stamp1.compareTo(stamp2) < 0);
         assertTrue(stamp2.compareTo(stamp3) < 0);
-        // therefore, stamp1.compareTo(stamp3) should be < 0
         assertTrue(stamp1.compareTo(stamp3) < 0);
     }
 
