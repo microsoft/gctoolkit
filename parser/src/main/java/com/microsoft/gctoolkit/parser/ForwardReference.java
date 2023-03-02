@@ -19,6 +19,7 @@ public class ForwardReference {
     ForwardReference(Decorators decorators, int id) {
         this.gcID = id;
         this.decorators = decorators;
+        this.startTime = decorators.getDateTimeStamp();
     }
 
     int getGcID() {

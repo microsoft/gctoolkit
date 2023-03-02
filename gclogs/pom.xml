@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.microsoft.gctoolkit</groupId>
         <artifactId>gctoolkit</artifactId>
-        <version>3.0.3-SNAPSHOT</version>
+        <version>${revision}</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -17,7 +17,7 @@
     <packaging>pom</packaging>
 
     <properties>
-        <gctoolkit-testdata-version>1.0.6</gctoolkit-testdata-version>
+        <gctoolkit-testdata-version>1.0.7</gctoolkit-testdata-version>
     </properties>
 
     <build>

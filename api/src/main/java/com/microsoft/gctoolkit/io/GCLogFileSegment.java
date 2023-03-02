@@ -72,12 +72,7 @@ public class GCLogFileSegment implements LogFileSegment {
     public double getStartTime() {
         try {
             ageOfJVMAtLogStart();
-            if ( startTime.hasTimeStamp())
-                return startTime.getTimeStamp();
-            else if ( startTime.hasDateStamp())
-                return startTime.toEpochInMillis();
-            else
-                return Double.MAX_VALUE;
+            return startTime.getTimeStamp();
         } catch (NullPointerException ex) {
             return Double.MAX_VALUE;
         }
@@ -96,12 +91,7 @@ public class GCLogFileSegment implements LogFileSegment {
     public double getEndTime() {
         try {
             ageOfJVMAtLogEnd();
-            if ( endTime.hasTimeStamp())
-                return endTime.getTimeStamp();
-            else if ( endTime.hasDateStamp())
-                return endTime.toEpochInMillis();
-            else
-                return Double.MAX_VALUE;
+            return endTime.getTimeStamp();
         } catch (NullPointerException|IOException ex) {
             return Double.MIN_VALUE;
         }
