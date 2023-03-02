@@ -208,7 +208,7 @@ public class DateTimeStamp implements Comparable<DateTimeStamp> {
      * @return {@code true} if this time stamp is less than the other.
      */
     public boolean before(DateTimeStamp other) {
-        return getTimeStamp() < other.getTimeStamp();
+        return compareTo(other) < 0;
     }
 
     /**
@@ -217,7 +217,7 @@ public class DateTimeStamp implements Comparable<DateTimeStamp> {
      * @return {@code true} if this time stamp is less than the other.
      */
     public boolean after(DateTimeStamp other) {
-        return getTimeStamp() > other.getTimeStamp();
+        return compareTo(other) > 0;
     }
 
     /**
