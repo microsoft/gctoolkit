@@ -261,7 +261,7 @@ public class DateTimeStamp implements Comparable<DateTimeStamp> {
             adjustedDateStamp = dateTime.plusSeconds(seconds).plusNanos(nanos);
         }
 
-            return new DateTimeStamp(adjustedDateStamp,adjustedTimeStamp);
+            return new DateTimeStamp(adjustedDateStamp, adjustedTimeStamp);
     }
 
     /**
