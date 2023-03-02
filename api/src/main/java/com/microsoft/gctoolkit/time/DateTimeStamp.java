@@ -148,7 +148,7 @@ public class DateTimeStamp implements Comparable<DateTimeStamp> {
      * @return The time stamp value, in decimal seconds.
      */
     public double getTimeStamp() {
-        if (! hasTimeStamp())
+        if (!hasTimeStamp())
             return toEpochInMillis();
         return timeStamp;
     }
