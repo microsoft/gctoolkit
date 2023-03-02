@@ -65,7 +65,7 @@
     </modules>
 
     <properties>
-        <checkstyle.version>10.7.0</checkstyle.version>
+        <checkstyle.version>10.8.0</checkstyle.version>
         <jreleaser.plugin.version>1.4.0</jreleaser.plugin.version>
         <junit5.version>5.9.2</junit5.version>
         <maven.antrun-plugin.version>3.1.0</maven.antrun-plugin.version>
@@ -97,7 +97,7 @@
         <maven.version>3.9.0</maven.version>
         <maven.versions-plugin.version>2.14.2</maven.versions-plugin.version>
         <mutability.detector.version>0.9.1</mutability.detector.version>
-        <pmd.version>6.54.0</pmd.version>
+        <pmd.version>6.55.0</pmd.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.github.repository>microsoft/gctoolkit</project.github.repository>
         <repository.url>git@github.com:${project.github.repository}.git</repository.url>
