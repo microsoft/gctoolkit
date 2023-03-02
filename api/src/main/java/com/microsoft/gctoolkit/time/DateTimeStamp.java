@@ -198,7 +198,7 @@ public class DateTimeStamp implements Comparable<DateTimeStamp> {
         if (hasDateStamp())
             buffer.append(getDateTime().toString());
         if (hasTimeStamp())
-            buffer.append("@").append(String.format(Locale.US,"%.3f",getTimeStamp()));
+            buffer.append("@").append(String.format(Locale.US,"%.3f", getTimeStamp()));
         return buffer.toString();
     }
 
