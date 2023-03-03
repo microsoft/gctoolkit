@@ -17,7 +17,6 @@
         <gcLogFile>../gclogs/preunified/cms/defnew/details/defnew.log</gcLogFile>
     </properties>
 
-
     <dependencies>
         <dependency>
             <groupId>com.microsoft.gctoolkit</groupId>
