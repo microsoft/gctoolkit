@@ -48,8 +48,9 @@ public class G1GCUnifiedParserRulesTest implements UnifiedG1GCPatterns {
     }
 
     // for debugging @Test
+    @Test
     public void testSingeRuleCapture() {
-        int index = 10;
+        int index = 6;
         assertEquals(lines[index].length, captureTest(rules[index], lines[index]), "Miss for " + rules[index].getName());
     }
 
