@@ -580,10 +580,12 @@ class G1GCForwardReference extends ForwardReference {
     
     void setEdenRegionSummary(RegionSummary summary) {
         regionSummaries[REGIONS.EDEN.ordinal()] = summary;
-        setEdenOccupancyBeforeCollection(summary.getBefore() * heapRegionSize * 1024L);
-        setEdenOccupancyAfterCollection(summary.getAfter() * heapRegionSize * 1024L);
-        setEdenSizeBeforeCollection(summary.getBefore() * heapRegionSize * 1024L);
-        setEdenSizeAfterCollection(summary.getAssigned() * heapRegionSize * 1024L);
+        if (heapRegionSize > 0) {
+            setEdenOccupancyBeforeCollection(summary.getBefore() * heapRegionSize * 1024L);
+            setEdenOccupancyAfterCollection(summary.getAfter() * heapRegionSize * 1024L);
+            setEdenSizeBeforeCollection(summary.getBefore() * heapRegionSize * 1024L);
+            setEdenSizeAfterCollection(summary.getAssigned() * heapRegionSize * 1024L);
+        }
     }
 
     void setSurvivorRegionSummary(RegionSummary summary) {
@@ -768,6 +770,7 @@ class G1GCForwardReference extends ForwardReference {
 
     private G1Young buildYoung(G1Young collection) {
         fillInMemoryPoolStats(collection);
+        fillInRegionSummary(collection);
         fillInMetaspaceStats(collection);
         fillInPhases(collection);
         if (toSpaceExhausted) collection.toSpaceExhausted();

@@ -73,7 +73,7 @@ public abstract class G1GCPauseEvent extends G1GCEvent {
     }
 
     public RegionSummary getHumongousRegionSummary() {
-        return this.humongousRegion == null ? NULL_REGION : this.edenRegion;
+        return this.humongousRegion == null ? NULL_REGION : this.humongousRegion;
     }
 
     public RegionSummary getArchiveRegionSummary() {

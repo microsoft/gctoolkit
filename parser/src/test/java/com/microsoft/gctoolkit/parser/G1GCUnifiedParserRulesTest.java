@@ -4,6 +4,7 @@ package com.microsoft.gctoolkit.parser;
 
 import com.microsoft.gctoolkit.parser.jvm.Decorators;
 import com.microsoft.gctoolkit.parser.unified.UnifiedG1GCPatterns;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.logging.Logger;
@@ -47,8 +48,7 @@ public class G1GCUnifiedParserRulesTest implements UnifiedG1GCPatterns {
         }
     }
 
-    // for debugging @Test
-    @Test
+    @Test @Disabled("used for debug testing")
     public void testSingeRuleCapture() {
         int index = 6;
         assertEquals(lines[index].length, captureTest(rules[index], lines[index]), "Miss for " + rules[index].getName());
