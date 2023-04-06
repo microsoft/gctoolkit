@@ -7,6 +7,7 @@ import com.microsoft.gctoolkit.event.GarbageCollectionTypes;
 import com.microsoft.gctoolkit.event.MalformedEvent;
 import com.microsoft.gctoolkit.event.MemoryPoolSummary;
 import com.microsoft.gctoolkit.event.ReferenceGCSummary;
+import com.microsoft.gctoolkit.event.RegionSummary;
 import com.microsoft.gctoolkit.event.SurvivorMemoryPoolSummary;
 import com.microsoft.gctoolkit.event.UnifiedCountSummary;
 import com.microsoft.gctoolkit.event.UnifiedStatisticalSummary;
@@ -31,6 +32,7 @@ import com.microsoft.gctoolkit.event.g1gc.G1YoungInitialMark;
 import com.microsoft.gctoolkit.parser.jvm.Decorators;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
 
+import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
@@ -130,7 +132,7 @@ class G1GCForwardReference extends ForwardReference {
     private static final int YOUNG_OCCUPANCY_BEFORE_COLLECTION = 12;
     private static final int YOUNG_OCCUPANCY_AFTER_COLLECTION = 13;
     private static final int YOUNG_SIZE_BEFORE_COLLECTION = 14;
-    private static final int YOUNG__SIZE_AFTER_COLLECTION = 15;
+    private static final int YOUNG_SIZE_AFTER_COLLECTION = 15;
     private static final int OLD_OCCUPANCY_BEFORE_COLLECTION = 16;
     private static final int OLD_OCCUPANCY_AFTER_COLLECTION = 17;
     private static final int OLD_SIZE_BEFORE_COLLECTION = 18;
@@ -176,6 +178,7 @@ class G1GCForwardReference extends ForwardReference {
         }
         return false;
     }
+
 
     boolean setHeapOccupancyBeforeCollection(long value) {
         return setMemoryPoolMeasurement(HEAP_OCCUPANCY_BEFORE_COLLECTION, value);
@@ -238,7 +241,7 @@ class G1GCForwardReference extends ForwardReference {
     }
 
     boolean setYoungSizeAfterCollection(long value) {
-        return setMemoryPoolMeasurement(YOUNG__SIZE_AFTER_COLLECTION, value);
+        return setMemoryPoolMeasurement(YOUNG_SIZE_AFTER_COLLECTION, value);
     }
 
     boolean setOldOccupancyBeforeCollection(long value) {
@@ -564,6 +567,77 @@ class G1GCForwardReference extends ForwardReference {
         collection.addPermOrMetaSpaceRecord(getMemoryPoolSummary(METASPACE_OCCUPANCY_BEFORE_COLLECTION));
     }
 
+
+    enum REGIONS {
+        EDEN,
+        SURVIVOR,
+        OLD,
+        HUMONGOUS,
+        ARCHIVE;
+    }
+
+    private final RegionSummary[] regionSummaries = new RegionSummary[REGIONS.values().length];
+    
+    void setEdenRegionSummary(RegionSummary summary) {
+        regionSummaries[REGIONS.EDEN.ordinal()] = summary;
+        if (heapRegionSize > 0) {
+            setEdenOccupancyBeforeCollection(summary.getBefore() * heapRegionSize * 1024L);
+            setEdenOccupancyAfterCollection(summary.getAfter() * heapRegionSize * 1024L);
+            setEdenSizeBeforeCollection(summary.getBefore() * heapRegionSize * 1024L);
+            setEdenSizeAfterCollection(summary.getAssigned() * heapRegionSize * 1024L);
+        }
+    }
+
+    void setSurvivorRegionSummary(RegionSummary summary) {
+        regionSummaries[REGIONS.SURVIVOR.ordinal()] = summary;
+        if (heapRegionSize > 0) {
+            setSurvivorOccupancyBeforeCollection(summary.getBefore() * heapRegionSize * 1024L);
+            setSurvivorOccupancyAfterCollection(summary.getAfter() * heapRegionSize * 1024L);
+            setSurvivorSizeBeforeCollection(summary.getBefore() * heapRegionSize * 1024L);
+            setSurvivorSizeAfterCollection(summary.getAssigned() * heapRegionSize * 1024L);
+        }
+    }
+
+    void setOldRegionSummary(RegionSummary summary) {
+        regionSummaries[REGIONS.OLD.ordinal()] = summary;
+        if (heapRegionSize > 0) {
+            setOldOccupancyBeforeCollection(summary.getBefore() * heapRegionSize * 1024L);
+            setOldOccupancyAfterCollection(summary.getAfter() * heapRegionSize * 1024L);
+            setOldSizeBeforeCollection(summary.getBefore() * heapRegionSize * 1024L);
+            setOldSizeAfterCollection(summary.getAfter() * heapRegionSize * 1024L);
+        }
+    }
+
+    void setHumongousRegionSummary(RegionSummary summary) {
+        regionSummaries[REGIONS.HUMONGOUS.ordinal()] = summary;
+        if (heapRegionSize > 0) {
+            setHumongousOccupancyBeforeCollection(summary.getBefore() * heapRegionSize * 1024L);
+            setHumongousOccupancyAfterCollection(summary.getAfter() * heapRegionSize * 1024L);
+            setHumongousSizeBeforeCollection(summary.getBefore() * heapRegionSize * 1024L);
+            setHumongousSizeAfterCollection(summary.getAfter() * heapRegionSize * 1024L);
+        }
+    }
+
+    void setArchiveRegionSummary(RegionSummary summary) {
+        regionSummaries[REGIONS.ARCHIVE.ordinal()] = summary;
+        if (heapRegionSize > 0) {
+            setArchiveOccupancyBeforeCollection(summary.getBefore() * heapRegionSize * 1024);
+            setArchiveOccupancyAfterCollection(summary.getAfter() * heapRegionSize * 1024);
+            setArchiveSizeBeforeCollection(summary.getBefore() * heapRegionSize * 1024);
+            setArchiveSizeAfterCollection(summary.getAfter() * heapRegionSize * 1024);
+        }
+    }
+
+    private void fillInRegionSummary(G1GCPauseEvent collection) {
+        collection.addRegionSummary(
+                regionSummaries[REGIONS.EDEN.ordinal()],
+                regionSummaries[REGIONS.SURVIVOR.ordinal()],
+                regionSummaries[REGIONS.OLD.ordinal()],
+                regionSummaries[REGIONS.HUMONGOUS.ordinal()],
+                regionSummaries[REGIONS.ARCHIVE.ordinal()]
+        );
+    }
+
     private void fullInInternalPhases(G1FullGC collection) {
         int index = 0;
         String key;
@@ -696,6 +770,7 @@ class G1GCForwardReference extends ForwardReference {
 
     private G1Young buildYoung(G1Young collection) {
         fillInMemoryPoolStats(collection);
+        fillInRegionSummary(collection);
         fillInMetaspaceStats(collection);
         fillInPhases(collection);
         if (toSpaceExhausted) collection.toSpaceExhausted();
