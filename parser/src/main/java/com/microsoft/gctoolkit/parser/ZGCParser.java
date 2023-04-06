@@ -34,6 +34,7 @@ import java.util.logging.Logger;
  * CMS failures
  * System.gc() calls
  */
+
 public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
 
     private static final Logger LOGGER = Logger.getLogger(ZGCParser.class.getName());

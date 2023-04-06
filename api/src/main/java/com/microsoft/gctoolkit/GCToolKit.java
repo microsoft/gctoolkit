@@ -3,6 +3,8 @@
 package com.microsoft.gctoolkit;
 
 import com.microsoft.gctoolkit.aggregator.Aggregation;
+import com.microsoft.gctoolkit.aggregator.Aggregator;
+import com.microsoft.gctoolkit.aggregator.EventSource;
 import com.microsoft.gctoolkit.io.DataSource;
 import com.microsoft.gctoolkit.io.GCLogFile;
 import com.microsoft.gctoolkit.io.RotatingGCLogFile;
@@ -12,9 +14,12 @@ import com.microsoft.gctoolkit.jvm.JavaVirtualMachine;
 import com.microsoft.gctoolkit.message.DataSourceChannel;
 import com.microsoft.gctoolkit.message.DataSourceParser;
 import com.microsoft.gctoolkit.message.JVMEventChannel;
+import com.microsoft.gctoolkit.message.JVMEventChannelAggregator;
 
 import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -22,6 +27,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.ServiceConfigurationError;
 import java.util.ServiceLoader;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -158,7 +164,15 @@ public class GCToolKit {
         registeredDataSourceParsers.add(dataSourceParser);
     }
 
-    private void loadDataSourceParsers(Diary diary) {
+
+
+    private List<DataSourceParser> additiveParsers = new ArrayList<>();
+    public void addDataSourceParser(DataSourceParser parser) {
+        additiveParsers.add(parser);
+    }
+
+    private Set<EventSource> loadDataSourceParsers(Diary diary) {
+        Set<EventSource> eventSources = new HashSet<>();
         loadDataSourceChannel();
         loadJVMEventChannel();
         List<DataSourceParser> dataSourceParsers;
@@ -209,11 +223,19 @@ public class GCToolKit {
             }
         }
 
+        /*
+         *  add in any additional parsers not provided by the module SPI.
+         */
+        dataSourceParsers.addAll(additiveParsers);
+
         for (DataSourceParser dataSourceParser : dataSourceParsers) {
             dataSourceParser.diary(diary);
             dataSourceChannel.registerListener(dataSourceParser);
             dataSourceParser.publishTo(jvmEventChannel);
         }
+
+        dataSourceParsers.stream().map(parser -> parser.producesEvents()).forEach(events -> eventSources.addAll(events));
+        return eventSources;
     }
 
     /**
@@ -230,14 +252,57 @@ public class GCToolKit {
      */
     public JavaVirtualMachine analyze(DataSource<?> dataSource) throws IOException  {
         GCLogFile logFile = (GCLogFile)dataSource;
-        loadDataSourceParsers(logFile.diary());
+        Set<EventSource> events = loadDataSourceParsers(logFile.diary());
         JavaVirtualMachine javaVirtualMachine = loadJavaVirtualMachine(logFile);
         try {
-            javaVirtualMachine.analyze(registeredAggregations, jvmEventChannel, dataSourceChannel);
+            List<Aggregator<? extends Aggregation>> filteredAggregators = filterAggregations(events);
+            javaVirtualMachine.analyze(filteredAggregators, jvmEventChannel, dataSourceChannel);
         } catch(Throwable t) {
             LOGGER.log(Level.SEVERE, "Internal Error: Cannot invoke analyze method", t);
         }
         return javaVirtualMachine;
+    }
+
+    private boolean debugging = true;
+
+    private List<Aggregator<? extends Aggregation>> filterAggregations(Set<EventSource> events) {
+        List<Aggregator<? extends Aggregation>> aggregators = new ArrayList<>();
+        for (Aggregation aggregation : registeredAggregations) {
+            if (debugging)
+                LOGGER.log(Level.INFO, "Evaluating: " + aggregation.toString());
+            Constructor<? extends Aggregator<?>> constructor = constructor(aggregation);
+            if (constructor == null) {
+                LOGGER.log(Level.WARNING, "Cannot find one of: default constructor or @Collates annotation for " + aggregation.getClass().getName());
+                continue;
+            }
+            if (debugging)
+                LOGGER.log(Level.INFO, "Loading   : " + aggregation.toString());
+            Aggregator<? extends Aggregation> aggregator = null;
+            try {
+                aggregator = constructor.newInstance(aggregation);
+            } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+                LOGGER.log(Level.SEVERE, e.getMessage(), e);
+                continue;
+            }
+            if (events.stream().filter(aggregator::aggregates).findFirst().isPresent()) {
+                aggregators.add(aggregator);
+            }
+        }
+        return aggregators;
+
+    }
+
+    private Constructor<? extends Aggregator<?>> constructor(Aggregation aggregation) {
+        Class<? extends Aggregator<?>> targetClazz = aggregation.collates();
+        if ( targetClazz != null) {
+            Constructor<?>[] constructors = targetClazz.getConstructors();
+            for (Constructor<?> constructor : constructors) {
+                Parameter[] parameters = constructor.getParameters();
+                if (parameters.length == 1 && Aggregation.class.isAssignableFrom(parameters[0].getType()))
+                    return (Constructor<? extends Aggregator<?>>) constructor;
+            }
+        }
+        return null;
     }
 
 }
