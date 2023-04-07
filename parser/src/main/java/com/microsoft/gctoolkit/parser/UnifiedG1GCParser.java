@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.parser;
 
+import com.microsoft.gctoolkit.aggregator.EventSource;
 import com.microsoft.gctoolkit.event.CPUSummary;
 import com.microsoft.gctoolkit.event.GarbageCollectionTypes;
 import com.microsoft.gctoolkit.event.MalformedEvent;
@@ -26,6 +27,7 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Queue;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
 import java.util.logging.Level;
@@ -46,7 +48,15 @@ import static com.microsoft.gctoolkit.event.GarbageCollectionTypes.fromLabel;
 public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GCPatterns {
 
     private static final Logger LOGGER = Logger.getLogger(UnifiedG1GCParser.class.getName());
-    private boolean debugging = Boolean.getBoolean("microsoft.debug");
+    private static final boolean DEBUGGING;
+    static {
+        String className = UnifiedG1GCParser.class.getSimpleName();
+        String debug = System.getProperty("gctoolkit.debug");
+        if (debug != null)
+            DEBUGGING = debug.isEmpty() || ((debug.contains("all") || debug.contains(className)) && !debug.contains("-" + className));
+        else
+            DEBUGGING = false;
+    }
 
     private final Map<Integer, G1GCForwardReference> collectionsUnderway = new ConcurrentHashMap<>();
 
@@ -154,6 +164,11 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
     }
 
     public UnifiedG1GCParser() {
+    }
+
+    @Override
+    public Set<EventSource> producesEvents() {
+        return Set.of(EventSource.G1GC);
     }
 
     public String getName() {
@@ -736,7 +751,7 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
     private void log(String line) {
         if ( ! ignoreFrequentlySeenButUnwantedLines(line)) {
 
-            if (debugging)
+            if (DEBUGGING)
                 LOGGER.fine("Missed: " + line);
             LOGGER.log(Level.FINE, "Missed: {0}", line);
         }

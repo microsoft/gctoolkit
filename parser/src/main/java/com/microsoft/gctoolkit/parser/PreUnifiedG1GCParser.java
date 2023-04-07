@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.parser;
 
+import com.microsoft.gctoolkit.aggregator.EventSource;
 import com.microsoft.gctoolkit.event.CPUSummary;
 import com.microsoft.gctoolkit.event.GCCause;
 import com.microsoft.gctoolkit.event.GarbageCollectionTypes;
@@ -33,6 +34,7 @@ import com.microsoft.gctoolkit.parser.collection.MRUQueue;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
 
 import java.util.AbstractMap;
+import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.function.BiConsumer;
 import java.util.logging.Level;
@@ -50,7 +52,15 @@ import java.util.logging.Logger;
 public class PreUnifiedG1GCParser extends PreUnifiedGCLogParser implements G1GCPatterns {
 
     private static final Logger LOGGER = Logger.getLogger(PreUnifiedG1GCParser.class.getName());
-    private boolean debugging = Boolean.getBoolean("microsoft.debug");
+    private static final boolean DEBUGGING;
+    static {
+        String className = PreUnifiedG1GCParser.class.getSimpleName();
+        String debug = System.getProperty("gctoolkit.debug");
+        if (debug != null)
+            DEBUGGING = debug.isEmpty() || ((debug.contains("all") || debug.contains(className)) && !debug.contains("-" + className));
+        else
+            DEBUGGING = false;
+    }
 
     //values show up at the end of GC log file from a normally terminated JVM
     @SuppressWarnings("unused")
@@ -237,6 +247,11 @@ public class PreUnifiedG1GCParser extends PreUnifiedGCLogParser implements G1GCP
 
     public PreUnifiedG1GCParser() {
         forwardReference = trap;
+    }
+
+    @Override
+    public Set<EventSource> producesEvents() {
+        return Set.of(EventSource.G1GC);
     }
 
     public String getName() {
@@ -1201,7 +1216,7 @@ public class PreUnifiedG1GCParser extends PreUnifiedGCLogParser implements G1GCP
         if (line.startsWith("Memory: ")) return;
         if (line.startsWith("CommandLine flags: ")) return;
 
-        if (debugging)
+        if (DEBUGGING)
             LOGGER.fine("Missed: " + line);
 
         LOGGER.log(Level.FINE, "Missed: {0}", line);

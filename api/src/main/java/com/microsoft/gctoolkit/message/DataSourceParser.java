@@ -9,5 +9,5 @@ public interface DataSourceParser extends DataSourceChannelListener {
     void publishTo(JVMEventChannel channel);
     void diary(Diary diary);
     boolean accepts(Diary diary);
-    public abstract Set<EventSource> producesEvents();
+    Set<EventSource> producesEvents();
 }

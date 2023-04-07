@@ -6,7 +6,9 @@ import org.junit.jupiter.api.Test;
 
 import java.util.logging.Logger;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ConcurrentMarkSweepPhaseParserRulesTest implements CMSPatterns {
 
@@ -30,13 +32,21 @@ public class ConcurrentMarkSweepPhaseParserRulesTest implements CMSPatterns {
 
     /* Code that is useful when testing individual records */
 
-    private final boolean debugging = Boolean.getBoolean("microsoft.debug");
+    private static final boolean DEBUGGING;
+    static {
+        String className = ConcurrentMarkSweepPhaseParserRulesTest.class.getSimpleName();
+        String debug = System.getProperty("gctoolkit.debug");
+        if (debug != null)
+            DEBUGGING = debug.isEmpty() || ((debug.contains("all") || debug.contains("test") || debug.contains(className)) && !debug.contains("-" + className));
+        else
+            DEBUGGING = false;
+    }
 
     @Test
     public void testDebugCMSParseRules() {
         int index = 0;
         GCParseRule rule = rules[index];
-        evaluate(rule, lines[index], debugging);
+        evaluate(rule, lines[index], DEBUGGING);
     }
 
 

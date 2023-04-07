@@ -14,9 +14,6 @@ import com.microsoft.gctoolkit.message.JVMEventChannelAggregator;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
 
 import java.io.IOException;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Parameter;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -32,7 +29,15 @@ import java.util.logging.Logger;
  */
 public abstract class AbstractJavaVirtualMachine implements JavaVirtualMachine {
 
-    private boolean debugging = Boolean.getBoolean("microsoft.debug.aggregation");
+    private static final boolean DEBUGGING;
+    static {
+        String className = AbstractJavaVirtualMachine.class.getSimpleName();
+        String debug = System.getProperty("gctoolkit.debug");
+        if (debug != null)
+            DEBUGGING = debug.isEmpty() || ((debug.contains("all") || debug.contains(className)) && !debug.contains("-" + className));
+        else
+            DEBUGGING = false;
+    }
 
     private static final Logger LOGGER = Logger.getLogger(AbstractJavaVirtualMachine.class.getName());
     private static final double LOG_FRAGMENT_THRESHOLD_SECONDS = 60.0d; //todo: replace magic threshold with a heuristic
@@ -172,7 +177,7 @@ public abstract class AbstractJavaVirtualMachine implements JavaVirtualMachine {
             Aggregation aggregation = aggregator.aggregation();
             aggregatedData.put(aggregation.getClass(), aggregation);
             generatedEvents.stream().filter(aggregator::aggregates).forEach(eventSource -> {
-                if (debugging)
+                if (DEBUGGING)
                     LOGGER.log(Level.FINE, "Registering: " + aggregator.getClass().getName());
                 finishLine.register();
                 aggregator.onCompletion(finishLine::arriveAndDeregister);

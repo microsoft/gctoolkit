@@ -14,7 +14,6 @@ import com.microsoft.gctoolkit.jvm.JavaVirtualMachine;
 import com.microsoft.gctoolkit.message.DataSourceChannel;
 import com.microsoft.gctoolkit.message.DataSourceParser;
 import com.microsoft.gctoolkit.message.JVMEventChannel;
-import com.microsoft.gctoolkit.message.JVMEventChannelAggregator;
 
 import java.io.IOException;
 import java.lang.reflect.Constructor;
@@ -38,6 +37,16 @@ import static java.lang.Class.forName;
  * The primary API for analyzing Java Garbage Collection (GC) logs.
  */
 public class GCToolKit {
+
+    private static final boolean DEBUGGING;
+    static {
+        String className = GCToolKit.class.getName();
+        String debug = System.getProperty("gctoolkit.debug");
+        if (debug != null)
+            DEBUGGING = debug.isEmpty() || ((debug.contains("all") || debug.contains(className)) && !debug.contains("-" + className));
+        else
+            DEBUGGING = false;
+    }
 
     private static final Logger LOGGER = Logger.getLogger(GCToolKit.class.getName());
 
@@ -160,15 +169,29 @@ public class GCToolKit {
         }
     }
 
+    /**
+     * This method allows full control over which DataSourceParsers are used to parse the DataSource.
+     * This method should be called before the {@link #analyze(DataSource)} method.
+     * DataSourceParsers loaded by this method are used in place of those that are ordinarily loaded via
+     * the service provider interface.
+     * Use the {@link #addDataSourceParser(DataSourceParser)} method to load a DataSourceParser in addition
+     * to those loaded by the service provider interface.
+     * @param dataSourceParser An implementation of DataSourceParser that will be used to parse the DataSource.
+     */
     public void loadDataSourceParser(DataSourceParser dataSourceParser) {
         registeredDataSourceParsers.add(dataSourceParser);
     }
 
-
-
     private List<DataSourceParser> additiveParsers = new ArrayList<>();
-    public void addDataSourceParser(DataSourceParser parser) {
-        additiveParsers.add(parser);
+
+    /**
+     * Add a DataSourceParser to be used to parse a DataSource. The DataSourceParser will be used in addition
+     * to those loaded by the service provider interface. This method should be called before the
+     * {@link #analyze(DataSource)} method.
+     * @param dataSourceParser An implementation of DataSourceParser that will be used to parse the DataSource.
+     */
+    public void addDataSourceParser(DataSourceParser dataSourceParser) {
+        additiveParsers.add(dataSourceParser);
     }
 
     private Set<EventSource> loadDataSourceParsers(Diary diary) {
@@ -263,20 +286,17 @@ public class GCToolKit {
         return javaVirtualMachine;
     }
 
-    private boolean debugging = true;
-
     private List<Aggregator<? extends Aggregation>> filterAggregations(Set<EventSource> events) {
         List<Aggregator<? extends Aggregation>> aggregators = new ArrayList<>();
         for (Aggregation aggregation : registeredAggregations) {
-            if (debugging)
+            if (DEBUGGING)
                 LOGGER.log(Level.INFO, "Evaluating: " + aggregation.toString());
             Constructor<? extends Aggregator<?>> constructor = constructor(aggregation);
             if (constructor == null) {
                 LOGGER.log(Level.WARNING, "Cannot find one of: default constructor or @Collates annotation for " + aggregation.getClass().getName());
                 continue;
             }
-            if (debugging)
-                LOGGER.log(Level.INFO, "Loading   : " + aggregation.toString());
+
             Aggregator<? extends Aggregation> aggregator = null;
             try {
                 aggregator = constructor.newInstance(aggregation);
@@ -284,14 +304,19 @@ public class GCToolKit {
                 LOGGER.log(Level.SEVERE, e.getMessage(), e);
                 continue;
             }
-            if (events.stream().filter(aggregator::aggregates).findFirst().isPresent()) {
+            if (events.stream().anyMatch(aggregator::aggregates)) {
+                if (DEBUGGING)
+                    LOGGER.log(Level.INFO, "Using   : " + aggregation.toString());
                 aggregators.add(aggregator);
+            } else if (DEBUGGING) {
+                LOGGER.log(Level.INFO, "Skipping: " + aggregation.toString());
             }
         }
         return aggregators;
 
     }
 
+    @SuppressWarnings("unchecked")
     private Constructor<? extends Aggregator<?>> constructor(Aggregation aggregation) {
         Class<? extends Aggregator<?>> targetClazz = aggregation.collates();
         if ( targetClazz != null) {

@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.parser;
 
+import com.microsoft.gctoolkit.aggregator.EventSource;
 import com.microsoft.gctoolkit.event.GCCause;
 import com.microsoft.gctoolkit.event.jvm.JVMEvent;
 import com.microsoft.gctoolkit.event.jvm.JVMTermination;
@@ -19,6 +20,7 @@ import com.microsoft.gctoolkit.time.DateTimeStamp;
 
 import java.util.AbstractMap;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -39,8 +41,15 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
 
     private static final Logger LOGGER = Logger.getLogger(ZGCParser.class.getName());
 
-    private final boolean debugging = Boolean.getBoolean("microsoft.debug");
-    private final boolean develop = Boolean.getBoolean("microsoft.develop");
+    private static final boolean DEBUGGING;
+    static {
+        String className = ZGCParser.class.getSimpleName();
+        String debug = System.getProperty("gctoolkit.debug");
+        if (debug != null)
+            DEBUGGING = debug.isEmpty() || ((debug.contains("all") || debug.contains(className)) && !debug.contains("-" + className));
+        else
+            DEBUGGING = false;
+    }
 
     private ZGCForwardReference forwardReference;
 
@@ -74,6 +83,11 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
 
 
     public ZGCParser() {}
+
+    @Override
+    public Set<EventSource> producesEvents() {
+        return Set.of(EventSource.ZGC);
+    }
 
     @Override
     public String getName() {
@@ -262,7 +276,7 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
     }
 
     private void log(String line) {
-        if (debugging)
+        if (DEBUGGING)
             LOGGER.log(Level.FINE, "ZGCHeapParser missed: {0}", line);
         LOGGER.log(Level.WARNING, "Missed: {0}", line);
 
