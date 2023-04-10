@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.parser;
 
+import com.microsoft.gctoolkit.GCToolKit;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -32,35 +33,27 @@ public class ConcurrentMarkSweepParserRulesTest implements CMSPatterns {
 
     /* Code that is useful when testing individual records */
 
-    private static final boolean DEBUGGING;
-    static {
-        String className = ConcurrentMarkSweepParserRulesTest.class.getSimpleName();
-        String debug = System.getProperty("gctoolkit.debug");
-        if (debug != null)
-            DEBUGGING = debug.isEmpty() || ((debug.contains("all") || debug.contains("test") || debug.contains(className)) && !debug.contains("-" + className));
-        else
-            DEBUGGING = false;
-    }
-
     // @Test
     //@Ignore("Not a real test, only for debugging")
     public void testDebugCMSParseRule() {
         int index = rules.length-1; // awesome fix from David.. thanks :-)
         //index = 36;
         GCParseRule rule = rules[index];
-        evaluate(rule, lines[index][0], DEBUGGING);
+        evaluate(rule, lines[index][0]);
     }
 
-    private void evaluate(GCParseRule rule, String string, boolean dump) {
+    private void evaluate(GCParseRule rule, String string) {
         //The IDE eats messages printed to the log file.. thus this information *is* printed to stout
         GCLogTrace trace = rule.parse(string);
         assertNotNull(trace);
-        if (dump) {
-            System.out.println("matches groups " + trace.groupCount());
+        // Enable debugging by setting gctoolkit.debug to true
+        GCToolKit.LOG_DEBUG_MESSAGE(() -> {
+            StringBuilder sb = new StringBuilder("matches groups " + trace.groupCount());
             for (int i = 0; i <= trace.groupCount(); i++) {
-                System.out.println(i + ": " + trace.getGroup(i));
+                sb.append(System.lineSeparator()).append(i).append(": ").append(trace.getGroup(i));
             }
-        }
+            return sb.toString();
+        });
     }
 
     private GCParseRule[] rules = {

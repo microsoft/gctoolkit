@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.parser;
 
+import com.microsoft.gctoolkit.GCToolKit;
 import com.microsoft.gctoolkit.aggregator.EventSource;
 import com.microsoft.gctoolkit.event.CPUSummary;
 import com.microsoft.gctoolkit.event.GCCause;
@@ -76,15 +77,6 @@ public class GenerationalHeapParser extends PreUnifiedGCLogParser implements Sim
     private int numberOfBlocksForwardReference;
     private long averageBlockSizeForwardReference;
     private int treeHeightForwardReference;
-    private static final boolean DEBUGGING;
-    static {
-        String className = GenerationalHeapParser.class.getSimpleName();
-        String debug = System.getProperty("gctoolkit.debug");
-        if (debug != null)
-            DEBUGGING = debug.isEmpty() || ((debug.contains("all") || debug.contains(className)) && !debug.contains("-" + className));
-        else
-            DEBUGGING = false;
-    }
 
     //Expect Remark
     private boolean expectRemark = false;
@@ -2021,8 +2013,7 @@ public class GenerationalHeapParser extends PreUnifiedGCLogParser implements Sim
         if (line.contains("GC log file has reached the maximum size")) return;
         if (line.contains("Large block")) return;
 
-        if (DEBUGGING)
-            LOGGER.fine("GenerationalHeapParser missed: " + line);
+        GCToolKit.LOG_DEBUG_MESSAGE(() -> "GenerationalHeapParser missed: " + line);
         LOGGER.log(Level.WARNING, "Missed: {0}", line);
 
     }

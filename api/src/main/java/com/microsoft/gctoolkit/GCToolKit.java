@@ -27,6 +27,7 @@ import java.util.Optional;
 import java.util.ServiceConfigurationError;
 import java.util.ServiceLoader;
 import java.util.Set;
+import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -38,17 +39,39 @@ import static java.lang.Class.forName;
  */
 public class GCToolKit {
 
-    private static final boolean DEBUGGING;
-    static {
-        String className = GCToolKit.class.getName();
-        String debug = System.getProperty("gctoolkit.debug");
-        if (debug != null)
-            DEBUGGING = debug.isEmpty() || ((debug.contains("all") || debug.contains(className)) && !debug.contains("-" + className));
-        else
-            DEBUGGING = false;
+    private static final Logger LOGGER = Logger.getLogger(GCToolKit.class.getName());
+
+    private static final String GCTOOLKIT_DEBUG = System.getProperty("gctoolkit.debug");
+    private static final boolean DEBUGGING = GCTOOLKIT_DEBUG != null;
+
+    // returns true if gctoolkit.debug is set to "all" or contains "className", but does not contain "-className"
+    private static boolean isDebugging(String className) {
+        return DEBUGGING
+                && (GCTOOLKIT_DEBUG.isEmpty()
+                || ((GCTOOLKIT_DEBUG.contains("all") || GCTOOLKIT_DEBUG.contains(className))
+                && !GCTOOLKIT_DEBUG.contains("-" + className)));
     }
 
-    private static final Logger LOGGER = Logger.getLogger(GCToolKit.class.getName());
+    /**
+     * Print a debug message to System.out if gctoolkit.debug is empty, is set to "all",
+     * or contains "className" but does not contain "-className".
+     * For example, to enable debug logging for all classes except UnifiedG1GCParser:
+     * <code>-Dgctoolkit.debug=all,-com.microsoft.gctoolkit.parser.UnifiedG1GCParser</code>
+     *
+     * @param message Supplies the message to log. If null, nothing will be logged.
+     */
+    public static void LOG_DEBUG_MESSAGE(Supplier<String> message) {
+        if (DEBUGGING && message != null) {
+            StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+            String methodName = stackTrace[2].getMethodName();
+            String className = stackTrace[2].getClassName();
+            String fileName = stackTrace[2].getFileName();
+            int lineNumber = stackTrace[2].getLineNumber();
+            if (isDebugging(className)) {
+                System.out.println(String.format("DEBUG: %s.%s(%s:%d): %s", className, methodName, fileName, lineNumber, message.get()));
+            }
+        }
+    }
 
     private final HashSet<DataSourceParser> registeredDataSourceParsers = new HashSet<>();
     private List<Aggregation> registeredAggregations;
@@ -289,8 +312,7 @@ public class GCToolKit {
     private List<Aggregator<? extends Aggregation>> filterAggregations(Set<EventSource> events) {
         List<Aggregator<? extends Aggregation>> aggregators = new ArrayList<>();
         for (Aggregation aggregation : registeredAggregations) {
-            if (DEBUGGING)
-                LOGGER.log(Level.INFO, "Evaluating: " + aggregation.toString());
+            LOG_DEBUG_MESSAGE(() -> "Evaluating: " + aggregation.toString());
             Constructor<? extends Aggregator<?>> constructor = constructor(aggregation);
             if (constructor == null) {
                 LOGGER.log(Level.WARNING, "Cannot find one of: default constructor or @Collates annotation for " + aggregation.getClass().getName());
@@ -305,11 +327,10 @@ public class GCToolKit {
                 continue;
             }
             if (events.stream().anyMatch(aggregator::aggregates)) {
-                if (DEBUGGING)
-                    LOGGER.log(Level.INFO, "Using   : " + aggregation.toString());
+                LOG_DEBUG_MESSAGE(() -> "Using     : " + aggregation.toString());
                 aggregators.add(aggregator);
-            } else if (DEBUGGING) {
-                LOGGER.log(Level.INFO, "Skipping: " + aggregation.toString());
+            } else {
+                LOG_DEBUG_MESSAGE(() -> "Skipping  : " + aggregation.toString());
             }
         }
         return aggregators;

@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.jvm;
 
+import com.microsoft.gctoolkit.GCToolKit;
 import com.microsoft.gctoolkit.aggregator.Aggregation;
 import com.microsoft.gctoolkit.aggregator.Aggregator;
 import com.microsoft.gctoolkit.aggregator.EventSource;
@@ -28,16 +29,6 @@ import java.util.logging.Logger;
  * lines to the parser(s) and post events to the aggregators.
  */
 public abstract class AbstractJavaVirtualMachine implements JavaVirtualMachine {
-
-    private static final boolean DEBUGGING;
-    static {
-        String className = AbstractJavaVirtualMachine.class.getSimpleName();
-        String debug = System.getProperty("gctoolkit.debug");
-        if (debug != null)
-            DEBUGGING = debug.isEmpty() || ((debug.contains("all") || debug.contains(className)) && !debug.contains("-" + className));
-        else
-            DEBUGGING = false;
-    }
 
     private static final Logger LOGGER = Logger.getLogger(AbstractJavaVirtualMachine.class.getName());
     private static final double LOG_FRAGMENT_THRESHOLD_SECONDS = 60.0d; //todo: replace magic threshold with a heuristic
@@ -177,8 +168,7 @@ public abstract class AbstractJavaVirtualMachine implements JavaVirtualMachine {
             Aggregation aggregation = aggregator.aggregation();
             aggregatedData.put(aggregation.getClass(), aggregation);
             generatedEvents.stream().filter(aggregator::aggregates).forEach(eventSource -> {
-                if (DEBUGGING)
-                    LOGGER.log(Level.FINE, "Registering: " + aggregator.getClass().getName());
+                GCToolKit.LOG_DEBUG_MESSAGE(() -> "Registering: " + aggregator.getClass().getName());
                 finishLine.register();
                 aggregator.onCompletion(finishLine::arriveAndDeregister);
                 JVMEventChannelAggregator eventChannelAggregator = new JVMEventChannelAggregator(eventSource.toChannel(), aggregator);

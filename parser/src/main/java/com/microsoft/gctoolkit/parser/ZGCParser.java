@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.parser;
 
+import com.microsoft.gctoolkit.GCToolKit;
 import com.microsoft.gctoolkit.aggregator.EventSource;
 import com.microsoft.gctoolkit.event.GCCause;
 import com.microsoft.gctoolkit.event.jvm.JVMEvent;
@@ -40,16 +41,6 @@ import java.util.logging.Logger;
 public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
 
     private static final Logger LOGGER = Logger.getLogger(ZGCParser.class.getName());
-
-    private static final boolean DEBUGGING;
-    static {
-        String className = ZGCParser.class.getSimpleName();
-        String debug = System.getProperty("gctoolkit.debug");
-        if (debug != null)
-            DEBUGGING = debug.isEmpty() || ((debug.contains("all") || debug.contains(className)) && !debug.contains("-" + className));
-        else
-            DEBUGGING = false;
-    }
 
     private ZGCForwardReference forwardReference;
 
@@ -276,8 +267,7 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
     }
 
     private void log(String line) {
-        if (DEBUGGING)
-            LOGGER.log(Level.FINE, "ZGCHeapParser missed: {0}", line);
+        GCToolKit.LOG_DEBUG_MESSAGE(() -> "ZGCHeapParser missed: " + line);
         LOGGER.log(Level.WARNING, "Missed: {0}", line);
 
     }

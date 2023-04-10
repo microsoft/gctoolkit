@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.parser;
 
+import com.microsoft.gctoolkit.GCToolKit;
 import com.microsoft.gctoolkit.aggregator.EventSource;
 import com.microsoft.gctoolkit.event.CPUSummary;
 import com.microsoft.gctoolkit.event.GCCause;
@@ -52,15 +53,6 @@ import java.util.logging.Logger;
 public class PreUnifiedG1GCParser extends PreUnifiedGCLogParser implements G1GCPatterns {
 
     private static final Logger LOGGER = Logger.getLogger(PreUnifiedG1GCParser.class.getName());
-    private static final boolean DEBUGGING;
-    static {
-        String className = PreUnifiedG1GCParser.class.getSimpleName();
-        String debug = System.getProperty("gctoolkit.debug");
-        if (debug != null)
-            DEBUGGING = debug.isEmpty() || ((debug.contains("all") || debug.contains(className)) && !debug.contains("-" + className));
-        else
-            DEBUGGING = false;
-    }
 
     //values show up at the end of GC log file from a normally terminated JVM
     @SuppressWarnings("unused")
@@ -1216,9 +1208,7 @@ public class PreUnifiedG1GCParser extends PreUnifiedGCLogParser implements G1GCP
         if (line.startsWith("Memory: ")) return;
         if (line.startsWith("CommandLine flags: ")) return;
 
-        if (DEBUGGING)
-            LOGGER.fine("Missed: " + line);
-
+        GCToolKit.LOG_DEBUG_MESSAGE(() -> "Missed: " + line);
         LOGGER.log(Level.FINE, "Missed: {0}", line);
     }
 
