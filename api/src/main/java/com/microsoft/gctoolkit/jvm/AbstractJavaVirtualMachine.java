@@ -168,7 +168,7 @@ public abstract class AbstractJavaVirtualMachine implements JavaVirtualMachine {
             Aggregation aggregation = aggregator.aggregation();
             aggregatedData.put(aggregation.getClass(), aggregation);
             generatedEvents.stream().filter(aggregator::aggregates).forEach(eventSource -> {
-                GCToolKit.LOG_DEBUG_MESSAGE(() -> "Registering: " + aggregator.getClass().getName());
+                GCToolKit.LOG_DEBUG_MESSAGE(() -> "Registering " + aggregator.getClass().getName() + " with " + eventSource.toChannel());
                 finishLine.register();
                 aggregator.onCompletion(finishLine::arriveAndDeregister);
                 JVMEventChannelAggregator eventChannelAggregator = new JVMEventChannelAggregator(eventSource.toChannel(), aggregator);

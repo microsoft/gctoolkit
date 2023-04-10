@@ -30,6 +30,7 @@ import java.util.Set;
 import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import static java.lang.Class.forName;
@@ -109,10 +110,10 @@ public class GCToolKit {
         ServiceLoader.load(Aggregation.class)
                 .stream()
                 .map(ServiceLoader.Provider::get)
-                .forEach(registeredAggregations::add);
-        //Useful for debugging
-        if ( Level.FINER.equals(LOGGER.getLevel()))
-            registeredAggregations.forEach(a -> LOGGER.log(Level.FINER, "Registered " + a.toString()));
+                .forEach(aggregation -> {
+                    registeredAggregations.add(aggregation);
+                    LOG_DEBUG_MESSAGE(() -> "ServiceLoader provided: " + aggregation.getClass().getName());
+                });
     }
 
     /**
@@ -218,7 +219,7 @@ public class GCToolKit {
     }
 
     private Set<EventSource> loadDataSourceParsers(Diary diary) {
-        Set<EventSource> eventSources = new HashSet<>();
+
         loadDataSourceChannel();
         loadJVMEventChannel();
         List<DataSourceParser> dataSourceParsers;
@@ -226,7 +227,7 @@ public class GCToolKit {
             dataSourceParsers = ServiceLoader.load(DataSourceParser.class)
                     .stream()
                     .map(ServiceLoader.Provider::get)
-                    .filter(consumer -> consumer.accepts(diary))
+                    .filter(dataSourceParser -> dataSourceParser.accepts(diary))
                     .collect(Collectors.toList());
         } else{
             dataSourceParsers = new ArrayList<>();
@@ -262,26 +263,28 @@ public class GCToolKit {
                     })
                     .filter(Optional::isPresent)
                     .map(optional -> (DataSourceParser) optional.get())
-                    .filter(consumer -> consumer.accepts(diary))
+                    .filter(dataSourceParser -> dataSourceParser.accepts(diary))
                     .collect(Collectors.toList());
-            if (dataSourceParsers.isEmpty()) {
-                throw new ServiceConfigurationError("Unable to find a suitable provider to create a DataSourceParser");
-            }
+
         }
 
-        /*
-         *  add in any additional parsers not provided by the module SPI.
-         */
+        //  add in any additional parsers not provided by the module SPI.
         dataSourceParsers.addAll(additiveParsers);
 
+        if (dataSourceParsers.isEmpty()) {
+            throw new ServiceConfigurationError("Unable to find a suitable provider to create a DataSourceParser");
+        }
+
         for (DataSourceParser dataSourceParser : dataSourceParsers) {
+            LOG_DEBUG_MESSAGE(() -> "Registering " + dataSourceParser.getClass().getName() + " with " + dataSourceChannel.getClass().getName());
             dataSourceParser.diary(diary);
             dataSourceChannel.registerListener(dataSourceParser);
             dataSourceParser.publishTo(jvmEventChannel);
         }
 
-        dataSourceParsers.stream().map(parser -> parser.producesEvents()).forEach(events -> eventSources.addAll(events));
-        return eventSources;
+        return dataSourceParsers.stream()
+                .map(DataSourceParser::producesEvents)
+                .collect(HashSet::new, Set::addAll, Set::addAll);
     }
 
     /**
@@ -312,7 +315,7 @@ public class GCToolKit {
     private List<Aggregator<? extends Aggregation>> filterAggregations(Set<EventSource> events) {
         List<Aggregator<? extends Aggregation>> aggregators = new ArrayList<>();
         for (Aggregation aggregation : registeredAggregations) {
-            LOG_DEBUG_MESSAGE(() -> "Evaluating: " + aggregation.toString());
+            LOG_DEBUG_MESSAGE(() -> "Evaluating: " + aggregation.getClass().getName());
             Constructor<? extends Aggregator<?>> constructor = constructor(aggregation);
             if (constructor == null) {
                 LOGGER.log(Level.WARNING, "Cannot find one of: default constructor or @Collates annotation for " + aggregation.getClass().getName());
@@ -327,10 +330,10 @@ public class GCToolKit {
                 continue;
             }
             if (events.stream().anyMatch(aggregator::aggregates)) {
-                LOG_DEBUG_MESSAGE(() -> "Using     : " + aggregation.toString());
+                LOG_DEBUG_MESSAGE(() -> "Including : " + aggregation.getClass().getName());
                 aggregators.add(aggregator);
             } else {
-                LOG_DEBUG_MESSAGE(() -> "Skipping  : " + aggregation.toString());
+                LOG_DEBUG_MESSAGE(() -> "Excluding : " + aggregation.getClass().getName());
             }
         }
         return aggregators;
