@@ -49,7 +49,7 @@ public class ConcurrentMarkSweepPhaseParserRulesTest implements CMSPatterns {
         GCToolKit.LOG_DEBUG_MESSAGE(() -> {
             StringBuilder sb = new StringBuilder("matches groups " + trace.groupCount());
             for (int i = 0; i <= trace.groupCount(); i++) {
-                sb.append(System.lineSeparator()).append(i).append(": ").append(trace.getGroup(i));
+                sb.append(String.format("%n%d : %s", i, trace.getGroup(i))) ;
             }
             return sb.toString();
         });

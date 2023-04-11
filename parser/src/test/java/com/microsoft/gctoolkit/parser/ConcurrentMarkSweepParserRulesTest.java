@@ -5,6 +5,8 @@ package com.microsoft.gctoolkit.parser;
 import com.microsoft.gctoolkit.GCToolKit;
 import org.junit.jupiter.api.Test;
 
+import java.util.StringJoiner;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -50,7 +52,7 @@ public class ConcurrentMarkSweepParserRulesTest implements CMSPatterns {
         GCToolKit.LOG_DEBUG_MESSAGE(() -> {
             StringBuilder sb = new StringBuilder("matches groups " + trace.groupCount());
             for (int i = 0; i <= trace.groupCount(); i++) {
-                sb.append(System.lineSeparator()).append(i).append(": ").append(trace.getGroup(i));
+                sb.append(String.format("%n%d : %s", i, trace.getGroup(i))) ;
             }
             return sb.toString();
         });
