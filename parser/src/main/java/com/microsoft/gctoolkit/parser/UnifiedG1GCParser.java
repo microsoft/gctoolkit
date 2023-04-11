@@ -159,7 +159,7 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
     }
 
     @Override
-    public Set<EventSource> producesEvents() {
+    public Set<EventSource> eventsProduced() {
         return Set.of(EventSource.G1GC);
     }
 

@@ -31,7 +31,7 @@ public class CMSTenuredPoolParser extends PreUnifiedGCLogParser implements Simpl
     public CMSTenuredPoolParser() {}
 
     @Override
-    public Set<EventSource> producesEvents() {
+    public Set<EventSource> eventsProduced() {
         return Set.of(EventSource.CMS_PREUNIFIED);
     }
 

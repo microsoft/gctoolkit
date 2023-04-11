@@ -30,7 +30,7 @@ public class JVMEventParser extends PreUnifiedGCLogParser implements JVMPatterns
     public JVMEventParser() {}
 
     @Override
-    public Set<EventSource> producesEvents() {
+    public Set<EventSource> eventsProduced() {
         return Set.of(EventSource.JVM);
     }
 

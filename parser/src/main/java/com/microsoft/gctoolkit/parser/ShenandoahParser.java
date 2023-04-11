@@ -45,7 +45,7 @@ public class ShenandoahParser extends UnifiedGCLogParser implements ShenandoahPa
     public ShenandoahParser() {}
 
     @Override
-    public Set<EventSource> producesEvents() {
+    public Set<EventSource> eventsProduced() {
         return Set.of(EventSource.SHENANDOAH);
     }
 

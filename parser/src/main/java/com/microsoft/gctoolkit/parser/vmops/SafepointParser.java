@@ -17,7 +17,7 @@ public class SafepointParser extends PreUnifiedGCLogParser implements SafepointP
     public SafepointParser() {}
 
     @Override
-    public Set<EventSource> producesEvents() {
+    public Set<EventSource> eventsProduced() {
         return Set.of(EventSource.SAFEPOINT);
     }
 

@@ -20,7 +20,7 @@ public class SurvivorMemoryPoolParser extends PreUnifiedGCLogParser implements T
     public SurvivorMemoryPoolParser() {}
 
     @Override
-    public Set<EventSource> producesEvents() {
+    public Set<EventSource> eventsProduced() {
         return Set.of(EventSource.SURVIVOR);
     }
 

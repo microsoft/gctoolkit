@@ -283,7 +283,7 @@ public class GCToolKit {
         }
 
         return dataSourceParsers.stream()
-                .map(DataSourceParser::producesEvents)
+                .map(DataSourceParser::eventsProduced)
                 .collect(HashSet::new, Set::addAll, Set::addAll);
     }
 

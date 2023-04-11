@@ -28,7 +28,7 @@ public class UnifiedJVMEventParser extends UnifiedGCLogParser implements JVMPatt
     public UnifiedJVMEventParser() {}
 
     @Override
-    public Set<EventSource> producesEvents() {
+    public Set<EventSource> eventsProduced() {
         return Set.of(EventSource.JVM);
     }
 

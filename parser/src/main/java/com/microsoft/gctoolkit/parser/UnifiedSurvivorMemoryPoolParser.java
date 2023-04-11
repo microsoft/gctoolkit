@@ -35,7 +35,7 @@ public class UnifiedSurvivorMemoryPoolParser extends UnifiedGCLogParser implemen
     public UnifiedSurvivorMemoryPoolParser() {}
 
     @Override
-    public Set<EventSource> producesEvents() {
+    public Set<EventSource> eventsProduced() {
         return Set.of(EventSource.SURVIVOR);
     }
 

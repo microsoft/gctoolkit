@@ -155,7 +155,7 @@ public class GarbageCollectionEventSourceTest {
         }
 
         @Override
-        public Set<EventSource> producesEvents() {
+        public Set<EventSource> eventsProduced() {
             return Set.of();
         }
     }

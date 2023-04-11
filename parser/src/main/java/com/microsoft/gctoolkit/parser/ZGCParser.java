@@ -76,7 +76,7 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
     public ZGCParser() {}
 
     @Override
-    public Set<EventSource> producesEvents() {
+    public Set<EventSource> eventsProduced() {
         return Set.of(EventSource.ZGC);
     }
 
