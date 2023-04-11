@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.vertx.io;
 
+import com.microsoft.gctoolkit.aggregator.EventSource;
 import com.microsoft.gctoolkit.event.GCCause;
 import com.microsoft.gctoolkit.event.GCEvent;
 import com.microsoft.gctoolkit.event.generational.DefNew;
@@ -19,9 +20,12 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class GarbageCollectionEventSourceTest {
 
@@ -148,6 +152,11 @@ public class GarbageCollectionEventSourceTest {
         @Override
         public boolean accepts(Diary diary) {
             return false;
+        }
+
+        @Override
+        public Set<EventSource> eventsProduced() {
+            return Set.of();
         }
     }
 

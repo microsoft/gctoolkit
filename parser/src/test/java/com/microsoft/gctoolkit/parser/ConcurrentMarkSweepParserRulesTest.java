@@ -2,9 +2,14 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.parser;
 
+import com.microsoft.gctoolkit.GCToolKit;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import java.util.StringJoiner;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ConcurrentMarkSweepParserRulesTest implements CMSPatterns {
 
@@ -30,27 +35,27 @@ public class ConcurrentMarkSweepParserRulesTest implements CMSPatterns {
 
     /* Code that is useful when testing individual records */
 
-    private final boolean debugging = Boolean.getBoolean("microsoft.debug");
-
     // @Test
     //@Ignore("Not a real test, only for debugging")
     public void testDebugCMSParseRule() {
         int index = rules.length-1; // awesome fix from David.. thanks :-)
         //index = 36;
         GCParseRule rule = rules[index];
-        evaluate(rule, lines[index][0], debugging);
+        evaluate(rule, lines[index][0]);
     }
 
-    private void evaluate(GCParseRule rule, String string, boolean dump) {
+    private void evaluate(GCParseRule rule, String string) {
         //The IDE eats messages printed to the log file.. thus this information *is* printed to stout
         GCLogTrace trace = rule.parse(string);
         assertNotNull(trace);
-        if (dump) {
-            System.out.println("matches groups " + trace.groupCount());
+        // Enable debugging by setting gctoolkit.debug to true
+        GCToolKit.LOG_DEBUG_MESSAGE(() -> {
+            StringBuilder sb = new StringBuilder("matches groups " + trace.groupCount());
             for (int i = 0; i <= trace.groupCount(); i++) {
-                System.out.println(i + ": " + trace.getGroup(i));
+                sb.append(String.format("%n%d : %s", i, trace.getGroup(i))) ;
             }
-        }
+            return sb.toString();
+        });
     }
 
     private GCParseRule[] rules = {

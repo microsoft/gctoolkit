@@ -2,6 +2,8 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.parser;
 
+import com.microsoft.gctoolkit.GCToolKit;
+import com.microsoft.gctoolkit.aggregator.EventSource;
 import com.microsoft.gctoolkit.event.jvm.JVMEvent;
 import com.microsoft.gctoolkit.event.jvm.JVMTermination;
 import com.microsoft.gctoolkit.jvm.Diary;
@@ -12,6 +14,7 @@ import com.microsoft.gctoolkit.parser.unified.ShenandoahPatterns;
 
 import java.util.AbstractMap;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -32,8 +35,6 @@ public class ShenandoahParser extends UnifiedGCLogParser implements ShenandoahPa
 
     private static final Logger LOGGER = Logger.getLogger(ShenandoahParser.class.getName());
 
-    private final boolean debugging = Boolean.getBoolean("microsoft.debug");
-
     private final MRUQueue<GCParseRule, BiConsumer<GCLogTrace, String>> parseRules;
 
     {
@@ -42,6 +43,11 @@ public class ShenandoahParser extends UnifiedGCLogParser implements ShenandoahPa
     }
 
     public ShenandoahParser() {}
+
+    @Override
+    public Set<EventSource> eventsProduced() {
+        return Set.of(EventSource.SHENANDOAH);
+    }
 
     @Override
     public String getName() {
@@ -85,8 +91,7 @@ public class ShenandoahParser extends UnifiedGCLogParser implements ShenandoahPa
     //Implement all capture methods
 
     private void log(String line) {
-        if (debugging)
-            LOGGER.log(Level.FINE,"ZGCHeapParser missed: {0}", line);
+        GCToolKit.LOG_DEBUG_MESSAGE(() -> "ZGCHeapParser missed: " + line);
         LOGGER.log(Level.WARNING, "Missed: {0}", line);
 
     }

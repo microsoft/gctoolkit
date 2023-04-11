@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.parser;
 
+import com.microsoft.gctoolkit.aggregator.EventSource;
 import com.microsoft.gctoolkit.event.jvm.JVMEvent;
 import com.microsoft.gctoolkit.event.jvm.JVMTermination;
 import com.microsoft.gctoolkit.event.jvm.SurvivorRecord;
@@ -9,6 +10,8 @@ import com.microsoft.gctoolkit.jvm.Diary;
 import com.microsoft.gctoolkit.message.ChannelName;
 import com.microsoft.gctoolkit.message.JVMEventChannel;
 import com.microsoft.gctoolkit.parser.jvm.Decorators;
+
+import java.util.Set;
 
 import static com.microsoft.gctoolkit.parser.unified.UnifiedPatterns.CPU_BREAKOUT;
 import static com.microsoft.gctoolkit.parser.unified.UnifiedPatterns.JVM_EXIT;
@@ -30,6 +33,11 @@ public class UnifiedSurvivorMemoryPoolParser extends UnifiedGCLogParser implemen
     private boolean ageDataCollected = false;
 
     public UnifiedSurvivorMemoryPoolParser() {}
+
+    @Override
+    public Set<EventSource> eventsProduced() {
+        return Set.of(EventSource.SURVIVOR);
+    }
 
     public String getName() {
         return "SurvivorMemoryPoolParser";

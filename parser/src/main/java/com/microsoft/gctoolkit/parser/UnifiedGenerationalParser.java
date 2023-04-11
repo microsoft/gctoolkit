@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.parser;
 
+import com.microsoft.gctoolkit.aggregator.EventSource;
 import com.microsoft.gctoolkit.event.CPUSummary;
 import com.microsoft.gctoolkit.event.GarbageCollectionTypes;
 import com.microsoft.gctoolkit.event.generational.AbortablePreClean;
@@ -33,11 +34,24 @@ import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static com.microsoft.gctoolkit.event.GarbageCollectionTypes.*;
+import static com.microsoft.gctoolkit.event.GarbageCollectionTypes.Abortable_Preclean;
+import static com.microsoft.gctoolkit.event.GarbageCollectionTypes.ConcurrentModeFailure;
+import static com.microsoft.gctoolkit.event.GarbageCollectionTypes.Concurrent_Mark;
+import static com.microsoft.gctoolkit.event.GarbageCollectionTypes.Concurrent_Preclean;
+import static com.microsoft.gctoolkit.event.GarbageCollectionTypes.Concurrent_Reset;
+import static com.microsoft.gctoolkit.event.GarbageCollectionTypes.Concurrent_Sweep;
+import static com.microsoft.gctoolkit.event.GarbageCollectionTypes.DefNew;
+import static com.microsoft.gctoolkit.event.GarbageCollectionTypes.FullGC;
+import static com.microsoft.gctoolkit.event.GarbageCollectionTypes.InitialMark;
+import static com.microsoft.gctoolkit.event.GarbageCollectionTypes.PSFull;
+import static com.microsoft.gctoolkit.event.GarbageCollectionTypes.PSYoungGen;
+import static com.microsoft.gctoolkit.event.GarbageCollectionTypes.ParNew;
+import static com.microsoft.gctoolkit.event.GarbageCollectionTypes.Remark;
 
 /**
  * TODO No reports or views generated from this data yet.
@@ -51,7 +65,6 @@ import static com.microsoft.gctoolkit.event.GarbageCollectionTypes.*;
 public class UnifiedGenerationalParser extends UnifiedGCLogParser implements UnifiedGenerationalPatterns {
 
     private static final Logger LOGGER = Logger.getLogger(UnifiedGenerationalParser.class.getName());
-    private boolean debugging = Boolean.getBoolean("microsoft.debug");
 
     private final RuleSet<GCParseRule, BiConsumer<GCLogTrace, String>> parseRules;
 
@@ -100,8 +113,13 @@ public class UnifiedGenerationalParser extends UnifiedGCLogParser implements Uni
     public UnifiedGenerationalParser() {
     }
 
+    @Override
+    public Set<EventSource> eventsProduced() {
+        return Set.of(EventSource.GENERATIONAL);
+    }
+
     public String getName() {
-        return "UnifiedG1GCParser";
+        return "UnifiedGenerationalParser";
     }
 
     @Override

@@ -121,10 +121,8 @@ public abstract class Aggregator<A extends Aggregation> {
      * Call a callback when aggregation is completed.
      */
     private void complete() {
-        Runnable t = completionTask;
-        this.completionTask = null;
-        if (t != null)
-            Executors.newSingleThreadExecutor().execute(t);
+        if (completionTask != null)
+            Executors.newSingleThreadExecutor().execute(completionTask);
 
     }
 

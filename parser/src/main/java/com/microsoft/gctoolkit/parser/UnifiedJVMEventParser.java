@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.parser;
 
+import com.microsoft.gctoolkit.aggregator.EventSource;
 import com.microsoft.gctoolkit.event.jvm.ApplicationConcurrentTime;
 import com.microsoft.gctoolkit.event.jvm.ApplicationStoppedTime;
 import com.microsoft.gctoolkit.event.jvm.JVMEvent;
@@ -11,6 +12,7 @@ import com.microsoft.gctoolkit.message.ChannelName;
 import com.microsoft.gctoolkit.message.JVMEventChannel;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
 
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -24,6 +26,11 @@ public class UnifiedJVMEventParser extends UnifiedGCLogParser implements JVMPatt
     private boolean gcPause = false;
 
     public UnifiedJVMEventParser() {}
+
+    @Override
+    public Set<EventSource> eventsProduced() {
+        return Set.of(EventSource.JVM);
+    }
 
     public String getName() {
         return "JavaEventParser";

@@ -2,11 +2,14 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.parser;
 
+import com.microsoft.gctoolkit.aggregator.EventSource;
 import com.microsoft.gctoolkit.event.jvm.JVMTermination;
 import com.microsoft.gctoolkit.event.jvm.SurvivorRecord;
 import com.microsoft.gctoolkit.jvm.Diary;
 import com.microsoft.gctoolkit.message.ChannelName;
 import com.microsoft.gctoolkit.message.JVMEventChannel;
+
+import java.util.Set;
 
 import static com.microsoft.gctoolkit.parser.unified.UnifiedPatterns.JVM_EXIT;
 
@@ -15,6 +18,11 @@ public class SurvivorMemoryPoolParser extends PreUnifiedGCLogParser implements T
     private SurvivorRecord forwardReference = null;
 
     public SurvivorMemoryPoolParser() {}
+
+    @Override
+    public Set<EventSource> eventsProduced() {
+        return Set.of(EventSource.SURVIVOR);
+    }
 
     public String getName() {
         return "SurvivorMemoryPoolParser";

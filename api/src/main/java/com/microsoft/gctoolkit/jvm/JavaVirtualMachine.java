@@ -5,6 +5,7 @@ package com.microsoft.gctoolkit.jvm;
 
 import com.microsoft.gctoolkit.GCToolKit;
 import com.microsoft.gctoolkit.aggregator.Aggregation;
+import com.microsoft.gctoolkit.aggregator.Aggregator;
 import com.microsoft.gctoolkit.io.DataSource;
 import com.microsoft.gctoolkit.message.DataSourceChannel;
 import com.microsoft.gctoolkit.message.JVMEventChannel;
@@ -122,5 +123,5 @@ public interface JavaVirtualMachine {
      * @param eventChannel JVMEvent message channel
      * @param dataSourceChannel GC logging data channel
      */
-    void analyze(List<Aggregation> registeredAggregations, JVMEventChannel eventChannel, DataSourceChannel dataSourceChannel);
+    void analyze(List<Aggregator<? extends Aggregation>> registeredAggregations, JVMEventChannel eventChannel, DataSourceChannel dataSourceChannel);
 }

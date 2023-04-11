@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.parser;
 
+import com.microsoft.gctoolkit.aggregator.EventSource;
 import com.microsoft.gctoolkit.event.jvm.ApplicationConcurrentTime;
 import com.microsoft.gctoolkit.event.jvm.ApplicationStoppedTime;
 import com.microsoft.gctoolkit.event.jvm.JVMEvent;
@@ -13,6 +14,7 @@ import com.microsoft.gctoolkit.time.DateTimeStamp;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -27,8 +29,13 @@ public class JVMEventParser extends PreUnifiedGCLogParser implements JVMPatterns
 
     public JVMEventParser() {}
 
+    @Override
+    public Set<EventSource> eventsProduced() {
+        return Set.of(EventSource.JVM);
+    }
+
     public String getName() {
-        return "JavaEventParser";
+        return "JVMEventParser";
     }
 
     /**

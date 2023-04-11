@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.parser;
 
+import com.microsoft.gctoolkit.aggregator.EventSource;
 import com.microsoft.gctoolkit.event.GCCause;
 import com.microsoft.gctoolkit.event.MemoryPoolSummary;
 import com.microsoft.gctoolkit.event.generational.AbortablePreClean;
@@ -18,6 +19,7 @@ import com.microsoft.gctoolkit.message.ChannelName;
 import com.microsoft.gctoolkit.message.JVMEventChannel;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
 
+import java.util.Set;
 import java.util.logging.Logger;
 
 public class CMSTenuredPoolParser extends PreUnifiedGCLogParser implements SimplePatterns, ICMSPatterns {
@@ -27,6 +29,11 @@ public class CMSTenuredPoolParser extends PreUnifiedGCLogParser implements Simpl
     private GCParseRule EndOfFile = new GCParseRule("END_OF_DATA_SENTINEL", END_OF_DATA_SENTINEL);
 
     public CMSTenuredPoolParser() {}
+
+    @Override
+    public Set<EventSource> eventsProduced() {
+        return Set.of(EventSource.CMS_PREUNIFIED);
+    }
 
     public String getName() {
         return ChannelName.CMS_TENURED_POOL_PARSER_OUTBOX.toString();

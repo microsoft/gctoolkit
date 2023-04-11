@@ -2,11 +2,14 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.parser;
 
+import com.microsoft.gctoolkit.GCToolKit;
 import org.junit.jupiter.api.Test;
 
 import java.util.logging.Logger;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ConcurrentMarkSweepPhaseParserRulesTest implements CMSPatterns {
 
@@ -30,26 +33,26 @@ public class ConcurrentMarkSweepPhaseParserRulesTest implements CMSPatterns {
 
     /* Code that is useful when testing individual records */
 
-    private final boolean debugging = Boolean.getBoolean("microsoft.debug");
-
     @Test
     public void testDebugCMSParseRules() {
         int index = 0;
         GCParseRule rule = rules[index];
-        evaluate(rule, lines[index], debugging);
+        evaluate(rule, lines[index]);
     }
 
 
-    private void evaluate(GCParseRule rule, String string, boolean dump) {
+    private void evaluate(GCParseRule rule, String string) {
 
         GCLogTrace trace = rule.parse(string);
         assertNotNull(trace);
-        if (dump) {
-            LOGGER.fine("matches groups " + trace.groupCount());
+        // Enable debugging by setting gctoolkit.debug to true
+        GCToolKit.LOG_DEBUG_MESSAGE(() -> {
+            StringBuilder sb = new StringBuilder("matches groups " + trace.groupCount());
             for (int i = 0; i <= trace.groupCount(); i++) {
-                LOGGER.fine(i + ": " + trace.getGroup(i));
+                sb.append(String.format("%n%d : %s", i, trace.getGroup(i))) ;
             }
-        }
+            return sb.toString();
+        });
     }
 
     //2015-08-04T19:50:56.691-0400: 168027.353: [GC[YG occupancy: 64589 K (720896 K)]2015-08-04T19:50:56.693-0400: 168027.355: [GC 168027.355: [ParNew

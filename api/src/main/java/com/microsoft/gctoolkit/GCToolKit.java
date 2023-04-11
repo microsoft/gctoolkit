@@ -3,6 +3,8 @@
 package com.microsoft.gctoolkit;
 
 import com.microsoft.gctoolkit.aggregator.Aggregation;
+import com.microsoft.gctoolkit.aggregator.Aggregator;
+import com.microsoft.gctoolkit.aggregator.EventSource;
 import com.microsoft.gctoolkit.io.DataSource;
 import com.microsoft.gctoolkit.io.GCLogFile;
 import com.microsoft.gctoolkit.io.RotatingGCLogFile;
@@ -14,7 +16,9 @@ import com.microsoft.gctoolkit.message.DataSourceParser;
 import com.microsoft.gctoolkit.message.JVMEventChannel;
 
 import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -22,8 +26,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.ServiceConfigurationError;
 import java.util.ServiceLoader;
+import java.util.Set;
+import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import static java.lang.Class.forName;
@@ -34,6 +41,38 @@ import static java.lang.Class.forName;
 public class GCToolKit {
 
     private static final Logger LOGGER = Logger.getLogger(GCToolKit.class.getName());
+
+    private static final String GCTOOLKIT_DEBUG = System.getProperty("gctoolkit.debug");
+    private static final boolean DEBUGGING = GCTOOLKIT_DEBUG != null;
+
+    // returns true if gctoolkit.debug is set to "all" or contains "className", but does not contain "-className"
+    private static boolean isDebugging(String className) {
+        return DEBUGGING
+                && (GCTOOLKIT_DEBUG.isEmpty()
+                || ((GCTOOLKIT_DEBUG.contains("all") || GCTOOLKIT_DEBUG.contains(className))
+                && !GCTOOLKIT_DEBUG.contains("-" + className)));
+    }
+
+    /**
+     * Print a debug message to System.out if gctoolkit.debug is empty, is set to "all",
+     * or contains "className" but does not contain "-className".
+     * For example, to enable debug logging for all classes except UnifiedG1GCParser:
+     * <code>-Dgctoolkit.debug=all,-com.microsoft.gctoolkit.parser.UnifiedG1GCParser</code>
+     *
+     * @param message Supplies the message to log. If null, nothing will be logged.
+     */
+    public static void LOG_DEBUG_MESSAGE(Supplier<String> message) {
+        if (DEBUGGING && message != null) {
+            StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+            String methodName = stackTrace[2].getMethodName();
+            String className = stackTrace[2].getClassName();
+            String fileName = stackTrace[2].getFileName();
+            int lineNumber = stackTrace[2].getLineNumber();
+            if (isDebugging(className)) {
+                System.out.println(String.format("DEBUG: %s.%s(%s:%d): %s", className, methodName, fileName, lineNumber, message.get()));
+            }
+        }
+    }
 
     private final HashSet<DataSourceParser> registeredDataSourceParsers = new HashSet<>();
     private List<Aggregation> registeredAggregations;
@@ -71,10 +110,10 @@ public class GCToolKit {
         ServiceLoader.load(Aggregation.class)
                 .stream()
                 .map(ServiceLoader.Provider::get)
-                .forEach(registeredAggregations::add);
-        //Useful for debugging
-        if ( Level.FINER.equals(LOGGER.getLevel()))
-            registeredAggregations.forEach(a -> LOGGER.log(Level.FINER, "Registered " + a.toString()));
+                .forEach(aggregation -> {
+                    registeredAggregations.add(aggregation);
+                    LOG_DEBUG_MESSAGE(() -> "ServiceLoader provided: " + aggregation.getClass().getName());
+                });
     }
 
     /**
@@ -154,11 +193,33 @@ public class GCToolKit {
         }
     }
 
+    /**
+     * This method allows full control over which DataSourceParsers are used to parse the DataSource.
+     * This method should be called before the {@link #analyze(DataSource)} method.
+     * DataSourceParsers loaded by this method are used in place of those that are ordinarily loaded via
+     * the service provider interface.
+     * Use the {@link #addDataSourceParser(DataSourceParser)} method to load a DataSourceParser in addition
+     * to those loaded by the service provider interface.
+     * @param dataSourceParser An implementation of DataSourceParser that will be used to parse the DataSource.
+     */
     public void loadDataSourceParser(DataSourceParser dataSourceParser) {
         registeredDataSourceParsers.add(dataSourceParser);
     }
 
-    private void loadDataSourceParsers(Diary diary) {
+    private List<DataSourceParser> additiveParsers = new ArrayList<>();
+
+    /**
+     * Add a DataSourceParser to be used to parse a DataSource. The DataSourceParser will be used in addition
+     * to those loaded by the service provider interface. This method should be called before the
+     * {@link #analyze(DataSource)} method.
+     * @param dataSourceParser An implementation of DataSourceParser that will be used to parse the DataSource.
+     */
+    public void addDataSourceParser(DataSourceParser dataSourceParser) {
+        additiveParsers.add(dataSourceParser);
+    }
+
+    private Set<EventSource> loadDataSourceParsers(Diary diary) {
+
         loadDataSourceChannel();
         loadJVMEventChannel();
         List<DataSourceParser> dataSourceParsers;
@@ -166,7 +227,7 @@ public class GCToolKit {
             dataSourceParsers = ServiceLoader.load(DataSourceParser.class)
                     .stream()
                     .map(ServiceLoader.Provider::get)
-                    .filter(consumer -> consumer.accepts(diary))
+                    .filter(dataSourceParser -> dataSourceParser.accepts(diary))
                     .collect(Collectors.toList());
         } else{
             dataSourceParsers = new ArrayList<>();
@@ -202,18 +263,28 @@ public class GCToolKit {
                     })
                     .filter(Optional::isPresent)
                     .map(optional -> (DataSourceParser) optional.get())
-                    .filter(consumer -> consumer.accepts(diary))
+                    .filter(dataSourceParser -> dataSourceParser.accepts(diary))
                     .collect(Collectors.toList());
-            if (dataSourceParsers.isEmpty()) {
-                throw new ServiceConfigurationError("Unable to find a suitable provider to create a DataSourceParser");
-            }
+
+        }
+
+        //  add in any additional parsers not provided by the module SPI.
+        dataSourceParsers.addAll(additiveParsers);
+
+        if (dataSourceParsers.isEmpty()) {
+            throw new ServiceConfigurationError("Unable to find a suitable provider to create a DataSourceParser");
         }
 
         for (DataSourceParser dataSourceParser : dataSourceParsers) {
+            LOG_DEBUG_MESSAGE(() -> "Registering " + dataSourceParser.getClass().getName() + " with " + dataSourceChannel.getClass().getName());
             dataSourceParser.diary(diary);
             dataSourceChannel.registerListener(dataSourceParser);
             dataSourceParser.publishTo(jvmEventChannel);
         }
+
+        return dataSourceParsers.stream()
+                .map(DataSourceParser::eventsProduced)
+                .collect(HashSet::new, Set::addAll, Set::addAll);
     }
 
     /**
@@ -230,14 +301,57 @@ public class GCToolKit {
      */
     public JavaVirtualMachine analyze(DataSource<?> dataSource) throws IOException  {
         GCLogFile logFile = (GCLogFile)dataSource;
-        loadDataSourceParsers(logFile.diary());
+        Set<EventSource> events = loadDataSourceParsers(logFile.diary());
         JavaVirtualMachine javaVirtualMachine = loadJavaVirtualMachine(logFile);
         try {
-            javaVirtualMachine.analyze(registeredAggregations, jvmEventChannel, dataSourceChannel);
+            List<Aggregator<? extends Aggregation>> filteredAggregators = filterAggregations(events);
+            javaVirtualMachine.analyze(filteredAggregators, jvmEventChannel, dataSourceChannel);
         } catch(Throwable t) {
             LOGGER.log(Level.SEVERE, "Internal Error: Cannot invoke analyze method", t);
         }
         return javaVirtualMachine;
+    }
+
+    private List<Aggregator<? extends Aggregation>> filterAggregations(Set<EventSource> events) {
+        List<Aggregator<? extends Aggregation>> aggregators = new ArrayList<>();
+        for (Aggregation aggregation : registeredAggregations) {
+            LOG_DEBUG_MESSAGE(() -> "Evaluating: " + aggregation.getClass().getName());
+            Constructor<? extends Aggregator<?>> constructor = constructor(aggregation);
+            if (constructor == null) {
+                LOGGER.log(Level.WARNING, "Cannot find one of: default constructor or @Collates annotation for " + aggregation.getClass().getName());
+                continue;
+            }
+
+            Aggregator<? extends Aggregation> aggregator = null;
+            try {
+                aggregator = constructor.newInstance(aggregation);
+            } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+                LOGGER.log(Level.SEVERE, e.getMessage(), e);
+                continue;
+            }
+            if (events.stream().anyMatch(aggregator::aggregates)) {
+                LOG_DEBUG_MESSAGE(() -> "Including : " + aggregation.getClass().getName());
+                aggregators.add(aggregator);
+            } else {
+                LOG_DEBUG_MESSAGE(() -> "Excluding : " + aggregation.getClass().getName());
+            }
+        }
+        return aggregators;
+
+    }
+
+    @SuppressWarnings("unchecked")
+    private Constructor<? extends Aggregator<?>> constructor(Aggregation aggregation) {
+        Class<? extends Aggregator<?>> targetClazz = aggregation.collates();
+        if ( targetClazz != null) {
+            Constructor<?>[] constructors = targetClazz.getConstructors();
+            for (Constructor<?> constructor : constructors) {
+                Parameter[] parameters = constructor.getParameters();
+                if (parameters.length == 1 && Aggregation.class.isAssignableFrom(parameters[0].getType()))
+                    return (Constructor<? extends Aggregator<?>>) constructor;
+            }
+        }
+        return null;
     }
 
 }

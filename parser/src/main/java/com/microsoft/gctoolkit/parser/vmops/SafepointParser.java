@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.parser.vmops;
 
+import com.microsoft.gctoolkit.aggregator.EventSource;
 import com.microsoft.gctoolkit.event.jvm.JVMTermination;
 import com.microsoft.gctoolkit.event.jvm.Safepoint;
 import com.microsoft.gctoolkit.jvm.Diary;
@@ -9,10 +10,16 @@ import com.microsoft.gctoolkit.message.ChannelName;
 import com.microsoft.gctoolkit.message.JVMEventChannel;
 import com.microsoft.gctoolkit.parser.PreUnifiedGCLogParser;
 
+import java.util.Set;
 
 public class SafepointParser extends PreUnifiedGCLogParser implements SafepointPatterns {
 
     public SafepointParser() {}
+
+    @Override
+    public Set<EventSource> eventsProduced() {
+        return Set.of(EventSource.SAFEPOINT);
+    }
 
     public String getName() {
         return "SafepointParser";
