@@ -11,9 +11,13 @@ public class VertxChannel {
 
     protected static final Logger LOGGER = Logger.getLogger(VertxChannel.class.getName());
 
-    private static final Vertx vertx;
+    //
+    // Note well! This cannot be a static final field.
+    // UnifiedJavaVirtualMachineConfigurationTest hangs if it is.
+    //
+    private final Vertx vertx;
 
-    static {
+    {
         //Disable unused Vert.x functionality
         System.setProperty("vertx.disableFileCPResolving", "true");
         System.setProperty("vertx.disableFileCaching", "true");
