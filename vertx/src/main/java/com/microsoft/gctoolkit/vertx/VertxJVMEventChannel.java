@@ -15,7 +15,6 @@ import java.util.logging.Logger;
 
 public class VertxJVMEventChannel extends VertxChannel implements JVMEventChannel {
 
-    private static final Logger LOGGER = Logger.getLogger(VertxJVMEventChannel.class.getName());
     final private DeliveryOptions options = new DeliveryOptions().setCodecName(JVMEventCodec.NAME);
 
     public VertxJVMEventChannel() {}
@@ -47,5 +46,7 @@ public class VertxJVMEventChannel extends VertxChannel implements JVMEventChanne
     }
 
     @Override
-    public void close() {}
+    public void close() {
+        super.close();
+    }
 }

@@ -35,5 +35,7 @@ public class VertxDataSourceChannel extends VertxChannel implements DataSourceCh
     }
 
     @Override
-    public void close() {}
+    public void close() {
+        super.close();
+    }
 }
