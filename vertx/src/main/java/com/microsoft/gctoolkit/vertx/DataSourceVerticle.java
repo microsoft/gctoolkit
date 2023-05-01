@@ -44,11 +44,6 @@ public class DataSourceVerticle extends AbstractVerticle {
     }
 
     @Override
-    public void stop(Promise promise) {
-        promise.complete();
-    }
-
-    @Override
     public boolean equals(Object other) {
         // we want Object.equals(other) because it's ok to have more than 1 AggregatorEngine on the bus
         // just not the same AggregatorEngine multiple times over and over redundantly

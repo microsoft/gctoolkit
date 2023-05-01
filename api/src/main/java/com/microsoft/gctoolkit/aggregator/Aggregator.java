@@ -6,6 +6,7 @@ import com.microsoft.gctoolkit.event.jvm.JVMEvent;
 import com.microsoft.gctoolkit.event.jvm.JVMTermination;
 
 import java.util.Arrays;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
@@ -117,13 +118,22 @@ public abstract class Aggregator<A extends Aggregation> {
         this.completionTask = task;
     }
 
+    private static final ExecutorService executorService =
+        Executors.newSingleThreadExecutor(runnable -> {
+            // Use a daemon thread for executing the completion task; otherwise, the JVM will not exit.
+            Thread thread = new Thread(runnable, "aggregator-completion");
+            thread.setDaemon(true);
+            return thread;
+        }
+    );
+
     /**
      * Call a callback when aggregation is completed.
      */
     private void complete() {
-        if (completionTask != null)
-            Executors.newSingleThreadExecutor().execute(completionTask);
-
+        if (completionTask != null) {
+            executorService.execute(completionTask);
+        }
     }
 
     /**
