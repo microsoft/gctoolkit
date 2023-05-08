@@ -56,9 +56,9 @@
 
     <properties>
         <revision>3.0.3-SNAPSHOT</revision>
-        <checkstyle.version>10.9.2</checkstyle.version>
-        <jreleaser.plugin.version>1.5.0</jreleaser.plugin.version>
-        <junit5.version>5.9.2</junit5.version>
+        <checkstyle.version>10.10.0</checkstyle.version>
+        <jreleaser.plugin.version>1.6.0</jreleaser.plugin.version>
+        <junit5.version>5.9.3</junit5.version>
         <maven.antrun-plugin.version>3.1.0</maven.antrun-plugin.version>
         <maven.changes-plugin.version>2.12.1</maven.changes-plugin.version>
         <maven.checkstyle-plugin.version>3.2.1</maven.checkstyle-plugin.version>
