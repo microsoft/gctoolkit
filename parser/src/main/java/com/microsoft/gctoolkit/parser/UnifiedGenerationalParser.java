@@ -33,7 +33,6 @@ import com.microsoft.gctoolkit.parser.unified.UnifiedGenerationalPatterns;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.logging.Level;
@@ -127,15 +126,23 @@ public class UnifiedGenerationalParser extends UnifiedGCLogParser implements Uni
 
         if (ignoreFrequentlySeenButUnwantedLines(line)) return;
 
-        Optional<AbstractMap.SimpleEntry<GCParseRule, GCLogTrace>> ruleToApply = parseRules.keys().stream()
+        parseRules.stream()
+                .map(Map.Entry::getKey)
                 .map(rule -> new AbstractMap.SimpleEntry<>(rule, rule.parse(line)))
                 .filter(tuple -> tuple.getValue() != null)
-                .findFirst();
+                .findAny()
+                .ifPresentOrElse(
+                        tuple -> {
+                            applyRule(tuple.getKey(), tuple.getValue(), line);
+                        },
+                        () -> LOGGER.log(Level.FINE, "Missed: {0}", line)
+                );
+    }
+
+
+    private void applyRule(GCParseRule ruleToApply, GCLogTrace trace, String line) {
         try {
-            if (ruleToApply.isPresent())
-                parseRules.get(ruleToApply.get().getKey()).accept(ruleToApply.get().getValue(), line);
-            else
-                LOGGER.log(Level.FINE, "Missed: {0}", line);
+            parseRules.select(ruleToApply).accept(trace, line);
         } catch (Throwable t) {
             LOGGER.throwing(this.getName(), "process", t);
         }

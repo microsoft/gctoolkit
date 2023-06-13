@@ -26,7 +26,6 @@ import com.microsoft.gctoolkit.time.DateTimeStamp;
 import java.util.AbstractMap;
 import java.util.LinkedList;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -174,18 +173,24 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
     }
 
     private void parse(String line) {
-        Optional<AbstractMap.SimpleEntry<GCParseRule, GCLogTrace>> ruleToApply = parseRules.keys().stream()
+        parseRules.stream()
+                .map(Map.Entry::getKey)
                 .map(rule -> new AbstractMap.SimpleEntry<>(rule, rule.parse(line)))
                 .filter(tuple -> tuple.getValue() != null)
-                .findFirst();
-        if (!ruleToApply.isPresent()) {
-            log(line);
-            return;
-        }
+                .findAny()
+                .ifPresentOrElse(
+                        tuple -> {
+                            applyRule(tuple.getKey(), tuple.getValue(), line);
+                        },
+                        () -> log(line)
+                );
+    }
 
+
+    private void applyRule(GCParseRule ruleToApply, GCLogTrace trace, String line) {
         try {
             setForwardReference(line);
-            parseRules.get(ruleToApply.get().getKey()).accept(ruleToApply.get().getValue(), line);
+            parseRules.select(ruleToApply).accept(trace, line);
         } catch (Throwable t) {
             LOGGER.throwing(this.getName(), "process", t);
         }
