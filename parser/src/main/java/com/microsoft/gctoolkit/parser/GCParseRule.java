@@ -44,4 +44,6 @@ public class GCParseRule {
     public String toString() {
         return this.name + " -> " + pattern.toString();
     }
+
+    public Pattern pattern() { return pattern; }
 }
