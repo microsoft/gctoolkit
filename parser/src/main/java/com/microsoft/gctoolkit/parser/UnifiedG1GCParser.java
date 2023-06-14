@@ -199,7 +199,8 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
                 .findAny()
                 .ifPresentOrElse(
                         tuple -> {
-                            setForwardReference(gcid, line.substring(0, end));
+                            // Typically, "end" will be greater than zero, but not always.
+                            setForwardReference(gcid, end > 0 ? line.substring(0, end) : line);
                             applyRule(tuple.getKey(), tuple.getValue(), line);
                         },
                         () -> log(line)
