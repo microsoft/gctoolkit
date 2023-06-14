@@ -30,7 +30,6 @@ import java.util.Set;
 import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import static java.lang.Class.forName;
@@ -305,7 +304,9 @@ public class GCToolKit {
         JavaVirtualMachine javaVirtualMachine = loadJavaVirtualMachine(logFile);
         try {
             List<Aggregator<? extends Aggregation>> filteredAggregators = filterAggregations(events);
+            long start = System.currentTimeMillis();
             javaVirtualMachine.analyze(filteredAggregators, jvmEventChannel, dataSourceChannel);
+            LOGGER.log(Level.FINE,() -> "Analysis completed in " + (System.currentTimeMillis() - start) + "ms");
         } catch(Throwable t) {
             LOGGER.log(Level.SEVERE, "Internal Error: Cannot invoke analyze method", t);
         }

@@ -32,6 +32,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static com.microsoft.gctoolkit.event.GarbageCollectionTypes.fromLabel;
 
@@ -172,14 +174,32 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
             parse(line);
     }
 
+    private static final Pattern gcIdPattern = GCLogParser.GCID_COUNTER.pattern();
+
     private void parse(String line) {
+
+        // Minor optimization. The parse rule only applies to what comes after the GC ID.
+        final int end;
+        final int gcid;
+        final Matcher gcIdMatcher = gcIdPattern.matcher(line);
+        if (gcIdMatcher.find()) {
+            gcid = Integer.parseInt(gcIdMatcher.group(1));
+            end = gcIdMatcher.end();
+        } else {
+            gcid = -1;
+            end = 0;
+        }
+
+        final String lineAfterGcId = line.substring(end);
+
         parseRules.stream()
                 .map(Map.Entry::getKey)
-                .map(rule -> new AbstractMap.SimpleEntry<>(rule, rule.parse(line)))
+                .map(rule -> new AbstractMap.SimpleEntry<>(rule, rule.parse(lineAfterGcId)))
                 .filter(tuple -> tuple.getValue() != null)
                 .findAny()
                 .ifPresentOrElse(
                         tuple -> {
+                            setForwardReference(gcid, line.substring(0, end));
                             applyRule(tuple.getKey(), tuple.getValue(), line);
                         },
                         () -> log(line)
@@ -189,23 +209,15 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
 
     private void applyRule(GCParseRule ruleToApply, GCLogTrace trace, String line) {
         try {
-            setForwardReference(line);
             parseRules.select(ruleToApply).accept(trace, line);
         } catch (Throwable t) {
             LOGGER.throwing(this.getName(), "process", t);
         }
     }
 
-    private void setForwardReference(String line) {
-        GCLogTrace trace = GCID_COUNTER.parse(line);
-        if (trace != null) {
-            int gcid = trace.getIntegerGroup(1);
-            forwardReference = collectionsUnderway.get(gcid);
-            if (forwardReference == null) {
-                forwardReference = new G1GCForwardReference(new Decorators(line), trace.getIntegerGroup(1));
-                collectionsUnderway.put(forwardReference.getGcID(), forwardReference);
-            } else if (gcid != forwardReference.getGcID())
-                forwardReference = collectionsUnderway.get(gcid);
+    private void setForwardReference(int gcid, String line) {
+        if (gcid != -1) {
+            forwardReference = collectionsUnderway.computeIfAbsent(gcid, k -> new G1GCForwardReference(new Decorators(line), gcid));
         }
     }
 
