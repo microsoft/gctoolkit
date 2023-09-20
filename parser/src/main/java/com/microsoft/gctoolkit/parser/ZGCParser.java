@@ -5,6 +5,7 @@ package com.microsoft.gctoolkit.parser;
 import com.microsoft.gctoolkit.GCToolKit;
 import com.microsoft.gctoolkit.aggregator.EventSource;
 import com.microsoft.gctoolkit.event.GCCause;
+import com.microsoft.gctoolkit.event.GarbageCollectionTypes;
 import com.microsoft.gctoolkit.event.jvm.JVMEvent;
 import com.microsoft.gctoolkit.event.jvm.JVMTermination;
 import com.microsoft.gctoolkit.event.zgc.OccupancySummary;
@@ -334,7 +335,7 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
         }
 
         ZGCCycle toZGCCycle(DateTimeStamp endTime) {
-            ZGCCycle cycle = new ZGCCycle(startTimeStamp, gcCause, endTime.minus(startTimeStamp));
+            ZGCCycle cycle = new ZGCCycle(startTimeStamp, GarbageCollectionTypes.ZGCCycle, gcCause, endTime.minus(startTimeStamp));
             cycle.setGcId(gcId);
             cycle.setPauseMarkStart(pauseMarkStart, pauseMarkStartDuration);
             cycle.setConcurrentMark(concurrentMarkStart, concurrentMarkDuration);
