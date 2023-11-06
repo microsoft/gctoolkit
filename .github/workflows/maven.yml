@@ -21,13 +21,13 @@ jobs:
         java: [11, 17]
 
     steps:
-    - uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3.6.0
+    - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
 
     - name: Set up JDK ${{ matrix.java }}
       uses: actions/setup-java@0ab4596768b603586c0de567f2430c30f5b0d2b0 # v3.13.0
       with:
         java-version: ${{ matrix.java }}
-        distribution: 'temurin'
+        distribution: 'microsoft'
         cache: 'maven'
         
     - name: Build with Maven
