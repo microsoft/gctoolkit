@@ -35,19 +35,19 @@ The GCToolKit artifacts are in [Maven Central](https://search.maven.org/search?q
     <dependency>
         <groupId>com.microsoft.gctoolkit</groupId>
         <artifactId>api</artifactId>
-        <version>3.0.0</version>
+        <version>3.0.4</version>
     </dependency>
     
     <dependency>
         <groupId>com.microsoft.gctoolkit</groupId>
         <artifactId>parser</artifactId>
-        <version>3.0.0</version>
+        <version>3.0.4</version>
     </dependency>
     
     <dependency>
         <groupId>com.microsoft.gctoolkit</groupId>
         <artifactId>vertx</artifactId>
-        <version>3.0.0</version>
+        <version>3.0.4</version>
     </dependency>
 
     ...

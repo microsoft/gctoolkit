@@ -16,25 +16,25 @@ or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any addi
 ## Submit an Issue
 
 if you wish to contribute to GCToolKit we would kindly ask that you submit an issue to the issue tracker. Doing so will help with the management of the project.
- 
+
 ## Build
 
-The build requires JDK 11, and uses the Maven wrapper (`mvnw`) to help ensure reproducible builds and so we don't force you to change your system Maven install. If you prefer to build with your local Maven installation, make sure the version matches the one in the project's [.mvn/wrapper/maven-wrapper.properties](https://github.com/microsoft/gctoolkit/blob/main/.mvn/wrapper/maven-wrapper.properties) file.
+The build requires JDK 11 (you can also use JDK 17 or 21), and uses the Maven wrapper (`mvnw`) to help ensure reproducible builds and so we don't force you to change your system Maven install. If you prefer to build with your local Maven installation, make sure the version matches the one in the project's [.mvn/wrapper/maven-wrapper.properties](https://github.com/microsoft/gctoolkit/blob/main/.mvn/wrapper/maven-wrapper.properties) file.
 
-* `mvnw clean` - remove build artifacts
-* `mvnw compile` - compile the source code
+* `./mvnw clean` - remove build artifacts
+* `./mvnw compile   |17>` - compile the source code. WARN you must set `11` or `17` for the release version.
 
 ## Test
 
 You can execute test cases with following command.
 
-* `mvnw test` - run unit tests (this project uses JUnit 5)
+* `./mvnw test -Dmaven.compiler.release=<11|17>` - run unit tests (this project uses JUnit 5)
 
 ## Package
 
 The packaging is vanilla Maven.
 
-* `mvnw package` - create the binaries.
+* `mvnw package -Dmaven.compiler.release=<11|17>` - create the binaries.
 
 ## Deploy / Publish
 
