@@ -33,6 +33,7 @@ jobs:
       fail-fast: false
       matrix:
         language: [ 'java' ]
+        java: [11, 17]
         # CodeQL supports [ 'cpp', 'csharp', 'go', 'java', 'javascript', 'python', 'ruby' ]
         # Learn more about CodeQL language support at https://git.io/codeql-language-support
 
@@ -52,8 +53,8 @@ jobs:
 
     # Autobuild attempts to build any compiled languages  (C/C++, C#, or Java).
     # If this step fails, then you should remove it and run the build manually (see below)
-    - name: Autobuild
-      uses: github/codeql-action/autobuild@v2
+    # - name: Autobuild
+    #  uses: github/codeql-action/autobuild@v2
 
     # ℹ️ Command-line programs to run using the OS shell.
     # 📚 https://git.io/JvXDl
@@ -65,6 +66,16 @@ jobs:
     #- run: |
     #   make bootstrap
     #   make release
+
+    - name: Set up JDK ${{ matrix.java }}
+      uses: actions/setup-java@0ab4596768b603586c0de567f2430c30f5b0d2b0 # v3.13.0
+      with:
+        java-version: ${{ matrix.java }}
+        distribution: 'microsoft'
+        cache: 'maven'
+        
+    - name: Build with Maven
+      run: ./mvnw -B verify -Dmaven.compiler.release=${{ matrix.java }} --file pom.xml 
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v2
