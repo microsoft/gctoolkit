@@ -850,6 +850,7 @@ class G1GCForwardReference extends ForwardReference {
         //collection.classUnloading()  todo: fill in
         fillInMemoryPoolStats(collection);
         fullInInternalPhases(collection);
+        fillInRegionSummary(collection);
         if (hasReferenceGCSummary())
             collection.add(generateReferenceGCSummary());
         collection.addCPUSummary(getCPUSummary());
