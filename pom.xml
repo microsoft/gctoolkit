@@ -64,7 +64,6 @@
         <maven.checkstyle-plugin.version>3.3.1</maven.checkstyle-plugin.version>
         <maven.clean-plugin.version>3.3.2</maven.clean-plugin.version>
         <maven.compiler-plugin.version>3.12.1</maven.compiler-plugin.version>
-        <!-- Commented out as we pass this parameter in so we can execute a matrix of builds -->
         <maven.compiler.release>11</maven.compiler.release>
         <maven.dependency-plugin.version>3.6.1</maven.dependency-plugin.version>
         <maven.deploy-plugin.version>3.1.1</maven.deploy-plugin.version>
