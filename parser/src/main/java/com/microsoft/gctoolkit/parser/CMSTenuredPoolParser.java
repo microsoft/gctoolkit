@@ -74,7 +74,7 @@ public class CMSTenuredPoolParser extends PreUnifiedGCLogParser implements Simpl
      */
     private void initialMark(GCLogTrace trace) {
         InitialMark initialMark = new InitialMark(trace.getDateTimeStamp(), GCCause.UNKNOWN_GCCAUSE, trace.getDoubleGroup(trace.groupCount()));
-        MemoryPoolSummary tenured = trace.getOccupancyBeforeAfterWithMemoryPoolSizeSummary(4);
+        MemoryPoolSummary tenured = trace.getOccupancyWithMemoryPoolSizeSummary(4);
         MemoryPoolSummary heap = trace.getOccupancyWithMemoryPoolSizeSummary(8);
         initialMark.add(heap.minus(tenured), tenured, heap);
         publish(initialMark);
@@ -151,7 +151,7 @@ public class CMSTenuredPoolParser extends PreUnifiedGCLogParser implements Simpl
         CMSRemark remark = new CMSRemark(startOfPhase, gcCause, trace.getDoubleGroup(trace.groupCount()));
 
         try {
-            MemoryPoolSummary tenured = trace.getOccupancyBeforeAfterWithMemoryPoolSizeSummary(1);
+            MemoryPoolSummary tenured = trace.getOccupancyWithMemoryPoolSizeSummary(1);
             MemoryPoolSummary heap = trace.getOccupancyWithMemoryPoolSizeSummary(5);
             remark.add(heap.minus(tenured), tenured, heap);
             recordRescanStepTimes(remark, line);
