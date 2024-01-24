@@ -321,40 +321,37 @@ public class GCToolKit {
 
     private List<Aggregator<? extends Aggregation>> filterAggregations(Set<EventSource> events) {
         List<Aggregator<? extends Aggregation>> aggregators = new ArrayList<>();
-        //try {
-            for (Aggregation aggregation : registeredAggregations) {
-                System.out.println("Evaluating: " + aggregation.getClass().getName());
-                LOG_DEBUG_MESSAGE(() -> "Evaluating: " + aggregation.getClass().getName());
-                Constructor<? extends Aggregator<?>> constructor = constructor(aggregation);
-                if (constructor == null) {
-                    LOGGER.log(Level.WARNING, "Cannot find one of: default constructor or @Collates annotation for " + aggregation.getClass().getName());
-                    continue;
-                }
-
-                Aggregator<? extends Aggregation> aggregator = null;
-                try {
-                    aggregator = constructor.newInstance(aggregation);
-                } catch (IllegalArgumentException iae) {
-                    // what is the argument, what is expected
-                    System.out.println("found " + aggregation.getClass().getName() + ", expected " + constructor.getParameterTypes()[0].getName());
-                    continue;
-                } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                    LOGGER.log(Level.SEVERE, e.getMessage(), e);
-                    continue;
-                }
-                if (events.stream().anyMatch(aggregator::aggregates)) {
-                    LOG_DEBUG_MESSAGE(() -> "Including : " + aggregation.getClass().getName());
-                    System.out.println("Including : " + aggregation.getClass().getName());
-                    aggregators.add(aggregator);
-                } else {
-                    LOG_DEBUG_MESSAGE(() -> "Excluding : " + aggregation.getClass().getName());
-                    System.out.println("Excluding : " + aggregation.getClass().getName());
-                }
+        for (Aggregation aggregation : registeredAggregations) {
+            LOG_DEBUG_MESSAGE(() -> "Evaluating: " + aggregation.getClass().getName());
+            Constructor<? extends Aggregator<?>> constructor = constructor(aggregation);
+            if (constructor == null) {
+                LOGGER.log(Level.WARNING, "Cannot find one of: default constructor or @Collates annotation for " + aggregation.getClass().getName());
+                continue;
             }
-//        } catch (Throwable t) {
-//            t.printStackTrace();
-//            System.out.println(t.getMessage());
-//        }
+
+            Aggregator<? extends Aggregation> aggregator = null;
+            try {
+                aggregator = constructor.newInstance(aggregation);
+            } catch (IllegalArgumentException iae) {
+                Class argumentType = aggregation.getClass();
+                LOGGER.log(Level.SEVERE, "Creating a " + constructor.getName() + " requires  a " + constructor.getParameterTypes()[0].getName() + " but was supplied with a " + argumentType, iae);
+                LOGGER.log(Level.SEVERE, "Expanding " + argumentType);
+                while (argumentType != Aggregation.class) {
+                    argumentType = argumentType.getSuperclass();
+                    LOGGER.log(Level.SEVERE, "    extends " + argumentType.getName());
+                }
+                continue;
+            } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+                LOGGER.log(Level.SEVERE, e.getMessage(), e);
+                continue;
+            }
+            if (events.stream().anyMatch(aggregator::aggregates)) {
+                LOG_DEBUG_MESSAGE(() -> "Including : " + aggregation.getClass().getName());
+                aggregators.add(aggregator);
+            } else {
+                LOG_DEBUG_MESSAGE(() -> "Excluding : " + aggregation.getClass().getName());
+            }
+        }
 
         return aggregators;
     }
@@ -362,7 +359,7 @@ public class GCToolKit {
     @SuppressWarnings("unchecked")
     private Constructor<? extends Aggregator<?>> constructor(Aggregation aggregation) {
         Class<? extends Aggregator<?>> targetClazz = aggregation.collates();
-        if ( targetClazz != null) {
+        if (targetClazz != null) {
             Constructor<?>[] constructors = targetClazz.getConstructors();
             for (Constructor<?> constructor : constructors) {
                 Parameter[] parameters = constructor.getParameters();
