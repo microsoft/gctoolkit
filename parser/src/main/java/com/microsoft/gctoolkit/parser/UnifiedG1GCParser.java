@@ -295,6 +295,7 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
     //[15.316s][debug][gc,heap      ] GC(0)   region size 1024K, 24 young (24576K), 0 survivors (0K)
     //ignore this logging for now
     private void youngRegionAllotment(GCLogTrace trace, String line) {
+        regionSize = trace.getIntegerGroup(1) / 1024;
         if (before) {
             forwardReference.setYoungOccupancyBeforeCollection(trace.getLongGroup(3));
             forwardReference.setSurvivorOccupancyBeforeCollection(trace.getLongGroup(5));
