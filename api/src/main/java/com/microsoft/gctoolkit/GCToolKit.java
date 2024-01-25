@@ -115,8 +115,7 @@ public class GCToolKit {
                         LOG_DEBUG_MESSAGE(() -> "ServiceLoader provided: " + aggregation.getClass().getName());
                     });
         } catch (Throwable e) {
-            System.out.println(e.getMessage());
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
             throw e;
         }
     }
