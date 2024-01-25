@@ -43,17 +43,17 @@ class G1GCForwardReference extends ForwardReference {
 
     private static final Logger LOGGER = Logger.getLogger(G1GCForwardReference.class.getName());
 
-    private static int heapRegionSize = 0;
+    private int heapRegionSize = 0;
     private static long minHeapSize;
     private static long initialHeapSize;
     private static long maxHeapSize;
     private DateTimeStamp concurrentCycleStartTime;
 
-    static void setHeapRegionSize(int sizeInMegaBytes) {
+    void setHeapRegionSize(int sizeInMegaBytes) {
         heapRegionSize = sizeInMegaBytes;
     }
 
-    static int getHeapRegionSize() {
+    int getHeapRegionSize() {
         return heapRegionSize;
     }
 
@@ -61,8 +61,9 @@ class G1GCForwardReference extends ForwardReference {
     private GarbageCollectionTypes gcType = null;
     private GarbageCollectionTypes concurrentPhase;
 
-    G1GCForwardReference(Decorators decorators, int gcID) {
+    G1GCForwardReference(Decorators decorators, int gcID, int heapRegionSize) {
         super(decorators, gcID);
+        this.heapRegionSize = heapRegionSize;
     }
 
     boolean isConcurrentCycle() {

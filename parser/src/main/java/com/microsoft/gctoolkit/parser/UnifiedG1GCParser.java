@@ -218,7 +218,7 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
 
     private void setForwardReference(int gcid, String line) {
         if (gcid != -1) {
-            forwardReference = collectionsUnderway.computeIfAbsent(gcid, k -> new G1GCForwardReference(new Decorators(line), gcid));
+            forwardReference = collectionsUnderway.computeIfAbsent(gcid, k -> new G1GCForwardReference(new Decorators(line), gcid, regionSize));
         }
     }
 
@@ -290,7 +290,6 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
 
     public void heapRegionSize(GCLogTrace trace, String line) {
         regionSize = trace.getIntegerGroup(1);
-        G1GCForwardReference.setHeapRegionSize(regionSize);
     }
 
     //[15.316s][debug][gc,heap      ] GC(0)   region size 1024K, 24 young (24576K), 0 survivors (0K)
