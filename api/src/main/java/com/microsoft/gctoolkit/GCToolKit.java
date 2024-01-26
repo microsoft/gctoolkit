@@ -106,13 +106,18 @@ public class GCToolKit {
      * </pre>
      */
     public void loadAggregationsFromServiceLoader() {
-        ServiceLoader.load(Aggregation.class)
-                .stream()
-                .map(ServiceLoader.Provider::get)
-                .forEach(aggregation -> {
-                    registeredAggregations.add(aggregation);
-                    LOG_DEBUG_MESSAGE(() -> "ServiceLoader provided: " + aggregation.getClass().getName());
-                });
+        try {
+            ServiceLoader.load(Aggregation.class)
+                    .stream()
+                    .map(ServiceLoader.Provider::get)
+                    .forEach(aggregation -> {
+                        registeredAggregations.add(aggregation);
+                        LOG_DEBUG_MESSAGE(() -> "ServiceLoader provided: " + aggregation.getClass().getName());
+                    });
+        } catch (Throwable e) {
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
+            throw e;
+        }
     }
 
     /**
@@ -326,6 +331,15 @@ public class GCToolKit {
             Aggregator<? extends Aggregation> aggregator = null;
             try {
                 aggregator = constructor.newInstance(aggregation);
+            } catch (IllegalArgumentException iae) {
+                Class argumentType = aggregation.getClass();
+                LOGGER.log(Level.SEVERE, "Creating a " + constructor.getName() + " requires  a " + constructor.getParameterTypes()[0].getName() + " but was supplied with a " + argumentType, iae);
+                LOGGER.log(Level.SEVERE, "Expanding " + argumentType);
+                while (argumentType != Aggregation.class) {
+                    argumentType = argumentType.getSuperclass();
+                    LOGGER.log(Level.SEVERE, "    extends " + argumentType.getName());
+                }
+                continue;
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
                 LOGGER.log(Level.SEVERE, e.getMessage(), e);
                 continue;
@@ -337,14 +351,14 @@ public class GCToolKit {
                 LOG_DEBUG_MESSAGE(() -> "Excluding : " + aggregation.getClass().getName());
             }
         }
-        return aggregators;
 
+        return aggregators;
     }
 
     @SuppressWarnings("unchecked")
     private Constructor<? extends Aggregator<?>> constructor(Aggregation aggregation) {
         Class<? extends Aggregator<?>> targetClazz = aggregation.collates();
-        if ( targetClazz != null) {
+        if (targetClazz != null) {
             Constructor<?>[] constructors = targetClazz.getConstructors();
             for (Constructor<?> constructor : constructors) {
                 Parameter[] parameters = constructor.getParameters();
