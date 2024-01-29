@@ -32,7 +32,6 @@ import com.microsoft.gctoolkit.event.g1gc.G1YoungInitialMark;
 import com.microsoft.gctoolkit.parser.jvm.Decorators;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
 
-import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
@@ -44,9 +43,9 @@ class G1GCForwardReference extends ForwardReference {
     private static final Logger LOGGER = Logger.getLogger(G1GCForwardReference.class.getName());
 
     private int heapRegionSize = 0;
-    private static long minHeapSize;
-    private static long initialHeapSize;
-    private static long maxHeapSize;
+    private long minHeapSize;
+    private long initialHeapSize;
+    private long maxHeapSize;
     private DateTimeStamp concurrentCycleStartTime;
 
     void setHeapRegionSize(int sizeInMegaBytes) {
@@ -61,9 +60,8 @@ class G1GCForwardReference extends ForwardReference {
     private GarbageCollectionTypes gcType = null;
     private GarbageCollectionTypes concurrentPhase;
 
-    G1GCForwardReference(Decorators decorators, int gcID, int heapRegionSize) {
+    G1GCForwardReference(Decorators decorators, int gcID) {
         super(decorators, gcID);
-        this.heapRegionSize = heapRegionSize;
     }
 
     boolean isConcurrentCycle() {
@@ -71,27 +69,27 @@ class G1GCForwardReference extends ForwardReference {
     }
 
     //bag of stuff to maybe eliminate
-    static void setMinHeapSize(long minHeapSize) {
-        G1GCForwardReference.minHeapSize = minHeapSize;
+    void setMinHeapSize(long minHeapSize) {
+        this.minHeapSize = minHeapSize;
     }
 
-    static long getMinHeapSize() {
+    long getMinHeapSize() {
         return minHeapSize;
     }
 
-    static void setInitialHeapSize(long initialHeapSize) {
-        G1GCForwardReference.initialHeapSize = initialHeapSize;
+    void setInitialHeapSize(long initialHeapSize) {
+        this.initialHeapSize = initialHeapSize;
     }
 
-    static long getInitialHeapSize() {
+    long getInitialHeapSize() {
         return initialHeapSize;
     }
 
-    static void setMaxHeapSize(long maxHeapSize) {
-        G1GCForwardReference.maxHeapSize = maxHeapSize;
+    void setMaxHeapSize(long maxHeapSize) {
+        this.maxHeapSize = maxHeapSize;
     }
 
-    static long getMaxHeapSize() {
+    long getMaxHeapSize() {
         return maxHeapSize;
     }
 
