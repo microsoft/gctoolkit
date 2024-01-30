@@ -219,6 +219,10 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
     private void setForwardReference(int gcid, String line) {
         if (gcid != -1) {
             forwardReference = collectionsUnderway.computeIfAbsent(gcid, k -> new G1GCForwardReference(new Decorators(line), gcid));
+            forwardReference.setHeapRegionSize(regionSize);
+            forwardReference.setMaxHeapSize(maxHeapSize);
+            forwardReference.setMinHeapSize(minHeapSize);
+            forwardReference.setInitialHeapSize(initialHeapSize);
         }
     }
 
@@ -280,22 +284,25 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
     //Minimum heap 8388608  Initial heap 268435456  Maximum heap 268435456
     //these values go back to the JavaVirtualMachine..
     public void heapSize(GCLogTrace trace, String line) {
-        G1GCForwardReference.setMinHeapSize(trace.getLongGroup(1));
-        G1GCForwardReference.setInitialHeapSize(trace.getLongGroup(2));
-        G1GCForwardReference.setMaxHeapSize(trace.getLongGroup(3));
+        this.minHeapSize = trace.getLongGroup(1);
+        this.initialHeapSize = trace.getLongGroup(2);
+        this.maxHeapSize = trace.getLongGroup(3);
     }
 
     //return to JVM
     private int regionSize = 0; //region size in Gigabytes
+    private long minHeapSize = 0;
+    private long initialHeapSize = 0;
+    private long maxHeapSize = 0;
 
     public void heapRegionSize(GCLogTrace trace, String line) {
         regionSize = trace.getIntegerGroup(1);
-        G1GCForwardReference.setHeapRegionSize(regionSize);
     }
 
     //[15.316s][debug][gc,heap      ] GC(0)   region size 1024K, 24 young (24576K), 0 survivors (0K)
     //ignore this logging for now
     private void youngRegionAllotment(GCLogTrace trace, String line) {
+        forwardReference.setHeapRegionSize(trace.getIntegerGroup(1) / 1024);
         if (before) {
             forwardReference.setYoungOccupancyBeforeCollection(trace.getLongGroup(3));
             forwardReference.setSurvivorOccupancyBeforeCollection(trace.getLongGroup(5));
