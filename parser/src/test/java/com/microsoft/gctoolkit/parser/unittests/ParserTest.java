@@ -114,6 +114,10 @@ public abstract class ParserTest {
         }
         return null;
     }
+
+    TestResults executeParsing(GCLogFile logfile) {
+        return null;
+    }
     
     TestResults testGenerationalRotatingLogFile(Path path) throws IOException {
         GCLogFile logfile = loadLogFile(path, true);
@@ -139,11 +143,11 @@ public abstract class ParserTest {
 
     TestResults testUnifiedG1GCSingleFile(Path path) throws IOException {
         SingleGCLogFile logfile = new SingleGCLogFile(path);
-        UnifiedDiarizer unifiedJVMConfiguration = new UnifiedDiarizer();
+        Diarizer jvmConfiguration = getJVMConfiguration(logfile);
         UnifiedG1GCParser parser = new UnifiedG1GCParser();
-        TestResults testResults = new TestResults();
+        TestResults testResults = new TestResults();  // dick sites  google/dec light weight monitoring system ---> graphical idiams for looking for locks and lock contention
         parser.publishTo(testResults);
-        parser.diary(unifiedJVMConfiguration.getDiary());
+        parser.diary(jvmConfiguration.getDiary());
         logfile.stream().map(String::trim).forEach(parser::receive);
         return testResults;
     }
@@ -151,6 +155,7 @@ public abstract class ParserTest {
     TestResults testRegionalRotatingLogFile(Path path) throws IOException {
         GCLogFile logfile = loadLogFile(path, true);
         Diarizer jvmConfiguration = getJVMConfiguration(logfile);
+        logfile.stream().map(String::trim).forEach(jvmConfiguration::diarize);
         PreUnifiedG1GCParser parser = new PreUnifiedG1GCParser();
         TestResults testResults = new TestResults();
         parser.publishTo(testResults);

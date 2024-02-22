@@ -29,7 +29,6 @@ public abstract class ParserTest {
         channel = new ParserTestSupportChannel();
         diarizer = diarizer();
         parser = parser();
-        parser.diary(diarizer.getDiary());
         parser.publishTo(channel);
     }
 
@@ -53,6 +52,7 @@ public abstract class ParserTest {
      */
     protected List<JVMEvent> feedParser(String[] lines) {
         Arrays.stream(lines).forEach(diarizer::diarize);
+        parser.diary(diarizer.getDiary());
         Arrays.stream(lines).map(String::trim).forEach(parser::receive);
         return channel.events();
     }

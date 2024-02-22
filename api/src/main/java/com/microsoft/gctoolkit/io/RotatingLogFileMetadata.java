@@ -137,9 +137,7 @@ public class RotatingLogFileMetadata extends LogFileMetadata {
 
     private void orderSegments() {
 
-        if (segments.size() < 2) {
-            return;
-        }
+        if (segments.size() < 2) return;
 
         LinkedList<LogFileSegment> orderedList = new LinkedList<>();
         List<LogFileSegment> workingList = new ArrayList<>();
@@ -151,7 +149,7 @@ public class RotatingLogFileMetadata extends LogFileMetadata {
                 .filter( segment -> segment.getSegmentName().endsWith(basePattern) || segment.getSegmentName().endsWith(".current"))
                 .findFirst().get();
 
-        orderedList.addFirst(current);
+        orderedList.addLast(current);
         workingList = removeIneligibleSegments (workingList, current);
         while ( ! workingList.isEmpty()) {
             current = workingList.stream()
@@ -160,7 +158,6 @@ public class RotatingLogFileMetadata extends LogFileMetadata {
             orderedList.addFirst(current);
             workingList = removeIneligibleSegments (workingList, current);
         }
-
         segments = orderedList;
     }
 

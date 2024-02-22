@@ -22,6 +22,8 @@ public interface UnifiedLoggingTokens extends GenericTokens {
         level -- The level associated with the log message
         tags -- The tag-set associated with the log message
         [2018-04-04T09:10:00.586-0100][0.018s][1522825800586ms][18ms][10026341461044ns][17738937ns][1375][7427][info][gc] Using G1
+
+        Note: Decorators are outputed in the order of the list above.
      */
 
     String DATE_STAMP = "\\[" + DATE + "\\]";
