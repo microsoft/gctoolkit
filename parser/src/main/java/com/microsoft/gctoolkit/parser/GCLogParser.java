@@ -26,7 +26,7 @@ public abstract class GCLogParser implements DataSourceParser, SharedPatterns {
     public static final GCParseRule GCID_COUNTER = new GCParseRule("GCID_COUNTER", " GC\\((\\d+)\\) ");
     private JVMEventChannel consumer;
     protected Diary diary;
-    private DateTimeStamp clock = new DateTimeStamp(DateTimeStamp.EPOC,0.0d);
+    private DateTimeStamp clock = new DateTimeStamp(DateTimeStamp.EPOC, 0.0d);
     private double lastDuration = 0.0d;
 
 
