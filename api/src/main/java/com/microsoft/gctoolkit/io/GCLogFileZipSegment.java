@@ -57,6 +57,7 @@ public class GCLogFileZipSegment implements LogFileSegment {
     private DateTimeStamp ageOfJVMAtLogStart() {
         if (startTime == null) {
             startTime = stream()
+                    .filter(s -> ! s.contains(" file created "))
                     .map(DateTimeStamp::fromGCLogLine)
                     .filter(dateTimeStamp -> dateTimeStamp.hasTimeStamp() || dateTimeStamp.hasDateStamp())
                     .findFirst()
@@ -74,7 +75,7 @@ public class GCLogFileZipSegment implements LogFileSegment {
                     .map(DateTimeStamp::fromGCLogLine)
                     .filter(dateTimeStamp -> dateTimeStamp.hasTimeStamp() || dateTimeStamp.hasDateStamp())
                     .max(Comparator.comparing(dateTimeStamp -> dateTimeStamp != null ? dateTimeStamp.getTimeStamp() : 0))
-                    .orElse(new DateTimeStamp(-1.0d));
+                    .orElse(DateTimeStamp.EMPTY_DATE);
         }
         return endTime;
     }

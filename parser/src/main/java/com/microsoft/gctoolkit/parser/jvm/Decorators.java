@@ -31,13 +31,27 @@ public class Decorators {
      * level -- The level associated with the log message
      * tags -- The tag-set associated with the log message
      *
-     * This implementation takes advantage of the property that the ordering of tags is stable.
-     * The default decorators (as of the time of authoring JDK 9-17) include [uptime][level][tags].
+     * This implementation takes advantage of the property that the ordering of tags is stable. For example,
+     * -Xlog:*::pid,time produces the identical ordering as -Xlog:*::time,pid. Moreover, the list of decorators
+     * is dedupped implying that the second decorator in -Xlog:*::time,time is ignored.
+     *
+     * The default decorators (as of the time of authoring JDK 9-21) include [uptime][level][tags].
      * For example, [1.361s][info][gc,heap]. This reads uptime of 1.361 seconds. The tag for the log record
      * is gc.heap at the info level.
      *
-     * At the moment, GCToolkit does not differentiate between timenanos and uptimenanos as there is no formatting hint
-     * to allow for a differentiation. Less importantly, there is currently no way to differentiate between pid and tid.
+     * At issue is that uptime and timemillis are, on the surface, indistinguishable. The same is true with
+     * timenanos and uptimenanos as well as with pid and tid. The following logic can be used to help differentiate
+     * indistinguishable decorators.
+     *
+     * 1) If both decorators are present then order can be used to differentiate
+     * 2) If ms time value - 20 years > 0, then timemillis can be assumed. Otherwise uptime is assumed. The reasoning
+     *    is, unified logging didn't exist that long ago. The value of 20 has been arbitrarily chosen.
+     * 3) There is no reliable way to differentiate the nanosecond timings if only 1 is present. However this may not
+     *    matter as GCToolKit would only use these values to create a baseline measure to align date/time with uptime.
+     *    This technique is designed to work-around the cases where logs do not contain the uptime decorator.
+     * 4) There is no known way to reliably differentiate between PID and TID. At this time, GCToolKit ignores these
+     *    decorators.
+     *
      * Todo: GCToolkit captures time in the DateTimeStamp class. That class will capture uptime or time or both. If both
      * are missing, GCToolkit JVMEvents will have no sense of time. It is possible that the other timing fields could fill
      * in cases where both the time and uptime decorators were missing.

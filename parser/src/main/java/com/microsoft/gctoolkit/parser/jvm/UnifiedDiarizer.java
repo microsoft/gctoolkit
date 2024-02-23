@@ -148,7 +148,8 @@ public class UnifiedDiarizer implements Diarizer {
     }
 
     private void timeOfFirstEvent(Decorators decorator) {
-        diary.setTimeOfFirstEvent(decorator.getDateTimeStamp());
+        if ( ! diary.hasTimeOfFirstEvent())
+            diary.setTimeOfFirstEvent(decorator.getDateTimeStamp());
     }
 
     private void extractTagsAndLevels(Decorators decorators) {

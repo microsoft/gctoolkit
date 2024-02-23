@@ -476,4 +476,11 @@ public class DateTimeStampTest {
         assertEquals(comp1To2, comp1To3, "compareTo() is not transitive");
     }
 
+    @Test
+    void malformedDateTimeStampThrowsException() {
+        final DateTimeStamp onlyDate = new DateTimeStamp("2021-09-01T11:12:13.111-0100");
+        final DateTimeStamp onlyTime = new DateTimeStamp(1.0D);
+        assertThrows(IllegalStateException.class, () -> onlyDate.after(onlyTime));
+    }
+
 }

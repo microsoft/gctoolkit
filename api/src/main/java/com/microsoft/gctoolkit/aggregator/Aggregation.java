@@ -89,7 +89,7 @@ import com.microsoft.gctoolkit.time.DateTimeStamp;
 public abstract class Aggregation {
 
     private DateTimeStamp timeOfFirstEvent = null;
-    private DateTimeStamp timeOfTermination = new DateTimeStamp(0.0d);
+    private DateTimeStamp timeOfTermination = DateTimeStamp.baseDate();
 
     /**
      * Constructor for the module SPI

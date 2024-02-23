@@ -386,7 +386,13 @@ public class Diary {
     public DateTimeStamp getTimeOfFirstEvent() {
         return this.timeOfFirstEvent;
     }
-/*    GENERATIONAL,
+
+    public boolean hasTimeOfFirstEvent() {
+        return this.timeOfFirstEvent != null;
+    }
+
+/*
+    GENERATIONAL,
     CMS,
     G1GC,
     SHENANDOAH,
@@ -394,7 +400,6 @@ public class Diary {
     SAFEPOINT,
     SURVIVOR,
     TENURED;
-
  */
     private void evaluate(Set<EventSource> events, SupportedFlags flag, EventSource eventSource) {
         if ( isStateKnown(flag) & isTrue(flag))

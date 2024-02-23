@@ -26,15 +26,21 @@ public abstract class GCLogParser implements DataSourceParser, SharedPatterns {
     public static final GCParseRule GCID_COUNTER = new GCParseRule("GCID_COUNTER", " GC\\((\\d+)\\) ");
     private JVMEventChannel consumer;
     protected Diary diary;
-    private DateTimeStamp clock = new DateTimeStamp(0.0d);
+    private DateTimeStamp clock = new DateTimeStamp(DateTimeStamp.EPOC, 0.0d);
     private double lastDuration = 0.0d;
 
 
     public GCLogParser() {}
 
+    /**
+     * Setting the diary will set the current clock time to the time of the first event
+     * in the GC log. This is a better choice than EPOC though EPOC is better than null.
+     * @param diary summary the GC log.
+     */
     @Override
     public void diary(Diary diary) {
         this.diary = diary;
+        this.clock = diary.getTimeOfFirstEvent();
     }
 
     public DateTimeStamp getClock() {

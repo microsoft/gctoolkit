@@ -2,6 +2,8 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.time;
 
+import java.time.Instant;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.chrono.ChronoZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -36,8 +38,9 @@ public class DateTimeStamp implements Comparable<DateTimeStamp> {
     // Timestamp can never be less than 0
     //      - use NaN to say it's not set
     public final static double TIMESTAMP_NOT_SET = Double.NaN;
+    public final static ZonedDateTime EPOC = ZonedDateTime.ofInstant(Instant.EPOCH, ZoneId.of("GMT"));
     private final ZonedDateTime dateTime;
-    private double timeStamp;
+    private final double timeStamp;
     public static final Comparator<DateTimeStamp> comparator = getComparator();
 
     // For some reason, ISO_DATE_TIME doesn't like that time-zone is -0100. It wants -01:00.
@@ -62,8 +65,8 @@ public class DateTimeStamp implements Comparable<DateTimeStamp> {
     private static final String TIME = INTEGER + DECIMAL_POINT + "\\d{3}";
 
     // Unified Tokens
-    private static final String DATE_TAG = "\\[" + DATE + "\\]";
-    private static final String UPTIME_TAG = "\\[(" + TIME + ")s\\]";
+    private static final String DATE_TAG = "\\[" + DATE + "]";
+    private static final String UPTIME_TAG = "\\[(" + TIME + ")s]";
 
     // Pre-unified tokens
     private static final String TIMESTAMP = "(" + TIME + "): ";
@@ -74,7 +77,7 @@ public class DateTimeStamp implements Comparable<DateTimeStamp> {
     private static final Pattern PREUNIFIED_DATE_TIMESTAMP = Pattern.compile(DATE_TIMESTAMP);
     // JEP 158 has ISO-8601 time and uptime in seconds and milliseconds as the first two decorators.
     private static final Pattern UNIFIED_DATE_TIMESTAMP = Pattern.compile("^(" + DATE_TAG + ")?(" + UPTIME_TAG + ")?");
-    private static final DateTimeStamp EMPTY_DATE = new DateTimeStamp(TIMESTAMP_NOT_SET);
+    public static final DateTimeStamp EMPTY_DATE = new DateTimeStamp(EPOC, TIMESTAMP_NOT_SET);
 
     public static DateTimeStamp fromGCLogLine(String line) {
         Matcher matcher;
@@ -89,6 +92,14 @@ public class DateTimeStamp implements Comparable<DateTimeStamp> {
             return new DateTimeStamp(dateFromString(matcher.group(1)), ageFromString(matcher.group(captureGroup)));
         else
             return EMPTY_DATE;
+    }
+
+    /**
+     * Provides a minimal date.
+     * @return
+     */
+    public static DateTimeStamp baseDate() {
+        return new DateTimeStamp(EPOC, 0.0d);
     }
 
     /**
@@ -167,7 +178,7 @@ public class DateTimeStamp implements Comparable<DateTimeStamp> {
      * @return {@code true} if the the date stamp is not {@code null}.
      */
     public boolean hasDateStamp() {
-        return getDateTime() != null;
+        return ! (getDateTime() == null || EPOC.equals(getDateTime()));
     }
 
     public boolean hasTimeStamp() {
@@ -328,7 +339,7 @@ public class DateTimeStamp implements Comparable<DateTimeStamp> {
         else if (o1.hasDateStamp() && o2.hasDateStamp())
             return comparing(DateTimeStamp::getDateTime, ChronoZonedDateTime::compareTo);
         else
-            throw new IllegalStateException("DateTimeStamp parameters cannot be compared as either timestamp or datestamp must be set.");
+            throw new IllegalStateException("DateTimeStamp parameters cannot be compared as either timestamp or datestamp must be set in both instances.");
     }
 
     public double toEpochInMillis() {
