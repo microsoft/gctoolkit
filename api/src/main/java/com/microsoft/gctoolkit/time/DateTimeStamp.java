@@ -77,7 +77,7 @@ public class DateTimeStamp implements Comparable<DateTimeStamp> {
     private static final Pattern PREUNIFIED_DATE_TIMESTAMP = Pattern.compile(DATE_TIMESTAMP);
     // JEP 158 has ISO-8601 time and uptime in seconds and milliseconds as the first two decorators.
     private static final Pattern UNIFIED_DATE_TIMESTAMP = Pattern.compile("^(" + DATE_TAG + ")?(" + UPTIME_TAG + ")?");
-    public static final DateTimeStamp EMPTY_DATE = new DateTimeStamp(EPOC,TIMESTAMP_NOT_SET);
+    public static final DateTimeStamp EMPTY_DATE = new DateTimeStamp(EPOC, TIMESTAMP_NOT_SET);
 
     public static DateTimeStamp fromGCLogLine(String line) {
         Matcher matcher;

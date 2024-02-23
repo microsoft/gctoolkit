@@ -145,7 +145,7 @@ public abstract class ParserTest {
         SingleGCLogFile logfile = new SingleGCLogFile(path);
         Diarizer jvmConfiguration = getJVMConfiguration(logfile);
         UnifiedG1GCParser parser = new UnifiedG1GCParser();
-        TestResults testResults = new TestResults();  // dick sites  google/dec light weight monitoring system ---> graphical idiams for looking for locks and lock contention
+        TestResults testResults = new TestResults();
         parser.publishTo(testResults);
         parser.diary(jvmConfiguration.getDiary());
         logfile.stream().map(String::trim).forEach(parser::receive);

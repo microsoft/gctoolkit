@@ -24,7 +24,7 @@ public class MissingTimeStampTest {
     }
 
     public void analyze(String gcLogFile) {
-        /**
+        /*
          * GC log files can come in  one of two types: single or series of rolling logs.
          * In this sample, we load a single log file.
          * The log files can be either in text, zip, or gzip format.
@@ -32,13 +32,13 @@ public class MissingTimeStampTest {
         GCLogFile logFile = new SingleGCLogFile(Path.of(gcLogFile));
         GCToolKit gcToolKit = new GCToolKit();
 
-        /**
+        /*
          * This call will load all implementations of Aggregator that have been declared in module-info.java.
          * This mechanism makes use of Module SPI.
          */
         gcToolKit.loadAggregationsFromServiceLoader();
 
-        /**
+        /*
          * The JavaVirtualMachine contains the aggregations as filled out by the Aggregators.
          * It also contains configuration information about how the JVM was configured for the runtime.
          */
@@ -64,10 +64,6 @@ public class MissingTimeStampTest {
         } catch (Throwable t) {
             fail("pauseTimePercentage failed", t);
         }
-
-        System.out.println("-----------------------------------------------");
-        System.out.println("Pause time percentage = " + pauseTimePercentage);
-        System.out.println("-----------------------------------------------");
         Assertions.assertTrue(pauseTimePercentage > 0.0d);
 
     }
