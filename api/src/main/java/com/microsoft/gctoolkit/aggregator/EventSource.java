@@ -17,6 +17,12 @@ public enum EventSource {
      */
     GENERATIONAL(GENERATIONAL_HEAP_PARSER_OUTBOX),
     CMS_UNIFIED(GENERATIONAL_HEAP_PARSER_OUTBOX),
+
+    /**
+     * Events that come from the CMS collection cycles
+     * @deprecated use the GENERATIONAL event source instead.
+     */
+    @Deprecated(since="3.0.8", forRemoval=true)
     CMS_PREUNIFIED(CMS_TENURED_POOL_PARSER_OUTBOX),
     /**
      * Events come from the G1 collector.
