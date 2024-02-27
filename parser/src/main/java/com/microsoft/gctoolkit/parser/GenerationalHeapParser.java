@@ -9,12 +9,19 @@ import com.microsoft.gctoolkit.event.GCCause;
 import com.microsoft.gctoolkit.event.GarbageCollectionTypes;
 import com.microsoft.gctoolkit.event.MemoryPoolSummary;
 import com.microsoft.gctoolkit.event.ReferenceGCSummary;
+import com.microsoft.gctoolkit.event.generational.AbortablePreClean;
 import com.microsoft.gctoolkit.event.generational.BinaryTreeDictionary;
+import com.microsoft.gctoolkit.event.generational.CMSConcurrentEvent;
 import com.microsoft.gctoolkit.event.generational.CMSRemark;
+import com.microsoft.gctoolkit.event.generational.ConcurrentMark;
 import com.microsoft.gctoolkit.event.generational.ConcurrentModeFailure;
 import com.microsoft.gctoolkit.event.generational.ConcurrentModeInterrupted;
+import com.microsoft.gctoolkit.event.generational.ConcurrentPreClean;
+import com.microsoft.gctoolkit.event.generational.ConcurrentReset;
+import com.microsoft.gctoolkit.event.generational.ConcurrentSweep;
 import com.microsoft.gctoolkit.event.generational.DefNew;
 import com.microsoft.gctoolkit.event.generational.FullGC;
+import com.microsoft.gctoolkit.event.generational.GenerationalGCPauseEvent;
 import com.microsoft.gctoolkit.event.generational.InitialMark;
 import com.microsoft.gctoolkit.event.generational.PSFullGC;
 import com.microsoft.gctoolkit.event.generational.PSYoungGen;
@@ -80,6 +87,7 @@ public class GenerationalHeapParser extends PreUnifiedGCLogParser implements Sim
 
     //Expect Remark
     private boolean expectRemark = false;
+    private boolean inConcurrentPhase = false;
 
     /* Rules not used....
         GCParseRule FULL_PARNEW_CMF_META
@@ -147,7 +155,6 @@ public class GenerationalHeapParser extends PreUnifiedGCLogParser implements Sim
         parseRules.put(CORRUPTED_PARNEW_BODY, this::corruptedParNewBody);
         parseRules.put(CONCURRENT_PHASE_START, this::concurrentPhaseStart);
         parseRules.put(CONCURRENT_PHASE_END, this::concurrentPhaseEnd);
-        parseRules.put(ABORT_PRECLEAN_DUE_TO_TIME_CLAUSE, this::abortPrecleanDueToTimeClause);
         parseRules.put(INITIAL_MARK, this::initialMark);
         parseRules.put(SCAVENGE_BEFORE_REMARK, this::scavengeBeforeRemark);
         parseRules.put(SCAVENGE_BEFORE_REMARK_TENURING, this::scavengeBeforeRemarkTenuring);
@@ -163,10 +170,8 @@ public class GenerationalHeapParser extends PreUnifiedGCLogParser implements Sim
         parseRules.put(PARALLEL_RESCAN_WEAK_CLASS_SCRUB, this::remarkAt13);
         //, 0.1127040 secs]220.624: [weak refs processing, 0.1513820 secs] [1 CMS-remark: 10541305K(16777216K)] 10742883K(18664704K), 0.7371020 secs]
         //todo: this was capturing records that is shouldn't have so the rule was modified.. now does it work??? Needs through testing now that order of evaluation will change
-        parseRules.put(REMARK_DETAILS, this::remarkAt1);
         parseRules.put(SERIAL_REMARK_SCAN_BREAKDOWNS, this::remarkAt15);
         parseRules.put(REMARK_DETAILS, this::remarkAt1);
-        parseRules.put(SERIAL_REMARK_SCAN_BREAKDOWNS, this::remarkAt15);
         parseRules.put(REMARK_REFERENCE_PROCESSING, this::recordRemarkWithReferenceProcessing);
         parseRules.put(TENURING_DETAILS, this::tenuringDetails);
         parseRules.put(RESCAN_WEAK_CLASS_SYMBOL_STRING, this::remarkAt11);
@@ -177,12 +182,12 @@ public class GenerationalHeapParser extends PreUnifiedGCLogParser implements Sim
         parseRules.put(PARNEW_DETAILS_PROMOTION_FAILED_WITH_CMS_PHASE, this::parNewDetailsPromotionFailedWithConcurrentMarkSweepPhase);
         parseRules.put(PARNEW_DETAILS_WITH_CONCURRENT_MODE_FAILURE, this::parNewDetailsWithConcurrentModeFailure);
         parseRules.put(CONCURRENT_MODE_FAILURE_REFERENCE, this::concurrentModeFailureReference);
-        parseRules.put(iCMS_PARNEW_DEFNEW_TENURING_DETAILS, this::iCMSParNewDefNewTenuringDetails);
         parseRules.put(iCMS_CONCURRENT_MODE_FAILURE, this::iCMSConcurrentModeFailure);
         parseRules.put(iCMS_CONCURRENT_MODE_FAILURE_META, this::iCMSConcurrentModeFailure);
         parseRules.put(iCMS_CMF_DUIRNG_PARNEW_DEFNEW_DETAILS, this::iCMSConcurrentModeFailureDuringParNewDefNewDetails);
         parseRules.put(FULL_GC_INTERRUPTS_CONCURRENT_PHASE, this::fullGCInterruptsConcurrentPhase);
         parseRules.put(FULL_PARNEW_START, this::fullParNewStart);
+        parseRules.put(CMS_FULL_80, this::psFullReferenceJDK8);
         parseRules.put(FULL_GC_REFERENCE_CMF, this::fullGCReferenceConcurrentModeFailure);
 
         parseRules.put(iCMS_PARNEW, this::iCMSParNew);
@@ -267,6 +272,35 @@ public class GenerationalHeapParser extends PreUnifiedGCLogParser implements Sim
         parseRules.put(CMF_LARGE_BLOCK, this::concurrentModeFailureSplitByLargeBlock);
         parseRules.put(WEAK_PROCESSING, this::noop);
 
+        //this rule must be evaluated before CONCURRENT_PHASE_END_BLOCK
+        parseRules.put(ABORT_PRECLEAN_DUE_TO_TIME_CLAUSE, this::abortPrecleanDueToTime);
+        parseRules.put(CONCURRENT_PHASE_START_BLOCK, this::startOfConcurrentPhase);
+        parseRules.put(CONCURRENT_PHASE_END_BLOCK, this::endOfConcurrentPhase);
+        parseRules.put(PRECLEAN_REFERENCE, this::endConcurrentPrecleanWithReferenceProcessing);
+
+        /*
+        //this rule must be evaluated before CONCURRENT_PHASE_END_BLOCK
+        if ((trace = ABORT_PRECLEAN_DUE_TO_TIME_CLAUSE.parse(line)) != null)
+//            abortPrecleanDueToTime(trace);
+        else if ((trace = CONCURRENT_PHASE_START_BLOCK.parse(line)) != null)
+            startOfConcurrentPhase(trace);
+        else if ((trace = CONCURRENT_PHASE_END_BLOCK.parse(line)) != null)
+            endOfConcurrentPhase(trace);
+        else if ((trace = PRECLEAN_REFERENCE.parse(line)) != null)
+            endConcurrentPrecleanWithReferenceProcessing(trace);
+        else if ((trace = INITIAL_MARK.parse(line)) != null)
+            initialMark(trace);
+        else if ((trace = REMARK_CLAUSE.parse(line)) != null)
+            remark(trace, line);
+        else if ((trace = REMARK_REFERENCE_PROCESSING.parse(line)) != null)
+            remarkWithReferenceProcessing(trace, line);
+        else if ((trace = SPLIT_REMARK.parse(line)) != null)
+            startOfPhase = getClock();
+        else if ((trace = EndOfFile.parse(line)) != null) {
+            super.publish(ChannelName.CMS_TENURED_POOL_PARSER_OUTBOX, new JVMTermination(getClock(), diary.getTimeOfFirstEvent()));
+        }
+         */
+
 
         parseRules.put(new GCParseRule("END_OF_DATA_SENTINEL", END_OF_DATA_SENTINEL), this::endOfFile);
     }
@@ -338,7 +372,7 @@ public class GenerationalHeapParser extends PreUnifiedGCLogParser implements Sim
         if (line.startsWith("eden space")) return true;
         if (line.startsWith("from space")) return true;
         if (line.startsWith("to   space")) return true;
-        if (line.contains("[0xffff") && line.endsWith("000)")) ;
+        if (line.contains("[0xffff") && line.endsWith("000)")) return true;
 
         if (line.startsWith("Finished ")) return true;
 
@@ -353,7 +387,7 @@ public class GenerationalHeapParser extends PreUnifiedGCLogParser implements Sim
     }
 
     public void endOfFile(GCLogTrace trace, String line) {
-        publish(new JVMTermination(getClock(),diary.getTimeOfFirstEvent()));
+        publish(new JVMTermination(getClock(),diary.getTimeOfFirstEvent()), true);
     }
 
     public void defNew(GCLogTrace trace, String line) {
@@ -558,7 +592,7 @@ public class GenerationalHeapParser extends PreUnifiedGCLogParser implements Sim
         publish(collection);
     }
 
-    //Very rare occurence where ParNew suffers from a promotion failure during the reset. This is, and isn't a CMF but will be treated as one.
+    //Very rare occurrence where ParNew suffers from a promotion failure during the reset. This is, and isn't a CMF but will be treated as one.
     public void parNewToPsudoConcurrentModeFailure(GCLogTrace trace, String line) {
         ConcurrentModeFailure collection = new ConcurrentModeFailure(scavengeTimeStamp, GCCause.PROMOTION_FAILED, trace.getDoubleGroup(trace.groupCount()));
         MemoryPoolSummary tenured = trace.getOccupancyBeforeAfterWithMemoryPoolSizeSummary(1);
@@ -782,9 +816,6 @@ public class GenerationalHeapParser extends PreUnifiedGCLogParser implements Sim
 
     public void concurrentPhaseEnd(GCLogTrace trace, String line) {
         //not interesting to this parser
-    }
-
-    public void abortPrecleanDueToTimeClause(GCLogTrace trace, String line) {
     }
 
     //12.986: [GC[1 CMS-initial-mark: 33532K(62656K)] 49652K(81280K), 0.0014191 secs] [Times: user=0.00 sys=0.00, real=0.00 secs]
@@ -2018,33 +2049,102 @@ public class GenerationalHeapParser extends PreUnifiedGCLogParser implements Sim
 
     }
 
+    private DateTimeStamp startOfConcurrentPhase;
+
+    //this rule must be evaluated before CONCURRENT_PHASE_END_BLOCK
+    private void abortPrecleanDueToTime(GCLogTrace trace, String line) {
+        try {
+            double cpuTime = trace.getDoubleGroup(4);
+            double wallClock = trace.getDoubleGroup(5);
+            publish(new AbortablePreClean(startOfConcurrentPhase, trace.getDateTimeStamp().getTimeStamp() - startOfConcurrentPhase.getTimeStamp(), cpuTime, wallClock, true));
+        } catch (Exception e) {
+            LOGGER.warning("concurrent phase end choked on " + trace);
+        }
+    }
+
+    private void startOfConcurrentPhase(GCLogTrace trace, String line) {
+        startOfConcurrentPhase = trace.getDateTimeStamp();
+    }
+    private void endOfConcurrentPhase(GCLogTrace trace, String line) {
+        DateTimeStamp endOfPhase = trace.getDateTimeStamp();
+        endOfConcurrentPhase(trace, endOfPhase);
+    }
+
+    private void endConcurrentPrecleanWithReferenceProcessing(GCLogTrace trace, String line) {
+        try {
+            publish(new ConcurrentPreClean(startOfConcurrentPhase, trace.getDoubleGroup(14) - startOfConcurrentPhase.getTimeStamp(), trace.getDoubleGroup(16), trace.getDoubleGroup(17)));
+        } catch (Throwable t) {
+            LOGGER.warning("concurrent phase choked on " + trace.toString());
+        }
+    }
+
+    private void endOfConcurrentPhase(GCLogTrace trace, DateTimeStamp timeStamp) {
+        String phase = trace.getGroup(3);
+        double cpuTime = trace.getDoubleGroup(4);
+        double wallTime = trace.getDoubleGroup(5);
+        double duration = timeStamp.getTimeStamp() - startOfConcurrentPhase.getTimeStamp();
+        if ("mark".equals(phase))
+            publish(new ConcurrentMark(startOfConcurrentPhase, duration, cpuTime, wallTime));
+        else if ("preclean".equals(phase))
+            publish(new ConcurrentPreClean(startOfConcurrentPhase, duration, cpuTime, wallTime));
+        else if ("abortable-preclean".equals(phase))
+            publish( new AbortablePreClean(startOfConcurrentPhase, duration, cpuTime, wallTime, false));
+        else if ("sweep".equals(phase))
+            publish( new ConcurrentSweep(startOfConcurrentPhase, duration, cpuTime, wallTime));
+        else if ("reset".equals(phase))
+            publish(new ConcurrentReset(startOfConcurrentPhase, duration, cpuTime, wallTime));
+        else
+            LOGGER.warning("concurrent phase choked on " + trace);
+    }
+
     public void logMissedFirstRecordForEvent(String line) {
         LOGGER.log(Level.WARNING, "Missing initial record for: {0}", line);
     }
 
-    public void publish(JVMEvent event, boolean clear) {
-        if (clear) {
-            garbageCollectionTypeForwardReference = null;
-            gcCauseForwardReference = GCCause.UNKNOWN_GCCAUSE;
-            fullGCTimeStamp = null;
-            scavengeTimeStamp = null;
-            youngMemoryPoolSummaryForwardReference = null;
-            tenuredForwardReference = null;
-            heapForwardReference = null;
-            scavengeDurationForwardReference = 0.0;
-            scavengeCPUSummaryForwardReference = null;
-            referenceGCForwardReference = null;
-            totalFreeSpaceForwardReference = 0;
-            maxChunkSizeForwardReference = 0;
-            numberOfBlocksForwardReference = 0;
-            averageBlockSizeForwardReference = 0;
-            treeHeightForwardReference = 0;
+    private void clear() {
+        garbageCollectionTypeForwardReference = null;
+        gcCauseForwardReference = GCCause.UNKNOWN_GCCAUSE;
+        fullGCTimeStamp = null;
+        scavengeTimeStamp = null;
+        youngMemoryPoolSummaryForwardReference = null;
+        tenuredForwardReference = null;
+        heapForwardReference = null;
+        scavengeDurationForwardReference = 0.0;
+        scavengeCPUSummaryForwardReference = null;
+        referenceGCForwardReference = null;
+        totalFreeSpaceForwardReference = 0;
+        maxChunkSizeForwardReference = 0;
+        numberOfBlocksForwardReference = 0;
+        averageBlockSizeForwardReference = 0;
+        treeHeightForwardReference = 0;
+    }
+
+    public void publish( JVMEvent event, boolean drain, boolean clear) {
+        if (drain) {
+            for( GenerationalGCPauseEvent pauseEvent : queue)
+                publish(pauseEvent, false);
         }
+        publish(event,clear);
+    }
+
+    public void publish(JVMEvent event, boolean clear) {
+        if (clear)
+            clear();
         super.publish(ChannelName.GENERATIONAL_HEAP_PARSER_OUTBOX, event);
     }
 
-    public void publish(JVMEvent event) {
-        this.publish(event, true);
+    final private ArrayList<GenerationalGCPauseEvent> queue = new ArrayList<>();
+    public void publish(GenerationalGCPauseEvent event) {
+        if ( inConcurrentPhase) {
+            queue.add(event);
+            clear();
+        } else
+            this.publish(event, true);
+    }
+
+    public void publish(CMSConcurrentEvent event) {
+        inConcurrentPhase = false;
+        publish( event, true, false);
     }
 
     @Override

@@ -17,5 +17,6 @@ open module com.microsoft.gctoolkit.integration {
             com.microsoft.gctoolkit.integration.aggregation.PauseTimeSummary,
             com.microsoft.gctoolkit.integration.aggregation.CollectionCycleCountsSummary,
             com.microsoft.gctoolkit.integration.shared.OneRuntimeReport,
-            com.microsoft.gctoolkit.integration.shared.TwoRuntimeReport;
+            com.microsoft.gctoolkit.integration.shared.TwoRuntimeReport,
+            com.microsoft.gctoolkit.integration.aggregation.CMSCycleAggregation;
 }

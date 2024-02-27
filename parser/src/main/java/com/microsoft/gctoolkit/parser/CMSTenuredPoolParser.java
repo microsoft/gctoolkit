@@ -64,7 +64,6 @@ public class CMSTenuredPoolParser extends PreUnifiedGCLogParser implements Simpl
         else if ((trace = EndOfFile.parse(line)) != null) {
             super.publish(ChannelName.CMS_TENURED_POOL_PARSER_OUTBOX, new JVMTermination(getClock(), diary.getTimeOfFirstEvent()));
         }
-
     }
 
     /**
