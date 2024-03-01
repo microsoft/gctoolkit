@@ -56,6 +56,12 @@ public abstract class ParserTest {
             Map.entry(GarbageCollectionTypes.G1GCMixedInitialMark, 3),
             Map.entry(GarbageCollectionTypes.Full, 4),
             Map.entry(GarbageCollectionTypes.ConcurrentMark, 5),
+
+            Map.entry(GarbageCollectionTypes.Concurrent_Preclean, 13),
+            Map.entry(GarbageCollectionTypes.Abortable_Preclean,14),
+            Map.entry(GarbageCollectionTypes.Concurrent_Sweep, 15),
+            Map.entry(GarbageCollectionTypes.Concurrent_Reset, 16),
+
             Map.entry(GarbageCollectionTypes.G1GCConcurrentMark, 5),
             Map.entry(GarbageCollectionTypes.G1GCRemark, 7),
 

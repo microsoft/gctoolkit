@@ -54,7 +54,7 @@ public class GCLogFileZipSegment implements LogFileSegment {
         return this.segmentName;
     }
 
-    private DateTimeStamp ageOfJVMAtLogStart() {
+    private void ageOfJVMAtLogStart() {
         if (startTime == null) {
             startTime = stream()
                     .filter(s -> ! s.contains(" file created "))
@@ -63,7 +63,6 @@ public class GCLogFileZipSegment implements LogFileSegment {
                     .findFirst()
                     .orElse(new DateTimeStamp(-1.0d));
         }
-        return startTime;
     }
 
     private DateTimeStamp ageOfJVMAtLogEnd()  {

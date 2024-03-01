@@ -7,7 +7,7 @@ import com.microsoft.gctoolkit.event.generational.CMSConcurrentEvent;
 import com.microsoft.gctoolkit.event.generational.CMSRemark;
 import com.microsoft.gctoolkit.event.generational.InitialMark;
 
-@Aggregates({EventSource.GENERATIONAL,EventSource.CMS_PREUNIFIED})
+@Aggregates({EventSource.GENERATIONAL})
 public class CMSCycleAggregator extends Aggregator<CMSCycleAggregation> {
 
     private InitialMark lastInitialMark = null;

@@ -569,6 +569,8 @@ public class GenerationalHeapParser extends PreUnifiedGCLogParser implements Sim
     //public static final ParseRule PARNEW_CONCURRENT_MODE_END = new ParseRule (GC_PREFIX + PARNEW_BLOCK + TIMESTAMP + "\\[CMS" + CMS_PHASE_END + "(?: " + CPU_BREAKDOWN + ")?$");
     //public static final String CMS_PHASE_END = DATE_TIMESTAMP + "\\[CMS-concurrent-(.+): " + CPU_WALLCLOCK + "\\]";
     public void parNewConcurrentModeEnd(GCLogTrace trace, String line) {
+        trace.notYetImplemented();
+        concurrentPhaseEnd(trace,line,14);
         garbageCollectionTypeForwardReference = GarbageCollectionTypes.ParNew;
         scavengeTimeStamp = getClock();
         gcCauseForwardReference = trace.gcCause();
@@ -698,6 +700,8 @@ public class GenerationalHeapParser extends PreUnifiedGCLogParser implements Sim
      * @param line The GC log line being parsed
      */
     public void parNewPromotionFailedInConcurrentMarkSweepPhase(GCLogTrace trace, String line) {
+        trace.notYetImplemented();
+        concurrentPhaseEnd(trace,line,12);
         int offset = (trace.groupCount() == 16) ? 2 : 0;
         scavengeTimeStamp = getClock();
         garbageCollectionTypeForwardReference = GarbageCollectionTypes.ParNewPromotionFailed;
@@ -811,11 +815,43 @@ public class GenerationalHeapParser extends PreUnifiedGCLogParser implements Sim
     }
 
     public void concurrentPhaseStart(GCLogTrace trace, String line) {
-        //not interesting to this parser
+        trace.notYetImplemented();
+        startOfConcurrentPhase = trace.getDateTimeStamp();
+        inConcurrentPhase = true;
     }
 
     public void concurrentPhaseEnd(GCLogTrace trace, String line) {
-        //not interesting to this parser
+        concurrentPhaseEnd(trace, line, 0);
+    }
+
+    public void concurrentPhaseEnd(GCLogTrace trace, String line, int offset) {
+        trace.notYetImplemented();
+        try {
+            double cpuTime = trace.getDoubleGroup(4 + offset);
+            double wallClock = trace.getDoubleGroup(5 + offset);
+            switch (trace.getGroup(3 + offset)) {
+                case "mark":
+                    publish(new ConcurrentMark(startOfConcurrentPhase, wallClock, cpuTime, wallClock));
+                    break;
+                case "preclean" :
+                    publish(new ConcurrentPreClean(startOfConcurrentPhase, wallClock, cpuTime, wallClock));
+                    break;
+                case "abortable-preclean" :
+                    publish(new AbortablePreClean(startOfConcurrentPhase, wallClock, cpuTime, wallClock, cpuTime > 0.0d));
+                    break;
+                case "sweep" :
+                    publish(new ConcurrentSweep(startOfConcurrentPhase, wallClock, cpuTime, wallClock));
+                    break;
+                case "reset" :
+                    publish(new ConcurrentReset(startOfConcurrentPhase, wallClock, cpuTime, wallClock));
+                    break;
+                default:
+                    LOGGER.warning("concurrent phase not recognized end statement -> " + trace);
+            }
+
+        } catch (Exception e) {
+            LOGGER.warning("concurrent phase end throws " + e.getMessage() + " for " + trace);
+        }
     }
 
     //12.986: [GC[1 CMS-initial-mark: 33532K(62656K)] 49652K(81280K), 0.0014191 secs] [Times: user=0.00 sys=0.00, real=0.00 secs]
@@ -2012,39 +2048,39 @@ public class GenerationalHeapParser extends PreUnifiedGCLogParser implements Sim
     */
 
     private void log(String line) {
-        if (CONCURRENT_PHASE_START.parse(line) != null) return;
-        if (CONCURRENT_PHASE_END.parse(line) != null) return;
-        if (ABORT_PRECLEAN_DUE_TO_TIME_CLAUSE.parse(line) != null) return;
-        if (PRECLEAN_REFERENCE.parse(line) != null) return;
-        if (line.startsWith("Missed: GC locker: Trying a full collection because scavenge failed")) return;
-
-        if (line.startsWith("PSYoungGen")) return;
-        if (line.startsWith("eden space")) return;
-        if (line.startsWith("to")) return;
-        if (line.startsWith("from")) return;
-        if (line.startsWith("ParOldGen")) return;
-        if (line.startsWith("PSOldGen")) return;
-        if (line.startsWith("space")) return;
-        if (line.startsWith("object space")) return;
-        if (line.startsWith("PSPermGen")) return;
-        if (line.startsWith("{Heap")) return;
-        if (line.startsWith("}")) return;
-        if (line.startsWith("Heap")) return;
-        if (line.startsWith("[Times: user")) return;
-        if (line.startsWith("par new generation   total")) return;
-        if (line.startsWith("concurrent mark-sweep generation total")) return;
-        if (line.startsWith("concurrent-mark-sweep perm gen total")) return;
+//        if (CONCURRENT_PHASE_START.parse(line) != null) return;
+//        if (CONCURRENT_PHASE_END.parse(line) != null) return;
+//        if (ABORT_PRECLEAN_DUE_TO_TIME_CLAUSE.parse(line) != null) return;
+//        if (PRECLEAN_REFERENCE.parse(line) != null) return;
+//        if (line.startsWith("Missed: GC locker: Trying a full collection because scavenge failed")) return;
+//
+//        if (line.startsWith("PSYoungGen")) return;
+//        if (line.startsWith("eden space")) return;
+//        if (line.startsWith("to")) return;
+//        if (line.startsWith("from")) return;
+//        if (line.startsWith("ParOldGen")) return;
+//        if (line.startsWith("PSOldGen")) return;
+//        if (line.startsWith("space")) return;
+//        if (line.startsWith("object space")) return;
+//        if (line.startsWith("PSPermGen")) return;
+//        if (line.startsWith("{Heap")) return;
+//        if (line.startsWith("}")) return;
+//        if (line.startsWith("Heap")) return;
+//        if (line.startsWith("[Times: user")) return;
+//        if (line.startsWith("par new generation   total")) return;
+//        if (line.startsWith("concurrent mark-sweep generation total")) return;
+//        if (line.startsWith("concurrent-mark-sweep perm gen total")) return;
         if (line.startsWith("(cardTable: ")) return;
-        if (line.contains("CMS-concurrent-abortable-preclean")) return;
-        if (line.contains("committed")) return;
-        if (line.startsWith("def new generation   total")) return;
-        if (line.startsWith("Before GC:")) return;
-        if (line.startsWith("After GC:")) return;
-        if (line.contains("GC log file created")) return;
-        if (line.contains("GC log file has reached the maximum size")) return;
-        if (line.contains("Large block")) return;
-
-        GCToolKit.LOG_DEBUG_MESSAGE(() -> "GenerationalHeapParser missed: " + line);
+//        if (line.contains("CMS-concurrent-abortable-preclean")) return;
+//        if (line.contains("committed")) return;
+//        if (line.startsWith("def new generation   total")) return;
+//        if (line.startsWith("Before GC:")) return;
+//        if (line.startsWith("After GC:")) return;
+//        if (line.contains("GC log file created")) return;
+//        if (line.contains("GC log file has reached the maximum size")) return;
+//        if (line.contains("Large block")) return;
+//
+//        GCToolKit.LOG_DEBUG_MESSAGE(() -> "GenerationalHeapParser missed: " + line);
         LOGGER.log(Level.WARNING, "Missed: {0}", line);
 
     }
@@ -2056,7 +2092,7 @@ public class GenerationalHeapParser extends PreUnifiedGCLogParser implements Sim
         try {
             double cpuTime = trace.getDoubleGroup(4);
             double wallClock = trace.getDoubleGroup(5);
-            publish(new AbortablePreClean(startOfConcurrentPhase, trace.getDateTimeStamp().getTimeStamp() - startOfConcurrentPhase.getTimeStamp(), cpuTime, wallClock, true));
+            publish(new AbortablePreClean(startOfConcurrentPhase, wallClock, cpuTime, wallClock, true));
         } catch (Exception e) {
             LOGGER.warning("concurrent phase end choked on " + trace);
         }
@@ -2123,6 +2159,7 @@ public class GenerationalHeapParser extends PreUnifiedGCLogParser implements Sim
         if (drain) {
             for( GenerationalGCPauseEvent pauseEvent : queue)
                 publish(pauseEvent, false);
+            queue.clear();
         }
         publish(event,clear);
     }
