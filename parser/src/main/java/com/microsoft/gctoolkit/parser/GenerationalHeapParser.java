@@ -524,7 +524,7 @@ public class GenerationalHeapParser extends PreUnifiedGCLogParser implements Sim
             fullGc.add(heap);
             publish(fullGc);
         } else
-            trace.notYetImplemented();
+            LOGGER.warning("Unable to parse -> " + trace);
     }
 
     private void parNewFLSHeader(GCLogTrace trace, String line) {
@@ -569,7 +569,6 @@ public class GenerationalHeapParser extends PreUnifiedGCLogParser implements Sim
     //public static final ParseRule PARNEW_CONCURRENT_MODE_END = new ParseRule (GC_PREFIX + PARNEW_BLOCK + TIMESTAMP + "\\[CMS" + CMS_PHASE_END + "(?: " + CPU_BREAKDOWN + ")?$");
     //public static final String CMS_PHASE_END = DATE_TIMESTAMP + "\\[CMS-concurrent-(.+): " + CPU_WALLCLOCK + "\\]";
     public void parNewConcurrentModeEnd(GCLogTrace trace, String line) {
-        trace.notYetImplemented();
         concurrentPhaseEnd(trace,line,14);
         garbageCollectionTypeForwardReference = GarbageCollectionTypes.ParNew;
         scavengeTimeStamp = getClock();
@@ -580,7 +579,7 @@ public class GenerationalHeapParser extends PreUnifiedGCLogParser implements Sim
     }
 
     public void parNewCardTable(GCLogTrace trace, String line) {
-        trace.notYetImplemented();
+        LOGGER.warning("Not Yet Implemented -> " + trace);
     }
 
 
@@ -700,7 +699,6 @@ public class GenerationalHeapParser extends PreUnifiedGCLogParser implements Sim
      * @param line The GC log line being parsed
      */
     public void parNewPromotionFailedInConcurrentMarkSweepPhase(GCLogTrace trace, String line) {
-        trace.notYetImplemented();
         concurrentPhaseEnd(trace,line,12);
         int offset = (trace.groupCount() == 16) ? 2 : 0;
         scavengeTimeStamp = getClock();
@@ -815,7 +813,6 @@ public class GenerationalHeapParser extends PreUnifiedGCLogParser implements Sim
     }
 
     public void concurrentPhaseStart(GCLogTrace trace, String line) {
-        trace.notYetImplemented();
         startOfConcurrentPhase = trace.getDateTimeStamp();
         inConcurrentPhase = true;
     }
@@ -825,7 +822,6 @@ public class GenerationalHeapParser extends PreUnifiedGCLogParser implements Sim
     }
 
     public void concurrentPhaseEnd(GCLogTrace trace, String line, int offset) {
-        trace.notYetImplemented();
         try {
             double cpuTime = trace.getDoubleGroup(4 + offset);
             double wallClock = trace.getDoubleGroup(5 + offset);
@@ -1004,7 +1000,7 @@ public class GenerationalHeapParser extends PreUnifiedGCLogParser implements Sim
             if (youngMemoryPoolSummaryForwardReference == null)
                 youngMemoryPoolSummaryForwardReference = heapSummary.minus(tenuredPoolSummary);
         } else {
-            trace.notYetImplemented();
+            LOGGER.warning("Unable to parse -> " + trace);
             return;
         }
 
@@ -1161,7 +1157,7 @@ public class GenerationalHeapParser extends PreUnifiedGCLogParser implements Sim
             failure.add(extractCPUSummary(line));
             publish(failure);
         } else {
-            trace.notYetImplemented();
+            LOGGER.warning("Unable to parse -> " + trace);
         }
     }
 
@@ -1337,7 +1333,7 @@ public class GenerationalHeapParser extends PreUnifiedGCLogParser implements Sim
         else if ((cause == GCCause.UNKNOWN_GCCAUSE) || (cause == GCCause.GCCAUSE_NOT_SET)) {
             collection = new FullGC(getClock(), cause, trace.getDoubleGroup(trace.groupCount()));
         } else {
-            trace.notYetImplemented();
+            LOGGER.warning("Unable to parse -> " + trace);
             return;
         }
 
@@ -1869,40 +1865,46 @@ public class GenerationalHeapParser extends PreUnifiedGCLogParser implements Sim
             fullGC.add(cpuSummary);
             publish(fullGC);
         } else {
-            trace.notYetImplemented();
+            LOGGER.warning("Unable to parse -> " + trace);
         }
         scavengeTimeStamp = getClock();
         garbageCollectionTypeForwardReference = GarbageCollectionTypes.DefNew;
     }
 
     public void rescanSplitUnloadingString(GCLogTrace trace, String line) {
-        trace.notYetImplemented();
+        LOGGER.warning("Not Yet Implemented -> " + trace);
     }
 
     public void parNewConcurrentPhaseCards(GCLogTrace trace, String line) {
-        trace.notYetImplemented();
+        LOGGER.warning("Not Yet Implemented -> " + trace);
     }
 
     public void concurrentPhaseYields(GCLogTrace trace, String line) {
+        LOGGER.warning("Not Yet Implemented -> " + trace);
     }
 
     private void precleanTimedoutWithCards(GCLogTrace trace, String line) {
+        LOGGER.warning("Not Yet Implemented -> " + trace);
     }
 
     private void shouldCollectConcurrent(GCLogTrace trace, String line) {
+        LOGGER.warning("Not Yet Implemented -> " + trace);
     }
 
     public void parNewShouldConcurrentCollect(GCLogTrace trace, String line) {
-        trace.notYetImplemented();
+        LOGGER.warning("Not yet Implemented -> " + trace);
     }
 
     private void psYoungAdaptivePolicySizeStart(GCLogTrace trace, String line) {
+        LOGGER.warning("Not yet Implemented -> " + trace);
     }
 
     private void psYoungAdaptivePolicySizeBody(GCLogTrace trace, String line) {
+        LOGGER.warning("Not yet Implemented -> " + trace);
     }
 
     private void adaptivePolicySizeBody(GCLogTrace trace, String line) {
+        LOGGER.warning("Not yet Implemented -> " + trace);
     }
 
     public void remarkSplitByDebug(GCLogTrace trace, String line) {
