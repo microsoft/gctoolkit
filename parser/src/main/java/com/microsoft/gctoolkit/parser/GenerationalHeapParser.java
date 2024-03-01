@@ -1043,6 +1043,9 @@ public class GenerationalHeapParser extends PreUnifiedGCLogParser implements Sim
     public void parNewDetailsPromotionFailedWithConcurrentMarkSweepPhase(GCLogTrace trace, String line) {
         youngMemoryPoolSummaryForwardReference = trace.getOccupancyBeforeAfterWithMemoryPoolSizeSummary(1);
         scavengeDurationForwardReference = trace.getDoubleGroup(7);
+        GCLogTrace concurrentPhase = CONCURRENT_PHASE_END_BLOCK.parse(line);
+        if (concurrentPhase != null)
+            endOfConcurrentPhase(concurrentPhase,line);
     }
 
     //: 1069879K->1069879K(1090560K), 0.3135220 secs]2014-09-19T06:07:23.135+0200: 73512.294: [CMS: 1613084K->823344K(2423488K), 3.5186340 secs] 2639961K->823344K(3514048K), [CMS Perm : 205976K->205949K(343356K)], 3.8323790 secs] [Times: user=4.44 sys=0.00, real=3.83 secs]

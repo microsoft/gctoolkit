@@ -128,8 +128,11 @@ public class PreUnifiedGenerationalParserTest extends ParserTest {
         List<JVMEvent> jvmEvents = feedParser(lines);
 
         InitialMark initialMark = (InitialMark) jvmEvents.get(0);
-        ParNewPromotionFailed parNewPromotionFailed = (ParNewPromotionFailed) jvmEvents.get(3);
-        //ConcurrentModeFailure concurrentModeFailure = (ConcurrentModeFailure) jvmEvents.get(4);
+        assertEquals(0.0008727d, initialMark.getDuration());
+        ParNewPromotionFailed parNewPromotionFailed = (ParNewPromotionFailed) jvmEvents.get(4);
+        assertEquals(0.0023005d, parNewPromotionFailed.getDuration());
+        ConcurrentModeFailure concurrentModeFailure = (ConcurrentModeFailure) jvmEvents.get(5);
+        assertEquals(0.095695d, concurrentModeFailure.getDuration());
     }
 
     @Test
