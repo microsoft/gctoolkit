@@ -244,8 +244,8 @@ public interface CMSPatterns extends SharedPatterns {
     // (concurrent mode failure): 62354K->8302K(64768K), 0.0931888 secs] 79477K->8302K(83392K), [CMS Perm : 10698K->10698K(21248K)], 0.0956950 secs] [Times: user=0.09 sys=0.00, real=0.09 secs]
     //(concurrent mode failure): 1044403K->1048509K(1048576K), 26.3929433 secs] 1478365K->1059706K(1520448K), 26.7743013 secs]
     // (concurrent mode failure): 62169K->8780K(64768K), 0.0909138 secs] 79462K->8780K(83392K), [CMS Perm : 10688K->10687K(21248K)], 0.0938215 secs]
-    GCParseRule CONCURRENT_MODE_FAILURE_DETAILS = new GCParseRule("CONCURRENT_MODE_FAILURE_DETAILS", "^\\(concurrent mode (?:failure|interrupted)\\): " + BEFORE_AFTER_CONFIGURED_PAUSE + "\\] " + BEFORE_AFTER_CONFIGURED + "(?:, " + PERM_RECORD + ")?, " + PAUSE_TIME + "\\]");
-    GCParseRule CONCURRENT_MODE_FAILURE_DETAILS_META = new GCParseRule("CONCURRENT_MODE_FAILURE_DETAILS_META", "^\\(concurrent mode (?:failure|interrupted)\\): " + BEFORE_AFTER_CONFIGURED_PAUSE + "\\] " + BEFORE_AFTER_CONFIGURED + "(?:, " + META_RECORD + ")?, " + PAUSE_TIME + "\\]");
+    GCParseRule CONCURRENT_MODE_FAILURE_DETAILS = new GCParseRule("CONCURRENT_MODE_FAILURE_DETAILS", "^\\s*\\(concurrent mode (?:failure|interrupted)\\): " + BEFORE_AFTER_CONFIGURED_PAUSE + "\\] " + BEFORE_AFTER_CONFIGURED + "(?:, " + PERM_RECORD + ")?, " + PAUSE_TIME + "\\]");
+    GCParseRule CONCURRENT_MODE_FAILURE_DETAILS_META = new GCParseRule("CONCURRENT_MODE_FAILURE_DETAILS_META", "^\\s*\\(concurrent mode (?:failure|interrupted)\\): " + BEFORE_AFTER_CONFIGURED_PAUSE + "\\] " + BEFORE_AFTER_CONFIGURED + "(?:, " + META_RECORD + ")?, " + PAUSE_TIME + "\\]");
 
     ////1.147: [Full GC (System) 1.147: [Tenured: 1827K->1889K(5312K), 0.0478658 secs] 2441K->1889K(7616K), [Perm : 10118K->10118K(21248K)], 0.0479395 secs]
     //1.149: [Full GC (System) 1.149: [CMS: 0K->1602K(62656K), 0.0761581 secs] 4659K->1602K(81280K), [CMS Perm : 10118K->10064K(21248K)], 0.0762653 secs] [Times: user=0.06 sys=0.01, real=0.08 secs]
