@@ -14,6 +14,7 @@ import com.microsoft.gctoolkit.event.jvm.JVMEvent;
 import com.microsoft.gctoolkit.jvm.Diarizer;
 import com.microsoft.gctoolkit.parser.CMSTenuredPoolParser;
 import com.microsoft.gctoolkit.parser.GCLogParser;
+import com.microsoft.gctoolkit.parser.ParserTest;
 import com.microsoft.gctoolkit.parser.jvm.PreUnifiedDiarizer;
 import org.junit.jupiter.api.Test;
 

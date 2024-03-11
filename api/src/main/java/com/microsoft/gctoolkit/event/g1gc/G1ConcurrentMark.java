@@ -24,7 +24,7 @@ public class G1ConcurrentMark extends G1GCConcurrentEvent {
      * @param duration duration of the event
      */
     public G1ConcurrentMark(DateTimeStamp timeStamp, double duration) {
-        super(timeStamp, GarbageCollectionTypes.ConcurrentMark, GCCause.GCCAUSE_NOT_SET, duration);
+        super(timeStamp, GarbageCollectionTypes.G1GCConcurrentMark, GCCause.GCCAUSE_NOT_SET, duration);
     }
 
     /**

@@ -14,7 +14,6 @@ public class CMSCycleAggregator extends Aggregator<CMSCycleAggregation> {
     private CMSRemark lastRemark = null;
     public CMSCycleAggregator(CMSCycleAggregation results) {
         super(results);
-        System.out.println("CMSCycleAggregator<init>");
         register(InitialMark.class, this::count);
         register(CMSRemark.class, this::count);
         register(CMSConcurrentEvent.class, this::count);

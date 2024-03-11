@@ -459,14 +459,15 @@ public class PreUnifiedDiarizer implements Diarizer {
         //todo: this rule is in the wrong place
         else if (CMSPatterns.SERIAL_FULL.parse(line) != null) {
             collectionCount++;
-            getDiary().setFalse(SupportedFlags.CMS, SupportedFlags.ICMS, SupportedFlags.G1GC);
-            getDiary().setTrue(SupportedFlags.SERIAL);
-
-            getDiary().setTrue(SupportedFlags.GC_DETAILS);
+            getDiary().setFalse(SupportedFlags.CMS, SupportedFlags.ICMS, SupportedFlags.PARALLELOLDGC, SupportedFlags.G1GC, SupportedFlags.CMS_DEBUG_LEVEL_1);
+            getDiary().setTrue(SupportedFlags.SERIAL, SupportedFlags.GC_DETAILS);
             //todo: private final int SupportedFlags.GC_CAUSE = 12;
             getDiary().setFalse(SupportedFlags.CMS_DEBUG_LEVEL_1);
             if (line.contains("Metaspace")) {
                 getDiary().setFalse(SupportedFlags.JDK70);
+                getDiary().setTrue(SupportedFlags.JDK80, SupportedFlags.GC_CAUSE);
+            } else if ( line.contains("Perm")) { // todo: maybe look for GC_CAUSE in JDK 7???
+                getDiary().setFalse(SupportedFlags.JDK80);
             }
             if (line.contains("Tenured")) {
                 getDiary().setFalse(SupportedFlags.CMS, SupportedFlags.ICMS);
@@ -475,7 +476,7 @@ public class PreUnifiedDiarizer implements Diarizer {
                 getDiary().setFalse(SupportedFlags.SERIAL);
                 getDiary().setTrue(SupportedFlags.CMS);
             }
-        } else if (CMSPatterns.SERIAL_FULL80.parse(line) != null) {
+        } else if (CMSPatterns.SERIAL_FULL.parse(line) != null) {
             collectionCount++;
             getDiary().setFalse(SupportedFlags.CMS, SupportedFlags.ICMS, SupportedFlags.PARALLELOLDGC, SupportedFlags.G1GC, SupportedFlags.CMS_DEBUG_LEVEL_1, SupportedFlags.JDK70);
             getDiary().setTrue(SupportedFlags.SERIAL, SupportedFlags.GC_DETAILS, SupportedFlags.GC_CAUSE, SupportedFlags.JDK80);

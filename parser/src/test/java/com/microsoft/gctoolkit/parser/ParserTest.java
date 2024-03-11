@@ -1,6 +1,6 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
-package com.microsoft.gctoolkit.parser.patterns;
+package com.microsoft.gctoolkit.parser;
 
 
 import com.microsoft.gctoolkit.event.MemoryPoolSummary;
