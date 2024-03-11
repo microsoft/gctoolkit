@@ -30,7 +30,7 @@ public class DateTimeStamp implements Comparable<DateTimeStamp> {
     // In the case where we have timestamps, the epoch is start of JVM
     // In the case where we only have date stamps, the epoch is 1970:01:01:00:00:00.000::UTC+0
     // All calculations in GCToolKit make use of the double, timeStamp.
-    // Calculations are based on an startup Epoch of 0.000 seconds. This isn't always the case and
+    // Calculations are based on the startup Epoch of 0.000 seconds. This isn't always the case and
     // certainly isn't the case when only date stamp is present. In these cases, start time is estimated.
     // This is surprisingly difficult to do thus use of timestamp is highly recommended.
 
@@ -61,7 +61,7 @@ public class DateTimeStamp implements Comparable<DateTimeStamp> {
 
     private static final String DECIMAL_POINT = "(?:\\.|,)";
     private static final String INTEGER = "\\d+";
-    private static final String DATE = "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}[\\+|\\-]\\d{4}";
+    private static final String DATE = "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}[+|-]\\d{4}";
     private static final String TIME = INTEGER + DECIMAL_POINT + "\\d{3}";
 
     // Unified Tokens
@@ -96,7 +96,7 @@ public class DateTimeStamp implements Comparable<DateTimeStamp> {
 
     /**
      * Provides a minimal date.
-     * @return
+     * @return a minimal date
      */
     public static DateTimeStamp baseDate() {
         return new DateTimeStamp(EPOC, 0.0d);
@@ -158,10 +158,21 @@ public class DateTimeStamp implements Comparable<DateTimeStamp> {
      * Return the time stamp value. Allows a consistent time stamp be available to all calculations.
      * @return The time stamp value, in decimal seconds.
      */
+    @Deprecated
     public double getTimeStamp() {
         if (!hasTimeStamp())
             return toEpochInMillis();
         return timeStamp;
+    }
+
+    public double toMilliseconds() {
+        if (!hasTimeStamp())
+            return toEpochInMillis();
+        return timeStamp * 1000.0d;
+    }
+
+    public double toSeconds() {
+        return toMilliseconds() / 1000.0d;
     }
 
     /**
@@ -175,7 +186,7 @@ public class DateTimeStamp implements Comparable<DateTimeStamp> {
     /**
      * Return {@code true} if the date stamp is not {@code null}.
      * It is possible to have two DateTimeStamps from the same GC log, one with a DateStamp and one without.
-     * @return {@code true} if the the date stamp is not {@code null}.
+     * @return {@code true} if the date stamp is not {@code null}.
      */
     public boolean hasDateStamp() {
         return ! (getDateTime() == null || EPOC.equals(getDateTime()));

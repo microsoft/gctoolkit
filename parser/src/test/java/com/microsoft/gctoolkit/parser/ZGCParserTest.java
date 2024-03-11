@@ -10,7 +10,6 @@ import com.microsoft.gctoolkit.event.zgc.ZGCMemoryPoolSummary;
 import com.microsoft.gctoolkit.event.zgc.ZGCMetaspaceSummary;
 import com.microsoft.gctoolkit.jvm.Diarizer;
 import com.microsoft.gctoolkit.parser.jvm.UnifiedDiarizer;
-import com.microsoft.gctoolkit.parser.patterns.ParserTest;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

@@ -62,7 +62,6 @@ public class EndToEndIntegrationTest {
                 .map(HeapOccupancyAfterCollectionSummary::get)
                 .ifPresent(summary -> {
                     summary.forEach((gcType, dataSet) -> {
-                        System.out.printf(message, gcType, dataSet.size());
                         switch (gcType) {
                             case DefNew:
                                 defNewCount = dataSet.size();
