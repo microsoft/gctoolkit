@@ -51,11 +51,17 @@ public abstract class ParserTest {
             Map.entry(GarbageCollectionTypes.InitialMark, 11),
             Map.entry(GarbageCollectionTypes.Remark, 12),
             Map.entry(GarbageCollectionTypes.PSFull, 8),  // bit of a hack to account that the parser is now differentiating between Full and PSFull. (kcp 11/8/15)
+            Map.entry(GarbageCollectionTypes.ConcurrentMark, 13),
+
+            Map.entry(GarbageCollectionTypes.Concurrent_Preclean, 14),
+            Map.entry(GarbageCollectionTypes.Abortable_Preclean,15),
+            Map.entry(GarbageCollectionTypes.Concurrent_Sweep, 16),
+            Map.entry(GarbageCollectionTypes.Concurrent_Reset, 17),
+
             Map.entry(GarbageCollectionTypes.Mixed, 1),
             Map.entry(GarbageCollectionTypes.G1GCYoungInitialMark, 2),
             Map.entry(GarbageCollectionTypes.G1GCMixedInitialMark, 3),
             Map.entry(GarbageCollectionTypes.Full, 4),
-            Map.entry(GarbageCollectionTypes.ConcurrentMark, 5),
             Map.entry(GarbageCollectionTypes.G1GCConcurrentMark, 5),
             Map.entry(GarbageCollectionTypes.G1GCRemark, 7),
 
@@ -86,7 +92,6 @@ public abstract class ParserTest {
         for (int i = 0; i < invocationCounts.length; i++) {
             assertEquals(invocationCounts[i], testResults.getCount(i), "Phase Count Differs @ " + i + " for " + findGarbageCollector(i) + " in " + gcLogName);
         }
-
     }
 
     private GCLogFile loadLogFile(Path path, boolean rotating) throws IOException {

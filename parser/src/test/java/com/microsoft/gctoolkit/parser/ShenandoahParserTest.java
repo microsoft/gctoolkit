@@ -6,7 +6,6 @@ import com.microsoft.gctoolkit.event.jvm.JVMEvent;
 import com.microsoft.gctoolkit.event.shenandoah.ShenandoahCycle;
 import com.microsoft.gctoolkit.jvm.Diarizer;
 import com.microsoft.gctoolkit.parser.jvm.UnifiedDiarizer;
-import com.microsoft.gctoolkit.parser.patterns.ParserTest;
 import org.junit.jupiter.api.Assertions;
 
 import java.util.List;

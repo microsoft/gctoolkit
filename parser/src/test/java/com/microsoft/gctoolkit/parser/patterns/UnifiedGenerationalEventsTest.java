@@ -19,6 +19,7 @@ import com.microsoft.gctoolkit.event.generational.ParNew;
 import com.microsoft.gctoolkit.event.jvm.JVMEvent;
 import com.microsoft.gctoolkit.jvm.Diarizer;
 import com.microsoft.gctoolkit.parser.GCLogParser;
+import com.microsoft.gctoolkit.parser.ParserTest;
 import com.microsoft.gctoolkit.parser.UnifiedGenerationalParser;
 import com.microsoft.gctoolkit.parser.jvm.UnifiedDiarizer;
 import org.junit.jupiter.api.Test;

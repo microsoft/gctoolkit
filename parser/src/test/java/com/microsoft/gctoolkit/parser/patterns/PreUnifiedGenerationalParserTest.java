@@ -3,8 +3,13 @@
 package com.microsoft.gctoolkit.parser.patterns;
 
 import com.microsoft.gctoolkit.event.GCCause;
+import com.microsoft.gctoolkit.event.generational.AbortablePreClean;
 import com.microsoft.gctoolkit.event.generational.CMSRemark;
+import com.microsoft.gctoolkit.event.generational.ConcurrentMark;
 import com.microsoft.gctoolkit.event.generational.ConcurrentModeFailure;
+import com.microsoft.gctoolkit.event.generational.ConcurrentPreClean;
+import com.microsoft.gctoolkit.event.generational.ConcurrentReset;
+import com.microsoft.gctoolkit.event.generational.ConcurrentSweep;
 import com.microsoft.gctoolkit.event.generational.DefNew;
 import com.microsoft.gctoolkit.event.generational.FullGC;
 import com.microsoft.gctoolkit.event.generational.InitialMark;
@@ -17,6 +22,7 @@ import com.microsoft.gctoolkit.io.GCLogFile;
 import com.microsoft.gctoolkit.jvm.Diarizer;
 import com.microsoft.gctoolkit.parser.GCLogParser;
 import com.microsoft.gctoolkit.parser.GenerationalHeapParser;
+import com.microsoft.gctoolkit.parser.ParserTest;
 import com.microsoft.gctoolkit.parser.jvm.PreUnifiedDiarizer;
 import org.junit.jupiter.api.Test;
 
@@ -121,8 +127,11 @@ public class PreUnifiedGenerationalParserTest extends ParserTest {
         List<JVMEvent> jvmEvents = feedParser(lines);
 
         InitialMark initialMark = (InitialMark) jvmEvents.get(0);
-        ParNewPromotionFailed parNewPromotionFailed = (ParNewPromotionFailed) jvmEvents.get(1);
-        ConcurrentModeFailure concurrentModeFailure = (ConcurrentModeFailure) jvmEvents.get(2);
+        assertEquals(0.0008727d, initialMark.getDuration());
+        ParNewPromotionFailed parNewPromotionFailed = (ParNewPromotionFailed) jvmEvents.get(4);
+        assertEquals(0.0023005d, parNewPromotionFailed.getDuration());
+        ConcurrentModeFailure concurrentModeFailure = (ConcurrentModeFailure) jvmEvents.get(5);
+        assertEquals(0.095695d, concurrentModeFailure.getDuration());
     }
 
     @Test
@@ -183,11 +192,19 @@ public class PreUnifiedGenerationalParserTest extends ParserTest {
         assertEquals(0.0082790, parNew.getDuration());
 
         InitialMark initialMark = (InitialMark) jvmEvents.get(1);
-        assertSame(initialMark.getGCCause(), GCCause.CMS_INITIAL_MARK);
-
-        CMSRemark cmsRemark = (CMSRemark) jvmEvents.get(2);
-        assertSame(cmsRemark.getGCCause(), GCCause.CMS_FINAL_REMARK);
-        assertEquals(0.0699640, cmsRemark.getDuration());
+        assertEquals(0.014794d, initialMark.getDuration());
+        ConcurrentMark concurrentPhase = (ConcurrentMark) jvmEvents.get(2);
+        assertEquals(0.005d, concurrentPhase.getDuration());
+        ConcurrentPreClean preClean = (ConcurrentPreClean) jvmEvents.get(3);
+        assertEquals(0.0d, preClean.getDuration());
+        AbortablePreClean abortablePreClean = (AbortablePreClean) jvmEvents.get(4);
+        assertEquals(0.349d, abortablePreClean.getDuration());
+        CMSRemark cmsRemark = (CMSRemark) jvmEvents.get(5);
+        assertEquals(0.069964d, cmsRemark.getDuration());
+        ConcurrentSweep concurrentSweep = (ConcurrentSweep) jvmEvents.get(6);
+        assertEquals(0.001d, concurrentSweep.getDuration());
+        ConcurrentReset reset = (ConcurrentReset) jvmEvents.get(7);
+        assertEquals(0.005d, reset.getDuration());
     }
 
     @Test
@@ -220,7 +237,7 @@ public class PreUnifiedGenerationalParserTest extends ParserTest {
         InitialMark initialMark = (InitialMark) jvmEvents.get(1);
         assertEquals(0.1976100, initialMark.getDuration());
 
-        CMSRemark cmsRemark = (CMSRemark) jvmEvents.get(2);
+        CMSRemark cmsRemark = (CMSRemark) jvmEvents.get(5);
         assertEquals(0.6306470, cmsRemark.getDuration());
     }
 }
