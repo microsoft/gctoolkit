@@ -488,6 +488,7 @@ public class GenerationalHeapParser extends PreUnifiedGCLogParser implements Sim
             MemoryPoolSummary heap = new MemoryPoolSummary(heapForwardReference.getOccupancyBeforeCollection(), heapForwardReference.getSizeAfterCollection(), heapForwardReference.getOccupancyBeforeCollection(), heapForwardReference.getSizeAfterCollection());
             FullGC fullGc = new FullGC(fullGCTimeStamp, gcCauseForwardReference, trace.getDuration());
             fullGc.add(heap);
+            fullGc.add(extractCPUSummary(line));
             publish(fullGc);
         } else
             LOGGER.warning("Unable to parse -> " + trace);
@@ -1173,6 +1174,7 @@ public class GenerationalHeapParser extends PreUnifiedGCLogParser implements Sim
         fullGCTimeStamp = getClock();
         garbageCollectionTypeForwardReference = GarbageCollectionTypes.FullGC;
         gcCauseForwardReference = trace.gcCause();
+        endOfConcurrentPhase(trace,trace.getDateTimeStamp(3), 5);
     }
 
     public void fullGCReferenceConcurrentModeFailure(GCLogTrace trace, String line) {
@@ -2068,6 +2070,7 @@ public class GenerationalHeapParser extends PreUnifiedGCLogParser implements Sim
 //        if (line.contains("Large block")) return;
 //
 //        GCToolKit.LOG_DEBUG_MESSAGE(() -> "GenerationalHeapParser missed: " + line);
+        if (line.contains("CMSCMS: Large block")) return;
         LOGGER.log(Level.WARNING, "Missed: {0}", line);
 
     }
@@ -2119,6 +2122,9 @@ public class GenerationalHeapParser extends PreUnifiedGCLogParser implements Sim
         double cpuTime = trace.getDoubleGroup(4 + offset);
         double wallTime = trace.getDoubleGroup(5 + offset);
         double duration = timeStamp.toSeconds() - startOfConcurrentPhase.toSeconds();
+        // The wallTime measure is a very good estimate of duration.
+        if ( duration == Double.NaN)
+            duration = wallTime;
         if ("mark".equals(phase))
             publish(new ConcurrentMark(startOfConcurrentPhase, duration, cpuTime, wallTime));
         else if ("preclean".equals(phase))
@@ -2158,12 +2164,12 @@ public class GenerationalHeapParser extends PreUnifiedGCLogParser implements Sim
     }
 
     public void publish( JVMEvent event, boolean drain, boolean clear) {
+        publish(event,clear);
         if (drain) {
             for( GenerationalGCPauseEvent pauseEvent : queue)
                 publish(pauseEvent, false);
             queue.clear();
         }
-        publish(event,clear);
     }
 
     public void publish(JVMEvent event, boolean clear) {

@@ -76,13 +76,28 @@ public abstract class AbstractLogTrace {
         }
     }
 
+    /**
+     *
+     * @return the date timestamp paring found at the beginning of the GC log line.
+     */
     public DateTimeStamp getDateTimeStamp() {
         return getDateTimeStamp(1);
     }
 
-    public DateTimeStamp getDateTimeStamp(int index) {
+    /**
+     * If a line contains multiple date timestamp group pairing then return the nth pair.
+     * The following example contains 3 different date timestamps. index of 1 yields 57724.218
+     * whereas index 3 yields 2010-04-21T10:45:33.367+0100@57724.319
+     * <code>
+     *     57724.218: [Full GC 57724.218: [CMS2010-04-21T10:45:33.367+0100: 57724.319: [CMS-concurrent-mark: 2.519/2.587 secs]
+     * <code/>
+     * one time stamp or a date timestamp pairing
+     * @param nth is date timestamp field pair to be returned
+     * @return the nth date timestamp pairing
+     */
+    public DateTimeStamp getDateTimeStamp(int nth) {
         Matcher matcher = DATE_TIME_STAMP_RULE.matcher(trace.group(0));
-        for (int i = 0; i < index - 1; i++)
+        for (int i = 0; i < nth - 1; i++)
             if (!matcher.find())
                 break;
         if (matcher.find()) {
