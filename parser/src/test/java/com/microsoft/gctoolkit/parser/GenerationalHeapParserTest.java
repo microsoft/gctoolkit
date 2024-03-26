@@ -203,4 +203,5 @@ public class GenerationalHeapParserTest extends ParserTest {
     protected GCLogParser parser() {
         return new GenerationalHeapParser();
     }
+
 }

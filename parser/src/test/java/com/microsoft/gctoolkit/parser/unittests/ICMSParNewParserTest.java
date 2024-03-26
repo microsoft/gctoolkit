@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.logging.Logger;
 
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -18,8 +17,6 @@ public class ICMSParNewParserTest extends ParserTest {
     0,          1,      2,                         3,                                4,                       5,                           6,          7,              8,                                 9,          10,           11,     12
     Young, DefNew, ParNew, ParNew (promotion failed), ParNew (concurrent mode failure), concurrent-mode-failure, concurrent mode interrupted, PSYoungGen, Full GC/PSFull, Full GC (concurrent mode failure), System.gc(), Initial-mark, Remark
     */
-
-    private static final Logger LOGGER = Logger.getLogger(ICMSParNewParserTest.class.getName());
 
     @Test
     public void testForSimpleLogs() {
