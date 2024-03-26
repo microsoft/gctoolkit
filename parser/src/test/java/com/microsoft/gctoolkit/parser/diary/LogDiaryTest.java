@@ -13,6 +13,7 @@ import com.microsoft.gctoolkit.parser.jvm.UnifiedDiarizer;
 import java.io.File;
 import java.io.IOException;
 import java.util.Objects;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -32,7 +33,6 @@ abstract class LogDiaryTest {
                 filter(completed -> completed).
                 findFirst();
 
-        jvmConfiguration.fillInKnowns();
         return jvmConfiguration;
     }
 

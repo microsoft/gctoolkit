@@ -32,8 +32,8 @@ public class UnifiedG1GCParserFragmentTest extends ParserTest {
     @Test
     public void testNewDecoratorCombination() {
         String[] lines = {
+                "[2023-12-06T07:32:54.113+0000][25ms] Using G1",
                 "[2023-12-06T07:32:54.117+0000][29ms] Version: 17.0.2+8-86 (release)",
-                "[2023-12-06T07:32:54.117+0000][25ms] Using G1",
                 "[2023-12-06T07:32:54.117+0000][29ms] CPUs: 2 total, 2 available",
                 "[2023-12-06T07:32:54.117+0000][29ms] Memory: 6531M",
                 "[2023-12-06T07:32:54.117+0000][29ms] Large Page Support: Disabled",
@@ -55,7 +55,7 @@ public class UnifiedG1GCParserFragmentTest extends ParserTest {
                 "[2023-12-06T07:32:54.359+0000][270ms] GC(0) Using 2 workers of 2 for evacuation",
                 "[2023-12-06T07:32:54.368+0000][280ms] GC(0) Pre Evacuate Collection Set: 0.1ms",
                 "[2023-12-06T07:32:54.368+0000][280ms] GC(0) Merge Heap Roots: 0.0ms",
-                "[2023-12-06T07:32:54.368+0000][280ms] GC(0) Evacuate Collection Set: 5.2ms",
+                "[2023-12-06T07:32:54.368+0000][280ms] GC(0) Evacuate Collection Set: 5.2ms:",
                 "[2023-12-06T07:32:54.368+0000][280ms] GC(0) Post Evacuate Collection Set: 3.9ms",
                 "[2023-12-06T07:32:54.368+0000][280ms] GC(0) Other: 0.2ms",
                 "[2023-12-06T07:32:54.368+0000][280ms] GC(0) Eden regions: 6->0(8)",
@@ -71,6 +71,7 @@ public class UnifiedG1GCParserFragmentTest extends ParserTest {
                 "[2023-12-06T07:32:54.701+0000][612ms] GC(1) Pre Evacuate Collection Set: 0.1ms",
                 "[2023-12-06T07:32:54.701+0000][613ms] GC(1) Merge Heap Roots: 0.0ms",
                 "[2023-12-06T07:32:54.701+0000][613ms] GC(1) Evacuate Collection Set: 4.3ms",
+                "[2023-12-06T07:32:54.701+0000][613ms] GC(1) Post Evacuate Collection Set: 0.3ms",
                 "[2023-12-06T07:32:54.701+0000][613ms] GC(1) Other: 0.1ms",
                 "[2023-12-06T07:32:54.701+0000][613ms] GC(1) Eden regions: 8->0(60)",
                 "[2023-12-06T07:32:54.701+0000][613ms] GC(1) Survivor regions: 1->2(2)",

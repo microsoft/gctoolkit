@@ -22,8 +22,6 @@ public interface Diarizer {
 
     boolean completed();
 
-    void fillInKnowns();
-
     boolean diarize(String line);
 
 }

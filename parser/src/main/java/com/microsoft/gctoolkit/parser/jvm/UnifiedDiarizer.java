@@ -41,8 +41,10 @@ public class UnifiedDiarizer implements Diarizer {
     public UnifiedDiarizer() {}
 
     public Diary getDiary() {
+        fillInKnowns();
         return diary;
     }
+
 
     @Override
     public boolean isUnified() {
@@ -62,19 +64,18 @@ public class UnifiedDiarizer implements Diarizer {
 
     @Override
     public boolean hasJVMEvents() {
-        return getDiary().isApplicationStoppedTime() ||
-                getDiary().isApplicationRunningTime() ||
-                getDiary().isTLABData();
+        return diary.isApplicationStoppedTime() ||
+                diary.isApplicationRunningTime() ||
+                diary.isTLABData();
     }
 
-    @Override
-    public void fillInKnowns() {
-        getDiary().setFalse(ADAPTIVE_SIZING);
+    private void fillInKnowns() {
+        diary.setFalse(ADAPTIVE_SIZING);
     }
 
     @Override
     public boolean completed() {
-        return getDiary().isComplete() || lineCount < 1;
+        return diary.isComplete() || lineCount < 1;
     }
 
     @Override
@@ -84,11 +85,11 @@ public class UnifiedDiarizer implements Diarizer {
                 return false;
             lineCount--;
             extractDecorators(line);
-            if (!getDiary().isCollectorKnown())
+            if (!diary.isCollectorKnown())
                 discoverCollector(line);
-            if (!getDiary().isDetailsKnown())
+            if (!diary.isDetailsKnown())
                 discoverDetails(line);
-            if (!getDiary().isJVMEventsKnown())
+            if (!diary.isJVMEventsKnown())
                 discoverJVMEvents(line);
             if ((CPU_BREAKOUT.parse(line) != null) || line.contains("gc,start"))
                 stopTheWorldEvents++;
@@ -109,40 +110,40 @@ public class UnifiedDiarizer implements Diarizer {
         if (decorators.getLogLevel().isPresent()) {
             UnifiedLoggingLevel logLevel = decorators.getLogLevel().get();
             if (decorators.tagsContain("gc,age"))
-                getDiary().setTrue(TENURING_DISTRIBUTION);
+                diary.setTrue(TENURING_DISTRIBUTION);
             else if (decorators.tagsContain("ref") && logLevel.isGreaterThanOrEqualTo(UnifiedLoggingLevel.debug))
-                getDiary().setTrue(PRINT_REFERENCE_GC);
+                diary.setTrue(PRINT_REFERENCE_GC);
             else if (decorators.tagsContain("gc,phases") && logLevel.isGreaterThanOrEqualTo(UnifiedLoggingLevel.debug))
-                getDiary().setTrue(GC_DETAILS);
+                diary.setTrue(GC_DETAILS);
             else if ( decorators.tagsContain("gc,ergo"))
-                getDiary().setTrue(ADAPTIVE_SIZING);
+                diary.setTrue(ADAPTIVE_SIZING);
             if (decorators.tagsContain("safepoint"))
-                getDiary().setTrue(APPLICATION_STOPPED_TIME, APPLICATION_CONCURRENT_TIME);
+                diary.setTrue(APPLICATION_STOPPED_TIME, APPLICATION_CONCURRENT_TIME);
 
-            if (getDiary().isZGC()) {
+            if (diary.isZGC()) {
                 if (decorators.tagsContain("task"))
-                    getDiary().setTrue(GC_DETAILS);
+                    diary.setTrue(GC_DETAILS);
                 else if (decorators.tagsContain("heap"))
-                    getDiary().setTrue(PRINT_HEAP_AT_GC);
+                    diary.setTrue(PRINT_HEAP_AT_GC);
                 else if (decorators.tagsContain("tlab"))
-                    getDiary().setTrue(TLAB_DATA);
+                    diary.setTrue(TLAB_DATA);
                 else if (decorators.tagsContain("gc,start") && line.contains("Garbage Collection ("))
-                    getDiary().setTrue(GC_CAUSE);
+                    diary.setTrue(GC_CAUSE);
                 else if (decorators.tagsContain("gc,heap")) {
                     if (line.contains("Heap before GC"))
-                        getDiary().setTrue(PRINT_HEAP_AT_GC);
-                    getDiary().setTrue(GC_DETAILS);
+                        diary.setTrue(PRINT_HEAP_AT_GC);
+                    diary.setTrue(GC_DETAILS);
                 } else if (decorators.tagsContain("gc,ref"))
-                    getDiary().setTrue(PRINT_REFERENCE_GC);
+                    diary.setTrue(PRINT_REFERENCE_GC);
                 else if (decorators.tagsContain("gc,heap") && decorators.getLogLevel().get() == UnifiedLoggingLevel.debug)
-                    getDiary().setTrue(PRINT_HEAP_AT_GC);
-            } else if (getDiary().isShenandoah()) {
+                    diary.setTrue(PRINT_HEAP_AT_GC);
+            } else if (diary.isShenandoah()) {
                 if (decorators.tagsContain("gc,task") || decorators.tagsContain("gc,start"))
-                    getDiary().setTrue(GC_DETAILS);
+                    diary.setTrue(GC_DETAILS);
                 else if (decorators.tagsContain("gc,ergo"))
-                    getDiary().setTrue(ADAPTIVE_SIZING);
+                    diary.setTrue(ADAPTIVE_SIZING);
                 else if (decorators.tagsContain("gc") && line.contains("Trigger"))
-                    getDiary().setTrue(GC_CAUSE);
+                    diary.setTrue(GC_CAUSE);
             }
         }
     }
@@ -170,42 +171,42 @@ public class UnifiedDiarizer implements Diarizer {
     private void discoverCollector(String line) {
 
         if ( ZGC_TAG.parse(line) != null || CYCLE_START.parse(line) != null) {
-            getDiary().setTrue(ZGC);
-            getDiary().setFalse(DEFNEW, SERIAL, PARALLELGC, PARALLELOLDGC, PARNEW, CMS, ICMS, G1GC, RSET_STATS, SHENANDOAH, CMS_DEBUG_LEVEL_1, PRE_JDK70_40, JDK70, JDK80, TENURING_DISTRIBUTION, MAX_TENURING_THRESHOLD_VIOLATION, TLAB_DATA, PRINT_PROMOTION_FAILURE, PRINT_FLS_STATISTICS);
+            diary.setTrue(ZGC);
+            diary.setFalse(DEFNEW, SERIAL, PARALLELGC, PARALLELOLDGC, PARNEW, CMS, ICMS, G1GC, RSET_STATS, SHENANDOAH, CMS_DEBUG_LEVEL_1, PRE_JDK70_40, JDK70, JDK80, TENURING_DISTRIBUTION, MAX_TENURING_THRESHOLD_VIOLATION, TLAB_DATA, PRINT_PROMOTION_FAILURE, PRINT_FLS_STATISTICS);
             return;
         }
 
         if ( SHENANDOAH_TAG.parse(line) != null) {
-            getDiary().setTrue(SHENANDOAH);
-            getDiary().setFalse(DEFNEW, SERIAL, PARALLELGC, PARALLELOLDGC, PARNEW, CMS, ICMS, G1GC, RSET_STATS, ZGC, CMS_DEBUG_LEVEL_1, PRE_JDK70_40, JDK70, JDK80, TENURING_DISTRIBUTION, MAX_TENURING_THRESHOLD_VIOLATION, TLAB_DATA, PRINT_PROMOTION_FAILURE, PRINT_FLS_STATISTICS, PRINT_HEAP_AT_GC);
+            diary.setTrue(SHENANDOAH);
+            diary.setFalse(DEFNEW, SERIAL, PARALLELGC, PARALLELOLDGC, PARNEW, CMS, ICMS, G1GC, RSET_STATS, ZGC, CMS_DEBUG_LEVEL_1, PRE_JDK70_40, JDK70, JDK80, TENURING_DISTRIBUTION, MAX_TENURING_THRESHOLD_VIOLATION, TLAB_DATA, PRINT_PROMOTION_FAILURE, PRINT_FLS_STATISTICS, PRINT_HEAP_AT_GC);
             return;
         }
 
         if (G1_TAG.parse(line) != null || line.contains("G1 Evacuation Pause") || (line.contains("Humongous regions: "))) {
-            getDiary().setTrue(G1GC);
-            getDiary().setFalse(DEFNEW, SERIAL, PARALLELGC, PARALLELOLDGC, PARNEW, CMS, ICMS, ZGC, SHENANDOAH, CMS_DEBUG_LEVEL_1, PRE_JDK70_40, JDK70, JDK80, TLAB_DATA, PRINT_PROMOTION_FAILURE, PRINT_FLS_STATISTICS);
+            diary.setTrue(G1GC);
+            diary.setFalse(DEFNEW, SERIAL, PARALLELGC, PARALLELOLDGC, PARNEW, CMS, ICMS, ZGC, SHENANDOAH, CMS_DEBUG_LEVEL_1, PRE_JDK70_40, JDK70, JDK80, TLAB_DATA, PRINT_PROMOTION_FAILURE, PRINT_FLS_STATISTICS);
             return;
         }
 
         if (CMS_TAG.parse(line) != null ||
                 PARNEW_TAG.parse(line) != null ||
                 line.contains("ParNew")) {
-            getDiary().setTrue(PARNEW, CMS);
-            getDiary().setFalse(DEFNEW, SERIAL, PARALLELGC, PARALLELOLDGC, ICMS, CMS_DEBUG_LEVEL_1, G1GC, ZGC, SHENANDOAH, PRE_JDK70_40, JDK70, JDK80, RSET_STATS);
+            diary.setTrue(PARNEW, CMS);
+            diary.setFalse(DEFNEW, SERIAL, PARALLELGC, PARALLELOLDGC, ICMS, CMS_DEBUG_LEVEL_1, G1GC, ZGC, SHENANDOAH, PRE_JDK70_40, JDK70, JDK80, RSET_STATS);
             return;
         }
 
         if (PARALLEL_TAG.parse(line) != null ||
                 line.contains("ParOldGen") ||
                 line.contains("PSYoungGen")) {
-            getDiary().setTrue(PARALLELGC, PARALLELOLDGC, GC_CAUSE);
-            getDiary().setFalse(DEFNEW, SERIAL, PARNEW, CMS, ICMS, CMS_DEBUG_LEVEL_1, G1GC, ZGC, SHENANDOAH, PRE_JDK70_40, JDK70, JDK80, RSET_STATS);
+            diary.setTrue(PARALLELGC, PARALLELOLDGC, GC_CAUSE);
+            diary.setFalse(DEFNEW, SERIAL, PARNEW, CMS, ICMS, CMS_DEBUG_LEVEL_1, G1GC, ZGC, SHENANDOAH, PRE_JDK70_40, JDK70, JDK80, RSET_STATS);
             return;
         }
 
         if (SERIAL_TAG.parse(line) != null || line.contains("DefNew")) {
-            getDiary().setTrue(DEFNEW, SERIAL, GC_CAUSE);
-            getDiary().setFalse(PARALLELGC, PARALLELOLDGC, PARNEW, CMS, ICMS, CMS_DEBUG_LEVEL_1, G1GC, ZGC, SHENANDOAH, PRE_JDK70_40, JDK70, JDK80, RSET_STATS);
+            diary.setTrue(DEFNEW, SERIAL, GC_CAUSE);
+            diary.setFalse(PARALLELGC, PARALLELOLDGC, PARNEW, CMS, ICMS, CMS_DEBUG_LEVEL_1, G1GC, ZGC, SHENANDOAH, PRE_JDK70_40, JDK70, JDK80, RSET_STATS);
             return;
         }
     }
@@ -218,26 +219,26 @@ public class UnifiedDiarizer implements Diarizer {
 
         //todo: RSET_STATS for G1 not looked for...
         if (G1_COLLECTION.parse(line) != null) {
-            getDiary().setTrue(GC_CAUSE);
+            diary.setTrue(GC_CAUSE);
         }
 
         else if (CYCLE_START.parse(line) != null) {
-            getDiary().setTrue(GC_CAUSE);
+            diary.setTrue(GC_CAUSE);
         }
 
         if (stopTheWorldEvents > CYCLES_TO_EXAMINE_BEFORE_GIVING_UP)
-            getDiary().setFalse(ADAPTIVE_SIZING, GC_CAUSE, TLAB_DATA, PRINT_REFERENCE_GC, PRINT_PROMOTION_FAILURE, PRINT_FLS_STATISTICS, RSET_STATS, PRINT_HEAP_AT_GC);
+            diary.setFalse(ADAPTIVE_SIZING, GC_CAUSE, TLAB_DATA, PRINT_REFERENCE_GC, PRINT_PROMOTION_FAILURE, PRINT_FLS_STATISTICS, RSET_STATS, PRINT_HEAP_AT_GC);
     }
 
     private void discoverJVMEvents(String line) {
         if (stopTheWorldEvents > CYCLES_TO_EXAMINE_FOR_SAFEPOINT) {
-            getDiary().setFalse(APPLICATION_STOPPED_TIME, APPLICATION_CONCURRENT_TIME);
+            diary.setFalse(APPLICATION_STOPPED_TIME, APPLICATION_CONCURRENT_TIME);
         }
     }
 
     @Override
     public DateTimeStamp getTimeOfFirstEvent() {
-        return getDiary().getTimeOfFirstEvent();
+        return diary.getTimeOfFirstEvent();
     }
 
 }

@@ -44,6 +44,10 @@ public abstract class ParserTest {
      */
     protected abstract GCLogParser parser();
 
+    GCLogParser getParser() {
+        return this.parser;
+    }
+
     /**
      * Parser runs in its own thread so start one for it and then feed it the lines to be parsed
      *
