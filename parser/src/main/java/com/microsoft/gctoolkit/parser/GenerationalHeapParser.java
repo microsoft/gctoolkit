@@ -2056,6 +2056,8 @@ public class GenerationalHeapParser extends PreUnifiedGCLogParser implements Sim
 //        if (line.startsWith("}")) return;
 //        if (line.startsWith("Heap")) return;
 //        if (line.startsWith("[Times: user")) return;
+        if ( line.startsWith("Metaspace       used")) return;
+        if ( line.startsWith("class space    used")) return;
         if (line.startsWith("par new generation   total")) return;
 //        if (line.startsWith("concurrent mark-sweep generation total")) return;
         if (line.startsWith("concurrent-mark-sweep perm gen total")) return;

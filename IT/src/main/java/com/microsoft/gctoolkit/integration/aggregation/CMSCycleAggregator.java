@@ -26,7 +26,6 @@ public class CMSCycleAggregator extends Aggregator<CMSCycleAggregation> {
     }
 
     public void count(CMSRemark event) {
-        System.out.println(event.toString());
         if ( event.equals(lastRemark)) return;
         lastRemark = event;
         aggregation().remark();
