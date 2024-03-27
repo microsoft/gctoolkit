@@ -111,8 +111,6 @@ public abstract class ParserTest {
                     map(jvmConfiguration::diarize).
                     filter(completed -> completed).
                     findFirst();
-
-            jvmConfiguration.fillInKnowns();
             return jvmConfiguration;
         } catch (IOException e) {
             fail(e.getMessage());

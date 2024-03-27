@@ -109,6 +109,7 @@ public class PreUnifiedDiarizer implements Diarizer {
 
     @Override
     public Diary getDiary() {
+        fillInKnowns();
         return diary;
     }
 
@@ -145,56 +146,56 @@ public class PreUnifiedDiarizer implements Diarizer {
 
     @Override
     public boolean hasJVMEvents() {
-        return getDiary().isApplicationStoppedTime() ||
-                getDiary().isApplicationRunningTime() ||
-                getDiary().isApplicationRunningTime() ||
-                getDiary().isTLABData();
+        return diary.isApplicationStoppedTime() ||
+                diary.isApplicationRunningTime() ||
+                diary.isApplicationRunningTime() ||
+                diary.isTLABData();
     }
 
     private boolean versionIsKnown() {
-        return (getDiary().isStateKnown(SupportedFlags.JDK80) && getDiary().isStateKnown(SupportedFlags.JDK70)) && getDiary().isStateKnown(SupportedFlags.PRE_JDK70_40);
+        return (diary.isStateKnown(SupportedFlags.JDK80) && diary.isStateKnown(SupportedFlags.JDK70)) && diary.isStateKnown(SupportedFlags.PRE_JDK70_40);
     }
 
     @Override
     public boolean completed() {
-        return getDiary().isComplete() || lineCount < 1 || (simpleCMSCycleDetected && (simpleCMSCycleDetected || simpleFullGCDetected));
+        return diary.isComplete() || lineCount < 1 || (simpleCMSCycleDetected && (simpleCMSCycleDetected || simpleFullGCDetected));
     }
 
     // Things that if we've not seen them, we know that they are false.
-    public void fillInKnowns() {
+    private void fillInKnowns() {
         if (simpleCMSCycleDetected) {
-            getDiary().setTrue(SupportedFlags.CMS);
-            getDiary().setFalse(SupportedFlags.SERIAL, SupportedFlags.PARALLELGC, SupportedFlags.PARALLELOLDGC, SupportedFlags.ICMS, SupportedFlags.G1GC, SupportedFlags.GC_DETAILS, SupportedFlags.TENURING_DISTRIBUTION, SupportedFlags.GC_CAUSE, SupportedFlags.CMS_DEBUG_LEVEL_1, SupportedFlags.ADAPTIVE_SIZING, SupportedFlags.PRINT_HEAP_AT_GC, SupportedFlags.RSET_STATS, SupportedFlags.JDK70, SupportedFlags.PRE_JDK70_40, SupportedFlags.JDK80);
+            diary.setTrue(SupportedFlags.CMS);
+            diary.setFalse(SupportedFlags.SERIAL, SupportedFlags.PARALLELGC, SupportedFlags.PARALLELOLDGC, SupportedFlags.ICMS, SupportedFlags.G1GC, SupportedFlags.GC_DETAILS, SupportedFlags.TENURING_DISTRIBUTION, SupportedFlags.GC_CAUSE, SupportedFlags.CMS_DEBUG_LEVEL_1, SupportedFlags.ADAPTIVE_SIZING, SupportedFlags.PRINT_HEAP_AT_GC, SupportedFlags.RSET_STATS, SupportedFlags.JDK70, SupportedFlags.PRE_JDK70_40, SupportedFlags.JDK80);
             // if we have age table or if no tenuring distribution, assume default ParNew/CMS
-            if (youngCollectionCount == 0 || ageTableDetected || !getDiary().isTenuringDistribution()) {
-                getDiary().setTrue(SupportedFlags.PARNEW);
-                getDiary().setFalse(SupportedFlags.DEFNEW);
+            if (youngCollectionCount == 0 || ageTableDetected || !diary.isTenuringDistribution()) {
+                diary.setTrue(SupportedFlags.PARNEW);
+                diary.setFalse(SupportedFlags.DEFNEW);
             } else { //CMS with no age table implies DEFNEW/CMS
-                getDiary().setTrue(SupportedFlags.DEFNEW);
-                getDiary().setFalse(SupportedFlags.PARNEW);
+                diary.setTrue(SupportedFlags.DEFNEW);
+                diary.setFalse(SupportedFlags.PARNEW);
             }
         } else if (simpleFullGCDetected) {
             if (ageTableDetected) {
-                getDiary().setTrue(SupportedFlags.PARNEW, SupportedFlags.SERIAL);
+                diary.setTrue(SupportedFlags.PARNEW, SupportedFlags.SERIAL);
             } else { //at this point we can't tell if it's serial or parallel so assume defaults
-                getDiary().setTrue(SupportedFlags.PARALLELGC, SupportedFlags.PARALLELOLDGC);
+                diary.setTrue(SupportedFlags.PARALLELGC, SupportedFlags.PARALLELOLDGC);
             }
-            getDiary().setFalse(SupportedFlags.DEFNEW, SupportedFlags.PARNEW, SupportedFlags.SERIAL, SupportedFlags.CMS, SupportedFlags.ICMS, SupportedFlags.G1GC, SupportedFlags.GC_DETAILS, SupportedFlags.TENURING_DISTRIBUTION, SupportedFlags.GC_CAUSE, SupportedFlags.CMS_DEBUG_LEVEL_1, SupportedFlags.ADAPTIVE_SIZING, SupportedFlags.PRINT_HEAP_AT_GC, SupportedFlags.RSET_STATS, SupportedFlags.JDK70, SupportedFlags.PRE_JDK70_40, SupportedFlags.JDK80);
+            diary.setFalse(SupportedFlags.DEFNEW, SupportedFlags.PARNEW, SupportedFlags.SERIAL, SupportedFlags.CMS, SupportedFlags.ICMS, SupportedFlags.G1GC, SupportedFlags.GC_DETAILS, SupportedFlags.TENURING_DISTRIBUTION, SupportedFlags.GC_CAUSE, SupportedFlags.CMS_DEBUG_LEVEL_1, SupportedFlags.ADAPTIVE_SIZING, SupportedFlags.PRINT_HEAP_AT_GC, SupportedFlags.RSET_STATS, SupportedFlags.JDK70, SupportedFlags.PRE_JDK70_40, SupportedFlags.JDK80);
         }
 
         //Not much information here, assume defaults
         else if (simpleParallelOrParNewDetected) {
             if (ageTableDetected) {
-                getDiary().setTrue(SupportedFlags.PARNEW, SupportedFlags.CMS);
-                getDiary().setFalse(SupportedFlags.PARALLELGC, SupportedFlags.PARALLELOLDGC);
+                diary.setTrue(SupportedFlags.PARNEW, SupportedFlags.CMS);
+                diary.setFalse(SupportedFlags.PARALLELGC, SupportedFlags.PARALLELOLDGC);
             } else {
-                getDiary().setTrue(SupportedFlags.PARALLELGC, SupportedFlags.PARALLELOLDGC);
-                getDiary().setFalse(SupportedFlags.PARNEW, SupportedFlags.CMS);
+                diary.setTrue(SupportedFlags.PARALLELGC, SupportedFlags.PARALLELOLDGC);
+                diary.setFalse(SupportedFlags.PARNEW, SupportedFlags.CMS);
             }
-            getDiary().setFalse(SupportedFlags.DEFNEW, SupportedFlags.SERIAL, SupportedFlags.ICMS, SupportedFlags.G1GC, SupportedFlags.GC_DETAILS, SupportedFlags.TENURING_DISTRIBUTION, SupportedFlags.GC_CAUSE, SupportedFlags.CMS_DEBUG_LEVEL_1, SupportedFlags.ADAPTIVE_SIZING, SupportedFlags.PRINT_HEAP_AT_GC, SupportedFlags.RSET_STATS, SupportedFlags.JDK70, SupportedFlags.PRE_JDK70_40, SupportedFlags.JDK80);
+            diary.setFalse(SupportedFlags.DEFNEW, SupportedFlags.SERIAL, SupportedFlags.ICMS, SupportedFlags.G1GC, SupportedFlags.GC_DETAILS, SupportedFlags.TENURING_DISTRIBUTION, SupportedFlags.GC_CAUSE, SupportedFlags.CMS_DEBUG_LEVEL_1, SupportedFlags.ADAPTIVE_SIZING, SupportedFlags.PRINT_HEAP_AT_GC, SupportedFlags.RSET_STATS, SupportedFlags.JDK70, SupportedFlags.PRE_JDK70_40, SupportedFlags.JDK80);
         }
 
-        getDiary().setFalse(SupportedFlags.MAX_TENURING_THRESHOLD_VIOLATION, SupportedFlags.PRINT_PROMOTION_FAILURE, SupportedFlags.PRINT_FLS_STATISTICS);
+        diary.setFalse(SupportedFlags.MAX_TENURING_THRESHOLD_VIOLATION, SupportedFlags.PRINT_PROMOTION_FAILURE, SupportedFlags.PRINT_FLS_STATISTICS);
     }
 
     /**
@@ -222,7 +223,6 @@ public class PreUnifiedDiarizer implements Diarizer {
             version(line);
             details(line);
         }
-
         return this.completed();
     }
 
@@ -249,23 +249,23 @@ public class PreUnifiedDiarizer implements Diarizer {
 
     private boolean jvmActivityFlag(String line) {
 
-        if (getDiary().isStateKnown(SupportedFlags.APPLICATION_STOPPED_TIME, SupportedFlags.APPLICATION_CONCURRENT_TIME, SupportedFlags.TLAB_DATA))
+        if (diary.isStateKnown(SupportedFlags.APPLICATION_STOPPED_TIME, SupportedFlags.APPLICATION_CONCURRENT_TIME, SupportedFlags.TLAB_DATA))
             return false;
 
         if ((JVMPatterns.APPLICATION_STOP_TIME.parse(line) != null) || (JVMPatterns.SIMPLE_APPLICATION_STOP_TIME.parse(line) != null) || JVMPatterns.APPLICATION_STOP_TIME_WITH_STOPPING_TIME.parse(line) != null) {
-            getDiary().setTrue(SupportedFlags.APPLICATION_STOPPED_TIME);
+            diary.setTrue(SupportedFlags.APPLICATION_STOPPED_TIME);
             return true;
         } else if ((JVMPatterns.APPLICATION_TIME.parse(line) != null) || (JVMPatterns.SIMPLE_APPLICATION_TIME.parse(line) != null)) {
-            getDiary().setTrue(SupportedFlags.APPLICATION_CONCURRENT_TIME);
+            diary.setTrue(SupportedFlags.APPLICATION_CONCURRENT_TIME);
             return true;
         } else if (JVMPatterns.TLAB_CONT.parse(line) != null) {
-            getDiary().setTrue(SupportedFlags.TLAB_DATA);
+            diary.setTrue(SupportedFlags.TLAB_DATA);
             return true;
         }
         //This will be reported along size a collection so if we don't see them by 3nd collection....
         // maybe some rubbish lines between collection and log so wait a bit longer than just the reporting of the first collection
         if (collectionCount > 1) {
-            getDiary().setFalse(SupportedFlags.APPLICATION_STOPPED_TIME, SupportedFlags.APPLICATION_CONCURRENT_TIME, SupportedFlags.TLAB_DATA);
+            diary.setFalse(SupportedFlags.APPLICATION_STOPPED_TIME, SupportedFlags.APPLICATION_CONCURRENT_TIME, SupportedFlags.TLAB_DATA);
         }
 
         return false;
@@ -280,70 +280,73 @@ public class PreUnifiedDiarizer implements Diarizer {
 
         GCLogTrace trace;
 
-        if ((!getDiary().isStateKnown(SupportedFlags.PARNEW, SupportedFlags.DEFNEW, SupportedFlags.PARALLELGC, SupportedFlags.G1GC)) ||
-                !getDiary().isStateKnown(SupportedFlags.GC_DETAILS) || collectionCount < 3) {
+        if ((!diary.isStateKnown(SupportedFlags.PARNEW, SupportedFlags.DEFNEW, SupportedFlags.PARALLELGC, SupportedFlags.G1GC)) ||
+                !diary.isStateKnown(SupportedFlags.GC_DETAILS) || collectionCount < 3) {
 
             if (line.contains("[PSYoungGen:")) {
-                getDiary().setTrue(SupportedFlags.PARALLELGC, SupportedFlags.PARALLELOLDGC);
-                getDiary().setFalse(SupportedFlags.DEFNEW, SupportedFlags.PARNEW, SupportedFlags.CMS, SupportedFlags.ICMS, SupportedFlags.SERIAL, SupportedFlags.G1GC, SupportedFlags.CMS_DEBUG_LEVEL_1, SupportedFlags.MAX_TENURING_THRESHOLD_VIOLATION, SupportedFlags.RSET_STATS);
+                diary.setTrue(SupportedFlags.PARALLELGC, SupportedFlags.PARALLELOLDGC);
+                diary.setFalse(SupportedFlags.DEFNEW, SupportedFlags.PARNEW, SupportedFlags.CMS, SupportedFlags.ICMS, SupportedFlags.SERIAL, SupportedFlags.G1GC, SupportedFlags.CMS_DEBUG_LEVEL_1, SupportedFlags.MAX_TENURING_THRESHOLD_VIOLATION, SupportedFlags.RSET_STATS);
                 collectionCount++;
                 youngCollectionCount++;
 
                 if ((trace = ParallelPatterns.PSYOUNGGEN.parse(line)) != null) {
-                    getDiary().setTrue(SupportedFlags.GC_DETAILS);
-                    getDiary().setFalse(SupportedFlags.TENURING_DISTRIBUTION);
-                    getDiary().setFalse(SupportedFlags.PRINT_HEAP_AT_GC);
+                    diary.setTrue(SupportedFlags.GC_DETAILS);
+                    diary.setFalse(SupportedFlags.TENURING_DISTRIBUTION);
+                    diary.setFalse(SupportedFlags.PRINT_HEAP_AT_GC);
                     setGCCause(trace.getGroup(3));
 
                 } else if (ParallelPatterns.PS_DETAILS_WITH_TENURING.parse(line) != null) {
-                    getDiary().setTrue(SupportedFlags.GC_DETAILS);
-                    getDiary().setFalse(SupportedFlags.PRINT_HEAP_AT_GC);
+                    diary.setTrue(SupportedFlags.GC_DETAILS);
+                    diary.setFalse(SupportedFlags.PRINT_HEAP_AT_GC);
                 }
             } else if (line.contains("ParNew")) {
-                getDiary().setTrue(SupportedFlags.PARNEW, SupportedFlags.CMS);
-                getDiary().setFalse(SupportedFlags.DEFNEW, SupportedFlags.PARALLELGC, SupportedFlags.PARALLELOLDGC, SupportedFlags.SERIAL, SupportedFlags.G1GC, SupportedFlags.RSET_STATS);
+                diary.setTrue(SupportedFlags.PARNEW, SupportedFlags.CMS);
+                diary.setFalse(SupportedFlags.DEFNEW, SupportedFlags.PARALLELGC, SupportedFlags.PARALLELOLDGC, SupportedFlags.SERIAL, SupportedFlags.G1GC, SupportedFlags.RSET_STATS);
                 collectionCount++;
                 youngCollectionCount++;
 
                 if ((trace = CMSPatterns.PARNEW.parse(line)) != null) {
-                    getDiary().setTrue(SupportedFlags.GC_DETAILS);
-                    getDiary().setFalse(SupportedFlags.TENURING_DISTRIBUTION, SupportedFlags.CMS_DEBUG_LEVEL_1, SupportedFlags.MAX_TENURING_THRESHOLD_VIOLATION);
+                    diary.setTrue(SupportedFlags.GC_DETAILS);
+                    diary.setFalse(SupportedFlags.TENURING_DISTRIBUTION, SupportedFlags.CMS_DEBUG_LEVEL_1, SupportedFlags.MAX_TENURING_THRESHOLD_VIOLATION);
                     setGCCause(trace.getGroup(4));
                 } else if ((trace = CMSPatterns.PARNEW_TENURING.parse(line)) != null) {
-                    getDiary().setTrue(SupportedFlags.GC_DETAILS, SupportedFlags.TENURING_DISTRIBUTION);
-                    getDiary().setFalse(SupportedFlags.CMS_DEBUG_LEVEL_1);
+                    diary.setTrue(SupportedFlags.GC_DETAILS, SupportedFlags.TENURING_DISTRIBUTION);
+                    diary.setFalse(SupportedFlags.CMS_DEBUG_LEVEL_1);
                     setGCCause(trace.getGroup(3));
                 } else if ((trace = SimplePatterns.PARNEW_NO_DETAILS.parse(line)) != null) {
-                    getDiary().setFalse(SupportedFlags.GC_DETAILS, SupportedFlags.TENURING_DISTRIBUTION, SupportedFlags.CMS_DEBUG_LEVEL_1, SupportedFlags.PRINT_HEAP_AT_GC, SupportedFlags.MAX_TENURING_THRESHOLD_VIOLATION);
+                    diary.setFalse(SupportedFlags.GC_DETAILS, SupportedFlags.TENURING_DISTRIBUTION, SupportedFlags.CMS_DEBUG_LEVEL_1, SupportedFlags.PRINT_HEAP_AT_GC, SupportedFlags.MAX_TENURING_THRESHOLD_VIOLATION);
                     setGCCause(trace.getGroup(3));
                 } else if ((trace = SimplePatterns.PARNEW_START.parse(line)) != null) {
-                    getDiary().setFalse(SupportedFlags.GC_DETAILS, SupportedFlags.CMS_DEBUG_LEVEL_1, SupportedFlags.ADAPTIVE_SIZING, SupportedFlags.PRINT_HEAP_AT_GC);
+                    diary.setFalse(SupportedFlags.GC_DETAILS, SupportedFlags.CMS_DEBUG_LEVEL_1, SupportedFlags.ADAPTIVE_SIZING, SupportedFlags.PRINT_HEAP_AT_GC);
                     setGCCause(trace.groupCount() > 2 ? trace.getGroup(3) : null);
                 } else if ((trace = CMSPatterns.PARNEW_REFERENCE_SPLIT.parse(line)) != null) {
-                    getDiary().setTrue(SupportedFlags.TENURING_DISTRIBUTION, SupportedFlags.PRINT_REFERENCE_GC);
+                    diary.setTrue(SupportedFlags.TENURING_DISTRIBUTION, SupportedFlags.PRINT_REFERENCE_GC);
                     setGCCause(trace.getGroup(3));
                 }
             } else if ((trace = SerialPatterns.DEFNEW.parse(line)) != null) {
                 collectionCount++;
                 youngCollectionCount++;
-                getDiary().setTrue(SupportedFlags.DEFNEW, SupportedFlags.GC_DETAILS);
-                getDiary().setFalse(SupportedFlags.PARALLELGC, SupportedFlags.PARALLELOLDGC, SupportedFlags.PARNEW, SupportedFlags.G1GC, SupportedFlags.TENURING_DISTRIBUTION, SupportedFlags.RSET_STATS, SupportedFlags.MAX_TENURING_THRESHOLD_VIOLATION);
+                diary.setTrue(SupportedFlags.DEFNEW, SupportedFlags.GC_DETAILS);
+                diary.setFalse(SupportedFlags.PARALLELGC, SupportedFlags.PARALLELOLDGC, SupportedFlags.PARNEW, SupportedFlags.G1GC, SupportedFlags.TENURING_DISTRIBUTION, SupportedFlags.RSET_STATS, SupportedFlags.MAX_TENURING_THRESHOLD_VIOLATION);
                 setGCCause(trace.getGroup(3));
             } else if ((trace = SerialPatterns.DEFNEW_TENURING.parse(line)) != null) {
                 collectionCount++;
                 youngCollectionCount++;
-                getDiary().setTrue(SupportedFlags.DEFNEW, SupportedFlags.GC_DETAILS, SupportedFlags.TENURING_DISTRIBUTION);
-                getDiary().setFalse(SupportedFlags.PARNEW, SupportedFlags.PARALLELGC, SupportedFlags.PARALLELOLDGC, SupportedFlags.G1GC, SupportedFlags.RSET_STATS);
+                diary.setTrue(SupportedFlags.DEFNEW, SupportedFlags.GC_DETAILS, SupportedFlags.TENURING_DISTRIBUTION);
+                diary.setFalse(SupportedFlags.PARNEW, SupportedFlags.PARALLELGC, SupportedFlags.PARALLELOLDGC, SupportedFlags.G1GC, SupportedFlags.RSET_STATS);
                 setGCCause(trace.getGroup(3));
             } else if (SimplePatterns.PARNEW_NO_DETAILS.parse(line) != null) {
                 collectionCount++;
                 youngCollectionCount++;
-                getDiary().setTrue(SupportedFlags.PARNEW);
-                getDiary().setFalse(SupportedFlags.DEFNEW, SupportedFlags.PARALLELGC, SupportedFlags.PARALLELOLDGC, SupportedFlags.G1GC, SupportedFlags.GC_DETAILS, SupportedFlags.TENURING_DISTRIBUTION, SupportedFlags.GC_CAUSE, SupportedFlags.CMS_DEBUG_LEVEL_1, SupportedFlags.ADAPTIVE_SIZING, SupportedFlags.PRINT_HEAP_AT_GC, SupportedFlags.RSET_STATS, SupportedFlags.MAX_TENURING_THRESHOLD_VIOLATION);
+                diary.setTrue(SupportedFlags.PARNEW);
+                diary.setFalse(SupportedFlags.DEFNEW, SupportedFlags.PARALLELGC, SupportedFlags.PARALLELOLDGC, SupportedFlags.G1GC, SupportedFlags.GC_DETAILS, SupportedFlags.TENURING_DISTRIBUTION, SupportedFlags.GC_CAUSE, SupportedFlags.CMS_DEBUG_LEVEL_1, SupportedFlags.ADAPTIVE_SIZING, SupportedFlags.PRINT_HEAP_AT_GC, SupportedFlags.RSET_STATS, SupportedFlags.MAX_TENURING_THRESHOLD_VIOLATION);
             } else if (SimplePatterns.YOUNG_NO_DETAILS.parse(line) != null) {
                 collectionCount++;
                 youngCollectionCount++;
                 simpleParallelOrParNewDetected = true;
+                diary.setFalse(SupportedFlags.G1GC, SupportedFlags.GC_DETAILS, SupportedFlags.TENURING_DISTRIBUTION,
+                        SupportedFlags.GC_CAUSE, SupportedFlags.JDK80, SupportedFlags.PRINT_HEAP_AT_GC,
+                        SupportedFlags.MAX_TENURING_THRESHOLD_VIOLATION, SupportedFlags.ADAPTIVE_SIZING);
             } else if (SimplePatterns.FULL_NO_GC_DETAILS.parse(line) != null) {
                 collectionCount++;
                 simpleFullGCDetected = true;
@@ -352,7 +355,7 @@ public class PreUnifiedDiarizer implements Diarizer {
                 collectionCount++;
                 simpleParallelOrParNewDetected = true;
                 youngCollectionCount++;
-                getDiary().setFalse(SupportedFlags.G1GC, SupportedFlags.RSET_STATS);
+                diary.setFalse(SupportedFlags.G1GC, SupportedFlags.RSET_STATS);
                 setGCCause(trace.getGroup(3));
             } else if (SimplePatterns.CMS_NO_DETAILS.parse(line) != null) {
                 // could be parallel or CMS.. look for Full GC but even that may be a trick
@@ -363,61 +366,61 @@ public class PreUnifiedDiarizer implements Diarizer {
             } else if ((trace = G1GCPatterns.G1_YOUNG_SPLIT_START.parse(line)) != null) {
                 collectionCount++;
                 youngCollectionCount++;
-                getDiary().setFalse(SupportedFlags.DEFNEW, SupportedFlags.PARNEW, SupportedFlags.CMS, SupportedFlags.ICMS, SupportedFlags.PARALLELGC, SupportedFlags.PARALLELOLDGC, SupportedFlags.SERIAL, SupportedFlags.CMS_DEBUG_LEVEL_1);
-                getDiary().setTrue(SupportedFlags.G1GC);
-                getDiary().setTrue(SupportedFlags.GC_DETAILS);
+                diary.setFalse(SupportedFlags.DEFNEW, SupportedFlags.PARNEW, SupportedFlags.CMS, SupportedFlags.ICMS, SupportedFlags.PARALLELGC, SupportedFlags.PARALLELOLDGC, SupportedFlags.SERIAL, SupportedFlags.CMS_DEBUG_LEVEL_1);
+                diary.setTrue(SupportedFlags.G1GC);
+                diary.setTrue(SupportedFlags.GC_DETAILS);
                 if (trace.gcCause() == GCCause.GCCAUSE_NOT_SET) {
-                    getDiary().setFalse(SupportedFlags.GC_CAUSE);
+                    diary.setFalse(SupportedFlags.GC_CAUSE);
                 } else if (trace.gcCause() == GCCause.METADATA_GENERATION_THRESHOLD) {
-                    getDiary().setTrue(SupportedFlags.GC_CAUSE, SupportedFlags.JDK80);
-                    getDiary().setFalse(SupportedFlags.JDK70, SupportedFlags.PRE_JDK70_40);
+                    diary.setTrue(SupportedFlags.GC_CAUSE, SupportedFlags.JDK80);
+                    diary.setFalse(SupportedFlags.JDK70, SupportedFlags.PRE_JDK70_40);
                 } else if ((trace.gcCause() == GCCause.G1_EVACUATION_PAUSE) || (trace.gcCause(3, 0) == GCCause.G1_HUMONGOUS_ALLOCATION)) {
-                    getDiary().setTrue(SupportedFlags.GC_CAUSE);
-                    getDiary().setFalse(SupportedFlags.PRE_JDK70_40);
+                    diary.setTrue(SupportedFlags.GC_CAUSE);
+                    diary.setFalse(SupportedFlags.PRE_JDK70_40);
                 }
             } else if ((trace = G1GCPatterns.G1_DETAILS.parse(line)) != null) {
                 collectionCount++;
                 youngCollectionCount++;
-                getDiary().setTrue(SupportedFlags.G1GC, SupportedFlags.GC_DETAILS);
-                getDiary().setFalse(SupportedFlags.DEFNEW, SupportedFlags.PARNEW, SupportedFlags.CMS, SupportedFlags.ICMS, SupportedFlags.PARALLELGC, SupportedFlags.PARALLELOLDGC, SupportedFlags.SERIAL, SupportedFlags.TENURING_DISTRIBUTION, SupportedFlags.CMS_DEBUG_LEVEL_1, SupportedFlags.MAX_TENURING_THRESHOLD_VIOLATION);
+                diary.setTrue(SupportedFlags.G1GC, SupportedFlags.GC_DETAILS);
+                diary.setFalse(SupportedFlags.DEFNEW, SupportedFlags.PARNEW, SupportedFlags.CMS, SupportedFlags.ICMS, SupportedFlags.PARALLELGC, SupportedFlags.PARALLELOLDGC, SupportedFlags.SERIAL, SupportedFlags.TENURING_DISTRIBUTION, SupportedFlags.CMS_DEBUG_LEVEL_1, SupportedFlags.MAX_TENURING_THRESHOLD_VIOLATION);
                 if (trace.gcCause(3, 0) == GCCause.GCCAUSE_NOT_SET) {
-                    getDiary().setFalse(SupportedFlags.GC_CAUSE, SupportedFlags.JDK80);
-                    getDiary().setTrue(SupportedFlags.JDK70);
+                    diary.setFalse(SupportedFlags.GC_CAUSE, SupportedFlags.JDK80);
+                    diary.setTrue(SupportedFlags.JDK70);
                 } else {
-                    getDiary().setFalse(SupportedFlags.GC_CAUSE);
-                    getDiary().setFalse(SupportedFlags.PRE_JDK70_40);
+                    diary.setFalse(SupportedFlags.GC_CAUSE);
+                    diary.setFalse(SupportedFlags.PRE_JDK70_40);
                 }
             } else if ((trace = G1GCPatterns.YOUNG.parse(line)) != null) {
                 collectionCount++;
                 youngCollectionCount++;
-                getDiary().setFalse(SupportedFlags.DEFNEW, SupportedFlags.PARNEW, SupportedFlags.CMS, SupportedFlags.ICMS, SupportedFlags.PARALLELGC, SupportedFlags.PARALLELOLDGC, SupportedFlags.SERIAL, SupportedFlags.GC_DETAILS, SupportedFlags.TENURING_DISTRIBUTION, SupportedFlags.CMS_DEBUG_LEVEL_1, SupportedFlags.MAX_TENURING_THRESHOLD_VIOLATION);
-                getDiary().setTrue(SupportedFlags.G1GC);
+                diary.setFalse(SupportedFlags.DEFNEW, SupportedFlags.PARNEW, SupportedFlags.CMS, SupportedFlags.ICMS, SupportedFlags.PARALLELGC, SupportedFlags.PARALLELOLDGC, SupportedFlags.SERIAL, SupportedFlags.GC_DETAILS, SupportedFlags.TENURING_DISTRIBUTION, SupportedFlags.CMS_DEBUG_LEVEL_1, SupportedFlags.MAX_TENURING_THRESHOLD_VIOLATION);
+                diary.setTrue(SupportedFlags.G1GC);
                 checkForGCCause(trace);
 
                 //2014-10-21T11:49:08.954-0500: 12053.551: [GC pause (young)12054.116: [SoftReference, 0 refs, 0.0000070 secs]12054.116: [WeakReference, 234 refs, 0.0000640 secs]12054.116: [FinalReference, 3805 refs, 0.0034010 secs]12054.119: [PhantomReference, 9 refs, 0.0000040 secs]12054.119: [JNI Weak Reference, 0.0001960 secs], 0.58191800 secs]
             } else if ((trace = G1GCPatterns.G1_DETAILS_REFERENCE_GC.parse(line)) != null) {
                 collectionCount++;
                 youngCollectionCount++;
-                getDiary().setFalse(SupportedFlags.DEFNEW, SupportedFlags.PARNEW, SupportedFlags.CMS, SupportedFlags.ICMS, SupportedFlags.PARALLELGC, SupportedFlags.PARALLELOLDGC, SupportedFlags.SERIAL, SupportedFlags.TENURING_DISTRIBUTION, SupportedFlags.CMS_DEBUG_LEVEL_1, SupportedFlags.MAX_TENURING_THRESHOLD_VIOLATION);
-                getDiary().setTrue(SupportedFlags.G1GC, SupportedFlags.GC_DETAILS, SupportedFlags.PRINT_REFERENCE_GC);
+                diary.setFalse(SupportedFlags.DEFNEW, SupportedFlags.PARNEW, SupportedFlags.CMS, SupportedFlags.ICMS, SupportedFlags.PARALLELGC, SupportedFlags.PARALLELOLDGC, SupportedFlags.SERIAL, SupportedFlags.TENURING_DISTRIBUTION, SupportedFlags.CMS_DEBUG_LEVEL_1, SupportedFlags.MAX_TENURING_THRESHOLD_VIOLATION);
+                diary.setTrue(SupportedFlags.G1GC, SupportedFlags.GC_DETAILS, SupportedFlags.PRINT_REFERENCE_GC);
                 if (trace.getGroup(3) != null)
-                    getDiary().setTrue(SupportedFlags.GC_CAUSE);
+                    diary.setTrue(SupportedFlags.GC_CAUSE);
                 else
-                    getDiary().setFalse(SupportedFlags.GC_CAUSE);
+                    diary.setFalse(SupportedFlags.GC_CAUSE);
             } else if (G1GCPatterns.G1_INITIAL_MARK.parse(line) != null) {
                 collectionCount++;
                 youngCollectionCount++;
-                getDiary().setFalse(SupportedFlags.DEFNEW, SupportedFlags.PARNEW, SupportedFlags.CMS, SupportedFlags.ICMS, SupportedFlags.PARALLELGC, SupportedFlags.PARALLELOLDGC, SupportedFlags.SERIAL, SupportedFlags.CMS_DEBUG_LEVEL_1, SupportedFlags.MAX_TENURING_THRESHOLD_VIOLATION);
-                getDiary().setTrue(SupportedFlags.G1GC, SupportedFlags.GC_DETAILS, SupportedFlags.GC_CAUSE, SupportedFlags.TENURING_DISTRIBUTION);
+                diary.setFalse(SupportedFlags.DEFNEW, SupportedFlags.PARNEW, SupportedFlags.CMS, SupportedFlags.ICMS, SupportedFlags.PARALLELGC, SupportedFlags.PARALLELOLDGC, SupportedFlags.SERIAL, SupportedFlags.CMS_DEBUG_LEVEL_1, SupportedFlags.MAX_TENURING_THRESHOLD_VIOLATION);
+                diary.setTrue(SupportedFlags.G1GC, SupportedFlags.GC_DETAILS, SupportedFlags.GC_CAUSE, SupportedFlags.TENURING_DISTRIBUTION);
             }
         }
 
-        if (getDiary().isTrue(SupportedFlags.ADAPTIVE_SIZING)) {
+        if (diary.isTrue(SupportedFlags.ADAPTIVE_SIZING)) {
             if ((trace = G1GCPatterns.YOUNG_SPLIT_BY_G1ERGONOMICS.parse(line)) != null) {
                 collectionCount++;
                 youngCollectionCount++;
-                getDiary().setTrue(SupportedFlags.G1GC, SupportedFlags.GC_DETAILS);
-                getDiary().setFalse(SupportedFlags.DEFNEW, SupportedFlags.PARNEW, SupportedFlags.CMS, SupportedFlags.ICMS, SupportedFlags.PARALLELGC, SupportedFlags.PARALLELOLDGC, SupportedFlags.SERIAL, SupportedFlags.CMS_DEBUG_LEVEL_1);
+                diary.setTrue(SupportedFlags.G1GC, SupportedFlags.GC_DETAILS);
+                diary.setFalse(SupportedFlags.DEFNEW, SupportedFlags.PARNEW, SupportedFlags.CMS, SupportedFlags.ICMS, SupportedFlags.PARALLELGC, SupportedFlags.PARALLELOLDGC, SupportedFlags.SERIAL, SupportedFlags.CMS_DEBUG_LEVEL_1);
                 checkForGCCause(trace);
             }
         }
@@ -425,90 +428,90 @@ public class PreUnifiedDiarizer implements Diarizer {
         //This has been verified true as of 1.7.0_51. Check later versions to make sure it hasn't been back ported
         if (ParallelPatterns.PS_FULL_GC_PERM.parse(line) != null) {
             collectionCount++;
-            getDiary().setTrue(SupportedFlags.JDK70);
-            getDiary().setFalse(SupportedFlags.JDK80);
+            diary.setTrue(SupportedFlags.JDK70);
+            diary.setFalse(SupportedFlags.JDK80);
             if (line.contains(" [PSYoungGen: "))
-                getDiary().setTrue(SupportedFlags.PARALLELGC);
-            getDiary().setTrue(SupportedFlags.PARALLELOLDGC, SupportedFlags.GC_DETAILS);
-            getDiary().setFalse(SupportedFlags.PARNEW, SupportedFlags.CMS, SupportedFlags.ICMS, SupportedFlags.SERIAL, SupportedFlags.G1GC);
+                diary.setTrue(SupportedFlags.PARALLELGC);
+            diary.setTrue(SupportedFlags.PARALLELOLDGC, SupportedFlags.GC_DETAILS);
+            diary.setFalse(SupportedFlags.PARNEW, SupportedFlags.CMS, SupportedFlags.ICMS, SupportedFlags.SERIAL, SupportedFlags.G1GC);
 
-            getDiary().setFalse(SupportedFlags.CMS_DEBUG_LEVEL_1);
-            getDiary().setFalse(SupportedFlags.PRINT_HEAP_AT_GC);
+            diary.setFalse(SupportedFlags.CMS_DEBUG_LEVEL_1);
+            diary.setFalse(SupportedFlags.PRINT_HEAP_AT_GC);
 
         }
 
         //This has been verified true as of 1.7.0_51. Check later versions to make sure it hasn't been back ported
         else if (ParallelPatterns.PS_FULL_GC_META.parse(line) != null) {
             collectionCount++;
-            getDiary().setFalse(SupportedFlags.JDK70, SupportedFlags.PRE_JDK70_40);
-            getDiary().setTrue(SupportedFlags.JDK80);
+            diary.setFalse(SupportedFlags.JDK70, SupportedFlags.PRE_JDK70_40);
+            diary.setTrue(SupportedFlags.JDK80);
             if (line.contains(" [PSYoungGen: "))
-                getDiary().setTrue(SupportedFlags.PARALLELGC);
-            getDiary().setTrue(SupportedFlags.PARALLELOLDGC, SupportedFlags.GC_DETAILS);
-            getDiary().setFalse(SupportedFlags.PARNEW, SupportedFlags.CMS, SupportedFlags.SERIAL, SupportedFlags.ICMS, SupportedFlags.G1GC);
+                diary.setTrue(SupportedFlags.PARALLELGC);
+            diary.setTrue(SupportedFlags.PARALLELOLDGC, SupportedFlags.GC_DETAILS);
+            diary.setFalse(SupportedFlags.PARNEW, SupportedFlags.CMS, SupportedFlags.SERIAL, SupportedFlags.ICMS, SupportedFlags.G1GC);
 
-            getDiary().setFalse(SupportedFlags.CMS_DEBUG_LEVEL_1);
-            getDiary().setFalse(SupportedFlags.PRINT_HEAP_AT_GC);
+            diary.setFalse(SupportedFlags.CMS_DEBUG_LEVEL_1);
+            diary.setFalse(SupportedFlags.PRINT_HEAP_AT_GC);
 
         } else if (line.contains("CMS-initial-mark")) {
             collectionCount++;
-            getDiary().setFalse(SupportedFlags.PARALLELGC, SupportedFlags.PARALLELOLDGC, SupportedFlags.SERIAL, SupportedFlags.G1GC);
-            getDiary().setTrue(SupportedFlags.CMS, SupportedFlags.GC_DETAILS);
+            diary.setFalse(SupportedFlags.PARALLELGC, SupportedFlags.PARALLELOLDGC, SupportedFlags.SERIAL, SupportedFlags.G1GC);
+            diary.setTrue(SupportedFlags.CMS, SupportedFlags.GC_DETAILS);
         }
 
         //todo: this rule is in the wrong place
         else if (CMSPatterns.SERIAL_FULL.parse(line) != null) {
             collectionCount++;
-            getDiary().setFalse(SupportedFlags.CMS, SupportedFlags.ICMS, SupportedFlags.PARALLELOLDGC, SupportedFlags.G1GC, SupportedFlags.CMS_DEBUG_LEVEL_1);
-            getDiary().setTrue(SupportedFlags.SERIAL, SupportedFlags.GC_DETAILS);
+            diary.setFalse(SupportedFlags.CMS, SupportedFlags.ICMS, SupportedFlags.PARALLELOLDGC, SupportedFlags.G1GC, SupportedFlags.CMS_DEBUG_LEVEL_1);
+            diary.setTrue(SupportedFlags.SERIAL, SupportedFlags.GC_DETAILS);
             //todo: private final int SupportedFlags.GC_CAUSE = 12;
-            getDiary().setFalse(SupportedFlags.CMS_DEBUG_LEVEL_1);
+            diary.setFalse(SupportedFlags.CMS_DEBUG_LEVEL_1);
             if (line.contains("Metaspace")) {
-                getDiary().setFalse(SupportedFlags.JDK70);
-                getDiary().setTrue(SupportedFlags.JDK80, SupportedFlags.GC_CAUSE);
+                diary.setFalse(SupportedFlags.JDK70);
+                diary.setTrue(SupportedFlags.JDK80, SupportedFlags.GC_CAUSE);
             } else if ( line.contains("Perm")) { // todo: maybe look for GC_CAUSE in JDK 7???
-                getDiary().setFalse(SupportedFlags.JDK80);
+                diary.setFalse(SupportedFlags.JDK80);
             }
             if (line.contains("Tenured")) {
-                getDiary().setFalse(SupportedFlags.CMS, SupportedFlags.ICMS);
-                getDiary().setTrue(SupportedFlags.SERIAL);
+                diary.setFalse(SupportedFlags.CMS, SupportedFlags.ICMS);
+                diary.setTrue(SupportedFlags.SERIAL);
             } else if (line.contains("CMS")) {
-                getDiary().setFalse(SupportedFlags.SERIAL);
-                getDiary().setTrue(SupportedFlags.CMS);
+                diary.setFalse(SupportedFlags.SERIAL);
+                diary.setTrue(SupportedFlags.CMS);
             }
         } else if (CMSPatterns.SERIAL_FULL.parse(line) != null) {
             collectionCount++;
-            getDiary().setFalse(SupportedFlags.CMS, SupportedFlags.ICMS, SupportedFlags.PARALLELOLDGC, SupportedFlags.G1GC, SupportedFlags.CMS_DEBUG_LEVEL_1, SupportedFlags.JDK70);
-            getDiary().setTrue(SupportedFlags.SERIAL, SupportedFlags.GC_DETAILS, SupportedFlags.GC_CAUSE, SupportedFlags.JDK80);
+            diary.setFalse(SupportedFlags.CMS, SupportedFlags.ICMS, SupportedFlags.PARALLELOLDGC, SupportedFlags.G1GC, SupportedFlags.CMS_DEBUG_LEVEL_1, SupportedFlags.JDK70);
+            diary.setTrue(SupportedFlags.SERIAL, SupportedFlags.GC_DETAILS, SupportedFlags.GC_CAUSE, SupportedFlags.JDK80);
         } else if (TENURED_BLOCK.parse(line) != null) {
             collectionCount++;
-            getDiary().setFalse(SupportedFlags.CMS);
-            getDiary().setFalse(SupportedFlags.ICMS);
-            getDiary().setTrue(SupportedFlags.SERIAL);
-            getDiary().setFalse(SupportedFlags.G1GC);
+            diary.setFalse(SupportedFlags.CMS);
+            diary.setFalse(SupportedFlags.ICMS);
+            diary.setTrue(SupportedFlags.SERIAL);
+            diary.setFalse(SupportedFlags.G1GC);
         }
 
-        if (getDiary().isTrue(SupportedFlags.CMS) && !getDiary().isStateKnown(SupportedFlags.ICMS)) {
+        if (diary.isTrue(SupportedFlags.CMS) && !diary.isStateKnown(SupportedFlags.ICMS)) {
             if (firstCMSCycle) {
                 if (line.contains("ParNew") || line.contains("DefNew"))
                     youngCountAfterFirstCMSCycle++;
 
                 if (line.contains("icms_dc"))
-                    getDiary().setTrue(SupportedFlags.ICMS);
+                    diary.setTrue(SupportedFlags.ICMS);
                 else if (youngCountAfterFirstCMSCycle > 1)
-                    getDiary().setFalse(SupportedFlags.ICMS);
+                    diary.setFalse(SupportedFlags.ICMS);
             }
             //The first CMS cycle is needed to kick off iCMS
             if (line.contains("concurrent-reset"))
                 firstCMSCycle = true;
-        } else if (getDiary().isTrue(SupportedFlags.G1GC)) {
+        } else if (diary.isTrue(SupportedFlags.G1GC)) {
             if (G1GCPatterns.G1_MEMORY_SUMMARY.parse(line) != null) {
                 if (line.contains("Metaspace")) {
-                    getDiary().setFalse(SupportedFlags.JDK70, SupportedFlags.PRE_JDK70_40);
-                    getDiary().setTrue(SupportedFlags.JDK80);
+                    diary.setFalse(SupportedFlags.JDK70, SupportedFlags.PRE_JDK70_40);
+                    diary.setTrue(SupportedFlags.JDK80);
                 } else {
-                    getDiary().setTrue(SupportedFlags.JDK70);
-                    getDiary().setFalse(SupportedFlags.JDK80);
+                    diary.setTrue(SupportedFlags.JDK70);
+                    diary.setFalse(SupportedFlags.JDK80);
                 }
             }
         }
@@ -516,10 +519,10 @@ public class PreUnifiedDiarizer implements Diarizer {
 
     private void checkForGCCause(GCLogTrace trace) {
         if (trace.gcCause(3, 0) == GCCause.METADATA_GENERATION_THRESHOLD) {
-            getDiary().setTrue(SupportedFlags.GC_CAUSE, SupportedFlags.JDK80);
-            getDiary().setFalse(SupportedFlags.JDK70, SupportedFlags.PRE_JDK70_40);
+            diary.setTrue(SupportedFlags.GC_CAUSE, SupportedFlags.JDK80);
+            diary.setFalse(SupportedFlags.JDK70, SupportedFlags.PRE_JDK70_40);
         } else if ((trace.gcCause(3, 0) == GCCause.G1_EVACUATION_PAUSE) || (trace.gcCause(3, 0) == GCCause.G1_HUMONGOUS_ALLOCATION)) {
-            getDiary().setTrue(SupportedFlags.GC_CAUSE);
+            diary.setTrue(SupportedFlags.GC_CAUSE);
         }
     }
 
@@ -541,59 +544,59 @@ public class PreUnifiedDiarizer implements Diarizer {
             String value = trace.getGroup(1).trim();
 
             if ("CMS Perm".equals(value)) {
-                getDiary().setTrue(SupportedFlags.JDK70);
-                getDiary().setFalse(SupportedFlags.JDK80);
+                diary.setTrue(SupportedFlags.JDK70);
+                diary.setFalse(SupportedFlags.JDK80);
             } else if ("PS Perm".equals(value)) {
-                getDiary().setTrue(SupportedFlags.JDK70);
-                getDiary().setFalse(SupportedFlags.JDK80);
+                diary.setTrue(SupportedFlags.JDK70);
+                diary.setFalse(SupportedFlags.JDK80);
             } else if ("Perm".equals(value)) {
-                getDiary().setTrue(SupportedFlags.JDK70);
-                getDiary().setFalse(SupportedFlags.JDK80);
+                diary.setTrue(SupportedFlags.JDK70);
+                diary.setFalse(SupportedFlags.JDK80);
             } else if ("PSPermGen".equals(value)) {
-                getDiary().setTrue(SupportedFlags.JDK70);
-                getDiary().setFalse(SupportedFlags.JDK80);
+                diary.setTrue(SupportedFlags.JDK70);
+                diary.setFalse(SupportedFlags.JDK80);
             } else if ("Metaspace".equals(value)) {
-                getDiary().setTrue(SupportedFlags.JDK80);
-                getDiary().setFalse(SupportedFlags.JDK70, SupportedFlags.PRE_JDK70_40);
+                diary.setTrue(SupportedFlags.JDK80);
+                diary.setFalse(SupportedFlags.JDK70, SupportedFlags.PRE_JDK70_40);
             }
         } else if (META_SPACE_RECORD.parse(line) != null) {
-            getDiary().setTrue(SupportedFlags.JDK80);
-            getDiary().setFalse(SupportedFlags.JDK70, SupportedFlags.PRE_JDK70_40);
+            diary.setTrue(SupportedFlags.JDK80);
+            diary.setFalse(SupportedFlags.JDK70, SupportedFlags.PRE_JDK70_40);
         }
 
         // maybe we'll get lucky, app server often call System.gc() after startup.
         if (line.contains("(System)")) {
-            getDiary().setTrue(SupportedFlags.JDK70, SupportedFlags.PRE_JDK70_40);
-            getDiary().setFalse(SupportedFlags.GC_CAUSE, SupportedFlags.JDK80);
+            diary.setTrue(SupportedFlags.JDK70, SupportedFlags.PRE_JDK70_40);
+            diary.setFalse(SupportedFlags.GC_CAUSE, SupportedFlags.JDK80);
         } else if (line.contains("(System.gc()")) {
-            getDiary().setFalse(SupportedFlags.PRE_JDK70_40);
-            getDiary().setTrue(SupportedFlags.GC_CAUSE);
-        } else if (getDiary().isGenerationalKnown() && getDiary().isGenerational()) {
+            diary.setFalse(SupportedFlags.PRE_JDK70_40);
+            diary.setTrue(SupportedFlags.GC_CAUSE);
+        } else if (diary.isGenerationalKnown() && diary.isGenerational()) {
             if ((trace = PREFIX.parse(line)) != null) {
-                if ((trace.getGroup(3) == null) && getDiary().isTrue(SupportedFlags.GC_DETAILS)) {
-                    getDiary().setTrue(SupportedFlags.JDK70);
-                    getDiary().setFalse(SupportedFlags.JDK80, SupportedFlags.GC_CAUSE);
+                if ((trace.getGroup(3) == null) && diary.isTrue(SupportedFlags.GC_DETAILS)) {
+                    diary.setTrue(SupportedFlags.JDK70);
+                    diary.setFalse(SupportedFlags.JDK80, SupportedFlags.GC_CAUSE);
                 } else if (trace.gcCause(3, 0) != GCCause.GCCAUSE_NOT_SET) {
-                    getDiary().setTrue(SupportedFlags.GC_CAUSE);
-                    getDiary().setFalse(SupportedFlags.PRE_JDK70_40);
+                    diary.setTrue(SupportedFlags.GC_CAUSE);
+                    diary.setFalse(SupportedFlags.PRE_JDK70_40);
                 }
             } else if ((trace = FULL_PREFIX.parse(line)) != null) {
-                if ((trace.getGroup(3) == null) && getDiary().isTrue(SupportedFlags.GC_DETAILS)) {
-                    getDiary().setTrue(SupportedFlags.JDK70);
-                    getDiary().setFalse(SupportedFlags.GC_CAUSE, SupportedFlags.JDK80);
+                if ((trace.getGroup(3) == null) && diary.isTrue(SupportedFlags.GC_DETAILS)) {
+                    diary.setTrue(SupportedFlags.JDK70);
+                    diary.setFalse(SupportedFlags.GC_CAUSE, SupportedFlags.JDK80);
                 } else if (trace.gcCause(3, 0) != GCCause.GCCAUSE_NOT_SET) {
-                    getDiary().setTrue(SupportedFlags.GC_CAUSE);
-                    getDiary().setFalse(SupportedFlags.PRE_JDK70_40);
+                    diary.setTrue(SupportedFlags.GC_CAUSE);
+                    diary.setFalse(SupportedFlags.PRE_JDK70_40);
                 }
             }
 
-        } else if (getDiary().isG1GCKnown() && getDiary().isG1GC()) {
+        } else if (diary.isG1GCKnown() && diary.isG1GC()) {
             if ((trace = G1GC_PREFIX.parse(line)) != null) {
-                if (getDiary().isTrue(SupportedFlags.GC_DETAILS) && (trace.gcCause() == GCCause.GCCAUSE_NOT_SET)) {
-                    getDiary().setTrue(SupportedFlags.JDK70);
-                    getDiary().setFalse(SupportedFlags.JDK80);
+                if (diary.isTrue(SupportedFlags.GC_DETAILS) && (trace.gcCause() == GCCause.GCCAUSE_NOT_SET)) {
+                    diary.setTrue(SupportedFlags.JDK70);
+                    diary.setFalse(SupportedFlags.JDK80);
                 } else { //we can't say much else unless we look for 8.0 specific details
-                    getDiary().setFalse(SupportedFlags.PRE_JDK70_40);
+                    diary.setFalse(SupportedFlags.PRE_JDK70_40);
                 }
             }
         }
@@ -612,73 +615,73 @@ public class PreUnifiedDiarizer implements Diarizer {
         if ((trace = PREFIX.parse(line)) != null) {
             String cause = trace.getGroup(3);
             if (cause != null) {
-                getDiary().setTrue(SupportedFlags.GC_CAUSE);
+                diary.setTrue(SupportedFlags.GC_CAUSE);
                 if ("(System)".equals(cause)) {
-                    getDiary().setFalse(SupportedFlags.JDK80);
-                    getDiary().setTrue(SupportedFlags.JDK70);
-                    getDiary().setTrue(SupportedFlags.PRE_JDK70_40);
+                    diary.setFalse(SupportedFlags.JDK80);
+                    diary.setTrue(SupportedFlags.JDK70);
+                    diary.setTrue(SupportedFlags.PRE_JDK70_40);
                 } else if ("(System.gc())".equals(cause)) {
-                    getDiary().setFalse(SupportedFlags.PRE_JDK70_40);
+                    diary.setFalse(SupportedFlags.PRE_JDK70_40);
                 } else {
-                    getDiary().setFalse(SupportedFlags.PRE_JDK70_40);
+                    diary.setFalse(SupportedFlags.PRE_JDK70_40);
                 }
             } else {
                 if ((trace = G1GC_PREFIX.parse(line)) != null) {
                     cause = trace.getGroup(3);
                     if (cause == null)
-                        getDiary().setTrue(SupportedFlags.PRE_JDK70_40);
+                        diary.setTrue(SupportedFlags.PRE_JDK70_40);
                     else
-                        getDiary().setFalse(SupportedFlags.PRE_JDK70_40);
+                        diary.setFalse(SupportedFlags.PRE_JDK70_40);
                 } else {
-                    getDiary().setFalse(SupportedFlags.GC_CAUSE);
+                    diary.setFalse(SupportedFlags.GC_CAUSE);
                 }
             }
-            getDiary().setFalse(SupportedFlags.GC_CAUSE);
+            diary.setFalse(SupportedFlags.GC_CAUSE);
         } else if (line.contains("promotion failure size ="))
-            getDiary().setTrue(SupportedFlags.PRINT_PROMOTION_FAILURE);
+            diary.setTrue(SupportedFlags.PRINT_PROMOTION_FAILURE);
         else if (FLS_HEADER.parse(line) != null) {
-            getDiary().setTrue(SupportedFlags.PRINT_FLS_STATISTICS);
+            diary.setTrue(SupportedFlags.PRINT_FLS_STATISTICS);
         }
 
         //old G1 log file
         //      [GC Worker Start (ms):  12053551.6  12053551.6  12053551.6  12053551.6  12053551.7  12053551.7  12053551.7  12053551.7  12053551.7  12053551.7  12053551.7  12053551.7
         //new G1 log file
         //      [GC Worker Start (ms): Min: 76.3, Avg: 76.3, Max: 76.4, Diff: 0.1]
-        if (getDiary().isG1GC()) {
+        if (diary.isG1GC()) {
             if (line.startsWith("[GC Worker Start (ms): "))
                 if (line.startsWith("[GC Worker Start (ms): Min: "))
-                    getDiary().setFalse(SupportedFlags.PRE_JDK70_40);
+                    diary.setFalse(SupportedFlags.PRE_JDK70_40);
                 else
-                    getDiary().setTrue(SupportedFlags.PRE_JDK70_40);
+                    diary.setTrue(SupportedFlags.PRE_JDK70_40);
         } else if (line.contains("AdaptiveSizePolicy::")) {
-            getDiary().setTrue(SupportedFlags.ADAPTIVE_SIZING);
+            diary.setTrue(SupportedFlags.ADAPTIVE_SIZING);
         }
 
         //if we've seen a collection and Print Reference GC hasn't been set...
-        if (youngCollectionCount > 1 && !getDiary().isStateKnown(SupportedFlags.PRINT_REFERENCE_GC)) {
-            getDiary().setFalse(SupportedFlags.PRINT_REFERENCE_GC);
+        if (youngCollectionCount > 1 && !diary.isStateKnown(SupportedFlags.PRINT_REFERENCE_GC)) {
+            diary.setFalse(SupportedFlags.PRINT_REFERENCE_GC);
         }
 
         GCLogTrace gcLogTrace;
         if ((gcLogTrace = MEMORY_SUMMARY_RULE.parse(line)) != null) {
             if (gcLogTrace.next() != null)
-                getDiary().setTrue(SupportedFlags.GC_DETAILS);
+                diary.setTrue(SupportedFlags.GC_DETAILS);
         }
 
         // if we've seen a statement than this is false
         if (line.startsWith("{Heap before GC invocations="))
-            getDiary().setTrue(SupportedFlags.PRINT_HEAP_AT_GC);
+            diary.setTrue(SupportedFlags.PRINT_HEAP_AT_GC);
         else if (collectionCount > 1)
-            getDiary().setFalse(SupportedFlags.PRINT_HEAP_AT_GC);
+            diary.setFalse(SupportedFlags.PRINT_HEAP_AT_GC);
 
         if ((trace = TenuredPatterns.TENURING_SUMMARY.parse(line)) != null) {
 
             //we have seen at least one good tenuring summary without an age breakdown
             if ((tenuringSummary > 0) && (!ageTableDetected)) {
-                getDiary().setTrue(SupportedFlags.PARALLELGC, SupportedFlags.PARALLELOLDGC);
-                getDiary().setFalse(SupportedFlags.DEFNEW, SupportedFlags.PARNEW, SupportedFlags.CMS, SupportedFlags.ICMS, SupportedFlags.SERIAL, SupportedFlags.G1GC, SupportedFlags.CMS_DEBUG_LEVEL_1);
+                diary.setTrue(SupportedFlags.PARALLELGC, SupportedFlags.PARALLELOLDGC);
+                diary.setFalse(SupportedFlags.DEFNEW, SupportedFlags.PARNEW, SupportedFlags.CMS, SupportedFlags.ICMS, SupportedFlags.SERIAL, SupportedFlags.G1GC, SupportedFlags.CMS_DEBUG_LEVEL_1);
             } else
-                getDiary().setTrue(SupportedFlags.TENURING_DISTRIBUTION);
+                diary.setTrue(SupportedFlags.TENURING_DISTRIBUTION);
 
             // if calculated tenuring threshold == 0 we won't get an age breakdown so delay evaluation
             if (trace.getIntegerGroup(2) > 0)
@@ -687,47 +690,47 @@ public class PreUnifiedDiarizer implements Diarizer {
             //If the MaxTenuringThreshold is set to be greater than 15 then we a configuration bug to report on.
             if (trace.getIntegerGroup(3) > 15) {
                 maxTenuringThreshold = trace.getIntegerGroup(3);
-                getDiary().setTrue(SupportedFlags.MAX_TENURING_THRESHOLD_VIOLATION);
+                diary.setTrue(SupportedFlags.MAX_TENURING_THRESHOLD_VIOLATION);
             } else
-                getDiary().setFalse(SupportedFlags.MAX_TENURING_THRESHOLD_VIOLATION);
+                diary.setFalse(SupportedFlags.MAX_TENURING_THRESHOLD_VIOLATION);
         } else if (TenuredPatterns.TENURING_AGE_BREAKDOWN.parse(line) != null) {
             ageTableDetected = true;
-            getDiary().setFalse(SupportedFlags.PARALLELGC, SupportedFlags.PARALLELOLDGC);
-        } else if (getDiary().isTenuringDistributionKnown() && collectionCount > 1 && youngCollectionCount > 1) {
-            getDiary().setFalse(SupportedFlags.TENURING_DISTRIBUTION);
+            diary.setFalse(SupportedFlags.PARALLELGC, SupportedFlags.PARALLELOLDGC);
+        } else if (diary.isTenuringDistributionKnown() && collectionCount > 1 && youngCollectionCount > 1) {
+            diary.setFalse(SupportedFlags.TENURING_DISTRIBUTION);
         }
 
         if (line.contains("G1Ergonomics")) {
             if (line.contains("CSet Construction") || line.contains("Heap Sizing")) {
                 collectionCount++;
-                getDiary().setTrue(SupportedFlags.G1GC, SupportedFlags.ADAPTIVE_SIZING);
-                getDiary().setFalse(SupportedFlags.DEFNEW, SupportedFlags.PARNEW, SupportedFlags.CMS, SupportedFlags.ICMS, SupportedFlags.PARALLELGC, SupportedFlags.PARALLELOLDGC, SupportedFlags.SERIAL, SupportedFlags.CMS_DEBUG_LEVEL_1);
+                diary.setTrue(SupportedFlags.G1GC, SupportedFlags.ADAPTIVE_SIZING);
+                diary.setFalse(SupportedFlags.DEFNEW, SupportedFlags.PARNEW, SupportedFlags.CMS, SupportedFlags.ICMS, SupportedFlags.PARALLELGC, SupportedFlags.PARALLELOLDGC, SupportedFlags.SERIAL, SupportedFlags.CMS_DEBUG_LEVEL_1);
             }
 
         }
 
         if (REFERENCE_PROCESSING_BLOCK.parse(line) != null)
-            getDiary().setTrue(SupportedFlags.PRINT_REFERENCE_GC);
+            diary.setTrue(SupportedFlags.PRINT_REFERENCE_GC);
 
         if (line.startsWith("Concurrent RS processed")) {
             collectionCount++;
-            getDiary().setTrue(SupportedFlags.G1GC, SupportedFlags.RSET_STATS);
-            getDiary().setFalse(SupportedFlags.DEFNEW, SupportedFlags.PARNEW, SupportedFlags.CMS, SupportedFlags.ICMS, SupportedFlags.PARALLELGC, SupportedFlags.PARALLELOLDGC, SupportedFlags.SERIAL, SupportedFlags.CMS_DEBUG_LEVEL_1);
+            diary.setTrue(SupportedFlags.G1GC, SupportedFlags.RSET_STATS);
+            diary.setFalse(SupportedFlags.DEFNEW, SupportedFlags.PARNEW, SupportedFlags.CMS, SupportedFlags.ICMS, SupportedFlags.PARALLELGC, SupportedFlags.PARALLELOLDGC, SupportedFlags.SERIAL, SupportedFlags.CMS_DEBUG_LEVEL_1);
         } else if (line.contains(" (cardTable: ")) {
-            getDiary().setTrue(SupportedFlags.CMS_DEBUG_LEVEL_1);
+            diary.setTrue(SupportedFlags.CMS_DEBUG_LEVEL_1);
         }
 
         if (collectionCount > 1) {
-            if (!getDiary().isCMSDebugLevel1Known()) {
-                getDiary().setFalse(SupportedFlags.CMS_DEBUG_LEVEL_1);
+            if (!diary.isCMSDebugLevel1Known()) {
+                diary.setFalse(SupportedFlags.CMS_DEBUG_LEVEL_1);
             }
 
-            if (!getDiary().isAdaptiveSizingKnown()) {
-                getDiary().setFalse(SupportedFlags.ADAPTIVE_SIZING);
+            if (!diary.isAdaptiveSizingKnown()) {
+                diary.setFalse(SupportedFlags.ADAPTIVE_SIZING);
             }
 
-            if (!getDiary().isRSetStatsKnown())
-                getDiary().setFalse(SupportedFlags.RSET_STATS);
+            if (!diary.isRSetStatsKnown())
+                diary.setFalse(SupportedFlags.RSET_STATS);
         }
     }
 
@@ -766,47 +769,47 @@ public class PreUnifiedDiarizer implements Diarizer {
             if (supportedFlag != null) {
                 switch (supportedFlag) {
                     case PrintGCApplicationStoppedTime:
-                        getDiary().setState(SupportedFlags.APPLICATION_STOPPED_TIME, flagTurnedOn);
+                        diary.setState(SupportedFlags.APPLICATION_STOPPED_TIME, flagTurnedOn);
                         break;
 
                     case PrintGCApplicationConcurrentTime:
-                        getDiary().setState(SupportedFlags.APPLICATION_CONCURRENT_TIME, flagTurnedOn);
+                        diary.setState(SupportedFlags.APPLICATION_CONCURRENT_TIME, flagTurnedOn);
                         break;
 
                     case PrintGCTimeStamps:
                         break;
 
                     case PrintGCDetails:
-                        getDiary().setState(SupportedFlags.GC_DETAILS, flagTurnedOn);
-                        if (flagTurnedOn && (getDiary().isJDK80() || getDiary().isUnifiedLogging()))
-                            getDiary().setTrue(SupportedFlags.GC_CAUSE);
+                        diary.setState(SupportedFlags.GC_DETAILS, flagTurnedOn);
+                        if (flagTurnedOn && (diary.isJDK80() || diary.isUnifiedLogging()))
+                            diary.setTrue(SupportedFlags.GC_CAUSE);
                         break;
 
                     case PrintGCCause:
-                        getDiary().setState(SupportedFlags.GC_CAUSE, flagTurnedOn);
+                        diary.setState(SupportedFlags.GC_CAUSE, flagTurnedOn);
                         break;
 
                     case PrintTenuringDistribution:
-                        getDiary().setState(SupportedFlags.TENURING_DISTRIBUTION, flagTurnedOn);
+                        diary.setState(SupportedFlags.TENURING_DISTRIBUTION, flagTurnedOn);
                         break;
 
                     case PrintAdaptiveSizePolicy:
-                        getDiary().setState(SupportedFlags.ADAPTIVE_SIZING, flagTurnedOn);
+                        diary.setState(SupportedFlags.ADAPTIVE_SIZING, flagTurnedOn);
                         break;
 
                     case PrintReferenceGC:
-                        getDiary().setState(SupportedFlags.PRINT_REFERENCE_GC, flagTurnedOn);
+                        diary.setState(SupportedFlags.PRINT_REFERENCE_GC, flagTurnedOn);
                         break;
 
                     case PrintHeapAtGC:
-                        getDiary().setState(SupportedFlags.PRINT_HEAP_AT_GC, flagTurnedOn);
+                        diary.setState(SupportedFlags.PRINT_HEAP_AT_GC, flagTurnedOn);
                         break;
 
                     case PrintPromotionFailure:
-                        getDiary().setTrue(SupportedFlags.PRINT_PROMOTION_FAILURE);
+                        diary.setTrue(SupportedFlags.PRINT_PROMOTION_FAILURE);
 
                     case PrintFLSStatistics:
-                        getDiary().setTrue(SupportedFlags.PRINT_FLS_STATISTICS);
+                        diary.setTrue(SupportedFlags.PRINT_FLS_STATISTICS);
 
                     default:
                         //shouldn't be able to get here....
@@ -852,7 +855,7 @@ public class PreUnifiedDiarizer implements Diarizer {
         }
 
         evaluateGCLogFlags();
-        getDiary().setFalse(SupportedFlags.APPLICATION_STOPPED_TIME, SupportedFlags.APPLICATION_CONCURRENT_TIME, SupportedFlags.GC_DETAILS,
+        diary.setFalse(SupportedFlags.APPLICATION_STOPPED_TIME, SupportedFlags.APPLICATION_CONCURRENT_TIME, SupportedFlags.GC_DETAILS,
                 SupportedFlags.GC_CAUSE, SupportedFlags.TENURING_DISTRIBUTION, SupportedFlags.ADAPTIVE_SIZING, SupportedFlags.PRINT_REFERENCE_GC,
                 SupportedFlags.PRINT_HEAP_AT_GC, SupportedFlags.PRINT_PROMOTION_FAILURE, SupportedFlags.PRINT_FLS_STATISTICS);
     }
@@ -885,26 +888,26 @@ public class PreUnifiedDiarizer implements Diarizer {
         if (matcher.find()) {
             switch (matcher.group(2).charAt(0)) {
                 case '7':
-                    getDiary().setTrue(SupportedFlags.JDK70);
-                    getDiary().setFalse(SupportedFlags.JDK80);
+                    diary.setTrue(SupportedFlags.JDK70);
+                    diary.setFalse(SupportedFlags.JDK80);
                     if (matcher.group(3) == null)
-                        getDiary().setTrue(SupportedFlags.PRE_JDK70_40);
+                        diary.setTrue(SupportedFlags.PRE_JDK70_40);
                     try {
                         int minorVersion = Integer.parseInt(matcher.group(3).substring(1));
                         if (minorVersion < 41)
-                            getDiary().setTrue(SupportedFlags.PRE_JDK70_40);
+                            diary.setTrue(SupportedFlags.PRE_JDK70_40);
                         else
-                            getDiary().setFalse(SupportedFlags.PRE_JDK70_40);
+                            diary.setFalse(SupportedFlags.PRE_JDK70_40);
                     } catch (NumberFormatException nfe) {
-                        getDiary().setTrue(SupportedFlags.PRE_JDK70_40);
+                        diary.setTrue(SupportedFlags.PRE_JDK70_40);
                     }
                     break;
                 case '8':
-                    getDiary().setFalse(SupportedFlags.JDK70, SupportedFlags.PRE_JDK70_40);
-                    getDiary().setTrue(SupportedFlags.JDK80, SupportedFlags.GC_CAUSE); // doesn't matter so much but may only be true for later versions of 8
+                    diary.setFalse(SupportedFlags.JDK70, SupportedFlags.PRE_JDK70_40);
+                    diary.setTrue(SupportedFlags.JDK80, SupportedFlags.GC_CAUSE); // doesn't matter so much but may only be true for later versions of 8
                     break;
                 case '9':
-                    getDiary().setFalse(SupportedFlags.JDK70, SupportedFlags.PRE_JDK70_40, SupportedFlags.JDK80);
+                    diary.setFalse(SupportedFlags.JDK70, SupportedFlags.PRE_JDK70_40, SupportedFlags.JDK80);
                     break;
                 default:
             }
@@ -962,64 +965,64 @@ public class PreUnifiedDiarizer implements Diarizer {
             case 4354:
             case 6146:
             case 16384:
-                getDiary().setTrue(SupportedFlags.PARALLELGC, SupportedFlags.PARALLELOLDGC);
-                getDiary().setFalse(SupportedFlags.DEFNEW, SupportedFlags.PARNEW, SupportedFlags.CMS, SupportedFlags.ICMS, SupportedFlags.SERIAL, SupportedFlags.G1GC, SupportedFlags.RSET_STATS, SupportedFlags.CMS_DEBUG_LEVEL_1);
+                diary.setTrue(SupportedFlags.PARALLELGC, SupportedFlags.PARALLELOLDGC);
+                diary.setFalse(SupportedFlags.DEFNEW, SupportedFlags.PARNEW, SupportedFlags.CMS, SupportedFlags.ICMS, SupportedFlags.SERIAL, SupportedFlags.G1GC, SupportedFlags.RSET_STATS, SupportedFlags.CMS_DEBUG_LEVEL_1);
                 break;
 
             case 1024: // parallel/serial
             case 1026:
-                getDiary().setTrue(SupportedFlags.PARALLELGC);
-                getDiary().setFalse(SupportedFlags.DEFNEW, SupportedFlags.PARNEW, SupportedFlags.CMS, SupportedFlags.ICMS, SupportedFlags.PARALLELOLDGC, SupportedFlags.SERIAL, SupportedFlags.G1GC, SupportedFlags.RSET_STATS, SupportedFlags.CMS_DEBUG_LEVEL_1);
+                diary.setTrue(SupportedFlags.PARALLELGC);
+                diary.setFalse(SupportedFlags.DEFNEW, SupportedFlags.PARNEW, SupportedFlags.CMS, SupportedFlags.ICMS, SupportedFlags.PARALLELOLDGC, SupportedFlags.SERIAL, SupportedFlags.G1GC, SupportedFlags.RSET_STATS, SupportedFlags.CMS_DEBUG_LEVEL_1);
                 break;
 
             case 1: // DefNew/Serial
-                getDiary().setTrue(SupportedFlags.DEFNEW, SupportedFlags.SERIAL);
-                getDiary().setFalse(SupportedFlags.PARNEW, SupportedFlags.CMS, SupportedFlags.ICMS, SupportedFlags.PARALLELGC, SupportedFlags.PARALLELOLDGC, SupportedFlags.G1GC, SupportedFlags.RSET_STATS, SupportedFlags.CMS_DEBUG_LEVEL_1);
+                diary.setTrue(SupportedFlags.DEFNEW, SupportedFlags.SERIAL);
+                diary.setFalse(SupportedFlags.PARNEW, SupportedFlags.CMS, SupportedFlags.ICMS, SupportedFlags.PARALLELGC, SupportedFlags.PARALLELOLDGC, SupportedFlags.G1GC, SupportedFlags.RSET_STATS, SupportedFlags.CMS_DEBUG_LEVEL_1);
                 break;
 
             case 8: //ParNew/Serial Deprecated
             case 4101:
-                getDiary().setTrue(SupportedFlags.PARNEW, SupportedFlags.SERIAL);
-                getDiary().setFalse(SupportedFlags.DEFNEW, SupportedFlags.CMS, SupportedFlags.ICMS, SupportedFlags.PARALLELGC, SupportedFlags.PARALLELOLDGC, SupportedFlags.G1GC, SupportedFlags.RSET_STATS, SupportedFlags.CMS_DEBUG_LEVEL_1);
+                diary.setTrue(SupportedFlags.PARNEW, SupportedFlags.SERIAL);
+                diary.setFalse(SupportedFlags.DEFNEW, SupportedFlags.CMS, SupportedFlags.ICMS, SupportedFlags.PARALLELGC, SupportedFlags.PARALLELOLDGC, SupportedFlags.G1GC, SupportedFlags.RSET_STATS, SupportedFlags.CMS_DEBUG_LEVEL_1);
                 break;
 
             case 16: //ParNew/CMS
             case 24:
             case 272:
-                getDiary().setTrue(SupportedFlags.PARNEW, SupportedFlags.CMS);
-                getDiary().setFalse(SupportedFlags.DEFNEW, SupportedFlags.ICMS, SupportedFlags.PARALLELGC, SupportedFlags.PARALLELOLDGC, SupportedFlags.SERIAL, SupportedFlags.G1GC, SupportedFlags.RSET_STATS);
+                diary.setTrue(SupportedFlags.PARNEW, SupportedFlags.CMS);
+                diary.setFalse(SupportedFlags.DEFNEW, SupportedFlags.ICMS, SupportedFlags.PARALLELGC, SupportedFlags.PARALLELOLDGC, SupportedFlags.SERIAL, SupportedFlags.G1GC, SupportedFlags.RSET_STATS);
                 break;
 
             case 2064: //DefNew/CMS Deprecated
-                getDiary().setTrue(SupportedFlags.DEFNEW, SupportedFlags.CMS);
-                getDiary().setFalse(SupportedFlags.PARNEW, SupportedFlags.ICMS, SupportedFlags.PARALLELGC, SupportedFlags.PARALLELOLDGC, SupportedFlags.SERIAL, SupportedFlags.G1GC, SupportedFlags.RSET_STATS);
+                diary.setTrue(SupportedFlags.DEFNEW, SupportedFlags.CMS);
+                diary.setFalse(SupportedFlags.PARNEW, SupportedFlags.ICMS, SupportedFlags.PARALLELGC, SupportedFlags.PARALLELOLDGC, SupportedFlags.SERIAL, SupportedFlags.G1GC, SupportedFlags.RSET_STATS);
                 break;
 
             case 48: //ParNew/iCMS
             case 56:
-                getDiary().setTrue(SupportedFlags.PARNEW, SupportedFlags.CMS, SupportedFlags.ICMS);
-                getDiary().setFalse(SupportedFlags.DEFNEW, SupportedFlags.PARALLELGC, SupportedFlags.PARALLELOLDGC, SupportedFlags.SERIAL, SupportedFlags.G1GC, SupportedFlags.RSET_STATS);
+                diary.setTrue(SupportedFlags.PARNEW, SupportedFlags.CMS, SupportedFlags.ICMS);
+                diary.setFalse(SupportedFlags.DEFNEW, SupportedFlags.PARALLELGC, SupportedFlags.PARALLELOLDGC, SupportedFlags.SERIAL, SupportedFlags.G1GC, SupportedFlags.RSET_STATS);
                 break;
 
             case 2096: //DefNew/iCMS
-                getDiary().setTrue(SupportedFlags.DEFNEW, SupportedFlags.CMS, SupportedFlags.ICMS);
-                getDiary().setFalse(SupportedFlags.PARNEW, SupportedFlags.PARALLELGC, SupportedFlags.PARALLELOLDGC, SupportedFlags.SERIAL, SupportedFlags.G1GC, SupportedFlags.RSET_STATS);
+                diary.setTrue(SupportedFlags.DEFNEW, SupportedFlags.CMS, SupportedFlags.ICMS);
+                diary.setFalse(SupportedFlags.PARNEW, SupportedFlags.PARALLELGC, SupportedFlags.PARALLELOLDGC, SupportedFlags.SERIAL, SupportedFlags.G1GC, SupportedFlags.RSET_STATS);
                 break;
 
             case 6208:
             case 64: //G1GC
-                getDiary().setTrue(SupportedFlags.G1GC);
-                getDiary().setFalse(SupportedFlags.DEFNEW, SupportedFlags.PARNEW, SupportedFlags.CMS, SupportedFlags.ICMS, SupportedFlags.PARALLELGC, SupportedFlags.PARALLELOLDGC, SupportedFlags.SERIAL, SupportedFlags.CMS_DEBUG_LEVEL_1);
+                diary.setTrue(SupportedFlags.G1GC);
+                diary.setFalse(SupportedFlags.DEFNEW, SupportedFlags.PARNEW, SupportedFlags.CMS, SupportedFlags.ICMS, SupportedFlags.PARALLELGC, SupportedFlags.PARALLELOLDGC, SupportedFlags.SERIAL, SupportedFlags.CMS_DEBUG_LEVEL_1);
                 break;
 
             case 4096:
-                getDiary().setTrue(SupportedFlags.PARALLELGC, SupportedFlags.PARALLELOLDGC);
-                getDiary().setFalse(SupportedFlags.DEFNEW, SupportedFlags.PARNEW, SupportedFlags.CMS, SupportedFlags.ICMS, SupportedFlags.G1GC, SupportedFlags.RSET_STATS, SupportedFlags.SERIAL, SupportedFlags.CMS_DEBUG_LEVEL_1);
+                diary.setTrue(SupportedFlags.PARALLELGC, SupportedFlags.PARALLELOLDGC);
+                diary.setFalse(SupportedFlags.DEFNEW, SupportedFlags.PARNEW, SupportedFlags.CMS, SupportedFlags.ICMS, SupportedFlags.G1GC, SupportedFlags.RSET_STATS, SupportedFlags.SERIAL, SupportedFlags.CMS_DEBUG_LEVEL_1);
                 break;
 
             case 4160:
-                getDiary().setTrue(SupportedFlags.G1GC);
-                getDiary().setFalse(SupportedFlags.PARALLELGC, SupportedFlags.PARALLELOLDGC, SupportedFlags.DEFNEW, SupportedFlags.PARNEW, SupportedFlags.CMS, SupportedFlags.ICMS, SupportedFlags.SERIAL, SupportedFlags.CMS_DEBUG_LEVEL_1);
+                diary.setTrue(SupportedFlags.G1GC);
+                diary.setFalse(SupportedFlags.PARALLELGC, SupportedFlags.PARALLELOLDGC, SupportedFlags.DEFNEW, SupportedFlags.PARNEW, SupportedFlags.CMS, SupportedFlags.ICMS, SupportedFlags.SERIAL, SupportedFlags.CMS_DEBUG_LEVEL_1);
                 break;
 
             default:
@@ -1028,21 +1031,21 @@ public class PreUnifiedDiarizer implements Diarizer {
     }
 
     private void setGCCause(String gcCause) {
-        if (gcCause == null && getDiary().isPrintGCDetails()) {
-            getDiary().setFalse(SupportedFlags.GC_CAUSE, SupportedFlags.JDK80);
+        if (gcCause == null && diary.isPrintGCDetails()) {
+            diary.setFalse(SupportedFlags.GC_CAUSE, SupportedFlags.JDK80);
         } else if (gcCause != null) {
             if (GCCauses.get(gcCause) == GCCause.GCCAUSE_NOT_SET) {
-                if (getDiary().isPrintGCDetailsKnown() && getDiary().isPrintGCDetails()) {
-                    getDiary().setFalse(SupportedFlags.GC_CAUSE, SupportedFlags.JDK80);
-                    getDiary().setTrue(SupportedFlags.JDK70);
+                if (diary.isPrintGCDetailsKnown() && diary.isPrintGCDetails()) {
+                    diary.setFalse(SupportedFlags.GC_CAUSE, SupportedFlags.JDK80);
+                    diary.setTrue(SupportedFlags.JDK70);
                 }
             } else {
                 if (gcCause.contains("System.gc()") || !gcCause.contains("System")) {
-                    getDiary().setTrue(SupportedFlags.GC_CAUSE);
-                    getDiary().setFalse(SupportedFlags.PRE_JDK70_40);
+                    diary.setTrue(SupportedFlags.GC_CAUSE);
+                    diary.setFalse(SupportedFlags.PRE_JDK70_40);
                 } else {
-                    getDiary().setTrue(SupportedFlags.PRE_JDK70_40);
-                    getDiary().setTrue(SupportedFlags.JDK70);
+                    diary.setTrue(SupportedFlags.PRE_JDK70_40);
+                    diary.setTrue(SupportedFlags.JDK70);
                 }
             }
         }

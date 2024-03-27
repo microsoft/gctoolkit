@@ -7,6 +7,7 @@ import com.microsoft.gctoolkit.event.generational.CMSConcurrentEvent;
 import com.microsoft.gctoolkit.event.generational.CMSRemark;
 import com.microsoft.gctoolkit.event.generational.InitialMark;
 
+
 @Aggregates({EventSource.GENERATIONAL})
 public class CMSCycleAggregator extends Aggregator<CMSCycleAggregation> {
 
@@ -26,7 +27,6 @@ public class CMSCycleAggregator extends Aggregator<CMSCycleAggregation> {
     }
 
     public void count(CMSRemark event) {
-        System.out.println(event.toString());
         if ( event.equals(lastRemark)) return;
         lastRemark = event;
         aggregation().remark();

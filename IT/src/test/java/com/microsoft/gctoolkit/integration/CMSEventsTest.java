@@ -51,8 +51,8 @@ public class CMSEventsTest {
 
         machine.getAggregation(CMSCycleAggregation.class).ifPresent(cmsCycleCounts -> {
             Assertions.assertEquals( 1, cmsCycleCounts.getInitialMark(), "Initial Mark events count");
-            //Assertions.assertEquals( 1, cmsCycleCounts.getRemark(), "Remark events count");
-            //Assertions.assertEquals( 4, cmsCycleCounts.getConcurrentEvent(), "concurrent phase events count");
+            Assertions.assertEquals( 1, cmsCycleCounts.getRemark(), "Remark events count");
+            Assertions.assertEquals( 5, cmsCycleCounts.getConcurrentEvent(), "concurrent phase events count");
         });
 
     }

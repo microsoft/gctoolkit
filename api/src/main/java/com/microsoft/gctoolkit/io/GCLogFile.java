@@ -127,8 +127,8 @@ public abstract class GCLogFile extends FileDataSource<String> {
      * @throws IOException Thrown from reading the stream.
      */
     private TripleState discoverFormat() {
-        try {
-            boolean isUnified = firstNLines(stream(), SHOULD_HAVE_SEEN_A_UNIFIED_DECORATOR_BY_THIS_LINE_IN_THE_LOG)
+        try (Stream<String> stream = stream()) {  // contribution from MansuyDavid @github
+            boolean isUnified = firstNLines(stream, SHOULD_HAVE_SEEN_A_UNIFIED_DECORATOR_BY_THIS_LINE_IN_THE_LOG)
                     .map(LINE_STARTS_WITH_DECORATOR::matcher)
                     .anyMatch(Matcher::find);
             return TripleState.valueOf(isUnified);
