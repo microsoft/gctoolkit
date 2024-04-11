@@ -41,6 +41,7 @@ public interface CMSPatterns extends SharedPatterns {
     /**********  CMS Phase records **********/
     //3.307: [GC [1 CMS-initial-mark: 0K(18874368K)] 302009K(20761856K), 0.0994470 secs] [Times: user=0.20 sys=0.00, real=0.10 secs]
     //12.986: [GC[1 CMS-initial-mark: 33532K(62656K)] 49652K(81280K), 0.0014191 secs] [Times: user=0.00 sys=0.00, real=0.00 secs]
+    //40.971: [GC (CMS Initial Mark) [1 CMS-initial-mark: 2692K(5376K)] 38078K(354944K), 0.0147940 secs] [Times: user=0.01 sys=0.00, real=0.02 secs]
     GCParseRule INITIAL_MARK = new GCParseRule("INITIAL_MARK", GC_PREFIX + "\\[1 CMS-initial-mark: " + OCCUPANCY_CONFIGURED + "\\] " + OCCUPANCY_CONFIGURED_PAUSE + "\\]");
     GCParseRule CONCURRENT_PHASE_START = new GCParseRule("CONCURRENT_PHASE_START", "^" + CMS_PHASE_START);
 
@@ -309,7 +310,7 @@ public interface CMSPatterns extends SharedPatterns {
     GCParseRule RESCAN_CARDS_DETAILS = new GCParseRule("RESCAN_CARDS_DETAILS", "^, " + PAUSE_TIME + "\\]" + WEAK_REF_BLOCK + " " + REMARK_BLOCK);
 
     //, 0.2020511 secs]34.132: [weak refs processing, 0.0000108 secs]34.132: [class unloading, 0.0026382 secs]34.135: [scrub symbol & string tables, 0.0026847 secs] [1 CMS-remark: 0K(4194304K)] 889188K(5872064K), 0.2081265 secs]
-    GCParseRule RESCAN_SPLIT_UNLOADING_STRING = new GCParseRule("RESCAN_SPLIT_UNLOADING_STRING", "^, " + TIMESTAMP + "\\]" + WEAK_REF_BLOCK + CLASS_UNLOADING_BLOCK + STRING_AND_SYMBOL_SCRUB_BLOCK + " " + REMARK_BLOCK);
+    GCParseRule RESCAN_SPLIT_UNLOADING_STRING = new GCParseRule("RESCAN_SPLIT_UNLOADING_STRING", "^, " + PAUSE_TIME + "\\]" + WEAK_REF_BLOCK + CLASS_UNLOADING_BLOCK + STRING_AND_SYMBOL_SCRUB_BLOCK + " " + REMARK_BLOCK);
 
     //, 1.2157670 secs]42102.265: [weak refs processing, 0.1038920 secs]Work queue overflow (benign) (pmc_rm=1542597, kac=0)
     GCParseRule RESCAN_OVERFLOW_DETAILS = new GCParseRule("RESCAN_OVERFLOW_DETAILS", "^, " + PAUSE_TIME + "\\]" + WEAK_REF_BLOCK + "Work queue overflow");

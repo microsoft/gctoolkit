@@ -73,8 +73,8 @@ public class CMSTenuredPoolParser extends PreUnifiedGCLogParser implements Simpl
      */
     private void initialMark(GCLogTrace trace) {
         InitialMark initialMark = new InitialMark(trace.getDateTimeStamp(), GCCause.UNKNOWN_GCCAUSE, trace.getDoubleGroup(trace.groupCount()));
-        MemoryPoolSummary tenured = trace.getOccupancyWithMemoryPoolSizeSummary(4);
-        MemoryPoolSummary heap = trace.getOccupancyWithMemoryPoolSizeSummary(8);
+        MemoryPoolSummary tenured = trace.getOccupancyWithMemoryPoolSizeSummary(7);
+        MemoryPoolSummary heap = trace.getOccupancyWithMemoryPoolSizeSummary(11);
         initialMark.add(heap.minus(tenured), tenured, heap);
         publish(initialMark);
     }
@@ -90,6 +90,7 @@ public class CMSTenuredPoolParser extends PreUnifiedGCLogParser implements Simpl
     }
 
     private void endConcurrentPrecleanWithReferenceProcessing(GCLogTrace trace) {
+        trace.notYetImplemented();
         try {
             publish(new ConcurrentPreClean(startOfPhase, trace.getDoubleGroup(14) - startOfPhase.getTimeStamp(), trace.getDoubleGroup(16), trace.getDoubleGroup(17)));
         } catch (Throwable t) {
@@ -98,9 +99,9 @@ public class CMSTenuredPoolParser extends PreUnifiedGCLogParser implements Simpl
     }
 
     private void endOfConcurrentPhase(GCLogTrace trace, DateTimeStamp timeStamp) {
-        String phase = trace.getGroup(3);
-        double cpuTime = trace.getDoubleGroup(4);
-        double wallTime = trace.getDoubleGroup(5);
+        String phase = trace.getGroup(6);
+        double cpuTime = trace.getDoubleGroup(7);
+        double wallTime = trace.getDoubleGroup(8);
         double duration = timeStamp.getTimeStamp() - startOfPhase.getTimeStamp();
         if ("mark".equals(phase))
             publish(new ConcurrentMark(startOfPhase, duration, cpuTime, wallTime));
@@ -118,8 +119,8 @@ public class CMSTenuredPoolParser extends PreUnifiedGCLogParser implements Simpl
 
     private void abortPrecleanDueToTime(GCLogTrace trace) {
         try {
-            double cpuTime = trace.getDoubleGroup(4);
-            double wallClock = trace.getDoubleGroup(5);
+            double cpuTime = trace.getDoubleGroup(7);
+            double wallClock = trace.getDoubleGroup(8);
             publish(new AbortablePreClean(startOfPhase, trace.getDateTimeStamp().getTimeStamp() - startOfPhase.getTimeStamp(), cpuTime, wallClock, true));
         } catch (Exception e) {
             LOG.warning("concurrent phase end choked on " + trace);

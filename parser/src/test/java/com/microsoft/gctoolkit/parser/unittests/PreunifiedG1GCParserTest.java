@@ -94,7 +94,8 @@ public class PreunifiedG1GCParserTest extends ParserTest {
             "180/neo4j-gc.log.20140625",
             "170_45/rolling/ahjapp02a_gclog/ahj_prod_gc.log.0",   //this file has been corrupted and hence missed an entire record
             "170_45/g1_details_tenuring_cause.log",
-            "180/seeker.log"
+            "180/seeker.log",
+            "180/seeker-notimestamp.log"
     };
 
     private static final int[] detailsTenuringNumberOfDifferentCollectors = {
@@ -104,18 +105,20 @@ public class PreunifiedG1GCParserTest extends ParserTest {
             9,
             9,
             8,
+            8,
             8
     };
 
     private static final int[][] detailsTenuringCounts = {
             //   0,    1,    2,    3,    4,    5,    6,    7,    8,    9,   10,   11,   12
-            {794, 413, 157, 0, 0, 157, 0, 157, 157, 157, 0, 0, 157},
-            {2194, 1308, 553, 0, 39, 553, 0, 523, 521, 523, 0, 0, 553},
-            {16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-            {1432, 9, 4, 0, 3, 4, 0, 4, 4, 4, 0, 0, 4},
-            {3019, 7, 3, 0, 4, 3, 0, 3, 3, 3, 0, 0, 3},
-            {544, 100, 52, 0, 0, 52, 0, 52, 36, 52, 0, 0, 52},
-            {1581, 708, 246, 0, 0, 246, 0, 246, 246, 246, 0, 0, 246}
+            {  794,  413,  157,    0,    0,  157,    0,  157,  157,  157,    0,    0,  157},
+            { 2194, 1308,  553,    0,   39,  553,    0,  523,  521,  523,    0,    0,  553},
+            {   16,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0},
+            { 1432,    9,    4,    0,    3,    4,    0,    4,    4,    4,    0,    0,    4},
+            { 3019,    7,    3,    0,    4,    3,    0,    3,    3,    3,    0,    0,    3},
+            {  544,  100,   52,    0,    0,   52,    0,   52,   36,   52,    0,    0,   52},
+            { 1581,  708,  246,    0,    0,  246,    0,  246,  246,  246,    0,    0,  246},
+            { 1581,  708,  246,    0,    0,  246,    0,  246,  246,  246,    0,    0,  246}
     };
 
 
@@ -136,6 +139,9 @@ public class PreunifiedG1GCParserTest extends ParserTest {
 
     private static final String[] detailsReference = {
             "post17040/170_51_mastermind.log",
+            //todo: there is a bug in the pre 1.7.0_45 G1 Collector that causes a Full GC and the subsequent concurrent
+            // cycles (which should not be happening) to be missed. This fix is twisty to I've decided to leave things
+            // as is because no one should be using G1 in JDK 1.7. Happy to revisit if it becomes an issue.
             "post17040/gc_with_overflow.log"
     };
 

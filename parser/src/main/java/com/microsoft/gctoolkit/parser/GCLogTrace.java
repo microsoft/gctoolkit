@@ -57,11 +57,11 @@ public class GCLogTrace extends AbstractLogTrace {
     }
 
     public GCCause gcCause(int offset) {
-        return gcCause(3, offset);
+        return gcCause(6, offset);
     }
 
     public GCCause gcCause() {
-        return gcCause(3, 0);
+        return gcCause(6, 0);
     }
 
     public double getPauseTime() {
@@ -182,7 +182,7 @@ public class GCLogTrace extends AbstractLogTrace {
             long size = toKBytes(offset + 4);
             return new MemoryPoolSummary(before, size, after, size);
         } catch (NumberFormatException numberFormatException) {
-            LOGGER.fine("Unable to calculate generational memory pool summary.");
+            LOGGER.warning("Unable to calculate generational memory pool summary.");
             notYetImplemented();
         }
 
@@ -194,6 +194,20 @@ public class GCLogTrace extends AbstractLogTrace {
         try {
             long occupancy = toKBytes(offset);
             long size = toKBytes(offset + 2);
+            return new MemoryPoolSummary(occupancy, size, occupancy, size);
+        } catch (NumberFormatException numberFormatException) {
+            LOGGER.fine("Unable to calculate generational memory pool occupancy summary.");
+            notYetImplemented();
+        }
+
+        return null;
+    }
+
+    public MemoryPoolSummary getOccupancyWithMemoryPoolSizeSummary() {
+
+        try {
+            long occupancy = toKBytes(1);
+            long size = toKBytes(3);
             return new MemoryPoolSummary(occupancy, size, occupancy, size);
         } catch (NumberFormatException numberFormatException) {
             LOGGER.fine("Unable to calculate generational memory pool occupancy summary.");
