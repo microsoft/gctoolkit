@@ -543,21 +543,18 @@ public class PreUnifiedDiarizer implements Diarizer {
         if ((trace = ParallelPatterns.PERM_SPACE_RECORD.parse(line)) != null) {
             String value = trace.getGroup(1).trim();
 
-            if ("CMS Perm".equals(value)) {
-                diary.setTrue(SupportedFlags.JDK70);
-                diary.setFalse(SupportedFlags.JDK80);
-            } else if ("PS Perm".equals(value)) {
-                diary.setTrue(SupportedFlags.JDK70);
-                diary.setFalse(SupportedFlags.JDK80);
-            } else if ("Perm".equals(value)) {
-                diary.setTrue(SupportedFlags.JDK70);
-                diary.setFalse(SupportedFlags.JDK80);
-            } else if ("PSPermGen".equals(value)) {
-                diary.setTrue(SupportedFlags.JDK70);
-                diary.setFalse(SupportedFlags.JDK80);
-            } else if ("Metaspace".equals(value)) {
-                diary.setTrue(SupportedFlags.JDK80);
-                diary.setFalse(SupportedFlags.JDK70, SupportedFlags.PRE_JDK70_40);
+            switch (value) {
+                case "CMS Perm":
+                case "PS Perm":
+                case "Perm":
+                case "PSPermGen":
+                    diary.setTrue(SupportedFlags.JDK70);
+                    diary.setFalse(SupportedFlags.JDK80);
+                    break;
+                case "Metaspace":
+                    diary.setTrue(SupportedFlags.JDK80);
+                    diary.setFalse(SupportedFlags.JDK70, SupportedFlags.PRE_JDK70_40);
+                    break;
             }
         } else if (META_SPACE_RECORD.parse(line) != null) {
             diary.setTrue(SupportedFlags.JDK80);

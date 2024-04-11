@@ -2077,9 +2077,6 @@ public class GenerationalHeapParser extends PreUnifiedGCLogParser implements Sim
         double cpuTime = trace.getDoubleGroup(7 + offset);
         double wallTime = trace.getDoubleGroup(8 + offset);
         double duration = timeStamp.toSeconds() - startOfConcurrentPhase.toSeconds();
-        // The wallTime measure is a very good estimate of duration.
-        if ( duration == Double.NaN)
-            duration = wallTime;
 
         switch (phase) {
             case "mark":
