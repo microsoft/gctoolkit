@@ -96,7 +96,7 @@ public abstract class AbstractLogTrace {
      */
     public DateTimeStamp getDateTimeStamp(int nth) {
         Matcher matcher;
-        if (nth > 0) {
+        if ( nth > 1) {
             matcher = DATE_TIME_STAMP_RULE.matcher(trace.group(0));
             for (int i = 0; i < nth; i++)
                 if (!matcher.find())
