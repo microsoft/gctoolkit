@@ -373,6 +373,7 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
                     break;
             }
         }
+        // The location for the gc cause is back 2 from where it typically is in other records.
         forwardReference.setGcType(gcType);
         forwardReference.setGCCause(trace.gcCause(-2));
         forwardReference.setStartTime(getClock());

@@ -39,7 +39,7 @@ public class ConcurrentMarkSweepPhaseParserRulesTest implements CMSPatterns {
 
     //@Test
     public void testDebugCMSParseRules() {
-        int index = 7;
+        int index = 8;
         for (String line : lines[index])
             evaluate(rules[index], line);
     }
@@ -68,13 +68,10 @@ public class ConcurrentMarkSweepPhaseParserRulesTest implements CMSPatterns {
             PRECLEAN_REFERENCE,
             CORRUPTED_PARNEW_BODY,
             PARNEW_DETAILS_WITH_CONCURRENT_MODE_FAILURE,
-            //new GCParseRule("PARNEW_DETAILS_WITH_CONCURRENT_MODE_FAILURE", "^: " + BEFORE_AFTER_CONFIGURED_PAUSE + "\\]" + CMS_TENURED_BLOCK), // + " " + BEFORE_AFTER_CONFIGURED + ", " + PERM_RECORD + ", " + PAUSE_TIME + "\\]"),
             iCMS_PARNEW_PROMOTION_FAILURE_RECORD, //todo: iCMS test???
             iCMS_FULL,
             iCMS_PARNEW_PROMOTION_FAILURE,
-            //iCMS_PARNEW_PROMOTION_FAILURE_RECORD  //todo: matches the rule above...
             PARNEW_CONCURRENT_MODE_FAILURE_PERM,
-            PARNEW_CONCURRENT_MODE_FAILURE_META   //todo: no matching data
     };
 
     private String[][] lines = {
@@ -106,9 +103,8 @@ public class ConcurrentMarkSweepPhaseParserRulesTest implements CMSPatterns {
             },
             {   //  7
                 "2015-02-04T17:36:07.103-0500: 199626.435: [GC 199626.435: [ParNew: 812672K->812672K(914240K), 0.0000400 secs]199626.435: [CMS (concurrent mode failure): 1071394K->1081343K(1081344K), 6.8504740 secs] 1884066K->1092775K(1995584K), [CMS Perm : 99417K->99411K(524288K)], 6.8510440 secs] [Times: user=6.63 sys=0.02, real=6.85 secs]",
-                "199626.435: [GC 199626.435: [ParNew: 812672K->812672K(914240K), 0.0000400 secs]199626.435: [CMS (concurrent mode failure): 1071394K->1081343K(1081344K), 6.8504740 secs] 1884066K->1092775K(1995584K), [CMS Perm : 99417K->99411K(524288K)], 6.8510440 secs] [Times: user=6.63 sys=0.02, real=6.85 secs]"
-            },
-            {   //  8
+                "199626.435: [GC 199626.435: [ParNew: 812672K->812672K(914240K), 0.0000400 secs]199626.435: [CMS (concurrent mode failure): 1071394K->1081343K(1081344K), 6.8504740 secs] 1884066K->1092775K(1995584K), [CMS Perm : 99417K->99411K(524288K)], 6.8510440 secs] [Times: user=6.63 sys=0.02, real=6.85 secs]",
+                "199626.435: [GC 199626.435: [ParNew: 812672K->812672K(914240K), 0.0000400 secs]199626.435: [CMS (concurrent mode failure): 1071394K->1081343K(1081344K), 6.8504740 secs] 1884066K->1092775K(1995584K), [Metaspace: 99417K->99411K(524288K)], 6.8510440 secs] [Times: user=6.63 sys=0.02, real=6.85 secs]"
             }
     };
 }

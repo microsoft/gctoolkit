@@ -1402,7 +1402,6 @@ public class GenerationalHeapParser extends PreUnifiedGCLogParser implements Sim
     }
 
     public void parNewConcurrentModeFailurePerm(GCLogTrace trace, String line) {
-        double totalPause = trace.getPauseTime();
         double concurrentModeFailurePause = trace.getDoubleGroup(26);
         double parNewPause = trace.getDoubleGroup(18);
         double startTimeGap = trace.getDoubleGroup(13) - getClock().getTimeStamp();

@@ -22,6 +22,7 @@ import com.microsoft.gctoolkit.time.DateTimeStamp;
 import java.util.Set;
 import java.util.logging.Logger;
 
+@Deprecated
 public class CMSTenuredPoolParser extends PreUnifiedGCLogParser implements SimplePatterns, ICMSPatterns {
 
     private static final Logger LOG = Logger.getLogger(CMSTenuredPoolParser.class.getName());
@@ -90,7 +91,6 @@ public class CMSTenuredPoolParser extends PreUnifiedGCLogParser implements Simpl
     }
 
     private void endConcurrentPrecleanWithReferenceProcessing(GCLogTrace trace) {
-        trace.notYetImplemented();
         try {
             publish(new ConcurrentPreClean(startOfPhase, trace.getDoubleGroup(14) - startOfPhase.getTimeStamp(), trace.getDoubleGroup(16), trace.getDoubleGroup(17)));
         } catch (Throwable t) {

@@ -96,7 +96,7 @@ public abstract class AbstractLogTrace {
      */
     public DateTimeStamp getDateTimeStamp(int nth) {
         Matcher matcher;
-        if ( nth > 1) {
+        if (nth > 0) {
             matcher = DATE_TIME_STAMP_RULE.matcher(trace.group(0));
             for (int i = 0; i < nth; i++)
                 if (!matcher.find())
@@ -104,14 +104,12 @@ public abstract class AbstractLogTrace {
         } else
             matcher = trace;
 
-        //if (matcher.find()) {
-            String timeStamp = ( matcher.group(3) == null) ? matcher.group(4) : matcher.group(3);
-            String dateStamp = ( matcher.group(2) == null) ? matcher.group(5) : matcher.group(2);
-            if (timeStamp != null) {
-                return new DateTimeStamp(dateStamp, convertToDouble(timeStamp));
-            } else if ( dateStamp != null)
-                return new DateTimeStamp(dateStamp);
-        //}
+        String timeStamp = ( matcher.group(3) == null) ? matcher.group(4) : matcher.group(3);
+        String dateStamp = ( matcher.group(2) == null) ? matcher.group(5) : matcher.group(2);
+        if (timeStamp != null) {
+            return new DateTimeStamp(dateStamp, convertToDouble(timeStamp));
+        } else if ( dateStamp != null)
+            return new DateTimeStamp(dateStamp);
         return new DateTimeStamp(MISSING_TIMESTAMP_SENTINEL);
     }
 

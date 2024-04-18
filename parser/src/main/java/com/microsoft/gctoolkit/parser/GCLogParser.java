@@ -162,17 +162,11 @@ public abstract class GCLogParser implements DataSourceParser, SharedPatterns {
         GCLogTrace trace;
         MemoryPoolSummary metaDataPool = null;
         if ((trace = PERM_SPACE_RECORD.parse(line)) != null) {
-            String type = trace.getGroup(1).trim();
-            switch (type) {
+            String recordType = trace.getGroup(1).trim();
+            switch (recordType) {
                 case "CMS Perm":
-                    metaDataPool = extractPermGenRecord(trace);
-                    break;
                 case "PS Perm":
-                    metaDataPool = extractPermGenRecord(trace);
-                    break;
                 case "PSPermGen":
-                    metaDataPool = extractPermGenRecord(trace);
-                    break;
                 case "Perm":
                     metaDataPool = extractPermGenRecord(trace);
                     break;

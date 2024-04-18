@@ -124,7 +124,6 @@ public class G1GCParserRulesTest implements G1GCPatterns {
             {   //  9
                     "100081.540: [Full GC100081.540: [GC concurrent-root-region-scan-start]",
                     "2018-01-29T17:34:24.984+0000: 5115.588: [Full GC (Metadata GC Threshold) 2018-01-29T17:34:24.984+0000: 5115.588: [GC concurrent-root-region-scan-start]",
-//                    "2018-02-08T20:13:02.246+0000: 878632.850: 2018-02-08T20:13:02.246+0000: [Full GC (Metadata GC Threshold) 878632.850: [GC concurrent-root-region-scan-start]"
             },
             {   // 10
                     "2015-12-21T10:26:34.913-0500: 35835.169: [GC remark 35835.169: [Finalize Marking, 0.8985905 secs] 35836.068: [GC ref-proc35836.068: [SoftReference, 74 refs, 0.0002156 secs]35836.068: [WeakReference, 243 refs, 0.0001747 secs]35836.068: [FinalReference, 4154 refs, 0.0012360 secs]35836.070: [PhantomReference, 0 refs, 0 refs, 0.0002882 secs]35836.070: [JNI Weak Reference, 0.0000227 secs], 0.0026411 secs] 35836.071: [Unloading, 0.0048615 secs], 0.9142368 secs]",

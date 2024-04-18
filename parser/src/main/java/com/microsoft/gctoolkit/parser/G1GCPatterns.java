@@ -231,7 +231,6 @@ public interface G1GCPatterns extends G1GCTokens {
     //549.251: [GC concurrent-mark-end, 0.0055240 secs]
     GCParseRule G1_CONCURRENT_END = new GCParseRule("G1_CONCURRENT_END", "^" + GC_PREFIX + "concurrent-(.+)-end, " + PAUSE_TIME);
     GCParseRule G1_CORRUPTED_CONCURRENT_END = new GCParseRule("G1_CORRUPTED_CONCURRENT_END", "^\\[GC concurrent-(.+)-end, " + PAUSE_TIME);
-    //GCParseRule G1_CORRUPTED_CONCURRENT_ROOT_REGION_SCAN_END = new GCParseRule("G1_CORRUPTED_CONCURRENT_ROOT_REGION_SCAN_END", "^" + DATE_TIMESTAMP + DATE_STAMP + "\\[GC concurrent-(.+)-end, " + PAUSE_TIME);
     GCParseRule G1_CORRUPTED_CONCURRENT_ROOT_REGION_SCAN_END = new GCParseRule("G1_CORRUPTED_CONCURRENT_ROOT_REGION_SCAN_END", "^" + DATE_TIMESTAMP + GC_PREFIX + "concurrent-(.+)-end, " + PAUSE_TIME);
     GCParseRule G1_FLOATING_CONCURRENT_PHASE_START = new GCParseRule("G1_FLOATING_CONCURRENT_PHASE_START", "^\\[GC concurrent(.+)\\]$");
     GCParseRule G1_FULL_INTERRUPTS_CONCURRENT_CYCLE = new GCParseRule("G1_FULL_INTERRUPTS_CONCURRENT_CYCLE", FULL_GC_PREFIX + GC_PREFIX + " concurrent-(.+)-end, " + PAUSE_TIME);
