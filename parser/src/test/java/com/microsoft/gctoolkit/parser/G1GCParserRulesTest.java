@@ -18,7 +18,7 @@ public class G1GCParserRulesTest implements G1GCPatterns {
             for (int j = 0; j < lines.length; j++) {
                 int captured = CommonTestHelper.captureTest(rules[i], lines[j]);
                 if (i == j) {
-                    assertEquals(captured, lines[j].length, i + " failed to captured it's lines");
+                    assertEquals(lines[j].length, captured, i + " failed to captured it's lines");
                 } else {
                     assertEquals(0, captured, i + " captured " + j);
                 }
@@ -59,7 +59,7 @@ public class G1GCParserRulesTest implements G1GCPatterns {
             G1_FULL_ADAPTIVE_SIZING,
             FULLGC_WITH_CONCURRENT_PHASE,
             G1_180_REMARK_REF_DETAILS,                // 10
-            G1_CORRUPTED_CONCURRENT_ROOT_REGION_SCAN_END,
+            G1_CORRUPTED_CONCURRENT_ROOT_REGION_SCAN_END,   //captured by 32
             G1_FLOATING_CONCURRENT_PHASE_START,
             PARALLEL_TIME,
             G1_PARALLEL_PHASE_SUMMARY,
@@ -80,16 +80,15 @@ public class G1GCParserRulesTest implements G1GCPatterns {
             CORRUPTED_CONCURRENT_START_V3,
             FULL_WITH_CONCURRENT_END,                 // 30
             CORRUPTED_CONCURRENT_START_V5,
-            CORRUPTED_CONCURRENT_START_V6,
             FULL_MISSING_TIMESTAMP_CONCURRENT_START,
             CORRUPTED_CONCURRENT_START_V7,
-            CORRUPTED_CONCURRENT_START_V8,            // 35
-            CORRUPTED_CONCURRENT_START_V9,
+            CORRUPTED_CONCURRENT_START_V8,
+            CORRUPTED_CONCURRENT_START_V9,            // 35
             FULL_GC_FRAGMENT,
             CORRUPTED_CONCURRENT_START_V2,
             CONCURRENT_START_V3,
-            CONCURRENT_START_V4,                     // 40
-            CONCURRENT_START_V5,
+            CONCURRENT_START_V4,
+            CONCURRENT_START_V5,                     // 40
             G1_CONCURRENT_ABORT
     };
 
@@ -124,14 +123,15 @@ public class G1GCParserRulesTest implements G1GCPatterns {
             },
             {   //  9
                     "100081.540: [Full GC100081.540: [GC concurrent-root-region-scan-start]",
-                    "2018-01-29T17:34:24.984+0000: 5115.588: [Full GC (Metadata GC Threshold) 2018-01-29T17:34:24.984+0000: 5115.588: [GC concurrent-root-region-scan-start]"
+                    "2018-01-29T17:34:24.984+0000: 5115.588: [Full GC (Metadata GC Threshold) 2018-01-29T17:34:24.984+0000: 5115.588: [GC concurrent-root-region-scan-start]",
             },
             {   // 10
                     "2015-12-21T10:26:34.913-0500: 35835.169: [GC remark 35835.169: [Finalize Marking, 0.8985905 secs] 35836.068: [GC ref-proc35836.068: [SoftReference, 74 refs, 0.0002156 secs]35836.068: [WeakReference, 243 refs, 0.0001747 secs]35836.068: [FinalReference, 4154 refs, 0.0012360 secs]35836.070: [PhantomReference, 0 refs, 0 refs, 0.0002882 secs]35836.070: [JNI Weak Reference, 0.0000227 secs], 0.0026411 secs] 35836.071: [Unloading, 0.0048615 secs], 0.9142368 secs]",
                     "2016-05-31T12:49:30.282-0400: 2328.858: [GC remark 2016-05-31T12:49:30.282-0400: 2328.858: [Finalize Marking, 0.0020922 secs] 2016-05-31T12:49:30.284-0400: 2328.860: [GC ref-proc2016-05-31T12:49:30.284-0400: 2328.860: [SoftReference, 0 refs, 0.0000754 secs]2016-05-31T12:49:30.284-0400: 2328.860: [WeakReference, 3894 refs, 0.0012230 secs]2016-05-31T12:49:30.285-0400: 2328.861: [FinalReference, 102 refs, 0.0002524 secs]2016-05-31T12:49:30.286-0400: 2328.861: [PhantomReference, 2 refs, 231 refs, 0.0004237 secs]2016-05-31T12:49:30.286-0400: 2328.862: [JNI Weak Reference, 0.0003428 secs], 0.0023558 secs] 2016-05-31T12:49:30.286-0400: 2328.862: [Unloading, 0.0457079 secs], 0.0556017 secs]"
             },
             {   // 11
-                    "2017-01-24T22:50:27.724-0500: 21438.188: 2017-01-24T22:50:27.724-0500: [GC concurrent-root-region-scan-end, 0.0303627 secs]"
+                    "2017-01-24T22:50:27.724-0500: 21438.188: 2017-01-24T22:50:27.724-0500: [GC concurrent-root-region-scan-end, 0.0303627 secs]",
+                    "2018-02-08T20:27:32.297+0000: 879502.901: 2018-02-08T20:27:32.297+0000: 879502.901: [GC concurrent-root-region-scan-end, 0.0000375 secs]"
             },
             {   // 12
                     "[GC concurrent-mark-start]"
@@ -207,40 +207,37 @@ public class G1GCParserRulesTest implements G1GCPatterns {
             {   // 30
                     ": [Full GC (Metadata GC Threshold) 2018-02-08T20:04:14.979+0000: 878105.583: [GC concurrent-root-region-scan-end, 0.0000770 secs]",
             },
-            {   // 32
+            {   // 31
                     "2018-02-08T20:21:26.246+0000: 2018-02-08T20:21:26.246+0000879136.850: [Full GC (Metadata GC Threshold) : 879136.850: [GC concurrent-root-region-scan-start]"
             },
-            {   // 33
-                    "2018-02-08T20:27:32.297+0000: 879502.901: 2018-02-08T20:27:32.297+0000: 879502.901: [GC concurrent-root-region-scan-end, 0.0000375 secs]"
-            },
-            {   // 34
+            {   // 32
                     "[Full GC (Metadata GC Threshold) 2018-02-08T20:27:32.297+0000: 879502.902: [GC concurrent-mark-start]"
             },
-            {
+            {   // 33
                     "2018-02-08T20:31:33.633+0000: 2018-02-08T20:31:33.633+0000: 879744.238879744.238: [Full GC (Metadata GC Threshold) : [GC concurrent-root-region-scan-start]"
             },
-            {
+            {   // 34
                     "2018-02-08T20:31:54.234+0000: 2018-02-08T20:31:54.234+0000879764.839: 879764.839: [Full GC (Metadata GC Threshold) : [GC concurrent-root-region-scan-start]"
             },
-            {
+            {   // 35
                     "2018-02-08T20:32:51.258+0000: 2018-02-08T20:32:51.258+0000: 879821.862: 879821.862[Full GC (Metadata GC Threshold) : [GC concurrent-root-region-scan-start]"
             },
-            {
+            {   // 36
                     "2018-02-08T20:35:03.232+0000: 879953.837: [Full GC (Metadata GC Threshold)"
             },
-            {
+            {   // 37
                     "2018-02-08T20:05:15.505+0000: 878166.1102018-02-08T20:05:15.505+0000: : 878166.110: [GC concurrent-root-region-scan-start]"
             },
-            {
+            {   // 38
                     "2018-02-08T20:32:54.965+0000: 2018-02-08T20:32:54.965+0000: 879825.569: [GC concurrent-root-region-scan-start]"
             },
-            {
+            {   // 39
                     "2018-02-08T20:33:01.419+0000: 2018-02-08T20:33:01.419+0000879832.023: [GC concurrent-root-region-scan-start]"
             },
-            {
+            {   // 40
                     "2018-02-08T20:34:59.393+0000: 2018-02-08T20:34:59.393+0000: 879949.998: 879949.998[GC concurrent-root-region-scan-start]"
             },
-            {
+            {   // 41
                     "27105.565: [GC concurrent-mark-abort]"
             }
     };

@@ -5,7 +5,7 @@ package com.microsoft.gctoolkit.parser;
 public interface G1GCTokens extends SharedPatterns {
 
 
-    String G1GC_PREFIX = DATE_TIMESTAMP + "\\[GC pause " + GC_CAUSE;
+    String G1GC_PREFIX = "^" + DATE_TIMESTAMP + "\\[GC pause " + GC_CAUSE;
 
     String G1_SURVIVOR_FROM_TO = REAL_VALUE + "([B,K,M,G])->" + REAL_VALUE + "([B,K,M,G])";
     String G1_OCCUPANCY_CONFIGURED = REAL_VALUE + "([B,K,M,G])\\(" + REAL_VALUE + "([B,K,M,G])\\)";

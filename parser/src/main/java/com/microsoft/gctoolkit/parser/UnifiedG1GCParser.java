@@ -191,7 +191,6 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
         }
 
         final String lineAfterGcId = line.substring(end);
-
         parseRules.stream()
                 .map(Map.Entry::getKey)
                 .map(rule -> new AbstractMap.SimpleEntry<>(rule, rule.parse(lineAfterGcId)))
@@ -374,8 +373,9 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
                     break;
             }
         }
+        // The location for the gc cause is back 2 from where it typically is in other records.
         forwardReference.setGcType(gcType);
-        forwardReference.setGCCause(trace.gcCause(1));
+        forwardReference.setGCCause(trace.gcCause(-2));
         forwardReference.setStartTime(getClock());
     }
 

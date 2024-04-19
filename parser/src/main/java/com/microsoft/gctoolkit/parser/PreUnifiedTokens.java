@@ -14,10 +14,12 @@ public interface PreUnifiedTokens extends GenericTokens {
     String MS_TIME_STAMP = TIME + " ms";
 
     String DATE_STAMP = "(" + DATE + "): ";
-    String DATE_TIMESTAMP = "(?:" + DATE_STAMP + ")?" + TIMESTAMP;
-    //DECIMAL_POINT = "(?:\\.|,)";
-    //    String INTEGER = "\\d+";
-    //"(?:(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}[\\+|\\-]\\d{4}): )?(" + "\\d+(?:\\.|,)\\d{3}): (?:#\\d+: )?\\[GC ?(\\([a-zA-Z\\. 1]+?\\(?\\){1,2})?\\s*";
+    //        String dateStampPattern = "(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{3}-\\d{4}: )";
+    //        String timeStampPattern = "(\\d+.\\d{3}: )";
+    //
+    //        Pattern combined = Pattern.compile(dateStampPattern + timeStampPattern + "|" + timeStampPattern + "|" + dateStampPattern);
+    int TIME_DATE_OFFSET = 6;
+    String DATE_TIMESTAMP = "(" + DATE_STAMP + TIMESTAMP + "|" + TIMESTAMP + "|" + DATE_STAMP + ")";
     GCParseRule DATE_TIMESTAMP_RECORD = new GCParseRule("DATE_TIMESTAMP_RECORD", DATE_TIMESTAMP);
 
     // Memory values
@@ -28,8 +30,9 @@ public interface PreUnifiedTokens extends GenericTokens {
     String FRACTIONAL_BEFORE_AFTER_CONFIGURED = FRACTIONAL_MEMORY_SIZE + "->" + FRACTIONAL_MEMORY_SIZE + "\\(" + FRACTIONAL_MEMORY_SIZE + "\\)";
 
     // GC Prefixes
-    String GC_PREFIX = DATE_TIMESTAMP + "(?:#\\d+: )?\\[GC ?" + GC_CAUSE;
-    String FULL_GC_PREFIX = DATE_TIMESTAMP + "(?:#\\d+: )?\\[Full GC ?" + GC_CAUSE;
+    String GC_ID = "(?:#\\\\d+: )?";
+    String GC_PREFIX = DATE_TIMESTAMP + GC_ID + "\\[GC ?" + GC_CAUSE;
+    String FULL_GC_PREFIX = DATE_TIMESTAMP + GC_ID + "\\[Full GC ?" + GC_CAUSE;
 
     // Pre 1.8.0 records
     // Update: no longer only pre 1.8.0, updated to fix Metaspace in CMF records

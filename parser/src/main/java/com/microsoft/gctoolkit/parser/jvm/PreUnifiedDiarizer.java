@@ -293,7 +293,7 @@ public class PreUnifiedDiarizer implements Diarizer {
                     diary.setTrue(SupportedFlags.GC_DETAILS);
                     diary.setFalse(SupportedFlags.TENURING_DISTRIBUTION);
                     diary.setFalse(SupportedFlags.PRINT_HEAP_AT_GC);
-                    setGCCause(trace.getGroup(3));
+                    setGCCause(trace.getGroup(6));
 
                 } else if (ParallelPatterns.PS_DETAILS_WITH_TENURING.parse(line) != null) {
                     diary.setTrue(SupportedFlags.GC_DETAILS);
@@ -308,33 +308,33 @@ public class PreUnifiedDiarizer implements Diarizer {
                 if ((trace = CMSPatterns.PARNEW.parse(line)) != null) {
                     diary.setTrue(SupportedFlags.GC_DETAILS);
                     diary.setFalse(SupportedFlags.TENURING_DISTRIBUTION, SupportedFlags.CMS_DEBUG_LEVEL_1, SupportedFlags.MAX_TENURING_THRESHOLD_VIOLATION);
-                    setGCCause(trace.getGroup(4));
+                    setGCCause(trace.getGroup(7));
                 } else if ((trace = CMSPatterns.PARNEW_TENURING.parse(line)) != null) {
                     diary.setTrue(SupportedFlags.GC_DETAILS, SupportedFlags.TENURING_DISTRIBUTION);
                     diary.setFalse(SupportedFlags.CMS_DEBUG_LEVEL_1);
-                    setGCCause(trace.getGroup(3));
+                    setGCCause(trace.getGroup(6));
                 } else if ((trace = SimplePatterns.PARNEW_NO_DETAILS.parse(line)) != null) {
                     diary.setFalse(SupportedFlags.GC_DETAILS, SupportedFlags.TENURING_DISTRIBUTION, SupportedFlags.CMS_DEBUG_LEVEL_1, SupportedFlags.PRINT_HEAP_AT_GC, SupportedFlags.MAX_TENURING_THRESHOLD_VIOLATION);
-                    setGCCause(trace.getGroup(3));
+                    setGCCause(trace.getGroup(6));
                 } else if ((trace = SimplePatterns.PARNEW_START.parse(line)) != null) {
                     diary.setFalse(SupportedFlags.GC_DETAILS, SupportedFlags.CMS_DEBUG_LEVEL_1, SupportedFlags.ADAPTIVE_SIZING, SupportedFlags.PRINT_HEAP_AT_GC);
-                    setGCCause(trace.groupCount() > 2 ? trace.getGroup(3) : null);
+                    setGCCause(trace.groupCount() > 5 ? trace.getGroup(6) : null);
                 } else if ((trace = CMSPatterns.PARNEW_REFERENCE_SPLIT.parse(line)) != null) {
                     diary.setTrue(SupportedFlags.TENURING_DISTRIBUTION, SupportedFlags.PRINT_REFERENCE_GC);
-                    setGCCause(trace.getGroup(3));
+                    setGCCause(trace.getGroup(6));
                 }
             } else if ((trace = SerialPatterns.DEFNEW.parse(line)) != null) {
                 collectionCount++;
                 youngCollectionCount++;
                 diary.setTrue(SupportedFlags.DEFNEW, SupportedFlags.GC_DETAILS);
                 diary.setFalse(SupportedFlags.PARALLELGC, SupportedFlags.PARALLELOLDGC, SupportedFlags.PARNEW, SupportedFlags.G1GC, SupportedFlags.TENURING_DISTRIBUTION, SupportedFlags.RSET_STATS, SupportedFlags.MAX_TENURING_THRESHOLD_VIOLATION);
-                setGCCause(trace.getGroup(3));
+                setGCCause(trace.getGroup(6));
             } else if ((trace = SerialPatterns.DEFNEW_TENURING.parse(line)) != null) {
                 collectionCount++;
                 youngCollectionCount++;
                 diary.setTrue(SupportedFlags.DEFNEW, SupportedFlags.GC_DETAILS, SupportedFlags.TENURING_DISTRIBUTION);
                 diary.setFalse(SupportedFlags.PARNEW, SupportedFlags.PARALLELGC, SupportedFlags.PARALLELOLDGC, SupportedFlags.G1GC, SupportedFlags.RSET_STATS);
-                setGCCause(trace.getGroup(3));
+                setGCCause(trace.getGroup(6));
             } else if (SimplePatterns.PARNEW_NO_DETAILS.parse(line) != null) {
                 collectionCount++;
                 youngCollectionCount++;
@@ -356,7 +356,7 @@ public class PreUnifiedDiarizer implements Diarizer {
                 simpleParallelOrParNewDetected = true;
                 youngCollectionCount++;
                 diary.setFalse(SupportedFlags.G1GC, SupportedFlags.RSET_STATS);
-                setGCCause(trace.getGroup(3));
+                setGCCause(trace.getGroup(6));
             } else if (SimplePatterns.CMS_NO_DETAILS.parse(line) != null) {
                 // could be parallel or CMS.. look for Full GC but even that may be a trick
                 collectionCount++;
@@ -374,7 +374,7 @@ public class PreUnifiedDiarizer implements Diarizer {
                 } else if (trace.gcCause() == GCCause.METADATA_GENERATION_THRESHOLD) {
                     diary.setTrue(SupportedFlags.GC_CAUSE, SupportedFlags.JDK80);
                     diary.setFalse(SupportedFlags.JDK70, SupportedFlags.PRE_JDK70_40);
-                } else if ((trace.gcCause() == GCCause.G1_EVACUATION_PAUSE) || (trace.gcCause(3, 0) == GCCause.G1_HUMONGOUS_ALLOCATION)) {
+                } else if ((trace.gcCause() == GCCause.G1_EVACUATION_PAUSE) || (trace.gcCause() == GCCause.G1_HUMONGOUS_ALLOCATION)) {
                     diary.setTrue(SupportedFlags.GC_CAUSE);
                     diary.setFalse(SupportedFlags.PRE_JDK70_40);
                 }
@@ -383,7 +383,7 @@ public class PreUnifiedDiarizer implements Diarizer {
                 youngCollectionCount++;
                 diary.setTrue(SupportedFlags.G1GC, SupportedFlags.GC_DETAILS);
                 diary.setFalse(SupportedFlags.DEFNEW, SupportedFlags.PARNEW, SupportedFlags.CMS, SupportedFlags.ICMS, SupportedFlags.PARALLELGC, SupportedFlags.PARALLELOLDGC, SupportedFlags.SERIAL, SupportedFlags.TENURING_DISTRIBUTION, SupportedFlags.CMS_DEBUG_LEVEL_1, SupportedFlags.MAX_TENURING_THRESHOLD_VIOLATION);
-                if (trace.gcCause(3, 0) == GCCause.GCCAUSE_NOT_SET) {
+                if (trace.gcCause() == GCCause.GCCAUSE_NOT_SET) {
                     diary.setFalse(SupportedFlags.GC_CAUSE, SupportedFlags.JDK80);
                     diary.setTrue(SupportedFlags.JDK70);
                 } else {
@@ -403,7 +403,7 @@ public class PreUnifiedDiarizer implements Diarizer {
                 youngCollectionCount++;
                 diary.setFalse(SupportedFlags.DEFNEW, SupportedFlags.PARNEW, SupportedFlags.CMS, SupportedFlags.ICMS, SupportedFlags.PARALLELGC, SupportedFlags.PARALLELOLDGC, SupportedFlags.SERIAL, SupportedFlags.TENURING_DISTRIBUTION, SupportedFlags.CMS_DEBUG_LEVEL_1, SupportedFlags.MAX_TENURING_THRESHOLD_VIOLATION);
                 diary.setTrue(SupportedFlags.G1GC, SupportedFlags.GC_DETAILS, SupportedFlags.PRINT_REFERENCE_GC);
-                if (trace.getGroup(3) != null)
+                if (trace.getGroup(6) != null)
                     diary.setTrue(SupportedFlags.GC_CAUSE);
                 else
                     diary.setFalse(SupportedFlags.GC_CAUSE);
@@ -518,10 +518,10 @@ public class PreUnifiedDiarizer implements Diarizer {
     }
 
     private void checkForGCCause(GCLogTrace trace) {
-        if (trace.gcCause(3, 0) == GCCause.METADATA_GENERATION_THRESHOLD) {
+        if (trace.gcCause() == GCCause.METADATA_GENERATION_THRESHOLD) {
             diary.setTrue(SupportedFlags.GC_CAUSE, SupportedFlags.JDK80);
             diary.setFalse(SupportedFlags.JDK70, SupportedFlags.PRE_JDK70_40);
-        } else if ((trace.gcCause(3, 0) == GCCause.G1_EVACUATION_PAUSE) || (trace.gcCause(3, 0) == GCCause.G1_HUMONGOUS_ALLOCATION)) {
+        } else if ((trace.gcCause() == GCCause.G1_EVACUATION_PAUSE) || (trace.gcCause() == GCCause.G1_HUMONGOUS_ALLOCATION)) {
             diary.setTrue(SupportedFlags.GC_CAUSE);
         }
     }
@@ -543,21 +543,18 @@ public class PreUnifiedDiarizer implements Diarizer {
         if ((trace = ParallelPatterns.PERM_SPACE_RECORD.parse(line)) != null) {
             String value = trace.getGroup(1).trim();
 
-            if ("CMS Perm".equals(value)) {
-                diary.setTrue(SupportedFlags.JDK70);
-                diary.setFalse(SupportedFlags.JDK80);
-            } else if ("PS Perm".equals(value)) {
-                diary.setTrue(SupportedFlags.JDK70);
-                diary.setFalse(SupportedFlags.JDK80);
-            } else if ("Perm".equals(value)) {
-                diary.setTrue(SupportedFlags.JDK70);
-                diary.setFalse(SupportedFlags.JDK80);
-            } else if ("PSPermGen".equals(value)) {
-                diary.setTrue(SupportedFlags.JDK70);
-                diary.setFalse(SupportedFlags.JDK80);
-            } else if ("Metaspace".equals(value)) {
-                diary.setTrue(SupportedFlags.JDK80);
-                diary.setFalse(SupportedFlags.JDK70, SupportedFlags.PRE_JDK70_40);
+            switch (value) {
+                case "CMS Perm":
+                case "PS Perm":
+                case "Perm":
+                case "PSPermGen":
+                    diary.setTrue(SupportedFlags.JDK70);
+                    diary.setFalse(SupportedFlags.JDK80);
+                    break;
+                case "Metaspace":
+                    diary.setTrue(SupportedFlags.JDK80);
+                    diary.setFalse(SupportedFlags.JDK70, SupportedFlags.PRE_JDK70_40);
+                    break;
             }
         } else if (META_SPACE_RECORD.parse(line) != null) {
             diary.setTrue(SupportedFlags.JDK80);
@@ -573,18 +570,18 @@ public class PreUnifiedDiarizer implements Diarizer {
             diary.setTrue(SupportedFlags.GC_CAUSE);
         } else if (diary.isGenerationalKnown() && diary.isGenerational()) {
             if ((trace = PREFIX.parse(line)) != null) {
-                if ((trace.getGroup(3) == null) && diary.isTrue(SupportedFlags.GC_DETAILS)) {
+                if ((trace.getGroup(6) == null) && diary.isTrue(SupportedFlags.GC_DETAILS)) {
                     diary.setTrue(SupportedFlags.JDK70);
                     diary.setFalse(SupportedFlags.JDK80, SupportedFlags.GC_CAUSE);
-                } else if (trace.gcCause(3, 0) != GCCause.GCCAUSE_NOT_SET) {
+                } else if (trace.gcCause() != GCCause.GCCAUSE_NOT_SET) {
                     diary.setTrue(SupportedFlags.GC_CAUSE);
                     diary.setFalse(SupportedFlags.PRE_JDK70_40);
                 }
             } else if ((trace = FULL_PREFIX.parse(line)) != null) {
-                if ((trace.getGroup(3) == null) && diary.isTrue(SupportedFlags.GC_DETAILS)) {
+                if ((trace.getGroup(6) == null) && diary.isTrue(SupportedFlags.GC_DETAILS)) {
                     diary.setTrue(SupportedFlags.JDK70);
                     diary.setFalse(SupportedFlags.GC_CAUSE, SupportedFlags.JDK80);
-                } else if (trace.gcCause(3, 0) != GCCause.GCCAUSE_NOT_SET) {
+                } else if (trace.gcCause() != GCCause.GCCAUSE_NOT_SET) {
                     diary.setTrue(SupportedFlags.GC_CAUSE);
                     diary.setFalse(SupportedFlags.PRE_JDK70_40);
                 }
@@ -613,7 +610,7 @@ public class PreUnifiedDiarizer implements Diarizer {
         GCLogTrace trace;
 
         if ((trace = PREFIX.parse(line)) != null) {
-            String cause = trace.getGroup(3);
+            String cause = trace.getGroup(6);
             if (cause != null) {
                 diary.setTrue(SupportedFlags.GC_CAUSE);
                 if ("(System)".equals(cause)) {
@@ -627,7 +624,7 @@ public class PreUnifiedDiarizer implements Diarizer {
                 }
             } else {
                 if ((trace = G1GC_PREFIX.parse(line)) != null) {
-                    cause = trace.getGroup(3);
+                    cause = trace.getGroup(6);
                     if (cause == null)
                         diary.setTrue(SupportedFlags.PRE_JDK70_40);
                     else

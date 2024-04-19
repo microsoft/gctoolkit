@@ -19,58 +19,17 @@ public interface GenericTokens {
     //Time
     String TIME = "(-?" + REAL_NUMBER + ")";
     String DURATION_MS = TIME + "\\s?ms";
+    //0.0700188
     String PAUSE_TIME = TIME + "\\s?(?:secs?|ms)";
     String CONCURRENT_TIME = PAUSE_TIME;
 
     // Date values
-    String DATE = "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}[\\+|\\-]\\d{4}";
+    String DATE = "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}[+|-]\\d{4}";
 
     // Post 1.7.0_40 clauses
     //"(\\(.+?\\)\\s?)? ?"; this rule was too liberal
-//    Permanent Generation Full
-//    CMS Failure
-//    Last ditch collection
-//    promotion failed"
-//    Update Allocation Context Stats
-//    Missing GC Cause
-//    Concurrent Mark Stack Overflow
-//    young
-//
-//    System.gc()
-//    FullGCAlot
-//    ScavengeAlot
-//    Allocation Profiler
-//    JvmtiEnv ForceGarbageCollection
-//    GCLocker Initiated GC
-//    Heap Inspection Initiated GC
-//    Heap Dump Initiated GC
-//    WhiteBox Initiated Young GC
-//    WhiteBox Initiated Concurrent Mark
-//    WhiteBox Initiated Full GC
-//    No GC
-//    Allocation Failure
-//    Tenured Generation Full
-//    Metadata GC Threshold
-//    Metadata GC Clear Soft References
-//    CMS Generation Full
-//    CMS Initial Mark
-//    CMS Final Remark
-//    CMS Concurrent Mark
-//    Old Generation Expanded On Last Scavenge
-//    Old Generation Too Full To Scavenge
-//    Ergonomics
-//    G1 Evacuation Pause
-//    G1 Humongous Allocation
-//    Diagnostic Command
-//    Timer
-//    Warmup
-//    Allocation Rate
-//    Allocation Stall
-//    Proactive
-//    ILLEGAL VALUE - last gc cause - ILLEGAL VALUE
-//    unknown GCCause
-
-    String GC_CAUSE = "(\\([a-zA-Z\\. 1]+?\\(?\\){1,2})?\\s*";
+    //"(\\([a-zA-Z\\. 1]+?\\(?\\){1,2})?\\s*"; this rule works, but I prefer the one below
+    String GC_CAUSE = "(\\([G1,A-Z,a-z, ,-,.gc\\(\\)]+\\))?\\s*";
     //  (Diagnostic Command) (System.gc())
     String SAFE_POINT_CAUSE = "\"(.+)\"";
 

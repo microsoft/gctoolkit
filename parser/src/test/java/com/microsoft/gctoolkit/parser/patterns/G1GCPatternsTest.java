@@ -3,6 +3,7 @@
 package com.microsoft.gctoolkit.parser.patterns;
 
 import com.microsoft.gctoolkit.parser.G1GCPatterns;
+import com.microsoft.gctoolkit.parser.GCLogTrace;
 import com.microsoft.gctoolkit.parser.GCParseRule;
 import org.junit.jupiter.api.Test;
 
@@ -10,6 +11,7 @@ import java.util.logging.Logger;
 
 import static com.microsoft.gctoolkit.parser.CommonTestHelper.captureTest;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class G1GCPatternsTest implements G1GCPatterns {
 
@@ -21,11 +23,22 @@ public class G1GCPatternsTest implements G1GCPatterns {
             for (int j = 0; j < lines.length; j++) {
                 int captured = captureTest(rules[i], lines[j]);
                 if (i == j) {
-                    assertEquals(captured, lines[j].length, i + " failed to captured it's lines");
+                    assertEquals( lines[j].length, captured, rules[i].getName() + " failed to captured it's lines");
                 } else {
-                    assertEquals(0, captured, i + " captured " + j);
+                    if ( captured != 0)
+                        for( int k = 0; k < lines[j].length; k++) {
+                            rules[i].parse(lines[j][k]).notYetImplemented();
+                            System.out.println(lines[j][k]);
+                        }
+                    assertEquals(0, captured, rules[i].getName() + " captured data from group " + j);
                 }
             }
+    }
+
+    @Test
+    public void testRuleThatShouldFail() {
+        // missing timestamp
+        assertNull(G1_YOUNG_SPLIT_START.parse("[GC pause (G1 Evacuation Pause) (young)"));
     }
 
     /* Code that is useful when testing individual records */
@@ -34,7 +47,7 @@ public class G1GCPatternsTest implements G1GCPatterns {
 //
 //    @Test
 //    public void testDebugParallelParseRules() {
-//        int index = 10;
+//        int index = 1;
 //        GCParseRule rule = rules[index];
 //        assertEquals(lines[index].length, captureTest( rule, lines[index]));
 //    }
@@ -52,7 +65,8 @@ public class G1GCPatternsTest implements G1GCPatterns {
             SPLIT_CLEANUP,
             FULL_WITH_CONCURRENT_PHASE_START,
             DELAY_MIXED_GC,
-            START_MIXED_GC
+            START_MIXED_GC,
+            G1_YOUNG_SPLIT_START
     };
 
     private String[][] lines = {
@@ -94,7 +108,7 @@ public class G1GCPatternsTest implements G1GCPatterns {
                     "369310.802: [GC pause (young) 485M->240M(512M), 0.0558340 secs]",
                     "369447.597: [GC pause (young) (initial-mark) 485M->239M(512M), 0.0719290 secs]",
                     "369674.919: [GC pause (mixed) 482M->185M(512M), 0.0679470 secs]",
-                    "0.583: [GC pause (G1 Evacuation Pause) (young) 24M->4561K(256M), 0.0047007 secs]"
+                    "0.583: [GC pause (G1 Evacuation Pause) (young) 24M->4561K(256M), 0.0047007 secs]",
             },
             { // FULL_GC, no details 1.8.0_102
                     "16.603: [Full GC (System.gc())  14M->3334K(11M), 0.0230975 secs]"
@@ -110,6 +124,11 @@ public class G1GCPatternsTest implements G1GCPatterns {
             },
             {
                     "7.986: [G1Ergonomics (Mixed GCs) do not start mixed GCs, reason: reclaimable percentage not over threshold, candidate old regions: 3 regions, reclaimable: 1380376 bytes (2.53 %), threshold: 10.00 %]"
+            },
+            {
+                    "2017-03-09T13:45:26.322-0500: 4.764: [GC pause (G1 Evacuation Pause) (young)",
+                    "4.764: [GC pause (G1 Evacuation Pause) (young)",
+                    "2017-03-09T13:45:26.322-0500: [GC pause (G1 Evacuation Pause) (young)",
             }
 
     };

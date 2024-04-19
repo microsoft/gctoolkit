@@ -1,6 +1,6 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
-package com.microsoft.gctoolkit.parser.patterns;
+package com.microsoft.gctoolkit.parser;
 
 
 import com.microsoft.gctoolkit.event.generational.AbortablePreClean;
@@ -12,9 +12,6 @@ import com.microsoft.gctoolkit.event.generational.ConcurrentSweep;
 import com.microsoft.gctoolkit.event.generational.InitialMark;
 import com.microsoft.gctoolkit.event.jvm.JVMEvent;
 import com.microsoft.gctoolkit.jvm.Diarizer;
-import com.microsoft.gctoolkit.parser.CMSTenuredPoolParser;
-import com.microsoft.gctoolkit.parser.GCLogParser;
-import com.microsoft.gctoolkit.parser.ParserTest;
 import com.microsoft.gctoolkit.parser.jvm.PreUnifiedDiarizer;
 import org.junit.jupiter.api.Test;
 

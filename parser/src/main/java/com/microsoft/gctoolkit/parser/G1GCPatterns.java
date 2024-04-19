@@ -222,15 +222,16 @@ public interface G1GCPatterns extends G1GCTokens {
     //Concurrent phase
 
     //549.246: [GC concurrent-root-region-scan-start]
+    //657.426: [GC concurrent-root-region-scan-end, 0.0052220 secs]
     //549.246: [GC concurrent-mark-start]
-    GCParseRule G1_CONCURRENT_START = new GCParseRule("G1_CONCURRENT_START", "^" + GC_PREFIX + "concurrent-(.+)-start\\]");
-    GCParseRule G1_CONCURRENT_START_WITHOUT_PREFIX = new GCParseRule("G1_CONCURRENT_START_WITHOUT_PREFIX", "^" + "concurrent-(.+)-start\\]");
+    GCParseRule G1_CONCURRENT_START = new GCParseRule("G1_CONCURRENT_START", "^" + GC_PREFIX + "concurrent-(.+)-start\\]$");
+    GCParseRule G1_CONCURRENT_START_WITHOUT_PREFIX = new GCParseRule("G1_CONCURRENT_START_WITHOUT_PREFIX", "^" + "concurrent-(.+)-start\\]$");
 
     //549.246: [GC concurrent-root-region-scan-end, 0.0000700 secs]
     //549.251: [GC concurrent-mark-end, 0.0055240 secs]
     GCParseRule G1_CONCURRENT_END = new GCParseRule("G1_CONCURRENT_END", "^" + GC_PREFIX + "concurrent-(.+)-end, " + PAUSE_TIME);
     GCParseRule G1_CORRUPTED_CONCURRENT_END = new GCParseRule("G1_CORRUPTED_CONCURRENT_END", "^\\[GC concurrent-(.+)-end, " + PAUSE_TIME);
-    GCParseRule G1_CORRUPTED_CONCURRENT_ROOT_REGION_SCAN_END = new GCParseRule("G1_CORRUPTED_CONCURRENT_ROOT_REGION_SCAN_END", DATE_TIMESTAMP + DATE_STAMP + "\\[GC concurrent-(.+)-end, " + PAUSE_TIME);
+    GCParseRule G1_CORRUPTED_CONCURRENT_ROOT_REGION_SCAN_END = new GCParseRule("G1_CORRUPTED_CONCURRENT_ROOT_REGION_SCAN_END", "^" + DATE_TIMESTAMP + GC_PREFIX + "concurrent-(.+)-end, " + PAUSE_TIME);
     GCParseRule G1_FLOATING_CONCURRENT_PHASE_START = new GCParseRule("G1_FLOATING_CONCURRENT_PHASE_START", "^\\[GC concurrent(.+)\\]$");
     GCParseRule G1_FULL_INTERRUPTS_CONCURRENT_CYCLE = new GCParseRule("G1_FULL_INTERRUPTS_CONCURRENT_CYCLE", FULL_GC_PREFIX + GC_PREFIX + " concurrent-(.+)-end, " + PAUSE_TIME);
     //Strange Full GC corruption
@@ -263,8 +264,6 @@ public interface G1GCPatterns extends G1GCTokens {
     GCParseRule CORRUPTED_CONCURRENT_START_V4 = new GCParseRule("CORRUPTED_CONCURRENT_START_V4", DATE_TIMESTAMP + DATE_STAMP + "\\[Full GC " + GC_CAUSE + GC_PREFIX + "concurrent-(.+)-start\\]");
     //2018-02-08T20:21:26.246+0000: 2018-02-08T20:21:26.246+0000879136.850: [Full GC (Metadata GC Threshold) : 879136.850: [GC concurrent-root-region-scan-start]
     GCParseRule CORRUPTED_CONCURRENT_START_V5 = new GCParseRule("CORRUPTED_CONCURRENT_START_V5", DATE_STAMP + DATE + FULL_GC_PREFIX + ": " + GC_PREFIX + "concurrent-(.+)-start\\]");
-    //2018-02-08T20:27:32.297+0000: 879502.901: 2018-02-08T20:27:32.297+0000: 879502.901: [GC concurrent-root-region-scan-end, 0.0000375 secs]
-    GCParseRule CORRUPTED_CONCURRENT_START_V6 = new GCParseRule("CORRUPTED_CONCURRENT_START_V6", DATE_TIMESTAMP + GC_PREFIX + "concurrent-(.+)-end, " + PAUSE_TIME);
     //2018-02-08T20:31:33.633+0000: 2018-02-08T20:31:33.633+0000: 879744.238879744.238: [Full GC (Metadata GC Threshold) : [GC concurrent-root-region-scan-start]
     GCParseRule CORRUPTED_CONCURRENT_START_V7 = new GCParseRule("CORRUPTED_CONCURRENT_START_V7", DATE_STAMP + DATE_STAMP + INTEGER + DECIMAL_POINT + "\\d{3}" + TIMESTAMP + "\\[Full GC " + GC_CAUSE + ": \\[GC concurrent-(.+)-start\\]");
     //2018-02-08T20:31:54.234+0000: 2018-02-08T20:31:54.234+0000879764.839: 879764.839: [Full GC (Metadata GC Threshold) : [GC concurrent-root-region-scan-start]
@@ -312,7 +311,7 @@ public interface G1GCPatterns extends G1GCTokens {
     //tag secs may or may not be there so lets not be greedy.
     GCParseRule YOUNG_WITH_CONCURRENT_END = new GCParseRule("YOUNG_WITH_CONCURRENT_END", G1GC_PREFIX + "\\((young|mixed)\\)" + GC_PREFIX + "concurrent-(.+)-end, " + "(-?" + REAL_NUMBER + ")");
     //100081.540: [Full GC100081.540: [GC concurrent-root-region-scan-start]
-    GCParseRule FULLGC_WITH_CONCURRENT_PHASE = new GCParseRule("FULLGC_WITH_CONCURRENT_PHASE", FULL_GC_PREFIX + GC_PREFIX + "concurrent-(.+)-start\\]");
+    GCParseRule FULLGC_WITH_CONCURRENT_PHASE = new GCParseRule("FULLGC_WITH_CONCURRENT_PHASE", "^" + FULL_GC_PREFIX + GC_PREFIX + "concurrent-(.+)-start\\]");
 
     //28983.087: [GC pause (young)28984.641: [SoftReference, 0 refs, 0.0000060 secs]28984.641: [WeakReference, 651 refs, 0.0001330 secs]28984.641: [FinalReference, 4358 refs, 0.0198770 secs]28984.661: [PhantomReference, 20 refs, 0.0000100 secs]28984.661: [JNI Weak Reference, 0.0002120 secs]2014-10-21T16:31:20.256-0500: 28984.853: [GC concurrent-mark-end, 0.8720730 sec] (to-space overflow), 1.88262800 secs]
     GCParseRule YOUNG_REFERENCE_WITH_CONCURRENT_END = new GCParseRule("YOUNG_REFERENCE_WITH_CONCURRENT_END", G1GC_PREFIX + "\\((young||mixed)\\)( \\(initial-mark\\))?" + REFERENCE_RECORDS + GC_PREFIX + " concurrent-(.+)-end, " + PAUSE_TIME + "\\]");
