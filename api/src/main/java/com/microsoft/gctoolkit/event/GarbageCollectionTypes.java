@@ -10,7 +10,7 @@ public enum GarbageCollectionTypes implements LabelledGCEventType {
     GC("GC"),
     Young("Young"),
     FullGC("Full GC"),
-    Full("FUll GC"),
+    Full("Full GC"),
     SystemGC("System.gc()"),
     PSYoungGen("PSYoungGen"),
     ScavengeBeforeFull("PSYoungGen (System)"),
