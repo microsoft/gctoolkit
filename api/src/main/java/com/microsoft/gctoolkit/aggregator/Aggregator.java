@@ -142,6 +142,8 @@ public abstract class Aggregator<A extends Aggregation> {
      * @param event an event to be processed
      */
     public void receive(JVMEvent event) {
+        aggregation().updateEventFrequency(event);
+
         if (event instanceof JVMTermination) {
             aggregation().timeOfTerminationEvent(((JVMTermination) event).getTimeOfTerminationEvent());
             aggregation().timeOfFirstEvent(((JVMTermination)event).getTimeOfFirstEvent());
