@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 public class PreunifiedJavaVirtualMachineConfigurationTest {
 
     private String logFile = "preunified/g1gc/details/tenuring/180/g1gc.log";
-    private int[] times = { 0, 1028, 945481, 945481};
+    private int[] times = { 0, 1028, 945481, 944453};
 
     @Tag("modulePath")
     @Test
