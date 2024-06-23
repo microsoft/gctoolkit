@@ -193,7 +193,25 @@ public class GenerationalHeapParserTest extends ParserTest {
         assertEquals(9.089,getParser().diary.getTimeOfFirstEvent().toSeconds());
     }
 
-
+    @Test
+    // jlittle-ptc: Added to validate changes in https://github.com/microsoft/gctoolkit/issues/352
+    // Fails without changes, passes with changes.
+    public void parallelYoungGenTest() {
+    	String[] lines = {
+    			"103.387: [GC [PSYoungGen: 138710K->17821K(154112K)] 138710K->17821K(506368K), 0.1040105 secs]",
+    			"135.734: [GC [PSYoungGen: 149917K->22007K(154112K)] 149917K->30709K(506368K), 0.2773358 secs]",
+    			"147.102: [GC [PSYoungGen: 154103K->22015K(154112K)] 162805K->57046K(506368K), 0.1371908 secs]",
+    			"156.646: [GC [PSYoungGen: 154111K->22001K(152320K)] 189142K->84340K(504576K), 0.1508722 secs]",
+    			"5989.323: [Full GC [PSYoungGen: 384K->0K(46208K)] [PSOldGen: 351520K->291209K(675840K)] 351904K->291209K(722048K) [PSPermGen: 46324K->46324K(94208K)], 5.6953760 secs]",
+    			"12023.260: [Full GC [PSYoungGen: 1463K->0K(172160K)] [PSOldGen: 674819K->546126K(917504K)] 676283K->546126K(1089664K) [PSPermGen: 75971K->75971K(126976K)], 12.4914242 secs]",
+    			"132380.027: [Full GC [PSYoungGen: 388637K->0K(581376K)] [PSOldGen: 1707204K->1099190K(1708032K)] 2095842K->1099190K(2289408K) [PSPermGen: 103975K->103975K(122880K)], 25.3055946 secs]"
+    	};
+    	
+        List<JVMEvent> jvmEvents = feedParser(lines);
+        assertEquals(7, jvmEvents.size());
+        assertEquals(103.387, getParser().diary.getTimeOfFirstEvent().toSeconds());    	
+    }
+      
     @Override
     protected Diarizer diarizer() {
         return new PreUnifiedDiarizer();
