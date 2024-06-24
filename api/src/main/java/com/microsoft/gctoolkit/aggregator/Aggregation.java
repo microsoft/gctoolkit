@@ -2,7 +2,9 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.aggregator;
 
+import com.microsoft.gctoolkit.event.jvm.JVMEvent;
 import com.microsoft.gctoolkit.jvm.JavaVirtualMachine;
+import com.microsoft.gctoolkit.online.statistics.WelfordVarianceCalculator;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
 
 /**
@@ -90,6 +92,8 @@ public abstract class Aggregation {
 
     private DateTimeStamp timeOfFirstEvent = null;
     private DateTimeStamp timeOfTermination = DateTimeStamp.baseDate();
+    private final WelfordVarianceCalculator varianceCalculator = new WelfordVarianceCalculator();
+    private DateTimeStamp timeOfLastSeenEvent = null;
 
     /**
      * Constructor for the module SPI
@@ -127,24 +131,27 @@ public abstract class Aggregation {
     }
 
     /**
-     * the 0.25 is a guess as to how far the first event should be from 0.000 seconds before the time of the
-     * first event will be considered to be the beginning of the log file.
+     * Estimates the start time of the log based on the available data.
+     * <p>
+     * If the first event does not have a timestamp, the method returns the time of the first event minus the variance of GC frequency.
+     * <p>
+     * If the timestamp is present and the timestamp of the first event is greater than the variance, the method returns the timestamp minus the variance.
+     * However, if the resulting timestamp is negative, the method returns the time of the first event instead, since a negative timestamp is not possible.
      *
-     * todo: The better way to do this is to calculate the variance in GC frequency and if the gap between 0.000 and
-     * the first event exceeds the variance, then the first event would be considered the beginning of the log file.
-     * otherwise, the time of the first event should be the time of the first event - the variance.
-     *
-     * @return estimate of the start of the log using the data presented (most likely is 0.000s)
+     * @return The estimated start time of the log based on the available data
      */
     public DateTimeStamp estimatedStartTime() {
-        if (timeOfFirstEvent.getTimeStamp() / timeOfTermination.getTimeStamp() > 0.25d) {
-            return timeOfFirstEvent;
+        double sd = Math.sqrt(varianceCalculator.getValue());
+        if (!timeOfFirstEvent.hasTimeStamp()) {
+            return timeOfFirstEvent.minus(sd);
         }
 
-        if ( ! timeOfFirstEvent.hasDateStamp())
-            return new DateTimeStamp(0.0d);
-        else // this looks after adjusting the date stamp.
-            return timeOfFirstEvent.minus(timeOfFirstEvent.getTimeStamp());
+        final DateTimeStamp estimatedStartTime = timeOfFirstEvent.minus(sd);
+        if (!estimatedStartTime.hasTimeStamp()) {
+            return timeOfFirstEvent;
+        } else {
+            return estimatedStartTime;
+        }
     }
 
     /**
@@ -173,6 +180,16 @@ public abstract class Aggregation {
      */
     public Class<? extends Aggregator<?>> collates() {
         return collates(getClass());
+    }
+
+    public void updateEventFrequency(JVMEvent event) {
+        final DateTimeStamp dateTimeStamp = event.getDateTimeStamp();
+        if (timeOfLastSeenEvent == null) {
+            timeOfLastSeenEvent = dateTimeStamp;
+            return;
+        }
+        double timeSpan = dateTimeStamp.minus(timeOfLastSeenEvent);
+        varianceCalculator.update(timeSpan);
     }
 
     /**
