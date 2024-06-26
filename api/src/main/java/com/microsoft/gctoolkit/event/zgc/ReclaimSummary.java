@@ -20,4 +20,11 @@ public class ReclaimSummary {
         return reclaimEnd;
     }
 
+    public ReclaimSummary sum(ReclaimSummary other) {
+        if (other == null) {
+            return this;
+        }
+        return new ReclaimSummary(reclaimStart + other.reclaimStart, reclaimEnd + other.reclaimEnd);
+    }
+
 }
