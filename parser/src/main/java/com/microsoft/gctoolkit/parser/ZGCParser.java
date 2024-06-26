@@ -220,13 +220,13 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
     private void memoryStatistics(GCLogTrace trace, String s) {
         switch (trace.getGroup(1)) {
             case "Young Generation":
-                forwardReference.setMemoryScope(1);
+                forwardReference.setMemoryScope(ZGCMemoryScope.YOUNG_GENERATION);
                 break;
             case "Old Generation":
-                forwardReference.setMemoryScope(2);
+                forwardReference.setMemoryScope(ZGCMemoryScope.OLD_GENERATION);
                 break;
             default:
-                forwardReference.setMemoryScope(0);
+                forwardReference.setMemoryScope(ZGCMemoryScope.ALL);
         }
     }
 
@@ -340,7 +340,7 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
         private ReclaimSummary reclaimed;
         private ReclaimSummary memorySummary;
         private ZGCMetaspaceSummary metaspace;
-        private int memoryScope; // 0: default all heap; 1: young generation; 2: old generation
+        private ZGCMemoryScope memoryScope = ZGCMemoryScope.ALL;
 
         //Load
         private double[] load = new double[3];
@@ -478,34 +478,34 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
             this.concurrentSelectRelocateDuration += concurrentSelectRelocateDuration;
         }
 
-        public void setMemoryScope(int scope) {
+        public void setMemoryScope(ZGCMemoryScope scope) {
             this.memoryScope = scope;
         }
 
         //Memory
         public void setMarkStart(ZGCMemoryPoolSummary summary) {
-            if (memoryScope != 0) {
+            if (memoryScope != ZGCMemoryScope.ALL) {
                 return;
             }
             this.markStart = summary;
         }
 
         public void setMarkEnd(ZGCMemoryPoolSummary summary) {
-            if (memoryScope != 0) {
+            if (memoryScope != ZGCMemoryScope.ALL) {
                 return;
             }
             this.markEnd = summary;
         }
 
         public void setRelocateStart(ZGCMemoryPoolSummary summary) {
-            if (memoryScope != 0) {
+            if (memoryScope != ZGCMemoryScope.ALL) {
                 return;
             }
             this.relocatedStart = summary;
         }
 
         public void setRelocateEnd(ZGCMemoryPoolSummary summary) {
-            if (memoryScope != 0) {
+            if (memoryScope != ZGCMemoryScope.ALL) {
                 return;
             }
             this.relocateEnd = summary;
