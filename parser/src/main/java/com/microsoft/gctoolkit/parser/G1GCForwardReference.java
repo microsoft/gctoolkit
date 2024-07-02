@@ -656,6 +656,11 @@ class G1GCForwardReference extends ForwardReference {
         postEvacuateCSetPhaseNames().forEach(name -> collection.addPostEvacuationCollectionPhase(name, postEvacuateCSetPhaseDuration(name)));
     }
 
+    private void fillInWorkers(G1Young collection) {
+        collection.setEvacuationWorkersUsed(evacuationWorkersUsed);
+        collection.setEvacuationWorkersAvailable(evacuationWorkersAvailable);
+    }
+
     private DateTimeStamp pausePhaseDuringConcurrentCycleTime = null;
     private double pausePhaseDuringConcurrentCycleDuration = -1.0d;
 
@@ -772,6 +777,7 @@ class G1GCForwardReference extends ForwardReference {
         fillInRegionSummary(collection);
         fillInMetaspaceStats(collection);
         fillInPhases(collection);
+        fillInWorkers(collection);
         if (toSpaceExhausted) collection.toSpaceExhausted();
         if (hasReferenceGCSummary())
             collection.add(generateReferenceGCSummary());
