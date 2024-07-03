@@ -26,4 +26,11 @@ public class OccupancySummary {
     public long getReclaimEnd() {
         return reclaimEnd;
     }
+
+    public OccupancySummary sum(OccupancySummary other) {
+        if (other == null) {
+            return this;
+        }
+        return new OccupancySummary(markEnd + other.markEnd, reclaimStart + other.reclaimStart, reclaimEnd + other.reclaimEnd);
+    }
 }
