@@ -10,7 +10,8 @@ import com.microsoft.gctoolkit.event.jvm.JVMEvent;
 import com.microsoft.gctoolkit.event.jvm.JVMTermination;
 import com.microsoft.gctoolkit.event.zgc.OccupancySummary;
 import com.microsoft.gctoolkit.event.zgc.ReclaimSummary;
-import com.microsoft.gctoolkit.event.zgc.ZGCCycle;
+import com.microsoft.gctoolkit.event.zgc.MajorZGCCycle;
+import com.microsoft.gctoolkit.event.zgc.MinorZGCCycle;
 import com.microsoft.gctoolkit.event.zgc.ZGCMemoryPoolSummary;
 import com.microsoft.gctoolkit.event.zgc.ZGCMetaspaceSummary;
 import com.microsoft.gctoolkit.jvm.Diary;
@@ -352,8 +353,22 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
             gcCause = cause;
         }
 
-        ZGCCycle toZGCCycle(DateTimeStamp endTime) {
-            ZGCCycle cycle = new ZGCCycle(startTimeStamp, GarbageCollectionTypes.ZGCCycle, gcCause, endTime.minus(startTimeStamp));
+        MajorZGCCycle toZGCCycle(DateTimeStamp endTime) {
+
+            MajorZGCCycle cycle = null;
+            switch(forwardReference.memoryScope) {
+                case ALL:
+                    cycle = new MajorZGCCycle(startTimeStamp, GarbageCollectionTypes.ZGCCycle, gcCause, endTime.minus(startTimeStamp));
+                    break;
+                case YOUNG_GENERATION:
+                    cycle = new MinorZGCCycle(startTimeStamp, GarbageCollectionTypes.ZGCCycle, gcCause, endTime.minus(startTimeStamp));
+                    break;
+                case OLD_GENERATION:
+                    cycle = new MajorZGCCycle(startTimeStamp, GarbageCollectionTypes.ZGCCycle, gcCause, endTime.minus(startTimeStamp));
+                    break;
+                default:
+                    LOGGER.warning("Internal Error - Unknown memory scope: " + forwardReference.memoryScope);
+            };
             cycle.setGcId(gcId);
             cycle.setPauseMarkStart(pauseMarkStart, pauseMarkStartDuration);
             cycle.setConcurrentMark(concurrentMarkStart, concurrentMarkDuration);

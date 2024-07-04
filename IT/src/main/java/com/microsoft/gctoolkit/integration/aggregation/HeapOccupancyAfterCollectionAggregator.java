@@ -6,7 +6,7 @@ import com.microsoft.gctoolkit.aggregator.EventSource;
 import com.microsoft.gctoolkit.event.g1gc.G1GCPauseEvent;
 import com.microsoft.gctoolkit.event.generational.GenerationalGCPauseEvent;
 import com.microsoft.gctoolkit.event.shenandoah.ShenandoahCycle;
-import com.microsoft.gctoolkit.event.zgc.ZGCCycle;
+import com.microsoft.gctoolkit.event.zgc.MajorZGCCycle;
 
 @Aggregates({EventSource.G1GC,EventSource.GENERATIONAL,EventSource.ZGC,EventSource.SHENANDOAH})
 public class HeapOccupancyAfterCollectionAggregator extends Aggregator<HeapOccupancyAfterCollectionAggregation> {
@@ -15,7 +15,7 @@ public class HeapOccupancyAfterCollectionAggregator extends Aggregator<HeapOccup
         super(results);
         register(GenerationalGCPauseEvent.class, this::extractHeapOccupancy);
         register(G1GCPauseEvent.class, this::extractHeapOccupancy);
-        register(ZGCCycle.class,this::extractHeapOccupancy);
+        register(MajorZGCCycle.class,this::extractHeapOccupancy);
         register(ShenandoahCycle.class,this::extractHeapOccupancy);
     }
 
@@ -29,7 +29,7 @@ public class HeapOccupancyAfterCollectionAggregator extends Aggregator<HeapOccup
             aggregation().addDataPoint(event.getGarbageCollectionType(), event.getDateTimeStamp(), event.getHeap().getOccupancyAfterCollection());
     }
 
-    private void extractHeapOccupancy(ZGCCycle event) {
+    private void extractHeapOccupancy(MajorZGCCycle event) {
         aggregation().addDataPoint(event.getGarbageCollectionType(), event.getDateTimeStamp(), event.getLive().getReclaimEnd());
     }
 

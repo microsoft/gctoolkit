@@ -5,7 +5,7 @@ package com.microsoft.gctoolkit.parser;
 import com.microsoft.gctoolkit.event.jvm.JVMEvent;
 import com.microsoft.gctoolkit.event.zgc.OccupancySummary;
 import com.microsoft.gctoolkit.event.zgc.ReclaimSummary;
-import com.microsoft.gctoolkit.event.zgc.ZGCCycle;
+import com.microsoft.gctoolkit.event.zgc.MajorZGCCycle;
 import com.microsoft.gctoolkit.event.zgc.ZGCMemoryPoolSummary;
 import com.microsoft.gctoolkit.event.zgc.ZGCMetaspaceSummary;
 import com.microsoft.gctoolkit.jvm.Diarizer;
@@ -72,7 +72,7 @@ public class ZGCParserTest extends ParserTest {
         List<JVMEvent> singleCycle = feedParser(eventLogEntries);
         try {
             assertEquals(1, singleCycle.size());
-            ZGCCycle zgc = (ZGCCycle) singleCycle.get(0);
+            MajorZGCCycle zgc = (MajorZGCCycle) singleCycle.get(0);
 
             assertEquals(zgc.getGcId(), 2L);
 
@@ -230,7 +230,7 @@ public class ZGCParserTest extends ParserTest {
         List<JVMEvent> singleCycle = feedParser(eventLogEntries);
         try {
             assertEquals(1, singleCycle.size());
-            ZGCCycle zgc = (ZGCCycle) singleCycle.get(0);
+            MajorZGCCycle zgc = (MajorZGCCycle) singleCycle.get(0);
 
             assertEquals(zgc.getGcId(), 0L);
 

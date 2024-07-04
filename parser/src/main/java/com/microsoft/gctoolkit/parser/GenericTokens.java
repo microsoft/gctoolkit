@@ -9,6 +9,7 @@ public interface GenericTokens {
     String INTEGER = "\\d+";
     String REAL_NUMBER = INTEGER + DECIMAL_POINT + INTEGER;
     String PERCENTAGE = "(" + REAL_NUMBER + ")" + "\\s?%";
+    String INT_PERCENTAGE = "(" + INTEGER + ")" + "%";
     String HEX = "0x[0-9,a-f]{16}";
     String INT = "(" + INTEGER + ")";
     String COUNTER = INT;
@@ -19,6 +20,7 @@ public interface GenericTokens {
     //Time
     String TIME = "(-?" + REAL_NUMBER + ")";
     String DURATION_MS = TIME + "\\s?ms";
+    String INT_DURATION_MS = INTEGER + "ms";
     //0.0700188
     String PAUSE_TIME = TIME + "\\s?(?:secs?|ms)";
     String CONCURRENT_TIME = PAUSE_TIME;
