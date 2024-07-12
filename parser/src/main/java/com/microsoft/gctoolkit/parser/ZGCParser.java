@@ -10,7 +10,8 @@ import com.microsoft.gctoolkit.event.jvm.JVMEvent;
 import com.microsoft.gctoolkit.event.jvm.JVMTermination;
 import com.microsoft.gctoolkit.event.zgc.OccupancySummary;
 import com.microsoft.gctoolkit.event.zgc.ReclaimSummary;
-import com.microsoft.gctoolkit.event.zgc.ZGCCycle;
+import com.microsoft.gctoolkit.event.zgc.MajorZGCCycle;
+import com.microsoft.gctoolkit.event.zgc.MinorZGCCycle;
 import com.microsoft.gctoolkit.event.zgc.ZGCMemoryPoolSummary;
 import com.microsoft.gctoolkit.event.zgc.ZGCMetaspaceSummary;
 import com.microsoft.gctoolkit.jvm.Diary;
@@ -59,6 +60,7 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
         parseRules.put(PAUSE_PHASE, this::pausePhase);
         parseRules.put(CONCURRENT_PHASE, this::concurrentPhase);
         parseRules.put(LOAD, this::load);
+        parseRules.put(GENERATION_LOAD, this::load);
         parseRules.put(MMU, this::mmu);
         parseRules.put(MARK_SUMMARY, this::markSummary);
         parseRules.put(RELOCATION_SUMMARY, this::relocationSummary);
@@ -66,6 +68,7 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
         parseRules.put(METASPACE, this::metaspace);
         parseRules.put(REFERENCE_PROCESSING, this::referenceProcessing);
         parseRules.put(CAPACITY, this::capacity);
+        parseRules.put(GENERATIONAL_MEMORY_STATISTICS, this::memoryStatistics);
         parseRules.put(MEMORY_TABLE_ENTRY_SIZE, this::sizeEntry);
         parseRules.put(MEMORY_TABLE_ENTRY_OCCUPANCY, this::occupancyEntry);
         parseRules.put(MEMORY_TABLE_ENTRY_RECLAIMED, this::reclaimed);
@@ -144,7 +147,8 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
         } else if ("Mark Free".equals(trace.getGroup(1))) {
             forwardReference.setConcurrentMarkFreeDuration(trace.getDuration());
             forwardReference.setConcurrentMarkFreeStart(startTime);
-        } else if ("Process Non-Strong References".equals(trace.getGroup(1))) {
+        } else if ("Process Non-Strong References".equals(trace.getGroup(1))
+                || "Process Non-Strong".equals(trace.getGroup(1))) {
             forwardReference.setConcurrentProcessNonStrongReferencesDuration(trace.getDuration());
             forwardReference.setConcurrentProcessNonStringReferencesStart(startTime);
         } else if ("Reset Relocation Set".equals(trace.getGroup(1))) {
@@ -214,6 +218,19 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
         relocateEnd[index] = trace.toKBytes(11);
     }
 
+    private void memoryStatistics(GCLogTrace trace, String s) {
+        switch (trace.getGroup(1)) {
+            case "Young Generation":
+                forwardReference.setMemoryScope(ZGCMemoryScope.YOUNG_GENERATION);
+                break;
+            case "Old Generation":
+                forwardReference.setMemoryScope(ZGCMemoryScope.OLD_GENERATION);
+                break;
+            default:
+                forwardReference.setMemoryScope(ZGCMemoryScope.ALL);
+        }
+    }
+
     private void sizeEntry(GCLogTrace trace, String s) {
         switch (trace.getGroup(1)) {
             case "Capacity":
@@ -223,10 +240,11 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
                 captureAtIndex(trace, 1);
                 break;
             case "Used":
-                forwardReference.setMarkStart(new ZGCMemoryPoolSummary(markStart[0], markStart[1], trace.toKBytes(2)));
-                forwardReference.setMarkEnd(new ZGCMemoryPoolSummary(markEnd[0], markEnd[1], trace.toKBytes(5)));
-                forwardReference.setRelocateStart(new ZGCMemoryPoolSummary(relocateStart[0], relocateStart[1], trace.toKBytes(8)));
-                forwardReference.setRelocateEnd(new ZGCMemoryPoolSummary(relocateEnd[0], relocateEnd[1], trace.toKBytes(11)));
+                captureAtIndex(trace, 2);
+                forwardReference.setMarkStart(new ZGCMemoryPoolSummary(markStart[0], markStart[1], markStart[2]));
+                forwardReference.setMarkEnd(new ZGCMemoryPoolSummary(markEnd[0], markEnd[1], markEnd[2]));
+                forwardReference.setRelocateStart(new ZGCMemoryPoolSummary(relocateStart[0], relocateStart[1], relocateStart[2]));
+                forwardReference.setRelocateEnd(new ZGCMemoryPoolSummary(relocateEnd[0], relocateEnd[1], relocateEnd[2]));
                 break;
             default:
                 LOGGER.warning(trace.getGroup(1) + "not recognized, Heap Occupancy/size is is ignored. Please report this with the GC log");
@@ -323,6 +341,7 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
         private ReclaimSummary reclaimed;
         private ReclaimSummary memorySummary;
         private ZGCMetaspaceSummary metaspace;
+        private ZGCMemoryScope memoryScope = ZGCMemoryScope.ALL;
 
         //Load
         private double[] load = new double[3];
@@ -334,8 +353,22 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
             gcCause = cause;
         }
 
-        ZGCCycle toZGCCycle(DateTimeStamp endTime) {
-            ZGCCycle cycle = new ZGCCycle(startTimeStamp, GarbageCollectionTypes.ZGCCycle, gcCause, endTime.minus(startTimeStamp));
+        MajorZGCCycle toZGCCycle(DateTimeStamp endTime) {
+
+            MajorZGCCycle cycle = null;
+            switch(forwardReference.memoryScope) {
+                case ALL:
+                    cycle = new MajorZGCCycle(startTimeStamp, GarbageCollectionTypes.ZGCCycle, gcCause, endTime.minus(startTimeStamp));
+                    break;
+                case YOUNG_GENERATION:
+                    cycle = new MinorZGCCycle(startTimeStamp, GarbageCollectionTypes.ZGCCycle, gcCause, endTime.minus(startTimeStamp));
+                    break;
+                case OLD_GENERATION:
+                    cycle = new MajorZGCCycle(startTimeStamp, GarbageCollectionTypes.ZGCCycle, gcCause, endTime.minus(startTimeStamp));
+                    break;
+                default:
+                    LOGGER.warning("Internal Error - Unknown memory scope: " + forwardReference.memoryScope);
+            };
             cycle.setGcId(gcId);
             cycle.setPauseMarkStart(pauseMarkStart, pauseMarkStartDuration);
             cycle.setConcurrentMark(concurrentMarkStart, concurrentMarkDuration);
@@ -363,107 +396,150 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
         }
 
         public void setPauseMarkStart(DateTimeStamp pauseMarkStart) {
+            if (this.pauseMarkStart != null) {
+                return;
+            }
             this.pauseMarkStart = pauseMarkStart;
         }
 
         public void setPauseMarkStartDuration(double pauseMarkStartDuration) {
-            this.pauseMarkStartDuration = pauseMarkStartDuration;
+            this.pauseMarkStartDuration += pauseMarkStartDuration;
         }
 
         public void setPauseMarkEndStart(DateTimeStamp pauseMarkEndStart) {
+            if (this.pauseMarkEndStart != null) {
+                return;
+            }
             this.pauseMarkEndStart = pauseMarkEndStart;
         }
 
         public void setPauseMarkEndDuration(double pauseMarkEndDuration) {
-            this.pauseMarkEndDuration = pauseMarkEndDuration;
+            this.pauseMarkEndDuration += pauseMarkEndDuration;
         }
 
         public void setPauseRelocateStart(DateTimeStamp pauseRelocateStart) {
+            if (this.pauseRelocateStart != null) {
+                return;
+            }
             this.pauseRelocateStart = pauseRelocateStart;
         }
 
         public void setPauseRelocateStartDuration(double pauseRelocateStartDuration) {
-            this.pauseRelocateStartDuration = pauseRelocateStartDuration;
+            this.pauseRelocateStartDuration += pauseRelocateStartDuration;
         }
 
         public void setConcurrentMarkStart(DateTimeStamp concurrentMarkStart) {
+            if (this.concurrentMarkStart != null) {
+                return;
+            }
             this.concurrentMarkStart = concurrentMarkStart;
         }
 
         public void setConcurrentMarkDuration(double concurrentMarkDuration) {
-            this.concurrentMarkDuration = concurrentMarkDuration;
+            this.concurrentMarkDuration += concurrentMarkDuration;
         }
 
         public void setConcurrentMarkFreeStart(DateTimeStamp concurrentMarkFreeStart) {
+            if (this.concurrentMarkFreeStart != null) {
+                return;
+            }
             this.concurrentMarkFreeStart = concurrentMarkFreeStart;
         }
         public void setConcurrentMarkFreeDuration(double concurrentMarkFreeDuration) {
-            this.concurrentMarkFreeDuration = concurrentMarkFreeDuration;
+            this.concurrentMarkFreeDuration += concurrentMarkFreeDuration;
         }
 
         public void setConcurrentProcessNonStringReferencesStart(DateTimeStamp concurrentProcessNonStringReferencesStart) {
+            if (this.concurrentProcessNonStringReferencesStart != null) {
+                return;
+            }
             this.concurrentProcessNonStringReferencesStart = concurrentProcessNonStringReferencesStart;
         }
 
         public void setConcurrentProcessNonStrongReferencesDuration(double concurrentProcessNonStrongReferencesDuration) {
-            this.concurrentProcessNonStrongReferencesDuration = concurrentProcessNonStrongReferencesDuration;
+            this.concurrentProcessNonStrongReferencesDuration += concurrentProcessNonStrongReferencesDuration;
         }
 
         public void setConcurrentResetRelocationSetStart(DateTimeStamp concurrentResetRelocationSetStart) {
+            if (this.concurrentResetRelocationSetStart != null) {
+                return;
+            }
             this.concurrentResetRelocationSetStart = concurrentResetRelocationSetStart;
         }
 
         public void setConcurrentResetRelocationSetDuration(double concurrentResetRelocationSetDuration) {
-            this.concurrentResetRelocationSetDuration = concurrentResetRelocationSetDuration;
+            this.concurrentResetRelocationSetDuration += concurrentResetRelocationSetDuration;
         }
 
         public void setConcurrentSelectRelocationSetStart(DateTimeStamp concurrentSelectRelocationSetStart) {
+            if (this.concurrentSelectRelocationSetStart != null) {
+                return;
+            }
             this.concurrentSelectRelocationSetStart = concurrentSelectRelocationSetStart;
         }
 
         public void setConcurrentSelectRelocationSetDuration(double concurrentSelectRelocationSetDuration) {
-            this.concurrentSelectRelocationSetDuration = concurrentSelectRelocationSetDuration;
+            this.concurrentSelectRelocationSetDuration += concurrentSelectRelocationSetDuration;
         }
 
         public void setConcurrentSelectRelocateStart(DateTimeStamp concurrentSelectRelocateStart) {
+            if (this.concurrentSelectRelocateStart != null) {
+                return;
+            }
             this.concurrentSelectRelocateStart = concurrentSelectRelocateStart;
         }
 
         public void setConcurrentSelectRelocateDuration(double concurrentSelectRelocateDuration) {
-            this.concurrentSelectRelocateDuration = concurrentSelectRelocateDuration;
+            this.concurrentSelectRelocateDuration += concurrentSelectRelocateDuration;
+        }
+
+        public void setMemoryScope(ZGCMemoryScope scope) {
+            this.memoryScope = scope;
         }
 
         //Memory
         public void setMarkStart(ZGCMemoryPoolSummary summary) {
+            if (memoryScope != ZGCMemoryScope.ALL) {
+                return;
+            }
             this.markStart = summary;
         }
 
         public void setMarkEnd(ZGCMemoryPoolSummary summary) {
+            if (memoryScope != ZGCMemoryScope.ALL) {
+                return;
+            }
             this.markEnd = summary;
         }
 
         public void setRelocateStart(ZGCMemoryPoolSummary summary) {
+            if (memoryScope != ZGCMemoryScope.ALL) {
+                return;
+            }
             this.relocatedStart = summary;
         }
 
         public void setRelocateEnd(ZGCMemoryPoolSummary summary) {
+            if (memoryScope != ZGCMemoryScope.ALL) {
+                return;
+            }
             this.relocateEnd = summary;
         }
 
         public void setMarkedLive(OccupancySummary summary) {
-            markedLive = summary;
+            this.markedLive = summary.sum(this.markedLive);
         }
 
         public void setAllocated(OccupancySummary summary) {
-            this.allocated = summary;
+            this.allocated = summary.sum(this.allocated);
         }
 
         public void setGarbage(OccupancySummary summary) {
-            this.garbage = summary;
+            this.garbage = summary.sum(this.garbage);
         }
 
         public void setReclaimed(ReclaimSummary summary) {
-            reclaimed = summary;
+            this.reclaimed = summary.sum(this.reclaimed);
         }
 
         public void setMemorySummary(ReclaimSummary summary) {
