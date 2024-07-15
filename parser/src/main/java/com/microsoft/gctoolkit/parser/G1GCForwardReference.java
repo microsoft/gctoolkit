@@ -544,6 +544,7 @@ class G1GCForwardReference extends ForwardReference {
         SurvivorMemoryPoolSummary survivor = getSurvivorMemoryPoolSummary();
         MemoryPoolSummary tenured = getMemoryPoolSummary(OLD_OCCUPANCY_BEFORE_COLLECTION);
         MemoryPoolSummary humongous = getMemoryPoolSummary(HUMONGOUS_OCCUPANCY_BEFORE_COLLECTION);
+        collection.addHeapRegionSize(heapRegionSize);
         if (heap != null && eden != null && survivor != null) {
             collection.addMemorySummary(eden, survivor, heap);
         } else if (eden == null && survivor == null && heap != null) {
