@@ -494,6 +494,7 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
                 forwardReference.setHumongousRegionSummary(summary);
                 break;
             case "Archive":
+                // Archive Region type is only available in JDK 14 and 17.
                 forwardReference.setArchiveRegionSummary(summary);
                 break;
             default:
