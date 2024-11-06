@@ -1,0 +1,204 @@
+# Release GCToolkit to Maven Central
+# 
+# Builds and tests the binaries.
+# Signs the artifacts and generates SHA checksums.
+# Publishes the artifacts to Maven Central.
+
+trigger: none
+pr: none
+
+variables:
+  JAVA_HOME_11_X64: /usr/lib/jvm/msopenjdk-11
+
+resources:
+  repositories:
+  - repository: 1esPipelines
+    type: git
+    name: 1ESPipelineTemplates/1ESPipelineTemplates
+    ref: refs/tags/release
+
+extends:
+  template: v1/1ES.Official.PipelineTemplate.yml@1esPipelines
+  parameters:
+    pool:
+      name: JEG-mariner2.0-x64-release
+      os: linux
+    sdl:
+      sourceAnalysisPool:
+        name: JEG-windows2022-x64-release
+        os: windows
+      credscan:
+        suppressionsFile: $(Build.SourcesDirectory)/.devops/credscan/suppressions.json
+
+    stages:
+      - stage: Release_GCToolkit
+        jobs:
+        - job: build_gctoolkit
+          workspace:
+            clean: all
+          displayName: Build with Maven
+          steps:
+            - checkout: self
+              path: gctoolkit
+              clean: true
+
+            # Use modern Java to build
+            - task: JavaToolInstaller@0
+              inputs:
+                versionSpec: '11'
+                jdkArchitectureOption: 'x64'
+                jdkSourceOption: 'PreInstalled'
+              env:
+                JAVA_HOME_11_X64: $(JAVA_HOME_11_X64)
+              displayName: 'Set Java to v11'
+
+            # download signing keys from Azure Key Vault
+            - task: AzureKeyVault@2
+              displayName: Download GPG signing keys
+              inputs:
+                azureSubscription: 'JEG-Infrastructure'
+                KeyVaultName: 'juniper-keyvault'
+                SecretsFilter: 'javask-gpg-passphrase,javask-gpg-private,javask-gpg-public,javask-gpg-trust'
+                RunAsPreJob: false
+
+            # base64 decode signing keys
+            - bash: |
+                echo "Base64 decoding keys..."
+                echo "$(javask-gpg-private)" | base64 -d > private.asc
+                echo "$(javask-gpg-public)" | base64 -d > public.asc
+                echo "$(javask-gpg-trust)" | base64 -d > trust.gpg
+              workingDirectory: $(Agent.BuildDirectory)
+              displayName: Base64 decode secret
+
+            # import signing keys into GPG
+            - bash: |
+                echo "GPG importing keys..."
+                echo $(javask-gpg-passphrase) | gpg --batch --passphrase-fd 0 --import $(Agent.BuildDirectory)/private.asc
+                echo $(javask-gpg-passphrase) | gpg --batch --passphrase-fd 0 --import $(Agent.BuildDirectory)/public.asc
+              displayName: GPG import keys
+
+            # restore owner trust
+            - bash: |
+                echo "GPG restore owner trust..."
+                gpg --import-ownertrust $(Agent.BuildDirectory)/trust.gpg
+              displayName: GPG restore owner trust
+
+            # Now that all the keys and whatnot are setup, do the build...
+            - bash: |
+                mkdir ~/.m2 \|| true
+                cp $(Build.SourcesDirectory)/.devops/feed-settings.xml ~/.m2/settings.xml
+              displayName: 'Copy feed-settings to .m2'
+
+            # Ensure authentication is in place for our use of internal DevDiv feeds
+            - task: MavenAuthenticate@0
+              inputs:
+                artifactsFeeds: 'java-engineering-feed'
+              displayName: 'Maven auth for DevDiv'
+
+            - bash: |
+                RELEASE_VERSION=$(./mvnw help:evaluate -Dexpression=project.version -q -DforceStdout | cut -d'-' -f1)
+                echo "##vso[task.setvariable variable=RELEASE_VERSION]$RELEASE_VERSION"
+              displayName: 'Set RELEASE_VERSION'
+
+            - bash: |
+                ./mvnw \
+                  -B -Prelease \
+                  -DaltDeploymentRepository=local::file:$(Build.ArtifactStagingDirectory)/staging \
+                  deploy
+              displayName: 'Build and deploy to local staging directory'
+
+            # Remove .sha1 and .md5 files. 
+            # Generate .sha256 after signing.
+            - bash: |
+                find staging \
+                  -type f \
+                  -name "*.sha1" \
+                  -delete -o \
+                  -name "*.md5" \
+                  -delete
+              displayName: 'Remove .sha1 and .md5 files'
+              workingDirectory: $(Build.ArtifactStagingDirectory)
+
+            # ESRP Sign all jars in the semantickernel-java directory
+            - task: SFP.build-tasks.custom-build-task-1.EsrpCodeSigning@5
+              displayName: ESRP Java JAR Signing
+              inputs:
+                ConnectedServiceName: 'JEG-Tooling-Prod'
+                AppRegistrationClientId: '516af6d8-6ab4-4069-8f64-b18c64d16688'
+                AppRegistrationTenantId: '33e01921-4d64-4f8c-a055-5bdaffd5e33d'
+                AuthAKVName: 'JEG-tooling-kv'
+                AuthCertName: 'JEG-Tooling-auth'
+                AuthSignCertName: 'GCToolKit-ESRP'
+                FolderPath: '$(Build.ArtifactStagingDirectory)/staging'
+                Pattern: '**/*-$(RELEASE_VERSION)*.jar'
+                UseMinimatch: true
+                signConfigType: 'inlineSignParams'
+                inlineOperation: |
+                  [
+                    {
+                      "KeyCode": "CP-447347-Java",
+                      "OperationCode": "JavaSign",
+                      "ToolName": "sign",
+                      "ToolVersion": "1.0",
+                      "Parameters": {
+                        "SigAlg": "SHA256withRSA",
+                        "Timestamp": "-tsa http://sha256timestamp.ws.digicert.com/sha256/timestamp"
+                      }
+                    },
+                    {
+                      "KeyCode": "CP-447347-Java",
+                      "OperationCode": "JavaVerify",
+                      "ToolName": "sign",
+                      "ToolVersion": "1.0",
+                      "Parameters": {}
+                    }
+                  ]
+                SessionTimeout: '120'
+                MaxConcurrency: '50'
+                MaxRetryAttempts: '5'
+                VerboseLogin: true
+
+            # gpg sign all artifacts in the semantickernel-java directory
+            # this will create a .asc file for each file in the directory. This is a detached signature
+            # required to publish into Maven Central.
+            - bash: |
+                for file in `find staging -type f -name *-$(RELEASE_VERSION).jar`; do
+                  echo $(javask-gpg-passphrase) | gpg --pinentry-mode loopback --passphrase-fd 0 -ab $file
+                done
+              workingDirectory: $(Build.ArtifactStagingDirectory)
+              displayName: GPG Signing
+
+            # generate sha256sums for all files in the staging directory
+            - bash: |
+                for file in `find staging -type f`; do
+                  sha256sum $file > $file.sha256
+                done
+              workingDirectory: $(Agent.BuildDirectory)
+              displayName: Create sha256sums
+
+            - task: EsrpRelease@8
+              inputs:
+                connectedservicename: 'JEG-Tooling-Prod'
+                keyvaultname: 'JEG-tooling-kv'
+                authcertname: 'JEG-Tooling-auth'
+                signcertname: 'GCToolKit-ESRP'
+                clientid: '516af6d8-6ab4-4069-8f64-b18c64d16688'
+                intent: 'PackageDistribution'
+                # Test with contentype PyPI to avoid publishing to Maven Central
+                # contenttype: 'Maven'
+                contenttype: 'PyPI'
+                contentsource: 'Folder'
+                folderlocation: '$(Build.ArtifactStagingDirectory)/staging'
+                waitforreleasecompletion: true
+                owners: 'luiseduardom@microsoft.com'
+                approvers: 'john.oliver@microsoft.com'
+                serviceendpointurl: 'https://api.esrp.microsoft.com'
+                mainpublisher: 'ESRPRELPACMAN'
+                domaintenantid: '33e01921-4d64-4f8c-a055-5bdaffd5e33d'
+              displayName: 'Publish to Maven Central'
+
+          templateContext:
+            outputs:
+              - output: pipelineArtifact
+                path: '$(Build.ArtifactStagingDirectory)/staging'
+                artifact: staged-artifacts
