@@ -4,14 +4,17 @@
 # Signs the artifacts and generates SHA checksums.
 # Publishes the artifacts to Maven Central.
 
+# This pipeline is triggered manually.
 trigger: none
 pr: none
 
-variables:
-  JAVA_HOME_11_X64: /usr/lib/jvm/msopenjdk-11
-
 resources:
   repositories:
+  - repository: gctoolkit
+    type: github
+    endpoint: Github-Java-Engineering
+    name: microsoft/gctoolkit
+
   - repository: 1esPipelines
     type: git
     name: 1ESPipelineTemplates/1ESPipelineTemplates
@@ -38,8 +41,8 @@ extends:
             clean: all
           displayName: Build with Maven
           steps:
-            - checkout: self
-              path: gctoolkit
+            - checkout: gctoolkit
+              path: s/gctoolkit
               clean: true
 
             # Use modern Java to build
@@ -48,8 +51,6 @@ extends:
                 versionSpec: '11'
                 jdkArchitectureOption: 'x64'
                 jdkSourceOption: 'PreInstalled'
-              env:
-                JAVA_HOME_11_X64: $(JAVA_HOME_11_X64)
               displayName: 'Set Java to v11'
 
             # download signing keys from Azure Key Vault
@@ -173,7 +174,7 @@ extends:
                 for file in `find staging -type f`; do
                   sha256sum $file > $file.sha256
                 done
-              workingDirectory: $(Agent.BuildDirectory)
+              workingDirectory: $(Build.ArtifactStagingDirectory)
               displayName: Create sha256sums
 
             - task: EsrpRelease@8
