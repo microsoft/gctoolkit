@@ -10,11 +10,6 @@ pr: none
 
 resources:
   repositories:
-  - repository: gctoolkit
-    type: github
-    endpoint: Github-Java-Engineering
-    name: microsoft/gctoolkit
-
   - repository: 1esPipelines
     type: git
     name: 1ESPipelineTemplates/1ESPipelineTemplates
@@ -41,7 +36,7 @@ extends:
             clean: all
           displayName: Build with Maven
           steps:
-            - checkout: gctoolkit
+            - checkout: self
               path: s/gctoolkit
               clean: true
 
