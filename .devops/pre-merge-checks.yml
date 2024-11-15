@@ -5,8 +5,7 @@
 
 # Do not run this pipeline on a push to a branch. This pipeline is intended to be run
 # only when a PR to main is created or updated
-trigger:
-  - none
+trigger: none
 pr:
   - main
 
