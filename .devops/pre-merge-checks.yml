@@ -37,35 +37,35 @@ extends:
       credscan:
         suppressionsFile: $(Build.SourcesDirectory)/.devops/credscan/suppressions.json
 
-    stages:
-      - stage: PreMergeCheck
-        jobs:
-        - job: build_and_analyze
-          workspace:
-          clean: all
-
-        - steps:
-          - checkout: gctoolkit
-            path: s/gctoolkit
-            clean: true
-
-          - task: JavaToolInstaller@0
-            inputs:
-              versionSpec: '11'
-              jdkArchitectureOption: 'x64'
-              jdkSourceOption: 'PreInstalled'
-
-          - task: Maven@4
-            inputs:
-              mavenPomFile: 'pom.xml'
-              goals: 'clean install'
-              options: '-B -Prelease'
-              mavenOptions: '-s $(Build.SourcesDirectory)/.devops/settings.xml'
-              mavenAuthenticateFeed: true
-              jdkVersionOption: '1.11'
-              jdkArchitectureOption: 'x64'
-            displayName: 'Build with Maven'
-
-          - task: AdvancedSecurity-Dependency-Scanning@1
-            inputs:
-              directoryExclusionList: '**/test/**'
+      stages:
+        - stage: PreMergeCheck
+          jobs:
+          - job: build_and_analyze
+            workspace:
+            clean: all
+  
+          - steps:
+            - checkout: gctoolkit
+              path: s/gctoolkit
+              clean: true
+  
+            - task: JavaToolInstaller@0
+              inputs:
+                versionSpec: '11'
+                jdkArchitectureOption: 'x64'
+                jdkSourceOption: 'PreInstalled'
+  
+            - task: Maven@4
+              inputs:
+                mavenPomFile: 'pom.xml'
+                goals: 'clean install'
+                options: '-B -Prelease'
+                mavenOptions: '-s $(Build.SourcesDirectory)/.devops/settings.xml'
+                mavenAuthenticateFeed: true
+                jdkVersionOption: '1.11'
+                jdkArchitectureOption: 'x64'
+              displayName: 'Build with Maven'
+  
+            - task: AdvancedSecurity-Dependency-Scanning@1
+              inputs:
+                directoryExclusionList: '**/test/**'
