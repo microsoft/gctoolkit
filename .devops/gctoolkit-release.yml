@@ -8,6 +8,9 @@
 trigger: none
 pr: none
 
+variables:
+  JAVA_HOME_11_X64: /usr/lib/jvm/msopenjdk-11
+
 resources:
   repositories:
   - repository: 1esPipelines
@@ -46,6 +49,8 @@ extends:
                 versionSpec: '11'
                 jdkArchitectureOption: 'x64'
                 jdkSourceOption: 'PreInstalled'
+              env:
+                JAVA_HOME_11_X64: $(JAVA_HOME_11_X64)
               displayName: 'Set Java to v11'
 
             # download signing keys from Azure Key Vault
