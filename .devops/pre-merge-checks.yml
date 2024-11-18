@@ -1,71 +1,24 @@
-#
-# A pipeline that builds and analyzes a Java project with CodeQL and Component Governance
-# as a pre-merge check. A PR should not be allowed to merge if this build fails.
-#
 
-# Do not run this pipeline on a push to a branch. This pipeline is intended to be run
-# only when a PR to main is created or updated
 trigger: none
-pr:
-  - main
 
-resources:
-  repositories:
-    - repository: gctoolkit
-      type: github
-      endpoint: Github-Java-Engineering
-      name: microsoft/gctoolkit
+schedules:
+  - cron: 0 0 * * 0
+    displayName: "Weekly build"
+    branches:
+      include: [ main ]
+    always: true
 
-    - repository: 1esPipelines
-      type: git
-      name: 1ESPipelineTemplates/1ESPipelineTemplates
-      ref: refs/tags/release
+pool:
+  vmImage: ubuntu-latest
 
-extends:
-  template: v1/1ES.Official.PipelineTemplate.yml@1esPipelines
-  parameters:
-    pool:
-      name: JEG-mariner2.0-x64-release
-      os: linux
-    sdl:
-      sourceAnalysisPool:
-        name: JEG-windows2022-x64-release
-        os: windows
-        sourceRepositoriesToScan:
-          include:
-            - repository: gctoolkit
-      credscan:
-        suppressionsFile: $(Build.SourcesDirectory)/.devops/credscan/suppressions.json
-
-      stages:
-        - stage: PreMergeCheck
-          jobs:
-          - job: build_and_analyze
-            workspace:
-            clean: all
-  
-          - steps:
-            - checkout: gctoolkit
-              path: s/gctoolkit
-              clean: true
-  
-            - task: JavaToolInstaller@0
-              inputs:
-                versionSpec: '11'
-                jdkArchitectureOption: 'x64'
-                jdkSourceOption: 'PreInstalled'
-  
-            - task: Maven@4
-              inputs:
-                mavenPomFile: 'pom.xml'
-                goals: 'clean install'
-                options: '-B -Prelease'
-                mavenOptions: '-s $(Build.SourcesDirectory)/.devops/settings.xml'
-                mavenAuthenticateFeed: true
-                jdkVersionOption: '1.11'
-                jdkArchitectureOption: 'x64'
-              displayName: 'Build with Maven'
-  
-            - task: AdvancedSecurity-Dependency-Scanning@1
-              inputs:
-                directoryExclusionList: '**/test/**'
+steps:
+  - task: Maven@4
+    inputs:
+      mavenPomFile: 'pom.xml'
+      goals: 'clean package'
+      options: '-B -Prelease'
+      mavenOptions: '-s $(Build.SourcesDirectory)/.devops/settings.xml'
+      mavenAuthenticateFeed: true
+      jdkVersionOption: '1.11'
+      jdkArchitectureOption: 'x64'
+    displayName: 'Build with Maven'
