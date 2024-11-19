@@ -25,7 +25,7 @@ git checkout -d ${release_version}
 # we can get back to our previous branch.
 set +e
 ./mvnw -B -pl :gctoolkit -Pjreleaser jreleaser:release \
-  -Djreleaser.previous.tag.name=gctoolkit-${previous_release_version} \
-  -Djreleaser.tag.name=gctoolkit-${release_version} 
+  -Djreleaser.previous.tag.name=${previous_release_version} \
+  -Djreleaser.tag.name=${release_version}
 
 git checkout ${branch}
