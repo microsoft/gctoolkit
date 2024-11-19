@@ -46,7 +46,7 @@
     <properties>
         <revision>3.0.3-SNAPSHOT</revision>
         <checkstyle.version>10.18.2</checkstyle.version>
-        <jreleaser.plugin.version>1.14.0</jreleaser.plugin.version>
+        <jreleaser.plugin.version>1.15.0</jreleaser.plugin.version>
         <junit5.version>5.11.1</junit5.version>
         <maven.antrun-plugin.version>3.1.0</maven.antrun-plugin.version>
         <maven.changes-plugin.version>2.12.1</maven.changes-plugin.version>
@@ -541,18 +541,34 @@
                                         <skipTag>true</skipTag>
                                         <changelog>
                                             <formatted>ALWAYS</formatted>
-                                            <preset>conventional-commits</preset>
+                                            <skipMergeCommits>true</skipMergeCommits>
+                                            <!-- <preset>conventional-commits</preset> -->
                                             <labelers>
                                                 <labeler>
                                                     <label>maven-release</label>
                                                     <title>[maven-release-plugin]</title>
                                                 </labeler>
                                                 <labeler>
+                                                    <label>bots</label>
+                                                    <contributor>dependabot[bot]</contributor>
+                                                    <!-- <title>^Bump.+from.+to.+</title> -->
+                                                    <!-- <title>regex:Bump.*from.*to</title> -->
+                                                </labeler>
+                                                <labeler>
                                                     <label>github-issue</label>
                                                     <title>#</title>
                                                 </labeler>
                                             </labelers>
+                                            <replacers>
+                                                <replacer>
+                                                    <search>[bot]</search>
+                                                </replacer>
+                                            </replacers>
                                             <categories>
+                                                <category>
+                                                    <title>bots</title>
+                                                    <labels>bots</labels>
+                                                </category>
                                                 <category>
                                                     <title>maven-release</title>
                                                     <labels>maven-release</labels>
@@ -569,10 +585,13 @@
                                             </contributors>
                                             <hide>
                                                 <contributors>
-                                                    GitHub
+                                                    <contributor>GitHub</contributor>
+                                                    <contributor>Git</contributor>
+                                                    <contributor>dependabot[bot]</contributor>
                                                 </contributors>
                                                 <categories>
-                                                    maven-release
+                                                    <category>maven-release</category>
+                                                    <category>bots</category>
                                                 </categories>
                                             </hide>
                                         </changelog>
