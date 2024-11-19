@@ -7,14 +7,8 @@ PROJECT_HOME=$SCRIPT_DIR/../..
 
 cd $PROJECT_HOME
 
-GIT_AUTHOR_NAME='GitHub' \
+GIT_AUTHOR_NAME='Git' \
 GIT_AUTHOR_EMAIL='noreply@github.com' \
-GIT_COMMITTER_NAME='GitHub' \
+GIT_COMMITTER_NAME='Git' \
 GIT_COMMITTER_EMAIL='noreply@github.com' \
-./mvnw -B clean \
-release:clean \
-release:prepare \
--Prelease \
--Pwith-samples \
--Prun-wiremocks \
--DpushChanges=false
+./mvnw -B -DskipTests clean release:clean release:prepare -Prelease -DpushChanges=false
