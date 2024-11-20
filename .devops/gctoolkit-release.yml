@@ -8,11 +8,31 @@
 trigger: none
 pr: none
 
+parameter:
+  - name: release_tag
+    type: string
+    displayName: Release Tag
+
+  - name: release_type
+    type: string
+    displayName: Release Type
+    default: dry-run
+    values:
+      - dry-run
+      - release
+
 variables:
   JAVA_HOME_11_X64: /usr/lib/jvm/msopenjdk-11
+  GCTOOLKIT_TAG: ${{ parameters.release_tag }}
 
 resources:
   repositories:
+  - repository: gctoolkit
+      type: github
+      endpoint: Github-Java-Engineering
+      name: microsoft/gctoolkit
+      ref: $(GCTOOLKIT_TAG)
+
   - repository: 1esPipelines
     type: git
     name: 1ESPipelineTemplates/1ESPipelineTemplates
@@ -28,6 +48,9 @@ extends:
       sourceAnalysisPool:
         name: JEG-windows2022-x64-release
         os: windows
+      sourceRepositoriesToScan:
+        exclude:
+          - repository: gctoolkit
       credscan:
         suppressionsFile: $(Build.SourcesDirectory)/.devops/credscan/suppressions.json
 
@@ -39,7 +62,7 @@ extends:
             clean: all
           displayName: Build with Maven
           steps:
-            - checkout: self
+            - checkout: gctoolkit
               path: gctoolkit
               clean: true
 
@@ -177,6 +200,11 @@ extends:
               workingDirectory: $(Build.ArtifactStagingDirectory)
               displayName: Create sha256sums
 
+          - task: PublishPipelineArtifact@1
+            inputs:
+              targetPath: '(Build.ArtifactStagingDirectory)/staging'
+              artifactName: staged-artifacts
+
             - task: EsrpRelease@8
               inputs:
                 connectedservicename: 'JEG-Tooling-Prod'
@@ -186,7 +214,10 @@ extends:
                 clientid: '516af6d8-6ab4-4069-8f64-b18c64d16688'
                 intent: 'PackageDistribution'
                 # Test with contentype PyPI to avoid publishing to Maven Central
-                contenttype: 'Maven'
+                ${{ if eq(parameters.release_type, 'release') }}:
+                  contenttype: 'Maven'
+                ${{ else }}:
+                  contenttype: 'PyPI'
                 contentsource: 'Folder'
                 folderlocation: '$(Build.ArtifactStagingDirectory)/staging'
                 waitforreleasecompletion: true
@@ -196,9 +227,3 @@ extends:
                 mainpublisher: 'ESRPRELPACMAN'
                 domaintenantid: '33e01921-4d64-4f8c-a055-5bdaffd5e33d'
               displayName: 'Publish to Maven Central'
-
-          templateContext:
-            outputs:
-              - output: pipelineArtifact
-                path: '$(Build.ArtifactStagingDirectory)/staging'
-                artifact: staged-artifacts
