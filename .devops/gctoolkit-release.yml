@@ -31,7 +31,7 @@ resources:
     type: github
     endpoint: Github-Java-Engineering
     name: microsoft/gctoolkit
-    ref: $(GCTOOLKIT_TAG)
+    ref: refs/tags/$(GCTOOLKIT_TAG)
 
   - repository: 1esPipelines
     type: git
