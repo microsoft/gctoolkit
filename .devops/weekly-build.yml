@@ -1,0 +1,39 @@
+
+trigger: none
+
+schedules:
+  - cron: 0 0 * * 0
+    displayName: "Weekly build"
+    branches:
+      include: [ main ]
+    always: true
+
+variables:
+  JAVA_HOME_11_X64: /usr/lib/jvm/msopenjdk-11
+
+pool:
+  name: JEG-mariner2.0-x64-release
+
+steps:
+  - task: JavaToolInstaller@0
+    inputs:
+      versionSpec: '11'
+      jdkArchitectureOption: 'x64'
+      jdkSourceOption: 'PreInstalled'
+    env:
+      JAVA_HOME_11_X64: $(JAVA_HOME_11_X64)
+    displayName: 'Set Java to v11'
+
+  - checkout: self
+    clean: true
+
+  - task: Maven@4
+    inputs:
+      mavenPomFile: 'pom.xml'
+      goals: 'clean package'
+      options: '-B -Prelease'
+      mavenOptions: '-s $(Build.SourcesDirectory)/.devops/feed-settings.xml'
+      mavenAuthenticateFeed: true
+      jdkVersionOption: '1.11'
+      jdkArchitectureOption: 'x64'
+    displayName: 'Build with Maven'
