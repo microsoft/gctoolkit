@@ -186,8 +186,7 @@ extends:
                 clientid: '516af6d8-6ab4-4069-8f64-b18c64d16688'
                 intent: 'PackageDistribution'
                 # Test with contentype PyPI to avoid publishing to Maven Central
-                # contenttype: 'Maven'
-                contenttype: 'PyPI'
+                contenttype: 'Maven'
                 contentsource: 'Folder'
                 folderlocation: '$(Build.ArtifactStagingDirectory)/staging'
                 waitforreleasecompletion: true
