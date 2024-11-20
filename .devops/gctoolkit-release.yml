@@ -28,10 +28,10 @@ variables:
 resources:
   repositories:
   - repository: gctoolkit
-      type: github
-      endpoint: Github-Java-Engineering
-      name: microsoft/gctoolkit
-      ref: $(GCTOOLKIT_TAG)
+    type: github
+    endpoint: Github-Java-Engineering
+    name: microsoft/gctoolkit
+    ref: $(GCTOOLKIT_TAG)
 
   - repository: 1esPipelines
     type: git
