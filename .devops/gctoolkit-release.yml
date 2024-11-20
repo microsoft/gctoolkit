@@ -200,10 +200,10 @@ extends:
               workingDirectory: $(Build.ArtifactStagingDirectory)
               displayName: Create sha256sums
 
-          - task: PublishPipelineArtifact@1
-            inputs:
-              targetPath: '(Build.ArtifactStagingDirectory)/staging'
-              artifactName: staged-artifacts
+            - task: 1ES.PublishPipelineArtifact@1
+              inputs:
+                targetPath: '(Build.ArtifactStagingDirectory)/staging'
+                artifactName: staged-artifacts
 
             - task: EsrpRelease@8
               inputs:
