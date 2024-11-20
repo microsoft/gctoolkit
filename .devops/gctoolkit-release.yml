@@ -202,7 +202,7 @@ extends:
 
             - task: 1ES.PublishPipelineArtifact@1
               inputs:
-                targetPath: '(Build.ArtifactStagingDirectory)/staging'
+                targetPath: '$(Build.ArtifactStagingDirectory)/staging'
                 artifactName: staged-artifacts
 
             - task: EsrpRelease@8
