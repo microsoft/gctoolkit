@@ -541,8 +541,6 @@
                                         <skipTag>true</skipTag>
                                         <changelog>
                                             <formatted>ALWAYS</formatted>
-                                            <skipMergeCommits>true</skipMergeCommits>
-                                            <!-- <preset>conventional-commits</preset> -->
                                             <labelers>
                                                 <labeler>
                                                     <label>maven-release</label>
@@ -551,31 +549,36 @@
                                                 <labeler>
                                                     <label>bots</label>
                                                     <contributor>dependabot[bot]</contributor>
-                                                    <!-- <title>^Bump.+from.+to.+</title> -->
-                                                    <!-- <title>regex:Bump.*from.*to</title> -->
+                                                </labeler>
+                                                <labeler>
+                                                    <label>not-github-issue</label>
+                                                    <title>regex:.*(?!#\\d+).*</title>
                                                 </labeler>
                                                 <labeler>
                                                     <label>github-issue</label>
                                                     <title>#</title>
                                                 </labeler>
                                             </labelers>
-                                            <replacers>
-                                                <replacer>
-                                                    <search>[bot]</search>
-                                                </replacer>
-                                            </replacers>
                                             <categories>
                                                 <category>
                                                     <title>bots</title>
                                                     <labels>bots</labels>
+                                                    <order>1</order>
                                                 </category>
                                                 <category>
                                                     <title>maven-release</title>
                                                     <labels>maven-release</labels>
+                                                    <order>2</order>
+                                                </category>
+                                                <category>
+                                                    <title>not-github-issue</title>
+                                                    <labels>not-github-issue</labels>
+                                                    <order>4</order>
                                                 </category>
                                                 <category>
                                                     <title>♻️  Changes</title>
                                                     <labels>github-issue</labels>
+                                                    <order>3</order>
                                                 </category>
                                             </categories>
                                             <contributors>
@@ -592,6 +595,7 @@
                                                 <categories>
                                                     <category>maven-release</category>
                                                     <category>bots</category>
+                                                    <category>not-github-issue</category>
                                                 </categories>
                                             </hide>
                                         </changelog>
