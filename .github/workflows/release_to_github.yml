@@ -58,4 +58,4 @@ jobs:
             -Djreleaser.previous.tag.name="$previous_version" \
             -Djreleaser.tag.name="$version"
         env:
-          JRELEASER_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          JRELEASER_GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
