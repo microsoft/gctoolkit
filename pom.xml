@@ -543,6 +543,7 @@
                                     <github>
                                         <tagName>gctoolkit-{{projectVersion}}</tagName>
                                         <skipTag>true</skipTag>
+                                        <overwrite>true</overwrite>
                                         <changelog>
                                             <formatted>ALWAYS</formatted>
                                             <labelers>
