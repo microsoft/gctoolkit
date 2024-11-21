@@ -1,0 +1,58 @@
+name: Release to GitHub
+
+on:
+  workflow_dispatch:
+
+jobs:
+  release:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout project
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Cache Maven
+        uses: actions/cache@6849a6489940f00c2f30c0fb92c6274307ccb58a # v4.1.2
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
+
+      - name: Setup Java JDK
+        uses: actions/setup-java@8df1039502a15bceb9433410b1a100fbe190c53b # v4.5.0
+        with:
+          java-version: '11'
+          distribution: 'microsoft'
+
+      - name: Version
+        id: version
+        run: |
+          release_version=$( ./mvnw help:evaluate -Dexpression=project.version -q -DforceStdout )
+          release_version=${release_version%-*}
+          echo "version=${release_version}" >> "$GITHUB_ENV"
+
+          # Get the previous release version from what is actually on GitHub
+          previous_release_version=$( ./mvnw help:evaluate -Dexpression=project.scm.tag -q -DforceStdout )
+          echo "previous_version=${previous_release_version}" >> "$GITHUB_ENV"
+
+      - name: Release Prepare
+        run: |
+          ./mvnw -B -Prelease release:clean release:prepare \
+            -Drepository.url=https://${{ github.actor }}:${{ secrets.RELEASE_TOKEN }}@github.com/${{ github.repository }}.git
+        env:
+          GIT_AUTHOR_NAME: 'Git'
+          GIT_AUTHOR_EMAIL: 'noreply@github.com'
+          GIT_COMMITTER_NAME: 'Git'
+          GIT_COMMITTER_EMAIL: 'noreply@github.com'
+
+      - name: Release to GitHub
+        run: |
+          ./mvnw -B -pl :gctoolkit -Pjreleaser jreleaser:release \
+            -Djreleaser.previous.tag.name="$previous_version" \
+            -Djreleaser.tag.name="$version"
+        env:
+          JRELEASER_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
