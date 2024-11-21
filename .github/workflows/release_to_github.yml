@@ -56,7 +56,7 @@ jobs:
 
       - name: Release to GitHub
         run: |
-          git checkout "$release_version"
+          git checkout "gctoolkit-$release_version"
           ./mvnw -B -pl :gctoolkit -Pjreleaser jreleaser:release \
             -Djreleaser.previous.tag.name="$previous_tag" \
             -Djreleaser.tag.name="gctoolkit-$release_version"
