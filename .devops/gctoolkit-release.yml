@@ -205,7 +205,7 @@ extends:
                 targetPath: '$(Build.ArtifactStagingDirectory)/staging'
                 artifactName: staged-artifacts
 
-            - task: EsrpRelease@8
+            - task: EsrpRelease@7
               inputs:
                 connectedservicename: 'JEG-Tooling-Prod'
                 keyvaultname: 'JEG-tooling-kv'
