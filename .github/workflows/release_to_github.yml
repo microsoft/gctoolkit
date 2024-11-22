@@ -35,7 +35,7 @@ jobs:
         run: |
           release_tag=$( ./mvnw help:evaluate -Dexpression=project.version -q -DforceStdout )
           release_tag=${release_tag%-*}
-          echo "release_version=gctoolkit-${release_tag}" >> "$GITHUB_ENV"
+          echo "release_tag=${release_tag}" >> "$GITHUB_ENV"
 
           previous_tag=$( git tag --sort=-taggerdate --list 'gctoolkit-*' | head -n1 )          
           echo "previous_tag=${previous_tag}" >> "$GITHUB_ENV"
