@@ -33,7 +33,7 @@ jobs:
       - name: Version
         id: version
         run: |
-          release_tag$( ./mvnw help:evaluate -Dexpression=project.version -q -DforceStdout )
+          release_tag=$( ./mvnw help:evaluate -Dexpression=project.version -q -DforceStdout )
           release_tag=${release_tag%-*}
           echo "release_version=gctoolkit-${release_tag}" >> "$GITHUB_ENV"
 
