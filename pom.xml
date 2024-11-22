@@ -5,7 +5,7 @@
     <groupId>com.microsoft.gctoolkit</groupId>
     <artifactId>gctoolkit</artifactId>
     <packaging>pom</packaging>
-    <version>3.3.0-SNAPSHOT</version>
+    <version>3.0.5-SNAPSHOT</version>
 
     <name>GCToolKit</name>
     <description>GC log parsing utilities</description>
@@ -539,6 +539,9 @@
                         <inherited>false</inherited>
                         <configuration>
                             <jreleaser>
+                                <upload>
+                                    <active>RELEASE</active>
+                                </upload>
                                 <release>
                                     <github>
                                         <tagName>gctoolkit-{{projectVersion}}</tagName>
