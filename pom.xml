@@ -508,6 +508,10 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-javadoc-plugin</artifactId>
+                        <configuration>
+                            <!-- don't aggregate parser and vertx javadocs -->
+                            <skippedModules>parser,vertx</skippedModules>
+                        </configuration>
                         <executions>
                             <execution>
                                 <id>attach-javadocs</id>
