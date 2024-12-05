@@ -8,12 +8,23 @@ import com.microsoft.gctoolkit.message.DataSourceParser;
 
 import java.util.concurrent.CountDownLatch;
 
+/**
+ * A class that represents a Vert.x data source channel.
+ * It extends VertxChannel and implements DataSourceChannel.
+ */
 public class VertxDataSourceChannel extends VertxChannel implements DataSourceChannel {
 
+    /**
+     * Default constructor.
+     */
     public VertxDataSourceChannel() {
         super();
     }
 
+    /**
+     * Registers a listener for the data source channel.
+     * @param listener the DataSourceParser listener to register.
+     */
     @Override
     public void registerListener(DataSourceParser listener) {
         final DataSourceVerticle processor = new DataSourceVerticle(vertx(), listener.channel().getName(), listener);
@@ -29,11 +40,19 @@ public class VertxDataSourceChannel extends VertxChannel implements DataSourceCh
         }
     }
 
+    /**
+     * Publishes a message to a specified channel.
+     * @param channel the channel to publish to.
+     * @param message the message to publish.
+     */
     @Override
     public void publish(ChannelName channel, String message) {
-        vertx().eventBus().publish(channel.getName(),message);
+        vertx().eventBus().publish(channel.getName(), message);
     }
 
+    /**
+     * Closes the data source channel.
+     */
     @Override
     public void close() {
         super.close();
