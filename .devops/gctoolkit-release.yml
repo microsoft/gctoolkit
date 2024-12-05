@@ -186,7 +186,7 @@ extends:
             # this will create a .asc file for each file in the directory. This is a detached signature
             # required to publish into Maven Central.
             - bash: |
-                for file in `find staging -type f -name *-$(RELEASE_VERSION)*.jar`; do
+                for file in `find staging -type f -name *-$(RELEASE_VERSION)*.jar -o -name *-$(RELEASE_VERSION)*.pom`; do
                   echo $(javask-gpg-passphrase) | gpg --pinentry-mode loopback --passphrase-fd 0 -ab $file
                 done
               workingDirectory: $(Build.ArtifactStagingDirectory)
