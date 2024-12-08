@@ -22,7 +22,7 @@
         <dependency>
             <groupId>io.vertx</groupId>
             <artifactId>vertx-core</artifactId>
-            <version>4.5.8</version>
+            <version>4.5.11</version>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
