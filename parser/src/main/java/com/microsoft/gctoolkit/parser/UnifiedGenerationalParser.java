@@ -4,6 +4,7 @@ package com.microsoft.gctoolkit.parser;
 
 import com.microsoft.gctoolkit.aggregator.EventSource;
 import com.microsoft.gctoolkit.event.CPUSummary;
+import com.microsoft.gctoolkit.event.GCCause;
 import com.microsoft.gctoolkit.event.GarbageCollectionTypes;
 import com.microsoft.gctoolkit.event.generational.AbortablePreClean;
 import com.microsoft.gctoolkit.event.generational.CMSConcurrentEvent;
@@ -21,6 +22,7 @@ import com.microsoft.gctoolkit.event.generational.InitialMark;
 import com.microsoft.gctoolkit.event.generational.PSFullGC;
 import com.microsoft.gctoolkit.event.generational.PSYoungGen;
 import com.microsoft.gctoolkit.event.generational.ParNew;
+import com.microsoft.gctoolkit.event.generational.SystemGC;
 import com.microsoft.gctoolkit.event.generational.YoungGC;
 import com.microsoft.gctoolkit.event.jvm.JVMTermination;
 import com.microsoft.gctoolkit.jvm.Diary;
@@ -481,12 +483,21 @@ public class UnifiedGenerationalParser extends UnifiedGCLogParser implements Uni
     }
 
     private FullGC buildFullGC(GenerationalForwardReference forwardReference) {
+        FullGC gc;
         switch (forwardReference.getGarbageCollectionType()) {
             case PSFull:
-                return fillOutFullGC(new PSFullGC(forwardReference.getStartTime(), forwardReference.getGCCause(), forwardReference.getDuration()), forwardReference);
+                if ( forwardReference.getGCCause().equals(GCCause.JAVA_LANG_SYSTEM))
+                    gc = new SystemGC(forwardReference.getStartTime(), forwardReference.getGCCause(), forwardReference.getDuration());
+                else
+                    gc = new PSFullGC(forwardReference.getStartTime(), forwardReference.getGCCause(), forwardReference.getDuration());
+                return fillOutFullGC(gc, forwardReference);
             case FullGC:
             case Full:
-                return fillOutFullGC(new FullGC(forwardReference.getStartTime(), forwardReference.getGCCause(), forwardReference.getDuration()), forwardReference);
+                if ( forwardReference.getGCCause().equals(GCCause.JAVA_LANG_SYSTEM))
+                    gc = new SystemGC(forwardReference.getStartTime(), forwardReference.getGCCause(), forwardReference.getDuration());
+                else
+                    gc = new FullGC(forwardReference.getStartTime(), forwardReference.getGCCause(), forwardReference.getDuration());
+                return fillOutFullGC(gc, forwardReference);
             default:
                 LOGGER.warning(forwardReference.getGarbageCollectionType() + " is unrecognized");
         }
