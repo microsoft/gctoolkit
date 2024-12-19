@@ -1578,7 +1578,7 @@ public class GenerationalHeapParser extends PreUnifiedGCLogParser implements Sim
     //939.183: [GC [PSYoungGen: 523744K->844K(547584K)] 657668K->135357K(1035008K), 0.0157986 secs] [Times: user=0.30 sys=0.01, real=0.02 secs]
     public void psYoungGen(GCLogTrace trace, String line) {
         PSYoungGen collection = new PSYoungGen(getClock(), trace.gcCause(), trace.getDoubleGroup(trace.groupCount()));
-        collection.add(trace.getOccupancyBeforeAfterWithMemoryPoolSizeSummary(5), getTotalOccupancyBeforeAfterWithTotalHeapPoolSizeSummary(trace, 11));
+        collection.add(trace.getOccupancyBeforeAfterWithMemoryPoolSizeSummary(8), getTotalOccupancyBeforeAfterWithTotalHeapPoolSizeSummary(trace, 14));
         collection.add(extractCPUSummary(line));
         publish(collection);
     }
@@ -1714,7 +1714,7 @@ public class GenerationalHeapParser extends PreUnifiedGCLogParser implements Sim
     //GC-- indicated a promotion failed
     public void psFailure(GCLogTrace trace, String line) {
         PSYoungGen collection = new PSYoungGen(getClock(), GCCause.PROMOTION_FAILED, trace.getDoubleGroup(trace.groupCount()));
-        collection.add(trace.getOccupancyBeforeAfterWithMemoryPoolSizeSummary(5), getTotalOccupancyBeforeAfterWithTotalHeapPoolSizeSummary(trace, 11));
+        collection.add(trace.getOccupancyBeforeAfterWithMemoryPoolSizeSummary(8), getTotalOccupancyBeforeAfterWithTotalHeapPoolSizeSummary(trace, 14));
     }
 
     public void psYoungAdaptiveSizePolicy(GCLogTrace trace, String line) {

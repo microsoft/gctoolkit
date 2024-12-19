@@ -29,6 +29,7 @@ public abstract class G1GCPauseEvent extends G1GCEvent {
     private RegionSummary archiveRegion;
 
     private CPUSummary cpuSummary;
+    private int heapRegionSize;
 
     public G1GCPauseEvent(DateTimeStamp timeStamp, GarbageCollectionTypes type, GCCause cause, double duration) {
         super(timeStamp, type, cause, duration);
@@ -102,10 +103,15 @@ public abstract class G1GCPauseEvent extends G1GCEvent {
         } else if (getSurvivor() == null) {
             return getHeap().minus(getEden());
         } else {
-            return new MemoryPoolSummary(getHeap().getOccupancyBeforeCollection() - this.getEden().getOccupancyBeforeCollection() - getSurvivor().getOccupancyBeforeCollection(),
-                    getHeap().getSizeBeforeCollection() - getEden().getSizeBeforeCollection() - getSurvivor().getOccupancyBeforeCollection(),
-                    getHeap().getOccupancyAfterCollection() - getEden().getOccupancyAfterCollection() - getSurvivor().getOccupancyAfterCollection(),
-                    getHeap().getSizeAfterCollection() - getEden().getSizeAfterCollection() - getSurvivor().getOccupancyAfterCollection());
+            final RegionSummary summary = getArchiveRegionSummary();
+            final long archiveRegionByteBefore = summary.getBefore() * heapRegionSize * 1024L;
+            final long archiveRegionByteAfter = summary.getAfter() * heapRegionSize * 1024L;
+            final long archiveRegionByteAssigned = summary.getAssigned() * heapRegionSize * 1024L;
+
+            return new MemoryPoolSummary(getHeap().getOccupancyBeforeCollection() - this.getEden().getOccupancyBeforeCollection() - getSurvivor().getOccupancyBeforeCollection() - archiveRegionByteAssigned,
+                    getHeap().getSizeBeforeCollection() - getEden().getSizeBeforeCollection() - getSurvivor().getOccupancyBeforeCollection() - archiveRegionByteBefore,
+                    getHeap().getOccupancyAfterCollection() - getEden().getOccupancyAfterCollection() - getSurvivor().getOccupancyAfterCollection() - archiveRegionByteAssigned,
+                    getHeap().getSizeAfterCollection() - getEden().getSizeAfterCollection() - getSurvivor().getOccupancyAfterCollection() - archiveRegionByteAfter);
         }
     }
 
@@ -121,4 +127,7 @@ public abstract class G1GCPauseEvent extends G1GCEvent {
         return this.cpuSummary;
     }
 
+    public void addHeapRegionSize(int heapRegionSize) {
+        this.heapRegionSize = heapRegionSize;
+    }
 }

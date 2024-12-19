@@ -34,11 +34,11 @@ public class TestSharedAggregators {
         }
 
         jvm.getAggregation(OneRuntimeReport.class).ifPresentOrElse(
-                oneRuntimeReport -> Assertions.assertEquals(8.782d, oneRuntimeReport.getRuntimeDuration()),
+                oneRuntimeReport -> Assertions.assertEquals(8.772d, oneRuntimeReport.getRuntimeDuration()),
                 () -> Assertions.fail("1 report missing"));
 
         jvm.getAggregation(TwoRuntimeReport.class).ifPresentOrElse(
-                twoRuntimeReport -> Assertions.assertEquals(8.782d, twoRuntimeReport.getRuntimeDuration()),
+                twoRuntimeReport -> Assertions.assertEquals(8.772d, twoRuntimeReport.getRuntimeDuration()),
                 () -> Assertions.fail("2 report missing"));
     }
 }

@@ -18,6 +18,8 @@ public class G1Young extends G1RealPause {
 
     private double parallelPhaseDuration = -1.0d;
     private int gcWorkers;
+    private int evacuationWorkersUsed;
+    private int evacuationWorkersAvailable;
     private double codeRootFixupDuration = -1.0d;
     private double codeRootMigrationDuration = -1.0d;
     private double codeRootPurgeDuration = -1.0d;
@@ -60,6 +62,14 @@ public class G1Young extends G1RealPause {
 
     public void setGcWorkers(int count) {
         this.gcWorkers = count;
+    }
+
+    public void setEvacuationWorkersUsed(int evacuationWorkersUsed) {
+        this.evacuationWorkersUsed = evacuationWorkersUsed;
+    }
+
+    public void setEvacuationWorkersAvailable(int evacuationWorkersAvailable) {
+        this.evacuationWorkersAvailable = evacuationWorkersAvailable;
     }
 
     public void setCodeRootFixupDuration(double duration) {
@@ -105,6 +115,14 @@ public class G1Young extends G1RealPause {
 
     public int getGcWorkers() {
         return gcWorkers;
+    }
+
+    public int getEvacuationWorkersUsed() {
+        return evacuationWorkersUsed;
+    }
+
+    public int getEvacuationWorkersAvailable() {
+        return evacuationWorkersAvailable;
     }
 
     public double getCodeRootFixupDuration() {

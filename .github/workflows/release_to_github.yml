@@ -1,0 +1,60 @@
+name: Release to GitHub
+
+on:
+  workflow_dispatch:
+
+jobs:
+  release:
+    permissions:
+      contents: write
+    
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout project
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Cache Maven
+        uses: actions/cache@1bd1e32a3bdc45362d1e726936510720a7c30a57 # v4.2.0
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
+
+      - name: Setup Java JDK
+        uses: actions/setup-java@7a6d8a8234af8eb26422e24e3006232cccaa061b # v4.6.0
+        with:
+          java-version: '11'
+          distribution: 'microsoft'
+
+      - name: Version
+        id: version
+        run: |
+          release_tag=$( ./mvnw help:evaluate -Dexpression=project.version -q -DforceStdout )
+          release_tag=${release_tag%-*}
+          echo "release_tag=gctoolkit-${release_tag}" >> "$GITHUB_ENV"
+
+          previous_tag=$( git tag --sort=-taggerdate --list 'gctoolkit-*' | head -n1 )          
+          echo "previous_tag=${previous_tag}" >> "$GITHUB_ENV"
+
+      - name: Release Prepare
+        run: |
+          ./mvnw -B -Prelease release:clean release:prepare \
+            -Drepository.url=https://${{ github.actor }}:${{ secrets.RELEASE_TOKEN }}@github.com/${{ github.repository }}.git
+        env:
+          GIT_AUTHOR_NAME: 'Git'
+          GIT_AUTHOR_EMAIL: 'noreply@github.com'
+          GIT_COMMITTER_NAME: 'Git'
+          GIT_COMMITTER_EMAIL: 'noreply@github.com'
+
+      - name: Release to GitHub
+        run: |
+          git checkout "$release_tag"
+          ./mvnw -B -pl :gctoolkit -Pjreleaser jreleaser:release \
+            -Djreleaser.previous.tag.name="$previous_tag" \
+            -Djreleaser.tag.name="$release_tag"
+        env:
+          JRELEASER_GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}

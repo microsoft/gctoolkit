@@ -9,25 +9,30 @@ public interface ZGCPatterns extends UnifiedPatterns {
 
     String MEMORY_PERCENT = GenericTokens.INT + GenericTokens.UNITS + "\\s*\\(" + GenericTokens.INT + "%\\)";
 
+    String LOAD_PERCENT = GenericTokens.REAL_VALUE + " \\(" + GenericTokens.INTEGER + "%\\)";
+
     GCParseRule ZGC_TAG = new GCParseRule("ZGC Tag", "Initializing The Z Garbage Collector$");
 
     //[3.558s][info ][gc,start       ] GC(3) Garbage Collection (Warmup)
-    GCParseRule CYCLE_START = new GCParseRule("CYCLE_START", "GC\\(" + GenericTokens.INT + "\\) Garbage Collection " + GenericTokens.GC_CAUSE + "$");
+    GCParseRule CYCLE_START = new GCParseRule("CYCLE_START", "GC\\(" + GenericTokens.INT + "\\) (?:Garbage|Major|Minor) Collection " + GenericTokens.GC_CAUSE + "$");
 
     //[3.559s][info ][gc,phases      ] GC(3) Pause Mark Start 0.460ms
     //[3.574s][info ][gc,phases      ] GC(3) Pause Mark End 0.830ms
     //[3.583s][info ][gc,phases      ] GC(3) Pause Relocate Start 0.794ms
-    GCParseRule PAUSE_PHASE = new GCParseRule("Pause Phase", "Pause (Mark Start|Mark End|Relocate Start) " + GenericTokens.PAUSE_TIME);
+    GCParseRule PAUSE_PHASE = new GCParseRule("Pause Phase", "Pause (Mark Start|Mark End|Relocate Start)(?: \\((Major|Minor)\\))? " + GenericTokens.PAUSE_TIME);
 
     //[3.573s][info ][gc,phases      ] GC(3) Concurrent Mark 14.621ms
     //[3.578s][info ][gc,phases      ] GC(3) Concurrent Process Non-Strong References 3.654ms
     //[3.578s][info ][gc,phases      ] GC(3) Concurrent Reset Relocation Set 0.194ms
     //[3.582s][info ][gc,phases      ] GC(3) Concurrent Select Relocation Set 3.193ms
     //[3.596s][info ][gc,phases      ] GC(3) Concurrent Relocate 12.962ms
-    GCParseRule CONCURRENT_PHASE = new GCParseRule("Concurrent Phase","Concurrent (Mark|Mark Free|Process Non-Strong References|Reset Relocation Set|Select Relocation Set|Relocate) " + GenericTokens.PAUSE_TIME);
+    GCParseRule CONCURRENT_PHASE = new GCParseRule("Concurrent Phase","Concurrent (Mark|Mark Free|Process Non-Strong References|Process Non-Strong|Reset Relocation Set|Select Relocation Set|Relocate) " + GenericTokens.PAUSE_TIME);
 
     //[3.596s][info ][gc,load        ] GC(3) Load: 4.28/3.95/3.22
     GCParseRule LOAD = new GCParseRule("Load","Load: " + GenericTokens.REAL_VALUE + "/" + GenericTokens.REAL_VALUE + "/" + GenericTokens.REAL_VALUE);
+
+    // [4.220s][info][gc,load     ] GC(0) O: Load: 9.07 (19%) / 9.48 (20%) / 10.07 (21%)
+    GCParseRule GENERATION_LOAD = new GCParseRule("Load","Load: " + LOAD_PERCENT + " / " + LOAD_PERCENT + " / " + LOAD_PERCENT);
 
     //[3.596s][info ][gc,mmu         ] GC(3) MMU: 2ms/32.7%, 5ms/60.8%, 10ms/80.4%, 20ms/85.4%, 50ms/90.8%, 100ms/95.4%
     GCParseRule MMU = new GCParseRule("MMU","MMU: 2ms/" + GenericTokens.PERCENTAGE + ", 5ms/" + GenericTokens.PERCENTAGE + ", 10ms/" + GenericTokens.PERCENTAGE + ", 20ms/" + GenericTokens.PERCENTAGE + ", 50ms/" + GenericTokens.PERCENTAGE + ", 100ms/" + GenericTokens.PERCENTAGE);
@@ -75,7 +80,7 @@ public interface ZGCPatterns extends UnifiedPatterns {
     GCParseRule MEMORY_TABLE_ENTRY_RECLAIMED = new GCParseRule("Memory table entry reclaimed", "Reclaimed:\\s*-\\s*-\\s*" + MEMORY_PERCENT + "\\s*" + MEMORY_PERCENT);
 
     //[3.596s][info ][gc             ] GC(3) Garbage Collection (Warmup) 894M(22%)->186M(5%)
-    GCParseRule MEMORY_SUMMARY = new GCParseRule("Memory Summary","Garbage Collection " + GenericTokens.GC_CAUSE + MEMORY_PERCENT + "->" + MEMORY_PERCENT);
+    GCParseRule MEMORY_SUMMARY = new GCParseRule("Memory Summary","(?:Garbage|Major|Minor) Collection " + GenericTokens.GC_CAUSE + MEMORY_PERCENT + "->" + MEMORY_PERCENT);
 
     /*
     todo: capture and report on these log entries
@@ -99,4 +104,11 @@ public interface ZGCPatterns extends UnifiedPatterns {
         [0.010s][info ][gc,init] Uncommit: Enabled, Delay: 300s
      */
 
+    /*
+        [4.179s][info][gc,heap     ] GC(0) Y: Heap Statistics:
+        [4.179s][info][gc,heap     ] GC(0) Y: Young Generation Statistics:
+        [4.220s][info][gc,heap     ] GC(0) O: Heap Statistics:
+        [4.220s][info][gc,heap     ] GC(0) O: Old Generation Statistics:
+     */
+    GCParseRule GENERATIONAL_MEMORY_STATISTICS = new GCParseRule("Generational Heap Statistics","(Young Generation|Old Generation|Heap) Statistics:");
 }
