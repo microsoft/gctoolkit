@@ -28,6 +28,9 @@ public class DirtyDataIntegrationTest {
     assertThrows(IllegalStateException.class, () -> analyze(path.toString()));
   }
 
+  /**
+   * Test an empty file that contains nothing
+   */
   @Test
   public void testEmptyFile() {
     Path path = new TestLogFile("streaming/gc_empty.log").getFile().toPath();
