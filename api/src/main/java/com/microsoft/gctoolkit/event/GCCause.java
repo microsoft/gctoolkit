@@ -52,7 +52,8 @@ public enum GCCause {
     ALLOC_RATE("Allocation Rate"),
     ALLOC_STALL("Allocation Stall"),
     PROACTIVE("Proactive"),
-    PREVENTIVE("G1 Preventive Collection");
+    PREVENTIVE("G1 Preventive Collection"),
+    CODE_CACHE_THRESHOLD("CodeCache GC Threshold");
 
     private final String label;
 

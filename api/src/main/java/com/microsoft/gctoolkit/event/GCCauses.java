@@ -52,6 +52,7 @@ public class GCCauses {
         Map.entry(ALLOC_RATE.getLabel(), ALLOC_RATE),
         Map.entry(ALLOC_STALL.getLabel(), ALLOC_STALL),
         Map.entry(PROACTIVE.getLabel(), PROACTIVE),
+        Map.entry(CODE_CACHE_THRESHOLD.getLabel(), CODE_CACHE_THRESHOLD),
         Map.entry(GCCause.PREVENTIVE.getLabel(),PREVENTIVE));
 
     public static GCCause get(String gcCauseName) {
@@ -113,4 +114,7 @@ public class GCCauses {
     PROACTIVE("Proactive");
     //JDK 17
     PREVENTATIVE("G1 Preventive Collection")
+    //JDK 21
+    CODE_CACHE_THRESHOLD("CodeCache GC Threshold")
+
  */
