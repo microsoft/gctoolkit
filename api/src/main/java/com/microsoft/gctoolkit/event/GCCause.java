@@ -7,7 +7,6 @@ package com.microsoft.gctoolkit.event;
  * causes that a GC log file can hold.
  */
 public enum GCCause {
-
     JAVA_LANG_SYSTEM("System.gc()"),
     DIAGNOSTIC_COMMAND("Diagnostic Command"),
     FULL_GC_ALOT("FullGCALot"),
@@ -47,12 +46,16 @@ public enum GCCause {
     WHITEBOX_CONCURRENT_MARK("WhiteBox Initiated Concurrent Mark"),
     WHITEBOX_FULL("WhiteBox Initiated Full GC"),
     META_CLEAR_SOFT_REF("Metadata GC Clear Soft References"),
+    PREVENTIVE("G1 Preventive Collection"),
+    CODE_CACHE_THRESHOLD("CodeCache GC Threshold"),
+
+    // ZGC Specific
     TIMER("Timer"),
     WARMUP("Warmup"),
     ALLOC_RATE("Allocation Rate"),
     ALLOC_STALL("Allocation Stall"),
     PROACTIVE("Proactive"),
-    PREVENTIVE("G1 Preventive Collection");
+    HIGH_USAGE("High Usage");
 
     private final String label;
 
@@ -63,5 +66,4 @@ public enum GCCause {
     public String getLabel() {
         return label;
     }
-
 }

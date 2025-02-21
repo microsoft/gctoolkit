@@ -82,7 +82,7 @@ public class ZGCParserRulesTest implements ZGCPatterns {
             MEMORY_TABLE_HEADER,            // 10
             MEMORY_TABLE_ENTRY_SIZE,
             MEMORY_TABLE_ENTRY_OCCUPANCY,
-            MEMORY_TABLE_ENTRY_RECLAIMED,
+            MEMORY_TABLE_ENTRY_RECLAIMED_PROMOTED,
             MEMORY_SUMMARY
     };
 

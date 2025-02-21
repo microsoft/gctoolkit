@@ -1,60 +1,91 @@
-// Copyright (c) Microsoft Corporation.
-// Licensed under the MIT License.
 package com.microsoft.gctoolkit.event.zgc;
 
-import com.microsoft.gctoolkit.event.GCCause;
-import com.microsoft.gctoolkit.event.GCEvent;
-import com.microsoft.gctoolkit.event.GarbageCollectionTypes;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
 
-public class ZGCCycle extends GCEvent {
-    public ZGCCycle(DateTimeStamp timeStamp, GarbageCollectionTypes gcType, GCCause cause, double duration) {
-        super(timeStamp, gcType, cause, duration);
-    }
-
-    public ZGCCycle(DateTimeStamp timeStamp, double duration) {
-        super(timeStamp, duration);
-    }
-
-    public ZGCCycle(DateTimeStamp timeStamp, GCCause cause, double duration) {
-        super(timeStamp, cause, duration);
-    }
-
-    public ZGCCycle(DateTimeStamp timeStamp, GarbageCollectionTypes gcType, double duration) {
-        super(timeStamp, gcType, duration);
-    }
-
+public class ZGCCycle {
+    private DateTimeStamp markRootsStart;
+    private double markRootsDuration;
+    private DateTimeStamp markFollowStart;
+    private double markFollowDuration;
+    private DateTimeStamp remapRootColoredStart;
+    private double remapRootsColoredDuration;
+    private DateTimeStamp remapRootsUncoloredStart;
+    private double remapRootsUncoloredDuration;
+    private DateTimeStamp remapRememberedStart;
+    private double remapRememberedDuration;
+    private ZGCMarkSummary markSummary;
+    private ZGCPromotedSummary promotedSummary;
+    private ZGCCompactedSummary compactedSummary;
+    private ZGCCollectionType type;
+    private ZGCPhase phase;
+    private OccupancySummary usedOccupancySummary;
     private long gcId;
-
     private DateTimeStamp pauseMarkStartTimeStamp;
     private double pauseMarkStartDuration;
-
     private DateTimeStamp concurrentMarkTimeStamp;
     private double concurrentMarkDuration;
-
     private DateTimeStamp concurrentMarkFreeTimeStamp;
     private double concurrentMarkFreeDuration;
-
     private DateTimeStamp pauseMarkEndTimeStamp;
     private double pauseMarkEndDuration;
-
     private DateTimeStamp concurrentProcessNonStrongReferencesTimeStamp;
     private double concurrentProcessNonStrongReferencesDuration;
-
     private DateTimeStamp concurrentResetRelocationSetTimeStamp;
     private double concurrentResetRelocationSetDuration;
-
     private DateTimeStamp concurrentSelectRelocationSetTimeStamp;
     private double concurrentSelectRelocationSetDuration;
-
     private DateTimeStamp pauseRelocateStartTimeStamp;
     private double pauseMarkRelocateDuration;
-
     private DateTimeStamp concurrentRelocateTimeStamp;
     private double concurrentRelocateDuration;
-
+    private DateTimeStamp concurrentMarkContinueTimeStamp;
+    private double concurrentMarkContinueDuration;
+    private DateTimeStamp concurrentRemapRootsStart;
+    private double concurrentRemapRootsDuration;
     private double[] load = new double[3];
     private double[] mmu = new double[6];
+
+    //Memory
+    private ZGCMemoryPoolSummary markStart;
+    private ZGCMemoryPoolSummary markEnd;
+    private ZGCMemoryPoolSummary relocateStart;
+    private ZGCMemoryPoolSummary relocateEnd;
+
+    private ZGCLiveSummary liveSummary;
+    private ZGCAllocatedSummary allocatedSummary;
+    private ZGCGarbageSummary garbageSummary;
+    private ZGCReclaimSummary reclaimSummary;
+    private ZGCMemorySummary memorySummary;
+    private ZGCMetaspaceSummary metaspaceSummary;
+
+    public ZGCReferenceSummary getSoftRefSummary() {
+        return softRefSummary;
+    }
+
+    public ZGCReferenceSummary getWeakRefSummary() {
+        return weakRefSummary;
+    }
+
+    public ZGCReferenceSummary getFinalRefSummary() {
+        return finalRefSummary;
+    }
+
+    public ZGCReferenceSummary getPhantomRefSummary() {
+        return phantomRefSummary;
+    }
+
+    private ZGCReferenceSummary softRefSummary;
+    private ZGCReferenceSummary weakRefSummary;
+    private ZGCReferenceSummary finalRefSummary;
+    private ZGCReferenceSummary phantomRefSummary;
+
+    public ZGCMarkSummary getMarkSummary() {
+        return markSummary;
+    }
+
+    public void setMarkSummary(ZGCMarkSummary markSummary) {
+        this.markSummary = markSummary;
+    }
 
     public DateTimeStamp getPauseMarkStartTimeStamp() {
         return pauseMarkStartTimeStamp;
@@ -181,101 +212,95 @@ public class ZGCCycle extends GCEvent {
         this.concurrentRelocateDuration = duration;
     }
 
-    //Memory
-    private ZGCMemoryPoolSummary markStart;
-    private ZGCMemoryPoolSummary markEnd;
-    private ZGCMemoryPoolSummary relocateStart;
-    private ZGCMemoryPoolSummary relocateEnd;
-    private OccupancySummary live;
-    private OccupancySummary allocated;
-    private OccupancySummary garbage;
-    private ReclaimSummary reclaimed;
-    private ReclaimSummary memorySummary;
-    private ZGCMetaspaceSummary metaspace;
-
-    public void setMarkStart(ZGCMemoryPoolSummary summary) {
-        this.markStart = summary;
-    }
-
-    public void setMarkEnd(ZGCMemoryPoolSummary summary) {
-        this.markEnd = summary;
-    }
-
-    public void setRelocateStart(ZGCMemoryPoolSummary summary) {
-        this.relocateStart = summary;
-    }
-
-    public void setRelocateEnd(ZGCMemoryPoolSummary summary) {
-        this.relocateEnd = summary;
-    }
-
-    public void setLive(OccupancySummary summary) {
-        this.live = summary;
-    }
-
-    public void setAllocated(OccupancySummary summary) {
-        this.allocated = summary;
-    }
-
-    public void setGarbage(OccupancySummary summary) {
-        this.garbage = summary;
-    }
-
-    public void setReclaimed(ReclaimSummary summary) {
-        this.reclaimed = summary;
-    }
-
-    public void setMemorySummary(ReclaimSummary summary) {
-        this.memorySummary = summary;
-    }
-
-    public void setMetaspace(ZGCMetaspaceSummary summary) {
-        this.metaspace = summary;
+    public void setConcurrentMarkContinue(DateTimeStamp concurrentMarkContinueTimeStamp, double duration) {
+        this.concurrentMarkContinueTimeStamp = concurrentMarkContinueTimeStamp;
+        this.concurrentMarkContinueDuration = duration;
     }
 
     public ZGCMemoryPoolSummary getMarkStart() {
         return markStart;
     }
 
+    public void setMarkStart(ZGCMemoryPoolSummary summary) {
+        this.markStart = summary;
+    }
+
     public ZGCMemoryPoolSummary getMarkEnd() {
         return markEnd;
+    }
+
+    public void setMarkEnd(ZGCMemoryPoolSummary summary) {
+        this.markEnd = summary;
     }
 
     public ZGCMemoryPoolSummary getRelocateStart() {
         return relocateStart;
     }
 
+    public void setRelocateStart(ZGCMemoryPoolSummary summary) {
+        this.relocateStart = summary;
+    }
+
     public ZGCMemoryPoolSummary getRelocateEnd() {
         return relocateEnd;
     }
 
-    public OccupancySummary getLive() {
-        return live;
+    public void setRelocateEnd(ZGCMemoryPoolSummary summary) {
+        this.relocateEnd = summary;
     }
 
-    public OccupancySummary getAllocated() {
-        return allocated;
+    public ZGCLiveSummary getLiveSummary() {
+        return liveSummary;
     }
 
-    public OccupancySummary getGarbage() {
-        return garbage;
+    public void setLiveSummary(ZGCLiveSummary summary) {
+        this.liveSummary = summary;
     }
 
-    public ReclaimSummary getReclaimed() {
-        return reclaimed;
+    public ZGCAllocatedSummary getAllocatedSummary() {
+        return allocatedSummary;
     }
 
-    public ReclaimSummary getMemorySummary() {
+    public void setAllocatedSummary(ZGCAllocatedSummary summary) {
+        this.allocatedSummary = summary;
+    }
+
+    public ZGCGarbageSummary getGarbageSummary() {
+        return garbageSummary;
+    }
+
+    public void setGarbageSummary(ZGCGarbageSummary summary) {
+        this.garbageSummary = summary;
+    }
+
+    public ZGCReclaimSummary getReclaimSummary() {
+        return reclaimSummary;
+    }
+
+    public void setReclaimSummary(ZGCReclaimSummary summary) {
+        this.reclaimSummary = summary;
+    }
+
+    public ZGCMemorySummary getMemorySummary() {
         return memorySummary;
     }
 
-    public ZGCMetaspaceSummary getMetaspace() {
-        return metaspace;
+    public void setMemorySummary(ZGCMemorySummary summary) {
+        this.memorySummary = summary;
+    }
+
+    public ZGCMetaspaceSummary getMetaspaceSummary() {
+        return metaspaceSummary;
+    }
+
+    public void setMetaspaceSummary(ZGCMetaspaceSummary summary) {
+        this.metaspaceSummary = summary;
     }
 
     public void setLoadAverages(double[] load) {
         this.load = load;
     }
+
     public double getLoadAverageAt(int time) {
         switch (time) {
             case 1:
@@ -311,57 +336,161 @@ public class ZGCCycle extends GCEvent {
                 return 0.0d;
         }
     }
+
+    public void setConcurrentRemapRoots(DateTimeStamp remapRootsStart, double remapRootsDuration) {
+        this.concurrentRemapRootsStart = remapRootsStart;
+        this.concurrentRemapRootsDuration = remapRootsDuration;
+    }
+
+    public void setMarkRoots(DateTimeStamp markRootsStart, double markRootsDuration) {
+        this.markRootsStart = markRootsStart;
+        this.markRootsDuration = markRootsDuration;
+    }
+
+    public void setMarkFollow(DateTimeStamp markFollowStart, double markFollowDuration) {
+        this.markFollowStart = markFollowStart;
+        this.markFollowDuration = markFollowDuration;
+    }
+
+    public void setRemapRootsColored(DateTimeStamp remapRootColoredStart, double remapRootsColoredDuration) {
+        this.remapRootColoredStart = remapRootColoredStart;
+        this.remapRootsColoredDuration = remapRootsColoredDuration;
+    }
+
+    public void setRemapRootsUncolored(DateTimeStamp remapRootsUncoloredStart, double remapRootsUncoloredDuration) {
+        this.remapRootsUncoloredStart = remapRootsUncoloredStart;
+        this.remapRootsUncoloredDuration = remapRootsUncoloredDuration;
+    }
+
+    public void setRemapRemembered(DateTimeStamp remapRememberedStart, double remapRememberedDuration) {
+
+        this.remapRememberedStart = remapRememberedStart;
+        this.remapRememberedDuration = remapRememberedDuration;
+    }
+
+    public ZGCPromotedSummary getPromotedSummary() {
+        return promotedSummary;
+    }
+
+    public void setPromotedSummary(ZGCPromotedSummary promotedSummary) {
+
+        this.promotedSummary = promotedSummary;
+    }
+
+    public ZGCCompactedSummary getCompactedSummary() {
+        return compactedSummary;
+    }
+
+    public void setCompactedSummary(ZGCCompactedSummary compactedSummary) {
+        this.compactedSummary = compactedSummary;
+    }
+
+    public void setusedOccupancySummary(OccupancySummary usedOccupancySummary) {
+
+        this.usedOccupancySummary = usedOccupancySummary;
+    }
+
+    public OccupancySummary getUsedOccupancySummary() {
+        return usedOccupancySummary;
+    }
+
+    public ZGCCollectionType getType() {
+        return type;
+    }
+
+    public void setType(ZGCCollectionType type) {
+        this.type = type;
+    }
+
+    public DateTimeStamp getMarkRootsStart() {
+        return markRootsStart;
+    }
+
+    public double getMarkRootsDuration() {
+        return markRootsDuration;
+    }
+
+    public DateTimeStamp getMarkFollowStart() {
+        return markFollowStart;
+    }
+
+    public double getMarkFollowDuration() {
+        return markFollowDuration;
+    }
+
+    public DateTimeStamp getRemapRootColoredStart() {
+        return remapRootColoredStart;
+    }
+
+    public double getRemapRootsColoredDuration() {
+        return remapRootsColoredDuration;
+    }
+
+    public DateTimeStamp getRemapRootsUncoloredStart() {
+        return remapRootsUncoloredStart;
+    }
+
+    public double getRemapRootsUncoloredDuration() {
+        return remapRootsUncoloredDuration;
+    }
+
+    public DateTimeStamp getRemapRememberedStart() {
+        return remapRememberedStart;
+    }
+
+    public double getRemapRememberedDuration() {
+        return remapRememberedDuration;
+    }
+
+    public double getPauseMarkRelocateDuration() {
+        return pauseMarkRelocateDuration;
+    }
+
+    public DateTimeStamp getConcurrentMarkContinueTimeStamp() {
+        return concurrentMarkContinueTimeStamp;
+    }
+
+    public double getConcurrentMarkContinueDuration() {
+        return concurrentMarkContinueDuration;
+    }
+
+    public DateTimeStamp getConcurrentRemapRootsStart() {
+        return concurrentRemapRootsStart;
+    }
+
+    public double getConcurrentRemapRootsDuration() {
+        return concurrentRemapRootsDuration;
+    }
+
+    public double[] getLoad() {
+        return load;
+    }
+
+    public double[] getMmu() {
+        return mmu;
+    }
+
+    public void setPhase(ZGCPhase phase) {
+        this.phase = phase;
+    }
+
+    public ZGCPhase getPhase() {
+        return phase;
+    }
+
+    public void setSoftRefSummary(ZGCReferenceSummary softRefSummary) {
+        this.softRefSummary = softRefSummary;
+    }
+
+    public void setWeakRefSummary(ZGCReferenceSummary weakRefSummary) {
+        this.weakRefSummary = weakRefSummary;
+    }
+
+    public void setFinalRefSummary(ZGCReferenceSummary finalRefSummary) {
+        this.finalRefSummary = finalRefSummary;
+    }
+
+    public void setPhantomRefSummary(ZGCReferenceSummary phantomRefSummary) {
+        this.phantomRefSummary = phantomRefSummary;
+    }
 }
-
-// Concurrent Mark duration
-// Pause mark end duration
-// Concurrent reference processing duration
-// Concurrent reset relocation set duration
-// Concurrent select relocation set duration
-// Pause relocate start
-// Load
-// MMU
-// Concurrent relocate
-// Relocation volume
-// NMethods, registered, unregistered
-// Metaspace used, capacity committed, reserved
-// Soft, weak, final, phantom.. encountered, discovered, enqueued
-// Memory stats
-
-/*
-[32.121s][info][gc,start    ] GC(2) Garbage Collection (Metadata GC Threshold)
-[32.121s][info][gc,phases   ] GC(2) Pause Mark Start 0.023ms
-[32.166s][info][gc,phases   ] GC(2) Concurrent Mark 44.623ms
-[32.166s][info][gc,phases   ] GC(2) Pause Mark End 0.029ms
-[32.166s][info][gc,phases   ] GC(2) Concurrent Mark Free 0.001ms
-[32.172s][info][gc,phases   ] GC(2) Concurrent Process Non-Strong References 5.797ms
-[32.172s][info][gc,phases   ] GC(2) Concurrent Reset Relocation Set 0.012ms
-[32.178s][info][gc,phases   ] GC(2) Concurrent Select Relocation Set 6.446ms
-[32.179s][info][gc,phases   ] GC(2) Pause Relocate Start 0.024ms
-[32.193s][info][gc,phases   ] GC(2) Concurrent Relocate 14.013ms
-[32.193s][info][gc,load     ] GC(2) Load: 7.28/6.63/5.01
-[32.193s][info][gc,mmu      ] GC(2) MMU: 2ms/98.2%, 5ms/99.3%, 10ms/99.5%, 20ms/99.7%, 50ms/99.9%, 100ms/99.9%
-[32.193s][info][gc,marking  ] GC(2) Mark: 4 stripe(s), 3 proactive flush(es), 1 terminate flush(es), 0 completion(s), 0 continuation(s)
-[32.193s][info][gc,marking  ] GC(2) Mark Stack Usage: 32M
-[32.193s][info][gc,metaspace] GC(2) Metaspace: 60M used, 60M committed, 1080M reserved
-[32.193s][info][gc,ref      ] GC(2) Soft: 5447 encountered, 0 discovered, 0 enqueued
-[32.193s][info][gc,ref      ] GC(2) Weak: 5347 encountered, 2016 discovered, 810 enqueued
-[32.193s][info][gc,ref      ] GC(2) Final: 1041 encountered, 113 discovered, 105 enqueued
-[32.193s][info][gc,ref      ] GC(2) Phantom: 558 encountered, 501 discovered, 364 enqueued
-[32.193s][info][gc,reloc    ] GC(2) Small Pages: 235 / 470M, Empty: 32M, Relocated: 40M, In-Place: 0
-[32.193s][info][gc,reloc    ] GC(2) Medium Pages: 2 / 64M, Empty: 0M, Relocated: 3M, In-Place: 0
-[32.193s][info][gc,reloc    ] GC(2) Large Pages: 3 / 24M, Empty: 8M, Relocated: 0M, In-Place: 0
-[32.193s][info][gc,reloc    ] GC(2) Forwarding Usage: 13M
-[32.193s][info][gc,heap     ] GC(2) Min Capacity: 8M(0%)
-[32.193s][info][gc,heap     ] GC(2) Max Capacity: 28686M(100%)
-[32.193s][info][gc,heap     ] GC(2) Soft Max Capacity: 28686M(100%)
-[32.193s][info][gc,heap     ] GC(2)                Mark Start          Mark End        Relocate Start      Relocate End           High               Low
-[32.193s][info][gc,heap     ] GC(2)  Capacity:     1794M (6%)         1794M (6%)         1794M (6%)         1794M (6%)         1794M (6%)         1794M (6%)
-[32.193s][info][gc,heap     ] GC(2)      Free:    28128M (98%)       28110M (98%)       28148M (98%)       28560M (100%)      28560M (100%)      28108M (98%)
-[32.193s][info][gc,heap     ] GC(2)      Used:      558M (2%)          576M (2%)          538M (2%)          126M (0%)          578M (2%)          126M (0%)
-[32.193s][info][gc,heap     ] GC(2)      Live:         -                71M (0%)           71M (0%)           71M (0%)             -                  -
-[32.193s][info][gc,heap     ] GC(2) Allocated:         -                18M (0%)           20M (0%)           18M (0%)             -                  -
-[32.193s][info][gc,heap     ] GC(2)   Garbage:         -               486M (2%)          446M (2%)           35M (0%)             -                  -
-[32.193s][info][gc,heap     ] GC(2) Reclaimed:         -                  -                40M (0%)          450M (2%)             -                  -
-[32.193s][info][gc          ] GC(2) Garbage Collection (Metadata GC Threshold) 558M(2%)->126M(0%)
-*/

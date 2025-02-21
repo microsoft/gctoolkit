@@ -42,17 +42,21 @@ public class GCCauses {
         // Additional GCCauses not found in gcause.cp
         Map.entry(GCCause.CONCURRENT_MARK_STACK_OVERFLOW.getLabel(), GCCause.CONCURRENT_MARK_STACK_OVERFLOW),
         Map.entry(GCCause.G1GC_YOUNG.getLabel(), GCCause.G1GC_YOUNG),
-        //JDK 11
+        // JDK 11
         Map.entry(WHITEBOX_YOUNG.getLabel(), WHITEBOX_YOUNG),
         Map.entry(WHITEBOX_CONCURRENT_MARK.getLabel(), WHITEBOX_CONCURRENT_MARK),
         Map.entry(WHITEBOX_FULL.getLabel(), WHITEBOX_FULL),
         Map.entry(META_CLEAR_SOFT_REF.getLabel(), META_CLEAR_SOFT_REF),
+        Map.entry(CODE_CACHE_THRESHOLD.getLabel(), CODE_CACHE_THRESHOLD),
+        Map.entry(GCCause.PREVENTIVE.getLabel(),PREVENTIVE),
+
+        // ZGC Specific
         Map.entry(TIMER.getLabel(), TIMER),
         Map.entry(WARMUP.getLabel(), WARMUP),
         Map.entry(ALLOC_RATE.getLabel(), ALLOC_RATE),
         Map.entry(ALLOC_STALL.getLabel(), ALLOC_STALL),
         Map.entry(PROACTIVE.getLabel(), PROACTIVE),
-        Map.entry(GCCause.PREVENTIVE.getLabel(),PREVENTIVE));
+        Map.entry(HIGH_USAGE.getLabel(), HIGH_USAGE));
 
     public static GCCause get(String gcCauseName) {
 
@@ -113,4 +117,7 @@ public class GCCauses {
     PROACTIVE("Proactive");
     //JDK 17
     PREVENTATIVE("G1 Preventive Collection")
+    //JDK 21
+    CODE_CACHE_THRESHOLD("CodeCache GC Threshold")
+
  */

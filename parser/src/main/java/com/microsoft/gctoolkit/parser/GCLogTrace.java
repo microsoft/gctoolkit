@@ -10,10 +10,14 @@ import com.microsoft.gctoolkit.event.UnifiedCountSummary;
 import com.microsoft.gctoolkit.event.UnifiedStatisticalSummary;
 import com.microsoft.gctoolkit.event.jvm.MetaspaceRecord;
 import com.microsoft.gctoolkit.event.jvm.PermGenSummary;
+import com.microsoft.gctoolkit.event.zgc.ZGCCollectionType;
+import com.microsoft.gctoolkit.event.zgc.ZGCPhase;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
+
+import static com.microsoft.gctoolkit.event.zgc.ZGCPhase.FULL;
 
 /**
  * Class that represents a chunk of GC log that we are attempting to match to a
@@ -82,6 +86,15 @@ public class GCLogTrace extends AbstractLogTrace {
      * @return The capture group parsed to a double.
      */
     public double getMilliseconds(int index) {
+        return getDoubleGroup(index);
+    }
+
+    /**
+     * Annoyingly we're assuming the field actually is s instead of confirming
+     * @param index Index of the capture group.
+     * @return The capture group parsed to a double.
+     */
+    public double getSeconds(int index) {
         return getDoubleGroup(index);
     }
 
@@ -288,5 +301,14 @@ public class GCLogTrace extends AbstractLogTrace {
         }
         System.out.println("-----------------------------------------");
         //}
+    }
+
+    public ZGCPhase getZCollectionPhase() {
+        String phase = getGroup(1);
+        if (phase == null) {
+            return FULL;
+        } else {
+            return ZGCPhase.get(phase);
+        }
     }
 }

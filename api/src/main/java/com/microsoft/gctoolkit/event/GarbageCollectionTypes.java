@@ -55,7 +55,9 @@ public enum GarbageCollectionTypes implements LabelledGCEventType {
     G1GCFull("Full"),
     G1Trap("G1GC Trap"),
     Unknown("Unknown"),
-    ZGCCycle("ZGC"),
+    ZGCFull("ZGC FULL"),
+    ZGCMajor("ZGC Major"),
+    ZGCMinor("ZGC Minor"),
     Shenandoah("Shenandoah");
 
     private final String label;

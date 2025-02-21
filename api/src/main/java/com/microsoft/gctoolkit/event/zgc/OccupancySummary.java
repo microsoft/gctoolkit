@@ -3,13 +3,13 @@
 package com.microsoft.gctoolkit.event.zgc;
 
 public class OccupancySummary {
-
+    private final long markStart;
     private final long markEnd;
     private final long reclaimStart;
     private final long reclaimEnd;
 
-
-    public OccupancySummary(long markEnd, long reclaimStart, long reclaimEnd) {
+    public OccupancySummary(long markStart, long markEnd, long reclaimStart, long reclaimEnd) {
+        this.markStart = markStart;
         this.markEnd = markEnd;
         this.reclaimStart = reclaimStart;
         this.reclaimEnd = reclaimEnd;
@@ -27,10 +27,14 @@ public class OccupancySummary {
         return reclaimEnd;
     }
 
+    public long getMarkStart() {
+        return markStart;
+    }
+
     public OccupancySummary sum(OccupancySummary other) {
         if (other == null) {
             return this;
         }
-        return new OccupancySummary(markEnd + other.markEnd, reclaimStart + other.reclaimStart, reclaimEnd + other.reclaimEnd);
+        return new OccupancySummary(markStart + other.markStart, markEnd + other.markEnd, reclaimStart + other.reclaimStart, reclaimEnd + other.reclaimEnd);
     }
 }
