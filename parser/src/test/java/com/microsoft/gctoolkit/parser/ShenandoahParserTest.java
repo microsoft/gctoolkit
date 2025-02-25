@@ -4,6 +4,9 @@ package com.microsoft.gctoolkit.parser;
 
 import com.microsoft.gctoolkit.event.jvm.JVMEvent;
 import com.microsoft.gctoolkit.event.shenandoah.ShenandoahCycle;
+import com.microsoft.gctoolkit.event.zgc.OccupancySummary;
+import com.microsoft.gctoolkit.event.zgc.ZGCReclaimSummary;
+import com.microsoft.gctoolkit.event.zgc.ZGCMemoryPoolSummary;
 import com.microsoft.gctoolkit.jvm.Diarizer;
 import com.microsoft.gctoolkit.parser.jvm.UnifiedDiarizer;
 import org.junit.jupiter.api.Assertions;
@@ -85,5 +88,21 @@ public class ShenandoahParserTest extends ParserTest {
         } catch (Throwable t) {
             Assertions.fail(t);
         }
+    }
+
+    private boolean checkZGCMemoryPoolSummary(ZGCMemoryPoolSummary summary, long capacity, long free, long used) {
+        return summary.getCapacity() == capacity && summary.getFree() == free && summary.getUsed() == used;
+    }
+
+    private boolean checkOccupancySummary(OccupancySummary summary, long markEnd, long relocateStart, long relocateEnd) {
+        return summary.getMarkEnd() == markEnd && summary.getReclaimStart() == relocateStart && summary.getReclaimEnd() == relocateEnd;
+    }
+
+    private boolean checkReclaimSummary(ZGCReclaimSummary summary, long relocateStart, long relocateEnd) {
+        return summary.getReclaimStart() == relocateStart && summary.getReclaimEnd() == relocateEnd;
+    }
+
+    private int toInt(double value, int significantDigits) {
+        return (int)(value * (double)significantDigits);
     }
 }
