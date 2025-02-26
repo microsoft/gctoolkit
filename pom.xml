@@ -548,7 +548,6 @@
                                 </upload>
                                 <release>
                                     <github>
-                                        <tagName>gctoolkit-{{projectVersion}}</tagName>
                                         <skipTag>true</skipTag>
                                         <overwrite>true</overwrite>
                                         <changelog>
