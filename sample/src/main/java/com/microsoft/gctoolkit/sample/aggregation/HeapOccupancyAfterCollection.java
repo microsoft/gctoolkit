@@ -24,11 +24,11 @@ public class HeapOccupancyAfterCollection extends Aggregator<HeapOccupancyAfterC
     }
 
     private void extractHeapOccupancy(MinorZGCCycle event) {
-        aggregation().addDataPoint(event.getGarbageCollectionType(), event.getDateTimeStamp(), event.getMemorySummary().getEnd());
+        aggregation().addDataPoint(event.getGarbageCollectionType(), event.getDateTimeStamp(), event.getMemorySummary().getOccupancyAfter());
     }
 
     private void extractHeapOccupancy(MajorZGCCycle event) {
-        aggregation().addDataPoint(event.getGarbageCollectionType(), event.getDateTimeStamp(), event.getMemorySummary().getEnd());
+        aggregation().addDataPoint(event.getGarbageCollectionType(), event.getDateTimeStamp(), event.getMemorySummary().getOccupancyAfter());
     }
 
     private void extractHeapOccupancy(GenerationalGCPauseEvent event) {

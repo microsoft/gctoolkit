@@ -159,7 +159,7 @@ public class ZGCParserTest extends ParserTest {
     }
 
     private boolean checkMemorySummary(ZGCMemorySummary summary, long relocateStart, long relocateEnd) {
-        return summary.getStart() == relocateStart && summary.getEnd() == relocateEnd;
+        return summary.getOccupancyBefore() == relocateStart && summary.getOccupancyAfter() == relocateEnd;
     }
 
     private int toInt(double value, int significantDigits) {

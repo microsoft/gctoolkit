@@ -304,11 +304,6 @@ public class GCLogTrace extends AbstractLogTrace {
     }
 
     public ZGCPhase getZCollectionPhase() {
-        String phase = getGroup(1);
-        if (phase == null) {
-            return FULL;
-        } else {
-            return ZGCPhase.get(phase);
-        }
+        return ZGCPhase.get(getGroup(1));
     }
 }

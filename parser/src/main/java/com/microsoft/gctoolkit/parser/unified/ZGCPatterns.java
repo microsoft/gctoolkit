@@ -106,14 +106,14 @@ public interface ZGCPatterns extends UnifiedPatterns {
 
     // [info][gc,phases   ] GC(58) Y: Young Generation 16052M(44%)->3022M(8%) 1.017s
     // [info][gc,phases   ] GC(58) O: Old Generation 3022M(8%)->5486M(15%) 1.757s
-    GCParseRule END_OF_PHASE_SUMMARY_GEN = new GCParseRule("End of Phase Summary", OPT_GEN + "(Old|Young) Generation " + MEMORY_PERCENT + "->" + MEMORY_PERCENT + "\\s*" + DURATION_S);
+    GCParseRule END_OF_PHASE_SUMMARY_GEN = new GCParseRule("End of Phase Summary", OPT_GEN + "(Old|Young) Generation " + MEMORY_PERCENT + "->" + MEMORY_PERCENT + "\\s*" + PAUSE_TIME);
 
 
     //[3.596s][info ][gc         ] GC(3) Garbage Collection (Warmup) 894M(22%)->186M(5%)
     // or
     // Gen GC
     //[3.596s][info][gc          ] GC(7) Minor Collection (Allocation Rate) 14720M(40%)->2054M(6%) 0.689s
-    GCParseRule MEMORY_SUMMARY = new GCParseRule("Memory Summary", "(Garbage|Minor|Major) Collection " + GenericTokens.GC_CAUSE + MEMORY_PERCENT + "->" + MEMORY_PERCENT + "(?:\\s*" + DURATION_S + ")?" );
+    GCParseRule MEMORY_SUMMARY = new GCParseRule("Memory Summary", "(Garbage|Minor|Major) Collection " + GenericTokens.GC_CAUSE + MEMORY_PERCENT + "->" + MEMORY_PERCENT + "(?:\\s*" + PAUSE_TIME + ")?");
 
     /*
     todo: capture and report on these log entries

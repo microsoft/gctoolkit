@@ -1,20 +1,20 @@
 package com.microsoft.gctoolkit.event.zgc;
 
 public class ZGCMemorySummary {
-    private final long start;
-    private final long end;
+    private final long occupancyBefore;
+    private final long occupancyAfter;
 
-    public ZGCMemorySummary(long start, long end) {
-        this.start = start;
-        this.end = end;
+    public ZGCMemorySummary(long occupancyBefore, long occupancyAfter) {
+        this.occupancyBefore = occupancyBefore;
+        this.occupancyAfter = occupancyAfter;
     }
 
-    public long getStart() {
-        return start;
+    public long getOccupancyBefore() {
+        return occupancyBefore;
     }
 
-    public long getEnd() {
-        return end;
+    public long getOccupancyAfter() {
+        return occupancyAfter;
     }
 
 }
