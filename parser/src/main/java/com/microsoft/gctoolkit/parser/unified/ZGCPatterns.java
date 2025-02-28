@@ -15,7 +15,7 @@ public interface ZGCPatterns extends UnifiedPatterns {
 
     String MEMORY_PERCENT = GenericTokens.INT + GenericTokens.UNITS + "\\s*\\(" + GenericTokens.INT + "%\\)";
 
-    GCParseRule ZGC_TAG = new GCParseRule("ZGC Tag", "Initializing The Z Garbage Collector$");
+    GCParseRule ZGC_TAG = new GCParseRule("ZGC Tag", "Using The Z Garbage Collector$");
 
     //[3.558s][info ][gc,start       ] GC(3) Garbage Collection (Warmup)
     GCParseRule CYCLE_START = new GCParseRule("CYCLE_START", "GC\\(" + GenericTokens.INT + "\\) (Garbage|Major|Minor) Collection " + GenericTokens.GC_CAUSE + "$");
