@@ -24,11 +24,11 @@ public class HeapOccupancyAfterCollectionAggregator extends Aggregator<HeapOccup
     }
 
     private void extractHeapOccupancy(MinorZGCCycle event) {
-        aggregation().addDataPoint(event.getGarbageCollectionType(), event.getDateTimeStamp(), event.getYoungCycle().getMemorySummary().getEnd());
+        aggregation().addDataPoint(event.getGarbageCollectionType(), event.getDateTimeStamp(), event.getYoungCycle().getMemorySummary().getOccupancyAfter());
     }
 
     private void extractHeapOccupancy(MajorZGCCycle event) {
-        aggregation().addDataPoint(event.getGarbageCollectionType(), event.getDateTimeStamp(), event.getMemorySummary().getEnd());
+        aggregation().addDataPoint(event.getGarbageCollectionType(), event.getDateTimeStamp(), event.getMemorySummary().getOccupancyAfter());
     }
 
     private void extractHeapOccupancy(GenerationalGCPauseEvent event) {
@@ -42,7 +42,7 @@ public class HeapOccupancyAfterCollectionAggregator extends Aggregator<HeapOccup
     }
 
     private void extractHeapOccupancy(FullZGCCycle event) {
-        aggregation().addDataPoint(event.getGarbageCollectionType(), event.getDateTimeStamp(), event.getMemorySummary().getEnd());
+        aggregation().addDataPoint(event.getGarbageCollectionType(), event.getDateTimeStamp(), event.getMemorySummary().getOccupancyAfter());
     }
 
     private void extractHeapOccupancy(ShenandoahCycle event) {

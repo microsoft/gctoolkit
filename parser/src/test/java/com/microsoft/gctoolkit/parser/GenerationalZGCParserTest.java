@@ -422,7 +422,7 @@ public class GenerationalZGCParserTest extends ParserTest {
     }
 
     private boolean checkMemorySummary(ZGCMemorySummary summary, long start, long end) {
-        return summary.getStart() == (start * 1024) && summary.getEnd() == (end * 1024);
+        return summary.getOccupancyBefore() == (start * 1024) && summary.getOccupancyAfter() == (end * 1024);
     }
 
     private int toInt(double value, int significantDigits) {

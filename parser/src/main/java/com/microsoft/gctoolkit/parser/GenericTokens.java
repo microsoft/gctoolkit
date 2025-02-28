@@ -20,10 +20,9 @@ public interface GenericTokens {
     //Time
     String TIME = "(-?" + REAL_NUMBER + ")";
     String DURATION_MS = TIME + "\\s?ms";
-    String DURATION_S = TIME + "\\s?s";
     String INT_DURATION_MS = INTEGER + "ms";
     //0.0700188
-    String PAUSE_TIME = TIME + "\\s?(?:secs?|ms)";
+    String PAUSE_TIME = TIME + "\\s?(?:secs?|ms|s)";
     String CONCURRENT_TIME = PAUSE_TIME;
 
     // Date values

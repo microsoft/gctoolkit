@@ -59,7 +59,7 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
     private final boolean debugging = Boolean.getBoolean("microsoft.debug");
     private final boolean develop = Boolean.getBoolean("microsoft.develop");
 
-    private ZFwdRef forwardReference;
+    private ZForwardReference forwardReference;
 
     private final long[] markStart = new long[3];
     private final long[] markEnd = new long[3];
@@ -512,11 +512,11 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
         forwardReference = null;
     }
 
-    private interface ZFwdRef {
+    private interface ZForwardReference {
         GCEvent getGCEVent(DateTimeStamp endTime);
     }
 
-    private static class ZGCMinorForwardReference implements ZFwdRef {
+    private static class ZGCMinorForwardReference implements ZForwardReference {
         private final DateTimeStamp startTimeStamp;
         private final GCCause gcCause;
         private final ZGCCollectionType type;
@@ -567,7 +567,7 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
         }
     }
 
-    private static class ZGCMajorForwardReference implements ZFwdRef {
+    private static class ZGCMajorForwardReference implements ZForwardReference {
         private final DateTimeStamp startTimeStamp;
         private final GCCause gcCause;
         private final ZGCCollectionType type;
@@ -625,7 +625,7 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
         }
     }
 
-    private static class ZGCForwardReference implements ZFwdRef {
+    private static class ZGCForwardReference implements ZForwardReference {
         private final DateTimeStamp startTimeStamp;
         private final GCCause gcCause;
         private final ZGCCollectionType type;
