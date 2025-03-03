@@ -1,7 +1,10 @@
 package com.microsoft.gctoolkit.event.zgc;
 
+import java.util.Arrays;
+import java.util.Objects;
+
 public enum ZGCPhase {
-    FULL(""),
+    FULL(null),
     MAJOR_YOUNG("Y"),
     MAJOR_OLD("O"),
     MINOR_YOUNG("y");
@@ -17,11 +20,9 @@ public enum ZGCPhase {
     }
 
     public static ZGCPhase get(String label) {
-        for (ZGCPhase zgcPhase : ZGCPhase.values()) {
-            if (zgcPhase.getPhase().equals(label.trim())) {
-                return zgcPhase;
-            }
-        }
-        throw new IllegalArgumentException("No matching ZGCPhase found for: " + label);
+        return Arrays.stream(ZGCPhase.class.getEnumConstants())
+                .filter(phase -> Objects.equals(phase.getPhase(), label))
+                .findFirst()
+                .orElse(null);
     }
 }

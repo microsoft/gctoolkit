@@ -1,5 +1,8 @@
 package com.microsoft.gctoolkit.event.zgc;
 
+import java.util.Arrays;
+import java.util.Objects;
+
 public enum ZGCCollectionType {
     FULL("Garbage"), // Legacy ZGC
     MINOR("Minor"),
@@ -12,11 +15,9 @@ public enum ZGCCollectionType {
     }
 
     public static ZGCCollectionType get(String label) {
-        for (ZGCCollectionType status : ZGCCollectionType.values()) {
-            if (status.collectionLabel.equalsIgnoreCase(label.trim())) {
-                return status;
-            }
-        }
-        throw new IllegalArgumentException("No matching ZGCCollectionType found for: " + label);
+        return Arrays.stream(ZGCCollectionType.class.getEnumConstants())
+                .filter(collectionType -> Objects.equals(collectionType.collectionLabel, label))
+                .findFirst()
+                .orElse(null);
     }
 }
