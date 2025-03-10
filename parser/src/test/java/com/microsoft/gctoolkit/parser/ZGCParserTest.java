@@ -109,13 +109,13 @@ public class ZGCParserTest extends ParserTest {
             assertTrue(checkZGCMemoryPoolSummary(zgc.getRelocateStart(),1837056, 28823552, 550912));
             assertTrue(checkZGCMemoryPoolSummary(zgc.getRelocateEnd(), 1837056, 29245440, 129024));
 
-            assertTrue(checkZGCMetaSpaceSummary(zgc.getMetaspace(),61440, 61440, 1105920));
+            assertTrue(checkZGCMetaSpaceSummary(zgc.getMetaspaceSummary(),61440, 61440, 1105920));
 
-            assertTrue(checkLiveSummary(zgc.getLive(), 72704, 72704, 72704));
-            assertTrue(checkAllocatedSummary(zgc.getAllocated(), 18432, 20480, 18432));
-            assertTrue(checkGarbageSummary(zgc.getGarbage(), 497664, 456704, 35840));
+            assertTrue(checkLiveSummary(zgc.getLiveSummary(), 72704, 72704, 72704));
+            assertTrue(checkAllocatedSummary(zgc.getAllocatedSummary(), 18432, 20480, 18432));
+            assertTrue(checkGarbageSummary(zgc.getGarbageSummary(), 497664, 456704, 35840));
 
-            assertTrue(checkReclaimSummary(zgc.getReclaimed(), 40960, 460800));
+            assertTrue(checkReclaimSummary(zgc.getReclaimSummary(), 40960, 460800));
             assertTrue(checkMemorySummary(zgc.getMemorySummary(), 571392, 129024));
 
             assertEquals(7.28, zgc.getLoadAverageAt(1));
