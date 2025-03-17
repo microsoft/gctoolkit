@@ -41,7 +41,7 @@ public class HeapOccupancyAfterCollection extends Aggregator<HeapOccupancyAfterC
     }
 
     private void extractHeapOccupancy(FullZGCCycle event) {
-        aggregation().addDataPoint(event.getGarbageCollectionType(), event.getDateTimeStamp(), event.getLive().getRelocateEnd());
+        aggregation().addDataPoint(event.getGarbageCollectionType(), event.getDateTimeStamp(), event.getMemorySummary().getOccupancyAfter());
     }
 
     private void extractHeapOccupancy(ShenandoahCycle event) {

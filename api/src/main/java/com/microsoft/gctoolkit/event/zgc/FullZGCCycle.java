@@ -10,28 +10,153 @@ import com.microsoft.gctoolkit.time.DateTimeStamp;
 public class FullZGCCycle extends GCEvent {
     private ZGCCycle delegate;
 
-    public FullZGCCycle(DateTimeStamp timeStamp, GarbageCollectionTypes gcType, GCCause cause, double duration) {
+    public FullZGCCycle(DateTimeStamp timeStamp, GarbageCollectionTypes gcType, GCCause cause, double duration, ZGCCycle delegate) {
         super(timeStamp, gcType, cause, duration);
-    }
-
-    public FullZGCCycle(DateTimeStamp timeStamp, double duration) {
-        super(timeStamp, duration);
-    }
-
-    public FullZGCCycle(DateTimeStamp timeStamp, GCCause cause, double duration) {
-        super(timeStamp, cause, duration);
-    }
-
-    public FullZGCCycle(DateTimeStamp timeStamp, GarbageCollectionTypes gcType, double duration) {
-        super(timeStamp, gcType, duration);
+        this.delegate = delegate;
     }
 
     public void setZGCCycle(ZGCCycle zgcCycle) {
         this.delegate = zgcCycle;
     }
 
+    public ZGCReferenceSummary getSoftRefSummary() {
+        return delegate.getSoftRefSummary();
+    }
+
+    public ZGCReferenceSummary getFinalRefSummary() {
+        return delegate.getFinalRefSummary();
+    }
+
+    public ZGCMemoryPoolSummary getMarkEnd() {
+        return delegate.getMarkEnd();
+    }
+
+    public DateTimeStamp getConcurrentRemapRootsStart() {
+        return delegate.getConcurrentRemapRootsStart();
+    }
+
+    public DateTimeStamp getRemapRememberedStart() {
+        return delegate.getRemapRememberedStart();
+    }
+
+    public ZGCPromotedSummary getPromotedSummary() {
+        return delegate.getPromotedSummary();
+    }
+
+    public ZGCMetaspaceSummary getMetaspaceSummary() {
+        return delegate.getMetaspaceSummary();
+    }
+
+    public ZGCReferenceSummary getWeakRefSummary() {
+        return delegate.getWeakRefSummary();
+    }
+
+    public DateTimeStamp getConcurrentSelectRelocationSetTimeStamp() {
+        return delegate.getConcurrentSelectRelocationSetTimeStamp();
+    }
+
+    public DateTimeStamp getRemapRootColoredStart() {
+        return delegate.getRemapRootColoredStart();
+    }
+
+    public ZGCPhase getPhase() {
+        return delegate.getPhase();
+    }
+
+    public double getRemapRootsColoredDuration() {
+        return delegate.getRemapRootsColoredDuration();
+    }
+
+    public double getConcurrentMarkContinueDuration() {
+        return delegate.getConcurrentMarkContinueDuration();
+    }
+
+    public double getConcurrentRemapRootsDuration() {
+        return delegate.getConcurrentRemapRootsDuration();
+    }
+
+    public double getPauseMarkRelocateDuration() {
+        return delegate.getPauseMarkRelocateDuration();
+    }
+
+    public ZGCAllocatedSummary getAllocatedSummary() {
+        return delegate.getAllocatedSummary();
+    }
+
+    public ZGCReferenceSummary getPhantomRefSummary() {
+        return delegate.getPhantomRefSummary();
+    }
+
     public ZGCMarkSummary getMarkSummary() {
         return delegate.getMarkSummary();
+    }
+
+    public double getRemapRememberedDuration() {
+        return delegate.getRemapRememberedDuration();
+    }
+
+    public ZGCGarbageSummary getGarbageSummary() {
+        return delegate.getGarbageSummary();
+    }
+
+    public DateTimeStamp getConcurrentResetRelocationSetTimeStamp() {
+        return delegate.getConcurrentResetRelocationSetTimeStamp();
+    }
+
+    public double getConcurrentMarkFreeDuration() {
+        return delegate.getConcurrentMarkFreeDuration();
+    }
+
+    public ZGCMemoryPoolSummary getMarkStart() {
+        return delegate.getMarkStart();
+    }
+
+    public ZGCLiveSummary getLiveSummary() {
+        return delegate.getLiveSummary();
+    }
+
+    public DateTimeStamp getConcurrentProcessNonStrongReferencesTimeStamp() {
+        return delegate.getConcurrentProcessNonStrongReferencesTimeStamp();
+    }
+
+    public DateTimeStamp getConcurrentMarkContinueTimeStamp() {
+        return delegate.getConcurrentMarkContinueTimeStamp();
+    }
+
+    public ZGCCollectionType getType() {
+        return delegate.getType();
+    }
+
+    public ZGCMemoryPoolSummary getRelocateStart() {
+        return delegate.getRelocateStart();
+    }
+
+    public DateTimeStamp getMarkFollowStart() {
+        return delegate.getMarkFollowStart();
+    }
+
+    public double getPauseMarkEndDuration() {
+        return delegate.getPauseMarkEndDuration();
+    }
+
+    public double getConcurrentSelectRelocationSetDuration() {
+        return delegate.getConcurrentSelectRelocationSetDuration();
+    }
+
+    public double getMarkRootsDuration() {
+        return delegate.getMarkRootsDuration();
+    }
+
+    public double[] getMmu() {
+        return delegate.getMmu();
+    }
+
+    public double getConcurrentProcessNonStrongReferencesDuration() {
+        return delegate.getConcurrentProcessNonStrongReferencesDuration();
+    }
+
+    public DateTimeStamp getConcurrentRelocateTimeStamp() {
+        return delegate.getConcurrentRelocateTimeStamp();
     }
 
     public DateTimeStamp getPauseMarkStartTimeStamp() {
@@ -42,206 +167,88 @@ public class FullZGCCycle extends GCEvent {
         return delegate.getPauseMarkStartDuration();
     }
 
-    public long getGcId() {
-        return delegate.getGcId();
+    public OccupancySummary getUsedOccupancySummary() {
+        return delegate.getUsedOccupancySummary();
     }
-
 
     public DateTimeStamp getConcurrentMarkTimeStamp() {
         return delegate.getConcurrentMarkTimeStamp();
-    }
-
-    public double getConcurrentMarkDuration() {
-        return delegate.getConcurrentMarkDuration();
-    }
-
-    public DateTimeStamp getConcurrentMarkFreeTimeStamp() {
-        return delegate.getConcurrentMarkFreeTimeStamp();
-    }
-
-    public double getConcurrentMarkFreeDuration() {
-        return delegate.getConcurrentMarkFreeDuration();
-    }
-
-    public DateTimeStamp getPauseMarkEndTimeStamp() {
-        return delegate.getPauseMarkEndTimeStamp();
-    }
-
-    public double getPauseMarkEndDuration() {
-        return delegate.getPauseMarkEndDuration();
-    }
-
-
-    public DateTimeStamp getConcurrentProcessNonStrongReferencesTimeStamp() {
-        return delegate.getConcurrentProcessNonStrongReferencesTimeStamp();
-    }
-
-    public double getConcurrentProcessNonStrongReferencesDuration() {
-        return delegate.getConcurrentProcessNonStrongReferencesDuration();
-    }
-
-    public DateTimeStamp getConcurrentResetRelocationSetTimeStamp() {
-        return delegate.getConcurrentResetRelocationSetTimeStamp();
-    }
-
-    public double getConcurrentResetRelocationSetDuration() {
-        return delegate.getConcurrentResetRelocationSetDuration();
-    }
-
-    public DateTimeStamp getConcurrentSelectRelocationSetTimeStamp() {
-        return delegate.getConcurrentSelectRelocationSetTimeStamp();
-    }
-
-    public double getConcurrentSelectRelocationSetDuration() {
-        return delegate.getConcurrentSelectRelocationSetDuration();
-    }
-
-    public DateTimeStamp getPauseRelocateStartTimeStamp() {
-        return delegate.getPauseRelocateStartTimeStamp();
-    }
-
-    public double getPauseRelocateStartDuration() {
-        return delegate.getPauseRelocateStartDuration();
-    }
-
-    public DateTimeStamp getConcurrentRelocateTimeStamp() {
-        return delegate.getConcurrentRelocateTimeStamp();
-    }
-
-    public double getConcurrentRelocateDuration() {
-        return delegate.getConcurrentRelocateDuration();
-    }
-
-    public ZGCMemoryPoolSummary getMarkStart() {
-        return delegate.getMarkStart();
-    }
-
-    public ZGCMemoryPoolSummary getMarkEnd() {
-        return delegate.getMarkEnd();
-    }
-
-    public ZGCMemoryPoolSummary getRelocateStart() {
-        return delegate.getRelocateStart();
-    }
-
-    public ZGCMemoryPoolSummary getRelocateEnd() {
-        return delegate.getRelocateEnd();
-    }
-
-    public ZGCLiveSummary getLive() {
-        return delegate.getLiveSummary();
-    }
-
-    public ZGCAllocatedSummary getAllocated() {
-        return delegate.getAllocatedSummary();
-    }
-
-    public ZGCGarbageSummary getGarbage() {
-        return delegate.getGarbageSummary();
-    }
-
-    public ZGCReclaimSummary getReclaimed() {
-        return delegate.getReclaimSummary();
-    }
-
-    public ZGCMemorySummary getMemorySummary() {
-        return delegate.getMemorySummary();
-    }
-
-    public ZGCMetaspaceSummary getMetaspace() {
-        return delegate.getMetaspaceSummary();
-    }
-
-    public double getLoadAverageAt(int time) {
-        return delegate.getLoadAverageAt(time);
     }
 
     public double getMMU(int percentage) {
         return delegate.getMMU(percentage);
     }
 
-    public ZGCPromotedSummary getPromotedSummary() {
-        return delegate.getPromotedSummary();
+    public ZGCMemorySummary getMemorySummary() {
+        return delegate.getMemorySummary();
     }
 
     public ZGCCompactedSummary getCompactedSummary() {
         return delegate.getCompactedSummary();
     }
 
-    public OccupancySummary getUsedOccupancySummary() {
-        return delegate.getUsedOccupancySummary();
+    public long getGcId() {
+        return delegate.getGcId();
     }
 
-    public ZGCCollectionType getType() {
-        return delegate.getType();
+    public double getConcurrentResetRelocationSetDuration() {
+        return delegate.getConcurrentResetRelocationSetDuration();
     }
 
-    public DateTimeStamp getMarkRootsStart() {
-        return delegate.getMarkRootsStart();
+    public DateTimeStamp getConcurrentMarkFreeTimeStamp() {
+        return delegate.getConcurrentMarkFreeTimeStamp();
     }
 
-    public double getMarkRootsDuration() {
-        return delegate.getMarkRootsDuration();
+    public DateTimeStamp getPauseMarkEndTimeStamp() {
+        return delegate.getPauseMarkEndTimeStamp();
     }
 
-    public DateTimeStamp getMarkFollowStart() {
-        return delegate.getMarkFollowStart();
+    public double getConcurrentRelocateDuration() {
+        return delegate.getConcurrentRelocateDuration();
     }
 
-    public double getMarkFollowDuration() {
-        return delegate.getMarkFollowDuration();
+    public double getLoadAverageAt(int time) {
+        return delegate.getLoadAverageAt(time);
     }
 
-    public DateTimeStamp getRemapRootColoredStart() {
-        return delegate.getRemapRootColoredStart();
-    }
-
-    public double getRemapRootsColoredDuration() {
-        return delegate.getRemapRootsColoredDuration();
-    }
-
-    public DateTimeStamp getRemapRootsUncoloredStart() {
-        return delegate.getRemapRootsUncoloredStart();
-    }
-
-    public double getRemapRootsUncoloredDuration() {
-        return delegate.getRemapRootsUncoloredDuration();
-    }
-
-    public DateTimeStamp getRemapRememberedStart() {
-        return delegate.getRemapRememberedStart();
-    }
-
-    public double getRemapRememberedDuration() {
-        return delegate.getRemapRememberedDuration();
-    }
-
-    public double getPauseMarkRelocateDuration() {
-        return delegate.getPauseMarkRelocateDuration();
-    }
-
-    public DateTimeStamp getConcurrentMarkContinueTimeStamp() {
-        return delegate.getConcurrentMarkContinueTimeStamp();
-    }
-
-    public double getConcurrentMarkContinueDuration() {
-        return delegate.getConcurrentMarkContinueDuration();
-    }
-
-    public DateTimeStamp getRemapRootsStart() {
-        return delegate.getConcurrentRemapRootsStart();
-    }
-
-    public double getRemapRootsDuration() {
-        return delegate.getConcurrentRemapRootsDuration();
+    public DateTimeStamp getPauseRelocateStartTimeStamp() {
+        return delegate.getPauseRelocateStartTimeStamp();
     }
 
     public double[] getLoad() {
         return delegate.getLoad();
     }
 
-    public double[] getMmu() {
-        return delegate.getMmu();
+    public double getPauseRelocateStartDuration() {
+        return delegate.getPauseRelocateStartDuration();
+    }
+
+    public DateTimeStamp getRemapRootsUncoloredStart() {
+        return delegate.getRemapRootsUncoloredStart();
+    }
+
+    public DateTimeStamp getMarkRootsStart() {
+        return delegate.getMarkRootsStart();
+    }
+
+    public double getRemapRootsUncoloredDuration() {
+        return delegate.getRemapRootsUncoloredDuration();
+    }
+
+    public double getConcurrentMarkDuration() {
+        return delegate.getConcurrentMarkDuration();
+    }
+
+    public ZGCReclaimSummary getReclaimSummary() {
+        return delegate.getReclaimSummary();
+    }
+
+    public double getMarkFollowDuration() {
+        return delegate.getMarkFollowDuration();
+    }
+
+    public ZGCMemoryPoolSummary getRelocateEnd() {
+        return delegate.getRelocateEnd();
     }
 }
 

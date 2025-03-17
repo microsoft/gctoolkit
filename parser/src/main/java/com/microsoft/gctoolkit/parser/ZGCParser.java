@@ -718,13 +718,12 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
 
             // Duration recorded by GC
             FullZGCCycle fullZGCCycle;
+            ZGCCycle delegate = getZGCCycle(endTime);
             if (gcDuration != null){
-                fullZGCCycle = new FullZGCCycle(startTimeStamp, gcType, gcCause, gcDuration);
+                fullZGCCycle = new FullZGCCycle(startTimeStamp, gcType, gcCause, gcDuration, delegate);
             } else {
-                fullZGCCycle = new FullZGCCycle(startTimeStamp, gcType, gcCause, endTime.minus(startTimeStamp));
+                fullZGCCycle = new FullZGCCycle(startTimeStamp, gcType, gcCause, endTime.minus(startTimeStamp), delegate);
             }
-
-            fullZGCCycle.setZGCCycle(getZGCCycle(endTime));
 
             return fullZGCCycle;
         }
