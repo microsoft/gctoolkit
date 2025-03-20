@@ -7,7 +7,6 @@ package com.microsoft.gctoolkit.event;
  * causes that a GC log file can hold.
  */
 public enum GCCause {
-
     JAVA_LANG_SYSTEM("System.gc()"),
     DIAGNOSTIC_COMMAND("Diagnostic Command"),
     FULL_GC_ALOT("FullGCALot"),
@@ -31,7 +30,9 @@ public enum GCCause {
     OLD_GENERATION_TOO_FULL_TO_SCAVENGE("Old Generation Too Full To Scavenge"),
     ADAPTIVE_SIZE_POLICY("Ergonomics"),
     G1_EVACUATION_PAUSE("G1 Evacuation Pause"),
+    G1_COMPACTION_PAUSE("G1 Compaction Pause"),
     G1_HUMONGOUS_ALLOCATION("G1 Humongous Allocation"),
+    G1_PERIODIC_COLLECTION("G1 Periodic Collection"),
     LAST_DITCH_COLLECTION("Last ditch collection"),
     LAST_GC_CAUSE("ILLEGAL VALUE - last gc cause - ILLEGAL VALUE"),
     UNKNOWN_GCCAUSE("unknown GCCause"),
@@ -46,13 +47,25 @@ public enum GCCause {
     WHITEBOX_YOUNG("WhiteBox Initiated Young GC"),
     WHITEBOX_CONCURRENT_MARK("WhiteBox Initiated Concurrent Mark"),
     WHITEBOX_FULL("WhiteBox Initiated Full GC"),
+    WHITEBOX_RUN_TO_BREAKPOINT("WhiteBox Initiated Run to Breakpoint"),
     META_CLEAR_SOFT_REF("Metadata GC Clear Soft References"),
+    PREVENTIVE("G1 Preventive Collection"),
+    CODE_CACHE_THRESHOLD("CodeCache GC Threshold"),
+    CODE_CACHE_AGGRESSIVE("CodeCache GC Aggressive"),
+
+    // Shenandoah
+    ALLOCATION_FAILURE_EVAC("Allocation Failure During Evacuation"),
+    STOP_VM("Stopping VM"),
+    CONCURRENT_GC("Concurrent GC"),
+    UPGRADE_TO_FULL_GC("Upgrade To Full GC"),
+
+    // ZGC Specific
     TIMER("Timer"),
     WARMUP("Warmup"),
     ALLOC_RATE("Allocation Rate"),
     ALLOC_STALL("Allocation Stall"),
     PROACTIVE("Proactive"),
-    PREVENTIVE("G1 Preventive Collection");
+    HIGH_USAGE("High Usage");
 
     private final String label;
 
@@ -63,5 +76,4 @@ public enum GCCause {
     public String getLabel() {
         return label;
     }
-
 }

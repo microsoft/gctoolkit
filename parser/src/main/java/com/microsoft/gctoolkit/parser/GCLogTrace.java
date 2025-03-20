@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.parser;
 
+import com.microsoft.gctoolkit.GCToolKit;
 import com.microsoft.gctoolkit.event.GCCause;
 import com.microsoft.gctoolkit.event.GCCauses;
 import com.microsoft.gctoolkit.event.MemoryPoolSummary;
@@ -10,10 +11,14 @@ import com.microsoft.gctoolkit.event.UnifiedCountSummary;
 import com.microsoft.gctoolkit.event.UnifiedStatisticalSummary;
 import com.microsoft.gctoolkit.event.jvm.MetaspaceRecord;
 import com.microsoft.gctoolkit.event.jvm.PermGenSummary;
+import com.microsoft.gctoolkit.event.zgc.ZGCCollectionType;
+import com.microsoft.gctoolkit.event.zgc.ZGCPhase;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
+
+import static com.microsoft.gctoolkit.event.zgc.ZGCPhase.FULL;
 
 /**
  * Class that represents a chunk of GC log that we are attempting to match to a
@@ -24,7 +29,6 @@ public class GCLogTrace extends AbstractLogTrace {
     private static final Logger LOGGER = Logger.getLogger(GCLogTrace.class.getName());
 
     private final boolean gcCauseDebugging = Boolean.getBoolean("microsoft.debug.gccause");
-    // private final boolean debugging = Boolean.getBoolean("microsoft.debug");
 
     public GCLogTrace(Matcher matcher) {
         super(matcher);
@@ -82,6 +86,15 @@ public class GCLogTrace extends AbstractLogTrace {
      * @return The capture group parsed to a double.
      */
     public double getMilliseconds(int index) {
+        return getDoubleGroup(index);
+    }
+
+    /**
+     * Annoyingly we're assuming the field actually is s instead of confirming
+     * @param index Index of the capture group.
+     * @return The capture group parsed to a double.
+     */
+    public double getSeconds(int index) {
         return getDoubleGroup(index);
     }
 
@@ -279,14 +292,19 @@ public class GCLogTrace extends AbstractLogTrace {
             LOGGER.log(Level.FINE, "{0} : {1}", new Object[]{i, getGroup(i)});
         }
         LOGGER.fine("-----------------------------------------");
-        //IntelliJ Eats this log output so it's displayed to stdout..
-        //And yes, that means System.out.println is in here in on purpose
-        //if ( debugging) {
-        System.out.println(threadName + ", not implemented: " + getGroup(0));
-        for (int i = 1; i < groupCount() + 1; i++) {
-            System.out.println(i + ": " + getGroup(i));
-        }
-        System.out.println("-----------------------------------------");
-        //}
+        //IntelliJ Eats this log output, so it's displayed to stdout
+        GCToolKit.LOG_DEBUG_MESSAGE(() -> {
+            StringBuilder debugMessage = new StringBuilder();
+            debugMessage.append(threadName).append(", not implemented: ").append(getGroup(0)).append(System.lineSeparator());
+            for (int i = 1; i < groupCount() + 1; i++) {
+                debugMessage.append(i).append(": ").append(getGroup(i)).append(System.lineSeparator());
+            }
+            debugMessage.append("-----------------------------------------");
+            return debugMessage.toString();
+        });
+    }
+
+    public ZGCPhase getZCollectionPhase() {
+        return ZGCPhase.get(getGroup(1));
     }
 }

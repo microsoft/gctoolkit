@@ -22,7 +22,7 @@ public interface GenericTokens {
     String DURATION_MS = TIME + "\\s?ms";
     String INT_DURATION_MS = INTEGER + "ms";
     //0.0700188
-    String PAUSE_TIME = TIME + "\\s?(?:secs?|ms)";
+    String PAUSE_TIME = TIME + "\\s?(?:secs?|ms|s)";
     String CONCURRENT_TIME = PAUSE_TIME;
 
     // Date values
