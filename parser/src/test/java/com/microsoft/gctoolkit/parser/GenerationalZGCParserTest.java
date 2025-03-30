@@ -10,6 +10,7 @@ import com.microsoft.gctoolkit.event.zgc.ZGCAllocatedSummary;
 import com.microsoft.gctoolkit.event.zgc.ZGCCompactedSummary;
 import com.microsoft.gctoolkit.event.zgc.ZGCCycle;
 import com.microsoft.gctoolkit.event.zgc.ZGCGarbageSummary;
+import com.microsoft.gctoolkit.event.zgc.ZGCHeapCapacitySummary;
 import com.microsoft.gctoolkit.event.zgc.ZGCLiveSummary;
 import com.microsoft.gctoolkit.event.zgc.ZGCMemoryPoolSummary;
 import com.microsoft.gctoolkit.event.zgc.ZGCMemorySummary;
@@ -163,6 +164,8 @@ public class GenerationalZGCParserTest extends ParserTest {
             assertEquals(toInt(13.129d, 1000), toInt(young.getConcurrentRelocateDuration(), 1000));
 
             //Memory
+            assertTrue(checkZGCHeapSummary(young.getHeapCapacitySummary(), 36864, 36864, 36864));
+
             assertTrue(checkZGCMemoryPoolSummary(young.getMarkStart(), 36864, 36568, 296));
             assertTrue(checkZGCMemoryPoolSummary(young.getMarkEnd(), 36864, 36556, 308));
             assertTrue(checkZGCMemoryPoolSummary(young.getRelocateStart(),36864, 36624, 240));
@@ -223,6 +226,8 @@ public class GenerationalZGCParserTest extends ParserTest {
             assertTrue(checkReferenceSummary(old.getPhantomRefSummary(), 497, 0, 0));
 
             //Memory
+            assertTrue(checkZGCHeapSummary(old.getHeapCapacitySummary(), 36864, 36864, 36864));
+
             assertTrue(checkZGCMemoryPoolSummary(old.getMarkStart(), 36864, 36568, 296));
             assertTrue(checkZGCMemoryPoolSummary(old.getMarkEnd(), 36864, 36788, 76 ));
             assertTrue(checkZGCMemoryPoolSummary(old.getRelocateStart(),36864, 36784, 80));
@@ -343,6 +348,8 @@ public class GenerationalZGCParserTest extends ParserTest {
             assertEquals(toInt(198.752d, 1000), toInt(young.getConcurrentRelocateDuration(), 1000));
 
             //Memory
+            assertTrue(checkZGCHeapSummary(young.getHeapCapacitySummary(), 36864, 36864, 36864));
+
             assertTrue(checkZGCMemoryPoolSummary(young.getMarkStart(), 36864, 22144, 14720));
             assertTrue(checkZGCMemoryPoolSummary(young.getMarkEnd(), 36864, 21376, 15488));
             assertTrue(checkZGCMemoryPoolSummary(young.getRelocateStart(),36864, 23912, 12952));
@@ -392,6 +399,11 @@ public class GenerationalZGCParserTest extends ParserTest {
     private boolean checkZGCMetaSpaceSummary(ZGCMetaspaceSummary summary, long usedMb, long committedMb, long reservedMb) {
         return summary.getUsed() ==(usedMb * 1024) && summary.getCommitted() == (committedMb * 1024) && summary.getReserved() == (reservedMb * 1024);
     }
+
+    private boolean checkZGCHeapSummary(ZGCHeapCapacitySummary summary, long minCapacityMb, long maxCapacityMb , long softMaxCapacityMb) {
+        return summary.getMinCapacity() == (minCapacityMb * 1024) && summary.getMaxCapacity() == (maxCapacityMb * 1024) && summary.getSoftMaxCapacity() == (softMaxCapacityMb * 1024);
+    }
+
 
     private boolean checkZGCMemoryPoolSummary(ZGCMemoryPoolSummary summary, long capacityMb, long freeMb , long usedMb) {
         return summary.getCapacity() == (capacityMb * 1024) && summary.getFree() == (freeMb * 1024) && summary.getUsed() == (usedMb * 1024);

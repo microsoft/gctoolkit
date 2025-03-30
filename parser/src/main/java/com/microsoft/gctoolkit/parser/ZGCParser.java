@@ -13,6 +13,7 @@ import com.microsoft.gctoolkit.event.zgc.MinorZGCCycle;
 import com.microsoft.gctoolkit.event.zgc.ZGCAllocatedSummary;
 import com.microsoft.gctoolkit.event.zgc.FullZGCCycle;
 import com.microsoft.gctoolkit.event.zgc.ZGCGarbageSummary;
+import com.microsoft.gctoolkit.event.zgc.ZGCHeapCapacitySummary;
 import com.microsoft.gctoolkit.event.zgc.ZGCLiveSummary;
 import com.microsoft.gctoolkit.event.zgc.MajorZGCCycle;
 import com.microsoft.gctoolkit.event.zgc.OccupancySummary;
@@ -35,6 +36,7 @@ import com.microsoft.gctoolkit.parser.unified.ZGCPatterns;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
 
 import java.util.AbstractMap;
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiConsumer;
@@ -65,6 +67,7 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
     private final long[] markEnd = new long[3];
     private final long[] relocateStart = new long[3];
     private final long[] relocateEnd = new long[3];
+    private final long[] heapCapacity = new long[3];
 
     private final MRUQueue<GCParseRule, BiConsumer<GCLogTrace, String>> parseRules;
     private boolean oldGenHeapStats = false;
@@ -349,7 +352,16 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
     }
 
     private void capacity(GCLogTrace trace, String s) {
-        //trace.notYetImplemented();
+        ZGCForwardReference ref = getForwardRefForPhase(trace.getZCollectionPhase());
+
+        if ("Min Capacity".equals(trace.getGroup(2))){
+            heapCapacity[0] = trace.toKBytes(3);
+        } else if ("Max Capacity".equals(trace.getGroup(2))) {
+            heapCapacity[1] = trace.toKBytes(3);
+        } else if ("Soft Max Capacity".equals(trace.getGroup(2))) {
+            heapCapacity[2] = trace.toKBytes(3);
+            ref.setHeapCapacitySummary(new ZGCHeapCapacitySummary(heapCapacity[0], heapCapacity[1], heapCapacity[2]));
+        }
     }
 
     private void captureAtIndex(GCLogTrace trace, int index) {
@@ -487,8 +499,16 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
                 break;
         }
 
-        // TODO: Consider using logging cycle duration instead of timestamps
+        // Clean up / reset temp variables
+        Arrays.fill(markStart, 0L);
+        Arrays.fill(markEnd, 0L);
+        Arrays.fill(relocateStart, 0L);
+        Arrays.fill(relocateEnd, 0L);
+        Arrays.fill(heapCapacity, 0L);
+        oldGenHeapStats = false;
+        youngGenHeapStats = false;
 
+        // TODO: Consider using logging cycle duration instead of timestamps
         publish();
     }
 
@@ -657,6 +677,7 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
 
 
         // Memory
+        private ZGCHeapCapacitySummary heapCapacitySummary;
         private ZGCMemoryPoolSummary markStart;
         private ZGCMemoryPoolSummary markEnd;
         private ZGCMemoryPoolSummary relocatedStart;
@@ -758,6 +779,7 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
             cycle.setPhantomRefSummary(phantomRefSummary);
 
             //Memory
+            cycle.setHeapCapacitySummary(heapCapacitySummary);
             cycle.setMarkStart(markStart);
             cycle.setMarkEnd(markEnd);
             cycle.setRelocateStart(relocatedStart);
@@ -773,7 +795,6 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
             cycle.setMarkSummary(markSummary);
             return cycle;
         }
-
 
         public void setPauseMarkStart(DateTimeStamp pauseMarkStart) {
             this.pauseMarkStart = pauseMarkStart;
@@ -1004,6 +1025,10 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
 
         public void setPhantomRefSummary(ZGCReferenceSummary phantomRefSummary) {
             this.phantomRefSummary = phantomRefSummary;
+        }
+
+        public void setHeapCapacitySummary(ZGCHeapCapacitySummary heapCapacitySummary) {
+            this.heapCapacitySummary = heapCapacitySummary;
         }
     }
 

@@ -57,6 +57,7 @@ public class ZGCCycle {
     private ZGCReclaimSummary reclaimSummary;
     private ZGCMemorySummary memorySummary;
     private ZGCMetaspaceSummary metaspaceSummary;
+    private ZGCHeapCapacitySummary heapCapacitySummary;
 
     public ZGCReferenceSummary getSoftRefSummary() {
         return softRefSummary;
@@ -492,5 +493,13 @@ public class ZGCCycle {
 
     public void setPhantomRefSummary(ZGCReferenceSummary phantomRefSummary) {
         this.phantomRefSummary = phantomRefSummary;
+    }
+
+    public void setHeapCapacitySummary(ZGCHeapCapacitySummary heapCapacitySummary) {
+        this.heapCapacitySummary = heapCapacitySummary;
+    }
+
+    public ZGCHeapCapacitySummary getHeapCapacitySummary() {
+        return heapCapacitySummary;
     }
 }
