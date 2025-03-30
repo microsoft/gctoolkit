@@ -9,6 +9,7 @@ import com.microsoft.gctoolkit.event.GCEvent;
 import com.microsoft.gctoolkit.event.GarbageCollectionTypes;
 import com.microsoft.gctoolkit.event.jvm.JVMEvent;
 import com.microsoft.gctoolkit.event.jvm.JVMTermination;
+import com.microsoft.gctoolkit.event.zgc.ZGCPageAgeSummary;
 import com.microsoft.gctoolkit.event.zgc.MinorZGCCycle;
 import com.microsoft.gctoolkit.event.zgc.ZGCAllocatedSummary;
 import com.microsoft.gctoolkit.event.zgc.FullZGCCycle;
@@ -19,6 +20,7 @@ import com.microsoft.gctoolkit.event.zgc.MajorZGCCycle;
 import com.microsoft.gctoolkit.event.zgc.OccupancySummary;
 import com.microsoft.gctoolkit.event.zgc.ZGCCompactedSummary;
 import com.microsoft.gctoolkit.event.zgc.ZGCNMethodSummary;
+import com.microsoft.gctoolkit.event.zgc.ZGCPageSummary;
 import com.microsoft.gctoolkit.event.zgc.ZGCPhase;
 import com.microsoft.gctoolkit.event.zgc.ZGCPromotedSummary;
 import com.microsoft.gctoolkit.event.zgc.ZGCReclaimSummary;
@@ -37,7 +39,9 @@ import com.microsoft.gctoolkit.parser.unified.ZGCPatterns;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
 
 import java.util.AbstractMap;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiConsumer;
@@ -99,6 +103,9 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
         parseRules.put(LOAD_GEN, this::loadGen);
         parseRules.put(REFERENCE_PROCESSING_GEN, this::referenceProcessingGen);
         parseRules.put(END_OF_PHASE_SUMMARY_GEN, this::endOfPhaseMemorySummary);
+        parseRules.put(PAGES_GEN, this::pageSummary);
+        parseRules.put(FORWARDING_USAGE_GEN, this::forwardingUsage);
+        parseRules.put(AGE_TABLE_GEN, this::ageTable);
 
         // Phase change rules
         parseRules.put(MARK_OLD_GEN_HEAP_STATS, this::markOldGenHeapStats);
@@ -269,6 +276,50 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
         }
         else
             trace.notYetImplemented();
+    }
+
+
+    private void pageSummary(GCLogTrace trace, String s) {
+        ZGCForwardReference ref = getForwardRefForPhase(trace.getZCollectionPhase());
+
+        ZGCPageSummary summary = new ZGCPageSummary(
+                trace.getLongGroup(3),
+                trace.getLongGroup(4),
+                trace.getLongGroup(5),
+                trace.toKBytes(6),
+                trace.toKBytes(8),
+                trace.toKBytes(10));
+        if ("Small".equals(trace.getGroup(2))){
+            ref.setSmallPageSummary(summary);
+        } else if ("Medium".equals(trace.getGroup(2))) {
+            ref.setMediumPageSummary(summary);
+        } else if ("Large".equals(trace.getGroup(2))) {
+            ref.setLargePageSummary(summary);
+        }
+    }
+
+    private void forwardingUsage(GCLogTrace trace, String s) {
+        ZGCForwardReference ref = getForwardRefForPhase(trace.getZCollectionPhase());
+
+        ref.setForwardingUsage(trace.toKBytes(2));
+    }
+
+    private void ageTable(GCLogTrace trace, String s) {
+        ZGCForwardReference ref = getForwardRefForPhase(trace.getZCollectionPhase());
+
+        ZGCPageAgeSummary summary = new ZGCPageAgeSummary(
+                trace.getGroup(2),
+                trace.toKBytes(3),
+                trace.getIntegerGroup(5),
+                trace.toKBytes(6),
+                trace.getIntegerGroup(8),
+                trace.getLongGroup(9),
+                trace.getLongGroup(10),
+                trace.getLongGroup(11),
+                trace.getLongGroup(12),
+                trace.getLongGroup(13),
+                trace.getLongGroup(14));
+        ref.addPageAgeSummary(summary);
     }
 
     private void load(GCLogTrace trace, String s) {
@@ -720,6 +771,11 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
         private ZGCReferenceSummary finalRefSummary;
         private ZGCReferenceSummary phantomRefSummary;
         private ZGCNMethodSummary nMethodSummary;
+        private ZGCPageSummary smallPageSummary;
+        private ZGCPageSummary mediumPageSummary;
+        private ZGCPageSummary largePageSummary;
+        private long forwardingUsage;
+        private List<ZGCPageAgeSummary> ageTableSummary;
 
         public ZGCForwardReference(DateTimeStamp dateTimeStamp, long gcId, GCCause cause, ZGCCollectionType type, ZGCPhase phase) {
             this.startTimeStamp = dateTimeStamp;
@@ -801,6 +857,11 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
             cycle.setMMU(mmu);
             cycle.setMarkSummary(markSummary);
             cycle.setNMethodSummary(nMethodSummary);
+            cycle.setSmallPageSummary(smallPageSummary);
+            cycle.setMediumPageSummary(mediumPageSummary);
+            cycle.setLargePageSummary(largePageSummary);
+            cycle.setForwardingUsage(forwardingUsage);
+            cycle.setAgeTableSummary(ageTableSummary);
             return cycle;
         }
 
@@ -1041,6 +1102,30 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
 
         public void setNMethodSummary(ZGCNMethodSummary nMethodSummary) {
             this.nMethodSummary = nMethodSummary;
+        }
+
+        public void setSmallPageSummary(ZGCPageSummary smallPageSummary) {
+            this.smallPageSummary = smallPageSummary;
+        }
+
+        public void setMediumPageSummary(ZGCPageSummary mediumPageSummary) {
+            this.mediumPageSummary = mediumPageSummary;
+        }
+
+        public void setLargePageSummary(ZGCPageSummary largePageSummary) {
+            this.largePageSummary = largePageSummary;
+        }
+
+        public void setForwardingUsage(long forwardingUsage) {
+            this.forwardingUsage = forwardingUsage;
+        }
+
+        public void addPageAgeSummary(ZGCPageAgeSummary summary) {
+            if (this.ageTableSummary == null) {
+                this.ageTableSummary = new ArrayList<>();
+            }
+
+            ageTableSummary.add(summary);
         }
     }
 

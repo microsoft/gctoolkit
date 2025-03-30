@@ -2,6 +2,8 @@ package com.microsoft.gctoolkit.event.zgc;
 
 import com.microsoft.gctoolkit.time.DateTimeStamp;
 
+import java.util.List;
+
 public class ZGCCycle {
     private DateTimeStamp markRootsStart;
     private double markRootsDuration;
@@ -59,6 +61,12 @@ public class ZGCCycle {
     private ZGCMetaspaceSummary metaspaceSummary;
     private ZGCHeapCapacitySummary heapCapacitySummary;
     private ZGCNMethodSummary nMethodSummary;
+
+    private ZGCPageSummary smallPageSummary;
+    private ZGCPageSummary mediumPageSummary;
+    private ZGCPageSummary largePageSummary;
+    private long forwardingUsage;
+    private List<ZGCPageAgeSummary> ageTableSummary;
 
     public ZGCReferenceSummary getSoftRefSummary() {
         return softRefSummary;
@@ -510,5 +518,45 @@ public class ZGCCycle {
 
     public ZGCNMethodSummary getNMethodSummary() {
         return nMethodSummary;
+    }
+
+    public void setSmallPageSummary(ZGCPageSummary smallPageSummary) {
+        this.smallPageSummary = smallPageSummary;
+    }
+
+    public void setMediumPageSummary(ZGCPageSummary mediumPageSummary) {
+        this.mediumPageSummary = mediumPageSummary;
+    }
+
+    public void setLargePageSummary(ZGCPageSummary largePageSummary) {
+        this.largePageSummary = largePageSummary;
+    }
+
+    public ZGCPageSummary getSmallPageSummary() {
+        return smallPageSummary;
+    }
+
+    public ZGCPageSummary getMediumPageSummary() {
+        return mediumPageSummary;
+    }
+
+    public ZGCPageSummary getLargePageSummary() {
+        return largePageSummary;
+    }
+
+    public void setForwardingUsage(long forwardingUsage) {
+        this.forwardingUsage = forwardingUsage;
+    }
+
+    public long getForwardingUsage() {
+        return forwardingUsage;
+    }
+
+    public void setAgeTableSummary(List<ZGCPageAgeSummary> ageTableSummary) {
+        this.ageTableSummary = ageTableSummary;
+    }
+
+    public List<ZGCPageAgeSummary> getAgeTableSummary() {
+        return ageTableSummary;
     }
 }

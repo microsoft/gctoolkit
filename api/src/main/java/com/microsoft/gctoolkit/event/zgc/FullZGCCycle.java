@@ -7,6 +7,8 @@ import com.microsoft.gctoolkit.event.GCEvent;
 import com.microsoft.gctoolkit.event.GarbageCollectionTypes;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
 
+import java.util.List;
+
 public class FullZGCCycle extends GCEvent {
     private ZGCCycle delegate;
 
@@ -257,6 +259,26 @@ public class FullZGCCycle extends GCEvent {
 
     public ZGCNMethodSummary getNMethodSummary() {
         return delegate.getNMethodSummary();
+    }
+
+    public ZGCPageSummary getSmallPageSummary() {
+        return delegate.getSmallPageSummary();
+    }
+
+    public ZGCPageSummary getMediumPageSummary() {
+        return delegate.getMediumPageSummary();
+    }
+
+    public ZGCPageSummary getLargePageSummary() {
+        return delegate.getLargePageSummary();
+    }
+
+    public long getForwardingUsage() {
+        return delegate.getForwardingUsage();
+    }
+
+    public List<ZGCPageAgeSummary> getAgeTableSummary() {
+        return delegate.getAgeTableSummary();
     }
 }
 
