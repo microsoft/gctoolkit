@@ -254,6 +254,10 @@ public class FullZGCCycle extends GCEvent {
     public ZGCHeapCapacitySummary getHeapCapacitySummary() {
         return delegate.getHeapCapacitySummary();
     }
+
+    public ZGCNMethodSummary getNMethodSummary() {
+        return delegate.getNMethodSummary();
+    }
 }
 
 // Concurrent Mark duration

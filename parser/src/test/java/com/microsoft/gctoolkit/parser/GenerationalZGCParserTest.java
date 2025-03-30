@@ -60,6 +60,7 @@ public class GenerationalZGCParserTest extends ParserTest {
                 "[2025-02-11T13:06:19.551-0800][info][gc,mmu      ] GC(1) Y: MMU: 2ms/98.9%, 5ms/99.5%, 10ms/99.8%, 20ms/99.8%, 50ms/99.9%, 100ms/99.9%",
                 "[2025-02-11T13:06:19.551-0800][info][gc,marking  ] GC(1) Y: Mark: 1 stripe(s), 2 proactive flush(es), 1 terminate flush(es), 0 completion(s), 0 continuation(s) ",
                 "[2025-02-11T13:06:19.551-0800][info][gc,marking  ] GC(1) Y: Mark Stack Usage: 32M",
+                "[2025-02-11T13:06:19.551-0800][info][gc,nmethod  ] GC(1) Y: NMethods: 2335 registered, 0 unregistered",
                 "[2025-02-11T13:06:19.551-0800][info][gc,metaspace] GC(1) Y: Metaspace: 36M used, 37M committed, 1088M reserved",
                 "[2025-02-11T13:06:19.551-0800][info][gc,reloc    ] GC(1) Y:                        Candidates     Selected     In-Place         Size        Empty    Relocated ",
                 "[2025-02-11T13:06:19.551-0800][info][gc,reloc    ] GC(1) Y: Small Pages:                  112           85            0         224M          36M           6M ",
@@ -102,6 +103,7 @@ public class GenerationalZGCParserTest extends ParserTest {
                 "[2025-02-11T13:06:19.580-0800][info][gc,mmu      ] GC(1) O: MMU: 2ms/98.9%, 5ms/99.5%, 10ms/99.8%, 20ms/99.8%, 50ms/99.9%, 100ms/99.9%",
                 "[2025-02-11T13:06:19.580-0800][info][gc,marking  ] GC(1) O: Mark: 1 stripe(s), 1 proactive flush(es), 1 terminate flush(es), 0 completion(s), 0 continuation(s) ",
                 "[2025-02-11T13:06:19.580-0800][info][gc,marking  ] GC(1) O: Mark Stack Usage: 0M",
+                "[2025-02-11T13:06:19.580-0800][info][gc,nmethod  ] GC(1) O: NMethods: 5978 registered, 1490 unregistered",
                 "[2025-02-11T13:06:19.580-0800][info][gc,metaspace] GC(1) O: Metaspace: 36M used, 37M committed, 1088M reserved",
                 "[2025-02-11T13:06:19.580-0800][info][gc,ref      ] GC(1) O:                       Encountered   Discovered     Enqueued ",
                 "[2025-02-11T13:06:19.580-0800][info][gc,ref      ] GC(1) O: Soft References:             4193            0            0 ",
@@ -182,6 +184,9 @@ public class GenerationalZGCParserTest extends ParserTest {
             assertTrue(checkPromotedSummary(young.getPromotedSummary(), 0, 0));
             assertTrue(checkCompactedSummary(young.getCompactedSummary(), 10));
 
+            assertEquals(2335, young.getNMethodSummary().getRegistered());
+            assertEquals(0, young.getNMethodSummary().getUnregistered());
+
             assertEquals(7.61, young.getLoadAverageAt(1));
             assertEquals(12.83, young.getLoadAverageAt(5));
             assertEquals(13.76, young.getLoadAverageAt(15));
@@ -244,6 +249,9 @@ public class GenerationalZGCParserTest extends ParserTest {
             assertNull(old.getPromotedSummary());
             assertTrue(checkCompactedSummary(old.getCompactedSummary(), 0));
 
+            assertEquals(5978, old.getNMethodSummary().getRegistered());
+            assertEquals(1490, old.getNMethodSummary().getUnregistered());
+
             assertEquals(7.61, old.getLoadAverageAt(1));
             assertEquals(12.83, old.getLoadAverageAt(5));
             assertEquals(13.76, old.getLoadAverageAt(15));
@@ -280,6 +288,7 @@ public class GenerationalZGCParserTest extends ParserTest {
                 "[2025-02-11T13:07:13.255-0800][info][gc,mmu      ] GC(7) y: MMU: 2ms/97.7%, 5ms/99.1%, 10ms/99.5%, 20ms/99.8%, 50ms/99.9%, 100ms/99.9%",
                 "[2025-02-11T13:07:13.255-0800][info][gc,marking  ] GC(7) y: Mark: 1 stripe(s), 2 proactive flush(es), 1 terminate flush(es), 0 completion(s), 0 continuation(s) ",
                 "[2025-02-11T13:07:13.255-0800][info][gc,marking  ] GC(7) y: Mark Stack Usage: 32M",
+                "[2025-02-11T13:07:13.255-0800][info][gc,nmethod  ] GC(7) y: NMethods: 2335 registered, 0 unregistered",
                 "[2025-02-11T13:07:13.255-0800][info][gc,metaspace] GC(7) y: Metaspace: 100M used, 101M committed, 1152M reserved",
                 "[2025-02-11T13:07:13.255-0800][info][gc,reloc    ] GC(7) y:                        Candidates     Selected     In-Place         Size        Empty    Relocated ",
                 "[2025-02-11T13:07:13.255-0800][info][gc,reloc    ] GC(7) y: Small Pages:                 7066         5720            0       14132M        2554M          74M ",
@@ -365,6 +374,9 @@ public class GenerationalZGCParserTest extends ParserTest {
             assertTrue(checkReclaimSummary(young.getReclaimSummary(), 2554, 14009));
             assertTrue(checkPromotedSummary(young.getPromotedSummary(), 0, 0));
             assertTrue(checkCompactedSummary(young.getCompactedSummary(), 104));
+
+            assertEquals(2335, young.getNMethodSummary().getRegistered());
+            assertEquals(0, young.getNMethodSummary().getUnregistered());
 
             assertEquals(17.42, young.getLoadAverageAt(1));
             assertEquals(14.37, young.getLoadAverageAt(5));

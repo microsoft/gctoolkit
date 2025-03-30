@@ -18,6 +18,7 @@ import com.microsoft.gctoolkit.event.zgc.ZGCLiveSummary;
 import com.microsoft.gctoolkit.event.zgc.MajorZGCCycle;
 import com.microsoft.gctoolkit.event.zgc.OccupancySummary;
 import com.microsoft.gctoolkit.event.zgc.ZGCCompactedSummary;
+import com.microsoft.gctoolkit.event.zgc.ZGCNMethodSummary;
 import com.microsoft.gctoolkit.event.zgc.ZGCPhase;
 import com.microsoft.gctoolkit.event.zgc.ZGCPromotedSummary;
 import com.microsoft.gctoolkit.event.zgc.ZGCReclaimSummary;
@@ -319,7 +320,12 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
     }
 
     private void nMethods(GCLogTrace trace, String s) {
-        //trace.notYetImplemented();
+        ZGCForwardReference ref = getForwardRefForPhase(trace.getZCollectionPhase());
+
+        ZGCNMethodSummary summary = new ZGCNMethodSummary(
+                trace.getLongGroup(2),
+                trace.getLongGroup(3));
+        ref.setNMethodSummary(summary);
     }
 
     private void metaspace(GCLogTrace trace, String s) {
@@ -713,6 +719,7 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
         private ZGCReferenceSummary weakRefSummary;
         private ZGCReferenceSummary finalRefSummary;
         private ZGCReferenceSummary phantomRefSummary;
+        private ZGCNMethodSummary nMethodSummary;
 
         public ZGCForwardReference(DateTimeStamp dateTimeStamp, long gcId, GCCause cause, ZGCCollectionType type, ZGCPhase phase) {
             this.startTimeStamp = dateTimeStamp;
@@ -793,6 +800,7 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
             cycle.setLoadAverages(load);
             cycle.setMMU(mmu);
             cycle.setMarkSummary(markSummary);
+            cycle.setNMethodSummary(nMethodSummary);
             return cycle;
         }
 
@@ -1029,6 +1037,10 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
 
         public void setHeapCapacitySummary(ZGCHeapCapacitySummary heapCapacitySummary) {
             this.heapCapacitySummary = heapCapacitySummary;
+        }
+
+        public void setNMethodSummary(ZGCNMethodSummary nMethodSummary) {
+            this.nMethodSummary = nMethodSummary;
         }
     }
 
