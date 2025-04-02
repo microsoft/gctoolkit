@@ -25,11 +25,13 @@ import com.microsoft.gctoolkit.time.DateTimeStamp;
 
 import java.util.AbstractMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -198,14 +200,102 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
                 .findAny()
                 .ifPresentOrElse(
                         tuple -> {
+                            parsablesMap.computeIfAbsent(gcid, k -> new LinkedList<>())
+                                    .add(new Parsable(gcid, line, tuple.getKey(), tuple.getValue()));
                             // Typically, "end" will be greater than zero, but not always.
-                            setForwardReference(gcid, end > 0 ? line.substring(0, end) : line);
-                            applyRule(tuple.getKey(), tuple.getValue(), line);
+//                            setForwardReference(gcid, end > 0 ? line.substring(0, end) : line);
+//                            applyRule(tuple.getKey(), tuple.getValue(), line);
                         },
                         () -> log(line)
                 );
     }
 
+    private class Parsable implements Comparable<Parsable> {
+        private final int gcid;
+        private final String line;
+        private final GCParseRule rule;
+        private final GCLogTrace trace;
+        private final Decorators decorators;
+
+        private Parsable(int gcid, String line, GCParseRule rule, GCLogTrace trace) {
+            this.line = line;
+            this.rule = rule;
+            this.trace = trace;
+            this.gcid = gcid;
+            this.decorators = new Decorators(line);
+        }
+
+        void applyRule() {
+            setClock(decorators.getDateTimeStamp());
+            forwardReference = getForwardReference(gcid, line);
+            (UnifiedG1GCParser.this).applyRule(rule, trace, line);
+        }
+
+        @Override
+        public int compareTo(Parsable other) {
+            int dateComparison = this.decorators.getDateStamp().compareTo(other.decorators.getDateStamp());
+            if (dateComparison != 0) {
+                return dateComparison;
+            }
+            return Double.compare(this.decorators.getUpTime(), other.decorators.getUpTime());
+        }
+
+    }
+
+    Map<Integer, List<Parsable>> parsablesMap = new ConcurrentHashMap<>();
+    private void drain() {
+        parsablesMap.entrySet().stream()
+            .sorted(Map.Entry.comparingByKey())
+            .forEach(entry -> {
+                entry.getValue().sort(Parsable::compareTo);
+                entry.getValue().forEach(Parsable::applyRule);
+            });
+        parsablesMap.clear();
+
+        collectionsUnderway.entrySet().stream()
+                .sorted(Map.Entry.comparingByKey())
+                .forEach(entry -> {
+                    G1GCForwardReference forwardReference = entry.getValue();
+                    if (forwardReference != null) {
+                        try {
+                            JVMEvent jvmEvent = forwardReference.buildEvent();
+                            if (jvmEvent instanceof G1GCPauseEvent) {
+                                publish((G1GCPauseEvent) jvmEvent);
+                            } else if (jvmEvent instanceof G1GCConcurrentEvent) {
+                                publish((G1GCConcurrentEvent) jvmEvent);
+                            } else if (jvmEvent instanceof G1ConcurrentUndoCycle) {
+                                publish((G1ConcurrentUndoCycle) jvmEvent);
+                            } else {
+                                publish(jvmEvent);
+                            }
+                        } catch (MalformedEvent malformedEvent) {
+                            LOGGER.warning(malformedEvent.getMessage());
+                        }
+                    }
+                });
+        collectionsUnderway.clear();
+        
+        // publish the JVM termination event
+        endOfFile(null, END_OF_DATA_SENTINEL);
+    }
+
+    @Override
+    public void receive(String trace) {
+        if (!trace.equals(END_OF_DATA_SENTINEL)) {
+            // bypass advanceClock
+            process(trace);
+        } else {
+            drain();
+        }
+    }
+
+    @Override
+    public void setClock(DateTimeStamp newValue) {
+        DateTimeStamp oldValue = this.getClock();
+        if (newValue != null && newValue.after(getClock())) {
+            super.setClock(newValue);
+        }
+    }
 
     private void applyRule(GCParseRule ruleToApply, GCLogTrace trace, String line) {
         try {
@@ -215,18 +305,20 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
         }
     }
 
-    private void setForwardReference(int gcid, String line) {
+    private G1GCForwardReference getForwardReference(int gcid, String line) {
+        G1GCForwardReference forwardRef = null;
         if (gcid != -1) {
-            forwardReference = collectionsUnderway.computeIfAbsent(gcid, k -> new G1GCForwardReference(new Decorators(line), gcid));
-            forwardReference.setHeapRegionSize(regionSize);
-            forwardReference.setMaxHeapSize(maxHeapSize);
-            forwardReference.setMinHeapSize(minHeapSize);
-            forwardReference.setInitialHeapSize(initialHeapSize);
+            forwardRef = collectionsUnderway.computeIfAbsent(gcid, k -> new G1GCForwardReference(new Decorators(line), gcid));
+            forwardRef.setHeapRegionSize(regionSize);
+            forwardRef.setMaxHeapSize(maxHeapSize);
+            forwardRef.setMinHeapSize(minHeapSize);
+            forwardRef.setInitialHeapSize(initialHeapSize);
         }
+        return forwardRef;
     }
 
     private void removeForwardReference(G1GCForwardReference forwardReference) {
-        collectionsUnderway.remove(forwardReference.getGcID());
+//        collectionsUnderway.remove(forwardReference.getGcID());
     }
 
     private void noop(GCLogTrace trace, String line) {}
@@ -239,11 +331,11 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
     private void cpuBreakout(GCLogTrace trace, String line) {
         CPUSummary cpuSummary = new CPUSummary(trace.getDoubleGroup(1), trace.getDoubleGroup(2), trace.getDoubleGroup(3));
         forwardReference.setCPUSummary(cpuSummary);
-        try {
-            publishPauseEvent(forwardReference.buildEvent());
-        } catch (MalformedEvent malformedEvent) {
-            LOGGER.warning(malformedEvent.getMessage());
-        }
+//        try {
+//            publishPauseEvent(forwardReference.buildEvent());
+//        } catch (MalformedEvent malformedEvent) {
+//            LOGGER.warning(malformedEvent.getMessage());
+//        }
     }
 
     // todo: need to drain the queues before terminating...
