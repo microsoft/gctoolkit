@@ -61,8 +61,8 @@ public class Decorators {
     private static final Logger LOGGER = Logger.getLogger(Decorators.class.getName());
 
     // This is to help differentiate between JVM running time and wall clock time.
-    private static final long TWENTY_YEARS_IN_MILLIS = 731L * 24L * 60L * 60L * 1000L;
-    private static final long TWENTY_YEARS_IN_NANO = 731L * 24L * 60L * 60L * 1000L;
+    private static final long TWENTY_YEARS_IN_MILLIS = 20L * 365L * 24L * 60L * 60L * 1000L;
+    private static final long TWENTY_YEARS_IN_NANO = 20L * 365L * 24L * 60L * 60L * 1_000_000_000L;
 
     int numberOfDecorators;
 
@@ -195,7 +195,15 @@ public class Decorators {
     }
 
     public DateTimeStamp getDateTimeStamp() {
-        return new DateTimeStamp(getDateStamp(), getUpTime());
+        double upTime = (double)getUptimeNano() / 1_000_000_000.0d;
+        if (upTime < 0.0d) {
+            upTime = getUptimeMillis() / 1000.0d;
+        }
+        if (upTime < 0.0d) {
+            upTime = getUpTime();
+        }
+
+        return new DateTimeStamp(getDateStamp(), upTime);
     }
 
     public int getNumberOfDecorators() {
