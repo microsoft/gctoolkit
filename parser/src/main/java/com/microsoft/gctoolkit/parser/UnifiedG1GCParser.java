@@ -31,7 +31,6 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -210,34 +209,24 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
                 );
     }
 
-    private class Parsable implements Comparable<Parsable> {
+    private class Parsable {
         private final int gcid;
         private final String line;
         private final GCParseRule rule;
         private final GCLogTrace trace;
-        private final Decorators decorators;
 
         private Parsable(int gcid, String line, GCParseRule rule, GCLogTrace trace) {
             this.line = line;
             this.rule = rule;
             this.trace = trace;
             this.gcid = gcid;
-            this.decorators = new Decorators(line);
         }
 
         void applyRule() {
+            Decorators decorators = new Decorators(line);
             setClock(decorators.getDateTimeStamp());
             forwardReference = getForwardReference(gcid, line);
             (UnifiedG1GCParser.this).applyRule(rule, trace, line);
-        }
-
-        @Override
-        public int compareTo(Parsable other) {
-            int dateComparison = this.decorators.getDateStamp().compareTo(other.decorators.getDateStamp());
-            if (dateComparison != 0) {
-                return dateComparison;
-            }
-            return Double.compare(this.decorators.getUpTime(), other.decorators.getUpTime());
         }
 
     }
@@ -247,7 +236,6 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
         parsablesMap.entrySet().stream()
             .sorted(Map.Entry.comparingByKey())
             .forEach(entry -> {
-                entry.getValue().sort(Parsable::compareTo);
                 entry.getValue().forEach(Parsable::applyRule);
             });
         parsablesMap.clear();
@@ -268,7 +256,7 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
                             } else {
                                 publish(jvmEvent);
                             }
-                        } catch (MalformedEvent malformedEvent) {
+                        } catch (Throwable malformedEvent) {
                             LOGGER.warning(malformedEvent.getMessage());
                         }
                     }
