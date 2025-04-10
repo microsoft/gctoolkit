@@ -6,14 +6,17 @@ import com.microsoft.gctoolkit.event.jvm.JVMEvent;
 import com.microsoft.gctoolkit.event.zgc.MajorZGCCycle;
 import com.microsoft.gctoolkit.event.zgc.MinorZGCCycle;
 import com.microsoft.gctoolkit.event.zgc.OccupancySummary;
+import com.microsoft.gctoolkit.event.zgc.ZGCPageAgeSummary;
 import com.microsoft.gctoolkit.event.zgc.ZGCAllocatedSummary;
 import com.microsoft.gctoolkit.event.zgc.ZGCCompactedSummary;
 import com.microsoft.gctoolkit.event.zgc.ZGCCycle;
 import com.microsoft.gctoolkit.event.zgc.ZGCGarbageSummary;
+import com.microsoft.gctoolkit.event.zgc.ZGCHeapCapacitySummary;
 import com.microsoft.gctoolkit.event.zgc.ZGCLiveSummary;
 import com.microsoft.gctoolkit.event.zgc.ZGCMemoryPoolSummary;
 import com.microsoft.gctoolkit.event.zgc.ZGCMemorySummary;
 import com.microsoft.gctoolkit.event.zgc.ZGCMetaspaceSummary;
+import com.microsoft.gctoolkit.event.zgc.ZGCPageSummary;
 import com.microsoft.gctoolkit.event.zgc.ZGCPromotedSummary;
 import com.microsoft.gctoolkit.event.zgc.ZGCReclaimSummary;
 import com.microsoft.gctoolkit.event.zgc.ZGCReferenceSummary;
@@ -59,6 +62,7 @@ public class GenerationalZGCParserTest extends ParserTest {
                 "[2025-02-11T13:06:19.551-0800][info][gc,mmu      ] GC(1) Y: MMU: 2ms/98.9%, 5ms/99.5%, 10ms/99.8%, 20ms/99.8%, 50ms/99.9%, 100ms/99.9%",
                 "[2025-02-11T13:06:19.551-0800][info][gc,marking  ] GC(1) Y: Mark: 1 stripe(s), 2 proactive flush(es), 1 terminate flush(es), 0 completion(s), 0 continuation(s) ",
                 "[2025-02-11T13:06:19.551-0800][info][gc,marking  ] GC(1) Y: Mark Stack Usage: 32M",
+                "[2025-02-11T13:06:19.551-0800][info][gc,nmethod  ] GC(1) Y: NMethods: 2335 registered, 0 unregistered",
                 "[2025-02-11T13:06:19.551-0800][info][gc,metaspace] GC(1) Y: Metaspace: 36M used, 37M committed, 1088M reserved",
                 "[2025-02-11T13:06:19.551-0800][info][gc,reloc    ] GC(1) Y:                        Candidates     Selected     In-Place         Size        Empty    Relocated ",
                 "[2025-02-11T13:06:19.551-0800][info][gc,reloc    ] GC(1) Y: Small Pages:                  112           85            0         224M          36M           6M ",
@@ -101,12 +105,18 @@ public class GenerationalZGCParserTest extends ParserTest {
                 "[2025-02-11T13:06:19.580-0800][info][gc,mmu      ] GC(1) O: MMU: 2ms/98.9%, 5ms/99.5%, 10ms/99.8%, 20ms/99.8%, 50ms/99.9%, 100ms/99.9%",
                 "[2025-02-11T13:06:19.580-0800][info][gc,marking  ] GC(1) O: Mark: 1 stripe(s), 1 proactive flush(es), 1 terminate flush(es), 0 completion(s), 0 continuation(s) ",
                 "[2025-02-11T13:06:19.580-0800][info][gc,marking  ] GC(1) O: Mark Stack Usage: 0M",
+                "[2025-02-11T13:06:19.580-0800][info][gc,nmethod  ] GC(1) O: NMethods: 5978 registered, 1490 unregistered",
                 "[2025-02-11T13:06:19.580-0800][info][gc,metaspace] GC(1) O: Metaspace: 36M used, 37M committed, 1088M reserved",
                 "[2025-02-11T13:06:19.580-0800][info][gc,ref      ] GC(1) O:                       Encountered   Discovered     Enqueued ",
                 "[2025-02-11T13:06:19.580-0800][info][gc,ref      ] GC(1) O: Soft References:             4193            0            0 ",
                 "[2025-02-11T13:06:19.580-0800][info][gc,ref      ] GC(1) O: Weak References:             2798            0            0 ",
                 "[2025-02-11T13:06:19.580-0800][info][gc,ref      ] GC(1) O: Final References:             719            0            0 ",
                 "[2025-02-11T13:06:19.580-0800][info][gc,ref      ] GC(1) O: Phantom References:           497            0            0 ",
+                "[2025-02-11T13:06:19.580-0800][info][gc,reloc    ] GC(1) O:                        Candidates     Selected     In-Place         Size        Empty    Relocated",
+                "[2025-02-11T13:06:19.580-0800][info][gc,reloc    ] GC(1) O: Small Pages:                 1312          509            0        2624M           2M         103M",
+                "[2025-02-11T13:06:19.580-0800][info][gc,reloc    ] GC(1) O: Medium Pages:                   3            2            0          96M           0M          22M",
+                "[2025-02-11T13:06:19.580-0800][info][gc,reloc    ] GC(1) O: Large Pages:                  182            0            0        1096M           0M           0M",
+                "[2025-02-11T13:06:19.580-0800][info][gc,reloc    ] GC(1) O: Forwarding Usage: 125M",
                 "[2025-02-11T13:06:19.580-0800][info][gc,heap     ] GC(1) O: Min Capacity: 36864M(100%)",
                 "[2025-02-11T13:06:19.580-0800][info][gc,heap     ] GC(1) O: Max Capacity: 36864M(100%)",
                 "[2025-02-11T13:06:19.580-0800][info][gc,heap     ] GC(1) O: Soft Max Capacity: 36864M(100%)",
@@ -163,6 +173,8 @@ public class GenerationalZGCParserTest extends ParserTest {
             assertEquals(toInt(13.129d, 1000), toInt(young.getConcurrentRelocateDuration(), 1000));
 
             //Memory
+            assertTrue(checkZGCHeapSummary(young.getHeapCapacitySummary(), 36864, 36864, 36864));
+
             assertTrue(checkZGCMemoryPoolSummary(young.getMarkStart(), 36864, 36568, 296));
             assertTrue(checkZGCMemoryPoolSummary(young.getMarkEnd(), 36864, 36556, 308));
             assertTrue(checkZGCMemoryPoolSummary(young.getRelocateStart(),36864, 36624, 240));
@@ -178,6 +190,19 @@ public class GenerationalZGCParserTest extends ParserTest {
             assertTrue(checkReclaimSummary(young.getReclaimSummary(), 68, 239));
             assertTrue(checkPromotedSummary(young.getPromotedSummary(), 0, 0));
             assertTrue(checkCompactedSummary(young.getCompactedSummary(), 10));
+
+            assertEquals(2335, young.getNMethodSummary().getRegistered());
+            assertEquals(0, young.getNMethodSummary().getUnregistered());
+
+            assertTrue(checkPageSummary(young.getSmallPageSummary(), 112, 85, 0, 224, 36, 6));
+            assertTrue(checkPageSummary(young.getMediumPageSummary(), 2,0,0, 64, 32, 0));
+            assertTrue(checkPageSummary(young.getLargePageSummary(), 1,0,0,8,0,0));
+
+            assertEquals(2, young.getAgeTableSummary().size());
+            assertTrue(checkPageAgeSummary(young.getAgeTableSummary().get(0), "Eden", 8, 0, 223, 1, 100, 78, 1, 0, 0,0));
+            assertTrue(checkPageAgeSummary(young.getAgeTableSummary().get(1), "Survivor 1", 16, 0 , 47, 0, 12, 7, 1, 0, 1, 0));
+
+            assertEquals(3 * 1024, young.getForwardingUsage());
 
             assertEquals(7.61, young.getLoadAverageAt(1));
             assertEquals(12.83, young.getLoadAverageAt(5));
@@ -223,12 +248,20 @@ public class GenerationalZGCParserTest extends ParserTest {
             assertTrue(checkReferenceSummary(old.getPhantomRefSummary(), 497, 0, 0));
 
             //Memory
+            assertTrue(checkZGCHeapSummary(old.getHeapCapacitySummary(), 36864, 36864, 36864));
+
             assertTrue(checkZGCMemoryPoolSummary(old.getMarkStart(), 36864, 36568, 296));
             assertTrue(checkZGCMemoryPoolSummary(old.getMarkEnd(), 36864, 36788, 76 ));
             assertTrue(checkZGCMemoryPoolSummary(old.getRelocateStart(),36864, 36784, 80));
             assertTrue(checkZGCMemoryPoolSummary(old.getRelocateEnd(), 36864, 36784, 80));
 
             assertTrue(checkZGCMetaSpaceSummary(old.getMetaspaceSummary(),36, 37, 1088));
+
+            assertTrue(checkPageSummary(old.getSmallPageSummary(), 1312, 509, 0, 2624, 2, 103));
+            assertTrue(checkPageSummary(old.getMediumPageSummary(), 3,2,0, 96,0, 22));
+            assertTrue(checkPageSummary(old.getLargePageSummary(), 182, 0, 0, 1096, 0, 0));
+
+            assertEquals(125 * 1024, old.getForwardingUsage());
 
             assertTrue(checkUsedSummary(old.getUsedOccupancySummary(), 0, 0, 0, 0));
             assertTrue(checkLiveSummary(old.getLiveSummary(), 0, 0, 0));
@@ -238,6 +271,9 @@ public class GenerationalZGCParserTest extends ParserTest {
             assertTrue(checkReclaimSummary(old.getReclaimSummary(), 0, 0));
             assertNull(old.getPromotedSummary());
             assertTrue(checkCompactedSummary(old.getCompactedSummary(), 0));
+
+            assertEquals(5978, old.getNMethodSummary().getRegistered());
+            assertEquals(1490, old.getNMethodSummary().getUnregistered());
 
             assertEquals(7.61, old.getLoadAverageAt(1));
             assertEquals(12.83, old.getLoadAverageAt(5));
@@ -275,6 +311,7 @@ public class GenerationalZGCParserTest extends ParserTest {
                 "[2025-02-11T13:07:13.255-0800][info][gc,mmu      ] GC(7) y: MMU: 2ms/97.7%, 5ms/99.1%, 10ms/99.5%, 20ms/99.8%, 50ms/99.9%, 100ms/99.9%",
                 "[2025-02-11T13:07:13.255-0800][info][gc,marking  ] GC(7) y: Mark: 1 stripe(s), 2 proactive flush(es), 1 terminate flush(es), 0 completion(s), 0 continuation(s) ",
                 "[2025-02-11T13:07:13.255-0800][info][gc,marking  ] GC(7) y: Mark Stack Usage: 32M",
+                "[2025-02-11T13:07:13.255-0800][info][gc,nmethod  ] GC(7) y: NMethods: 2335 registered, 0 unregistered",
                 "[2025-02-11T13:07:13.255-0800][info][gc,metaspace] GC(7) y: Metaspace: 100M used, 101M committed, 1152M reserved",
                 "[2025-02-11T13:07:13.255-0800][info][gc,reloc    ] GC(7) y:                        Candidates     Selected     In-Place         Size        Empty    Relocated ",
                 "[2025-02-11T13:07:13.255-0800][info][gc,reloc    ] GC(7) y: Small Pages:                 7066         5720            0       14132M        2554M          74M ",
@@ -343,6 +380,8 @@ public class GenerationalZGCParserTest extends ParserTest {
             assertEquals(toInt(198.752d, 1000), toInt(young.getConcurrentRelocateDuration(), 1000));
 
             //Memory
+            assertTrue(checkZGCHeapSummary(young.getHeapCapacitySummary(), 36864, 36864, 36864));
+
             assertTrue(checkZGCMemoryPoolSummary(young.getMarkStart(), 36864, 22144, 14720));
             assertTrue(checkZGCMemoryPoolSummary(young.getMarkEnd(), 36864, 21376, 15488));
             assertTrue(checkZGCMemoryPoolSummary(young.getRelocateStart(),36864, 23912, 12952));
@@ -358,6 +397,20 @@ public class GenerationalZGCParserTest extends ParserTest {
             assertTrue(checkReclaimSummary(young.getReclaimSummary(), 2554, 14009));
             assertTrue(checkPromotedSummary(young.getPromotedSummary(), 0, 0));
             assertTrue(checkCompactedSummary(young.getCompactedSummary(), 104));
+
+            assertEquals(2335, young.getNMethodSummary().getRegistered());
+            assertEquals(0, young.getNMethodSummary().getUnregistered());
+
+            assertTrue(checkPageSummary(young.getSmallPageSummary(), 7066, 5720, 0, 14132, 2554, 74));
+            assertTrue(checkPageSummary(young.getMediumPageSummary(), 0,0,0,0,0, 0));
+            assertTrue(checkPageSummary(young.getLargePageSummary(), 0,0,0,0,0, 0));
+
+            assertEquals(36 * 1024, young.getForwardingUsage());
+
+            assertEquals(3, young.getAgeTableSummary().size());
+            assertTrue(checkPageAgeSummary(young.getAgeTableSummary().get(0), "Eden", 79, 0 , 13800, 37, 6940, 5622, 0, 0, 0, 0));
+            assertTrue(checkPageAgeSummary(young.getAgeTableSummary().get(1), "Survivor 1", 25, 0, 132, 0, 79, 61, 0, 0, 0, 0));
+            assertTrue(checkPageAgeSummary(young.getAgeTableSummary().get(2), "Survivor 2", 15, 0, 78, 0, 47, 37, 0, 0, 0, 0));
 
             assertEquals(17.42, young.getLoadAverageAt(1));
             assertEquals(14.37, young.getLoadAverageAt(5));
@@ -382,15 +435,35 @@ public class GenerationalZGCParserTest extends ParserTest {
 
     private boolean checkUsedSummary(OccupancySummary summary, long markStart, long markEnd, long relocateStart, long relocateEnd) {
         return summary.getMarkStart() == (markStart * 1024) && summary.getMarkEnd() == (markEnd * 1024) && summary.getReclaimStart() == (relocateStart * 1024) && summary.getReclaimEnd() == (relocateEnd * 1024);
-
     }
 
     private boolean checkDateTimeStampMatch(String expected, double offsetMs, DateTimeStamp dateTimeStamp) {
        return new DateTimeStamp(expected).minus(offsetMs/1000).compareTo(dateTimeStamp) == 0;
     }
+    private boolean checkPageSummary(ZGCPageSummary summary, long candidates, long selected, long inplace, long sizeMb, long emptyMb, long relocatedMb) {
+        return summary.getCandidates() == candidates && summary.getSelected() == selected && summary.getInPlace() == inplace && summary.getSize() == (sizeMb * 1024L) && summary.getEmpty() == (emptyMb * 1024L) && summary.getRelocated() == (relocatedMb * 1024L);
+    }
+
+    private boolean checkPageAgeSummary(ZGCPageAgeSummary summary, String name, int liveMb, int livePct, int garbageMb, int garbagePct, int smallCandidates, int smallSelected, int mediumCandidates, int mediumSelected, int largeCandidates, int largeSelected) {
+        return summary.getName().equals(name) &&
+                summary.getLive() == (1024L * liveMb) &&
+                summary.getLivePct() == livePct &&
+                summary.getGarbage() == (1024L * garbageMb) &&
+                summary.getGarbagePct() == garbagePct &&
+                summary.getSmallPageCandidates() == smallCandidates &&
+                summary.getSmallPageSelected() == smallSelected &&
+                summary.getMediumPageCandidates() == mediumCandidates &&
+                summary.getMediumPageSelected() == mediumSelected &&
+                summary.getLargePageCandidates() == largeCandidates &&
+                summary.getLargePageSelected() == largeSelected;
+    }
 
     private boolean checkZGCMetaSpaceSummary(ZGCMetaspaceSummary summary, long usedMb, long committedMb, long reservedMb) {
         return summary.getUsed() ==(usedMb * 1024) && summary.getCommitted() == (committedMb * 1024) && summary.getReserved() == (reservedMb * 1024);
+    }
+
+    private boolean checkZGCHeapSummary(ZGCHeapCapacitySummary summary, long minCapacityMb, long maxCapacityMb , long softMaxCapacityMb) {
+        return summary.getMinCapacity() == (minCapacityMb * 1024) && summary.getMaxCapacity() == (maxCapacityMb * 1024) && summary.getSoftMaxCapacity() == (softMaxCapacityMb * 1024);
     }
 
     private boolean checkZGCMemoryPoolSummary(ZGCMemoryPoolSummary summary, long capacityMb, long freeMb , long usedMb) {
