@@ -472,13 +472,14 @@ public class UnifiedGenerationalParser extends UnifiedGCLogParser implements Uni
                 youngCollection = new PSYoungGen(forwardReference.getStartTime(), forwardReference.getGCCause(), forwardReference.getDuration());
                 break;
             default:
-                LOGGER.warning(forwardReference.getGarbageCollectionType() + " not recognized");
+                throw new IllegalStateException(forwardReference.getGarbageCollectionType() + " not recognized");
         }
 
         fillOutMemoryPoolData(youngCollection, forwardReference);
         fillOutMetaspaceData(youngCollection, forwardReference);
         youngCollection.add(forwardReference.getCPUSummary());
-        // add in reference processing
+        youngCollection.add(forwardReference.getSurvivorRecord());
+        // todo: add in reference processing
         return youngCollection;
     }
 
@@ -542,7 +543,7 @@ public class UnifiedGenerationalParser extends UnifiedGCLogParser implements Uni
                 return buildInitialMark(forwardReference);
             case Remark:
                 return buildRemark(forwardReference);
-            case PSFull: //todo:
+            case PSFull:
             case FullGC:
             case Full:
                 return buildFullGC(forwardReference);
