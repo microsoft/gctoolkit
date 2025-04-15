@@ -47,6 +47,22 @@ public interface ZGCPatterns extends UnifiedPatterns {
     //[3.596s][info ][gc,reloc       ] GC(3) Relocation: Successful, 6M relocated
     GCParseRule RELOCATION_SUMMARY = new GCParseRule("Relocation Summary",OPT_GEN + "Relocation: Successful, (\\d+)M relocated");
 
+    //[2025-03-07T17:46:45.563-0800][info][gc,reloc    ] GC(380) Y:                        Candidates     Selected     In-Place         Size        Empty    Relocated
+    //[2025-03-07T17:46:45.563-0800][info][gc,reloc    ] GC(380) Y: Small Pages:                53993        26715            0      107986M       53924M         180M
+    //[2025-03-07T17:46:45.563-0800][info][gc,reloc    ] GC(380) Y: Medium Pages:                   2            0            0          64M          32M           0M
+    //[2025-03-07T17:46:45.563-0800][info][gc,reloc    ] GC(380) Y: Large Pages:                    0            0            0           0M           0M           0M
+    GCParseRule PAGES_GEN = new GCParseRule("Page Summary",OPT_GEN + "(Small|Medium|Large) Pages:\\s+" + INT + "\\s+" + INT + "\\s+" + INT + "\\s+" + INT + UNITS + "\\s+" + INT + UNITS + "\\s+" + INT + UNITS);
+
+    //[2025-03-07T17:46:50.397-0800][info][gc,reloc    ] GC(380) O: Forwarding Usage: 125M
+    GCParseRule FORWARDING_USAGE_GEN = new GCParseRule("Forwarding Usage",OPT_GEN + "Forwarding Usage: " + INT + UNITS);
+
+    // [2025-03-07T17:49:56.358-0800][info][gc,reloc    ] GC(389) y:                    Live             Garbage             Small              Medium             Large
+    //[2025-03-07T17:49:56.358-0800][info][gc,reloc    ] GC(389) y: Eden             234M (0%)       156765M (79%)      78484 / 36719          1 / 0              0 / 0
+    //[2025-03-07T17:49:56.358-0800][info][gc,reloc    ] GC(389) y: Survivor 1        52M (0%)          649M (0%)         335 / 275            1 / 1              0 / 0
+    //[2025-03-07T17:49:56.358-0800][info][gc,reloc    ] GC(389) y: Survivor 2        40M (0%)          255M (0%)         148 / 91             0 / 0              0 / 0
+    //[2025-03-07T17:49:56.359-0800][info][gc,reloc    ] GC(389) y: Survivor 3        38M (0%)           65M (0%)          52 / 20             0 / 0              0 / 0
+    GCParseRule AGE_TABLE_GEN = new GCParseRule("Age Table",OPT_GEN + "(Eden|Survivor \\d+)\\s+" + MEMORY_PERCENT + "\\s+" + MEMORY_PERCENT + "\\s+" + INT + " \\/ " + INT + "\\s+" + INT + " \\/ " + INT + "\\s+" + INT + " \\/ " + INT );
+
     //[3.596s][info ][gc,nmethod     ] GC(3) NMethods: 1163 registered, 0 unregistered
     GCParseRule NMETHODS = new GCParseRule("NMethods",OPT_GEN + " NMethods: " + GenericTokens.INT + " registered, " + GenericTokens.INT + " unregistered");
 
