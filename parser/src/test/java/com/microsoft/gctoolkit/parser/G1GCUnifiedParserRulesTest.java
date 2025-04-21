@@ -215,7 +215,8 @@ public class G1GCUnifiedParserRulesTest implements UnifiedG1GCPatterns {
                     "[6.641s][info][gc           ] GC(0) Pause Young (Normal) (G1 Evacuation Pause) 23M->6M(64M) 6.302ms",
                     "[7.965s][info][gc            ] GC(415) Pause Young (Concurrent Start) (G1 Evacuation Pause) 49M->30M(64M) 1.965ms",
                     "[7.981s][info][gc            ] GC(419) Pause Young (Prepare Mixed) (G1 Evacuation Pause) 43M->16M(64M) 1.734ms",
-                    "[7.984s][info][gc            ] GC(420) Pause Young (Mixed) (G1 Evacuation Pause) 26M->11M(64M) 1.453ms"
+                    "[7.984s][info][gc            ] GC(420) Pause Young (Mixed) (G1 Evacuation Pause) 26M->11M(64M) 1.453ms",
+                    "[19.869s][info][gc] GC(8) Pause Young (Normal) (G1 Evacuation Pause) 170M->42M(1024M) 8.502ms"
             },
             {   //  9
                     "[2018-03-09T11:14:05.002-0100][12.277s][info ][gc,cpu       ] GC(0) User=0.04s Sys=0.01s Real=0.01s"

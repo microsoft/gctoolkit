@@ -206,9 +206,9 @@ public class G1DiarizerTest extends LogDiaryTest {
     };
 
     private static final boolean[][] unifiedDiary = {
-            //   0      1      2      3      4      5      6      7      8      9     10     11     12     13     14     15     16     17     18,    19,    20,    21,    22,    23,    24,    25,    26,    27
-            { true,  true, false, false, false, false, false, false, false,  true, false, false,  true,  true,  true, false, false, false, false, false,  true, false, false,  true, false, false, false, false},
-            { true,  true, false, false, false, false, false, false, false,  true, false, false,  true,  true,  true, false, false, false, false, false,  true, false, false,  true, false, false, false, false}
+            //   0      1      2      3      4      5      6      7      8      9     10     11     12     13     14     15     16     17     18,    19,    20,    21,    22,    23,    24,    25,    26,    27,   28
+            { true,  true, false, false, false, false, false, false, false,  true, false, false,  true,  true,  true, false, false, false, false, false,  true, false, false,  true, false, false, false, false, true},
+            { true,  true, false, false, false, false, false, false, false,  true, false, false,  true,  true,  true, false, false, false, false, false,  true, false, false,  true, false, false, false, false, true}
     };
 
     private static final int[][] unifiedUnknown = {
@@ -217,8 +217,8 @@ public class G1DiarizerTest extends LogDiaryTest {
     };
 
     private static final int[][] unifiedKnown = {
-            {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27},
-            {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27}
+            {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28},
+            {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28}
     };
 
 }

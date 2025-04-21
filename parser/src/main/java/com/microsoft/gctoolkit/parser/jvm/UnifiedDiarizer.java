@@ -117,6 +117,9 @@ public class UnifiedDiarizer implements Diarizer {
                 diary.setTrue(GC_DETAILS);
             else if ( decorators.tagsContain("gc,ergo"))
                 diary.setTrue(ADAPTIVE_SIZING);
+            else if (decorators.tagsContain("gc,cpu"))
+            	diary.setTrue(PRINT_CPU_TIMES);
+            
             if (decorators.tagsContain("safepoint"))
                 diary.setTrue(APPLICATION_STOPPED_TIME, APPLICATION_CONCURRENT_TIME);
 
