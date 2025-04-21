@@ -35,6 +35,8 @@ public enum SupportedFlags {
     MAX_TENURING_THRESHOLD_VIOLATION,           // 24
     TLAB_DATA,                                  // 25
     PRINT_PROMOTION_FAILURE,                    // 26
-    PRINT_FLS_STATISTICS                        // 27
+    PRINT_FLS_STATISTICS,                       // 27
+    
+    PRINT_CPU_TIMES								// 28
 
 }

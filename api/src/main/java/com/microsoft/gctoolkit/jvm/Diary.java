@@ -378,6 +378,10 @@ public class Diary {
         return isApplicationStoppedTimeKnown() && isApplicationRunningTime();
     }
 
+    public boolean isPrintCPUTimes() {
+    	return isStateKnown(SupportedFlags.PRINT_CPU_TIMES);
+    }
+    
     public void setTimeOfFirstEvent(DateTimeStamp startTime) {
         if ( this.timeOfFirstEvent == null)
             this.timeOfFirstEvent = startTime;
