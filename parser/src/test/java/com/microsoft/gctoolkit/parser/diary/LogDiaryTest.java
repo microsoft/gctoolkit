@@ -13,7 +13,6 @@ import com.microsoft.gctoolkit.parser.jvm.UnifiedDiarizer;
 import java.io.File;
 import java.io.IOException;
 import java.util.Objects;
-import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -288,6 +287,9 @@ abstract class LogDiaryTest {
                     case 27:
                         assertTrue(name + ":PRINT_FLS_STATISTICS should be known", diary.isPrintFLSStatisticsKnown());
                         break;
+                    case 28:
+                    	assertTrue(name + ":PRINT_CPU_TIMES should be known", diary.isPrintCPUTimes());
+                    	break;
                     default:
                         fail("unknown unknown");
                 }
