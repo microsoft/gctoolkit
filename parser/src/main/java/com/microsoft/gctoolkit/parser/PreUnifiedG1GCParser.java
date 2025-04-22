@@ -389,11 +389,13 @@ public class PreUnifiedG1GCParser extends PreUnifiedGCLogParser implements G1GCP
     //5.478: [GC pause (young) 8878K->5601K(13M), 0.0027650 secs]
     //1566.108: [GC pause (mixed) 7521K->5701K(13M), 0.0030090 secs]
     //549.243: [GC pause (young) (initial-mark) 9521K->7824K(13M), 0.0021590 secs]
+    //0.867: [GC pause (G1 Evacuation Pause) (young) 52816K->9563K(1024M), 0.0225122 secs]
     private void processYoung(GCLogTrace trace, String line) {
-        MemoryPoolSummary summary = trace.getOccupancyBeforeAfterWithMemoryPoolSizeSummary(9);
-        if ("young".equals(trace.getGroup(4))) {
+    	// #433 - All offsets in method incremented by 3 as they weren't matching the correct groups.
+        MemoryPoolSummary summary = trace.getOccupancyBeforeAfterWithMemoryPoolSizeSummary(12);
+        if ("young".equals(trace.getGroup(7))) {
             G1Young collection = null;
-            if (trace.getGroup(6) == null)
+            if (trace.getGroup(9) == null)
                 collection = new G1Young(getClock(), trace.gcCause(), trace.getPauseTime());
             else {
                 trace.notYetImplemented();
@@ -401,7 +403,7 @@ public class PreUnifiedG1GCParser extends PreUnifiedGCLogParser implements G1GCP
             }
             collection.addMemorySummary(summary);
             publish(collection);
-        } else if ("mixed".equals(trace.getGroup(4))) {
+        } else if ("mixed".equals(trace.getGroup(7))) {
             G1Young collection = new G1Mixed(getClock(), trace.gcCause(), trace.getPauseTime());
             collection.addMemorySummary(summary);
             publish(collection);

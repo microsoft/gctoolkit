@@ -89,7 +89,8 @@ public class G1GCParserRulesTest implements G1GCPatterns {
             CONCURRENT_START_V3,
             CONCURRENT_START_V4,
             CONCURRENT_START_V5,                     // 40
-            G1_CONCURRENT_ABORT
+            G1_CONCURRENT_ABORT,
+            YOUNG
     };
 
     private String[][] lines = {
@@ -239,6 +240,12 @@ public class G1GCParserRulesTest implements G1GCPatterns {
             },
             {   // 41
                     "27105.565: [GC concurrent-mark-abort]"
+            }, 
+            {   // 42
+            		"5.478: [GC pause (young) 8878K->5601K(13M), 0.0027650 secs]",
+            		"549.243: [GC pause (young) (initial-mark) 9521K->7824K(13M), 0.0021590 secs]",
+            		"1566.108: [GC pause (mixed) 7521K->5701K(13M), 0.0030090 secs]",
+            		"0.867: [GC pause (G1 Evacuation Pause) (young) 52816K->9563K(1024M), 0.0225122 secs]"
             }
     };
 }
