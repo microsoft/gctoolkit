@@ -16,7 +16,7 @@ public class SurvivorRecord extends JVMEvent {
     private int maxTenuringThreshold;
 
     // JDK bug, we have now seen a max tenuring threshold of 32, even 64
-    // Fold anything older than 15 back into the 15th slot
+    // Fold anything older than maxTenuringThreshold back into the maxTenuringThreshold slot
     private long[] bytesAtAge;
 
     public SurvivorRecord(DateTimeStamp timeStamp, long desiredOccupancy, int calculatedTenuringThreshold, int maxTenuringThreshold) {
@@ -56,13 +56,12 @@ public class SurvivorRecord extends JVMEvent {
 
     public long getBytesAtAge(int age) {
         if (this.bytesAtAge == null) return 0L;
-        return this.bytesAtAge[age];
+        return this.bytesAtAge[normalizeAge(age)];
     }
 
     /*
      * There is a bug in the JVM that allows tenuring threshold to appear to be greater than 15.
-     * Fold anything greater than 15 into 15.
-     *
+     * Fold anything greater than maxTenuringThreshold into maxTenuringThreshold.
      */
     public void add(int age, long bytes) {
 
@@ -74,7 +73,7 @@ public class SurvivorRecord extends JVMEvent {
         if (age <= maxTenuringThreshold) {
             bytesAtAge[age] = bytes;
         } else {
-            bytesAtAge[age] += bytes;
+            bytesAtAge[maxTenuringThreshold] += bytes;
         }
     }
 
@@ -82,5 +81,9 @@ public class SurvivorRecord extends JVMEvent {
         if (bytesAtAge == null)
             return new long[0];
         return bytesAtAge;
+    }
+
+    private int normalizeAge(int age) {
+        return age <= maxTenuringThreshold ? age : maxTenuringThreshold;
     }
 }

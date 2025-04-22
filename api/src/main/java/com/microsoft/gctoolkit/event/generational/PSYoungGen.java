@@ -4,7 +4,6 @@ package com.microsoft.gctoolkit.event.generational;
 
 import com.microsoft.gctoolkit.event.GCCause;
 import com.microsoft.gctoolkit.event.GarbageCollectionTypes;
-import com.microsoft.gctoolkit.event.jvm.SurvivorRecord;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
 
 public class PSYoungGen extends GenerationalGCPauseEvent {
@@ -16,6 +15,4 @@ public class PSYoungGen extends GenerationalGCPauseEvent {
     public PSYoungGen(DateTimeStamp timeStamp, GCCause cause, double duration) {
         super(timeStamp, GarbageCollectionTypes.PSYoungGen, cause, duration);
     }
-
-
 }
