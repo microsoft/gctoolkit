@@ -56,7 +56,7 @@ public class SurvivorRecord extends JVMEvent {
 
     public long getBytesAtAge(int age) {
         if (this.bytesAtAge == null) return 0L;
-        return this.bytesAtAge[normalizeAge(age)];
+        return this.bytesAtAge[age];
     }
 
     /*
@@ -81,9 +81,5 @@ public class SurvivorRecord extends JVMEvent {
         if (bytesAtAge == null)
             return new long[0];
         return bytesAtAge;
-    }
-
-    private int normalizeAge(int age) {
-        return age <= maxTenuringThreshold ? age : maxTenuringThreshold;
     }
 }
