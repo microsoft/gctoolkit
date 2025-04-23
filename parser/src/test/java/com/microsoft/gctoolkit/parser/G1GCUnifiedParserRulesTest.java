@@ -12,7 +12,7 @@ import java.util.logging.Logger;
 import static com.microsoft.gctoolkit.parser.CommonTestHelper.captureTest;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class G1GCUnifiedParserRulesTest implements UnifiedG1GCPatterns {
+public class G1GCUnifiedParserRulesTest implements UnifiedG1GCPatterns, TenuredPatterns {
 
     /**
      * The rules are;
@@ -152,7 +152,9 @@ public class G1GCUnifiedParserRulesTest implements UnifiedG1GCPatterns {
             WEAK_PROCESSING,
             CLEANUP__FINALIZE_CONC_MARK,
             CONCURRENT_UNDO_CYCLE_START,
-            CONCURRENT_UNDO_CYCLE_END     // 70
+            CONCURRENT_UNDO_CYCLE_END ,    // 70
+            TENURING_SUMMARY,
+            TENURING_AGE_BREAKDOWN
     };
 
     /*
@@ -447,6 +449,12 @@ public class G1GCUnifiedParserRulesTest implements UnifiedG1GCPatterns {
             },
             {   // 70
                     "[155.836s][info ][gc          ] GC(2457) Concurrent Undo Cycle 49.351ms",
+            },
+            {   // 71
+                    "[10.749s][debug][gc,age       ] GC(0) Desired survivor size 1572864 bytes, new threshold 15 (max threshold 15)\n"
+            },
+            {   // 72
+                    "[10.754s][trace][gc,age       ] GC(0) - age   1:    2579584 bytes,    2579584 total"
             }
 
             // Remaining lines which may not need to be parsed...

@@ -1,6 +1,6 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
-package com.microsoft.gctoolkit.parser.patterns;
+package com.microsoft.gctoolkit.parser;
 
 
 import com.microsoft.gctoolkit.event.MemoryPoolSummary;
@@ -17,10 +17,8 @@ import com.microsoft.gctoolkit.event.generational.PSFullGC;
 import com.microsoft.gctoolkit.event.generational.PSYoungGen;
 import com.microsoft.gctoolkit.event.generational.ParNew;
 import com.microsoft.gctoolkit.event.jvm.JVMEvent;
+import com.microsoft.gctoolkit.event.jvm.SurvivorRecord;
 import com.microsoft.gctoolkit.jvm.Diarizer;
-import com.microsoft.gctoolkit.parser.GCLogParser;
-import com.microsoft.gctoolkit.parser.ParserTest;
-import com.microsoft.gctoolkit.parser.UnifiedGenerationalParser;
 import com.microsoft.gctoolkit.parser.jvm.UnifiedDiarizer;
 import org.junit.jupiter.api.Test;
 
@@ -332,15 +330,15 @@ public class UnifiedGenerationalEventsTest extends ParserTest {
         try {
             assertEquals(1, jvmEvents.size());
             PSYoungGen collection = (PSYoungGen) jvmEvents.get(0);
-            assertEquals(53228,collection.getYoung().getOccupancyBeforeCollection());
-            assertEquals(7148,collection.getYoung().getOccupancyAfterCollection());
-            assertEquals(53248,collection.getYoung().getSizeAfterCollection());
-            assertEquals(65568,collection.getTenured().getOccupancyBeforeCollection());
-            assertEquals(111512,collection.getTenured().getOccupancyAfterCollection());
-            assertEquals(121856,collection.getTenured().getSizeAfterCollection());
-            assertEquals(116*1024,collection.getHeap().getOccupancyBeforeCollection());
-            assertEquals(115*1024,collection.getHeap().getOccupancyAfterCollection());
-            assertEquals(171*1024,collection.getHeap().getSizeAfterCollection());
+            assertEquals(53228, collection.getYoung().getOccupancyBeforeCollection());
+            assertEquals(7148, collection.getYoung().getOccupancyAfterCollection());
+            assertEquals(53248, collection.getYoung().getSizeAfterCollection());
+            assertEquals(65568, collection.getTenured().getOccupancyBeforeCollection());
+            assertEquals(111512, collection.getTenured().getOccupancyAfterCollection());
+            assertEquals(121856, collection.getTenured().getSizeAfterCollection());
+            assertEquals(116 * 1024, collection.getHeap().getOccupancyBeforeCollection());
+            assertEquals(115 * 1024, collection.getHeap().getOccupancyAfterCollection());
+            assertEquals(171 * 1024, collection.getHeap().getSizeAfterCollection());
             assertEquals(3646, collection.getPermOrMetaspace().getOccupancyBeforeCollection());
             assertEquals(4864, collection.getPermOrMetaspace().getSizeBeforeCollection());
             assertEquals(3646, collection.getPermOrMetaspace().getOccupancyAfterCollection());
@@ -357,5 +355,97 @@ public class UnifiedGenerationalEventsTest extends ParserTest {
         } catch (ClassCastException cce) {
             fail(cce.getMessage());
         }
+    }
+
+
+    @Test
+    public void parallelWithSurvivorRecordsTest() {
+        String[] lines = {
+                "[9.371s][info ][gc,start       ] GC(18) Pause Young (Allocation Failure)",
+                "[9.371s][debug][gc,age         ] GC(18) Desired survivor size 2097152 bytes, new threshold 1 (max threshold 15)",
+                "[9.371s][info ][gc,heap        ] GC(18) PSYoungGen: 309244K(311296K)->454K(298496K) Eden: 308694K(308736K)->0K(297984K) From: 550K(2560K)->454K(512K)",
+                "[9.371s][info ][gc,heap        ] GC(18) ParOldGen: 4018K(349696K)->4042K(349696K)",
+                "[9.371s][info ][gc,metaspace   ] GC(18) Metaspace: 9573K(9856K)->9573K(9856K) NonClass: 8504K(8640K)->8504K(8640K) Class: 1069K(1216K)->1069K(1216K)",
+                "[9.371s][info ][gc             ] GC(18) Pause Young (Allocation Failure) 305M->4M(633M) 0.242ms",
+                "[9.371s][info ][gc,cpu         ] GC(18) User=0.01s Sys=0.00s Real=0.00s"
+        };
+
+        List<JVMEvent> jvmEvents = feedParser(lines);
+        assertEquals(1, jvmEvents.size());
+        PSYoungGen collection = (PSYoungGen) jvmEvents.get(0);
+        assertEquals(9.371, collection.getDateTimeStamp().toSeconds());
+        SurvivorRecord record = collection.getSurvivorRecord();
+        assertNotNull(record);
+        assertEquals(15, record.getMaxTenuringThreshold());
+        assertEquals(1, record.getCalculatedTenuringThreshold());
+        assertEquals(2097152, record.getDesiredOccupancyAfterCollection());
+        assertEquals(0, record.getBytesAtEachAge().length);
+    }
+
+    @Test
+    public void serialWithSurvivorRecordsTest() {
+
+        String[] lines = {"[8.726s][info ][gc,start       ] GC(9) Pause Young (Allocation Failure)",
+                "[8.726s][debug][gc,age         ] GC(9) Desired survivor size 8945664 bytes, new threshold 15 (max threshold 15)",
+                "[8.726s][trace][gc,age         ] GC(9) Age table with threshold 15 (max threshold 15)",
+                "[8.726s][trace][gc,age         ] GC(9) - age   1:     400368 bytes,     400368 total",
+                "[8.726s][trace][gc,age         ] GC(9) - age   3:        304 bytes,     400672 total",
+                "[8.726s][trace][gc,age         ] GC(9) - age   8:         32 bytes,     400704 total",
+                "[8.726s][trace][gc,age         ] GC(9) - age   9:     554176 bytes,     954880 total",
+                "[8.726s][info ][gc,heap        ] GC(9) DefNew: 140789K(157376K)->932K(157376K) Eden: 139857K(139904K)->0K(139904K) From: 932K(17472K)->932K(17472K)",
+                "[8.726s][info ][gc,heap        ] GC(9) Tenured: 3357K(349568K)->3357K(349568K)",
+                "[8.726s][info ][gc,metaspace   ] GC(9) Metaspace: 9628K(9856K)->9628K(9856K) NonClass: 8545K(8640K)->8545K(8640K) Class: 1082K(1216K)->1082K(1216K)",
+                "[8.727s][info ][gc             ] GC(9) Pause Young (Allocation Failure) 140M->4M(495M) 0.445ms",
+                "[8.727s][info ][gc,cpu         ] GC(9) User=0.00s Sys=0.00s Real=0.00s"
+        };
+
+        List<JVMEvent> jvmEvents = feedParser(lines);
+        assertEquals(1, jvmEvents.size());
+        DefNew collection = (DefNew) jvmEvents.get(0);
+        assertEquals(8.726, collection.getDateTimeStamp().toSeconds());
+        SurvivorRecord record = collection.getSurvivorRecord();
+        assertNotNull(record);
+        assertEquals(15, record.getMaxTenuringThreshold());
+        assertEquals(15, record.getCalculatedTenuringThreshold());
+        assertEquals(8945664, record.getDesiredOccupancyAfterCollection());
+        assertEquals(16, record.getBytesAtEachAge().length);
+        int[] bytesAtAge = {0, 400368, 0, 304, 0, 0, 0, 0, 32, 554176, 0, 0, 0, 0, 0, 0};
+        for (int i = 1; i < bytesAtAge.length; i++) {
+            assertEquals(bytesAtAge[i], record.getBytesAtAge(i));
+        }
+        assertThrows(IndexOutOfBoundsException.class, () -> record.getBytesAtAge(16));
+    }
+
+    @Test
+    public void cmsWithSurvivorRecordsTest() {
+
+        String[] lines = {"[11.633s][info ][gc,start       ] GC(12) Pause Young (Allocation Failure)",
+                "[11.633s][info ][gc,task        ] GC(12) Using 9 workers of 9 for evacuation",
+                "[11.634s][debug][gc,age         ] GC(12) Desired survivor size 8945664 bytes, new threshold 6 (max threshold 6)",
+                "[11.634s][trace][gc,age         ] GC(12) Age table with threshold 6 (max threshold 6)",
+                "[11.634s][trace][gc,age         ] GC(12) - age   1:     400208 bytes,     400208 total",
+                "[11.634s][trace][gc,age         ] GC(12) - age   6:        304 bytes,     400512 total",
+                "[11.634s][info ][gc,heap        ] GC(12) ParNew: 140026K->398K(157376K)",
+                "[11.634s][info ][gc,heap        ] GC(12) CMS: 3662K->3662K(349568K)",
+                "[11.634s][info ][gc,metaspace   ] GC(12) Metaspace: 15714K(16256K)->15714K(16256K) NonClass: 14027K(14336K)->14027K(14336K) Class: 1686K(1920K)->1686K(1920K)",
+                "[11.634s][info ][gc             ] GC(12) Pause Young (Allocation Failure) 140M->3M(495M) 0.430ms",
+                "[11.634s][info ][gc,cpu         ] GC(12) User=0.00s Sys=0.00s Real=0.00s",
+        };
+        List<JVMEvent> jvmEvents = feedParser(lines);
+        assertEquals(1, jvmEvents.size());
+        ParNew collection = (ParNew) jvmEvents.get(0);
+
+        assertEquals(11.633, collection.getDateTimeStamp().toSeconds());
+        SurvivorRecord record = collection.getSurvivorRecord();
+        assertNotNull(record);
+        assertEquals(6, record.getMaxTenuringThreshold());
+        assertEquals(6, record.getCalculatedTenuringThreshold());
+        assertEquals(8945664, record.getDesiredOccupancyAfterCollection());
+        assertEquals(7, record.getBytesAtEachAge().length);
+        int[] bytesAtAge = {0, 400208, 0, 0, 0, 0, 304};
+        for (int i = 1; i < bytesAtAge.length; i++) {
+            assertEquals(bytesAtAge[i], record.getBytesAtAge(i));
+        }
+        assertThrows(IndexOutOfBoundsException.class, () -> record.getBytesAtAge(7));
     }
 }
