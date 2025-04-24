@@ -366,13 +366,16 @@ public class PreUnifiedG1GCParser extends PreUnifiedGCLogParser implements G1GCP
     //2014-02-22T10:49:26.508-0100: 7.498: [GC pause (G1 Evacuation Pause) (mixed), 0.0026410 secs]
     //26.893: [GC pause (G1 Evacuation Pause) (young) (to-space exhausted), 0.1709670 secs]
     //115.421: [GC pause (G1 Evacuation Pause) (young) (initial-mark) (to-space exhausted), 0.0476190 secs]
+    //2025-03-23T03:57:20.841+0000: 661.878: [GC pause (System.gc()) (young) (initial-mark), 0.0502295 secs]
     private void processYoungGenCollection(GCLogTrace trace, String line) {
         boolean initialMark = trace.contains(8, "initial-mark");
         boolean tospaceExhausted = trace.contains(trace.groupCount() - 2, "to-space");
 
         if (trace.contains(7, "young")) {
             if (initialMark)
-                forwardReference = new G1YoungInitialMark(trace.getDateTimeStamp(), trace.gcCause(3, 0), trace.getDoubleGroup(trace.groupCount()));
+            	// jlittle-ptc: Cause was misaligned, originally pointed to group 3, but seems to be consistently in group 6.
+            	// which is default for trace.gcCause(), and would match with other off-by-3 issues I've found.
+                forwardReference = new G1YoungInitialMark(trace.getDateTimeStamp(), trace.gcCause(), trace.getDoubleGroup(trace.groupCount()));
             else
                 forwardReference = new G1Young(trace.getDateTimeStamp(), trace.gcCause(), trace.getDoubleGroup(trace.groupCount()));
             if (tospaceExhausted)
