@@ -11,6 +11,7 @@ import com.microsoft.gctoolkit.event.generational.ConcurrentReset;
 import com.microsoft.gctoolkit.event.generational.ConcurrentSweep;
 import com.microsoft.gctoolkit.event.generational.FullGC;
 import com.microsoft.gctoolkit.event.generational.InitialMark;
+import com.microsoft.gctoolkit.event.generational.PSYoungGen;
 import com.microsoft.gctoolkit.event.generational.ParNew;
 import com.microsoft.gctoolkit.event.jvm.JVMEvent;
 import com.microsoft.gctoolkit.jvm.Diarizer;
@@ -211,7 +212,24 @@ public class GenerationalHeapParserTest extends ParserTest {
         assertEquals(7, jvmEvents.size());
         assertEquals(103.387, getParser().diary.getTimeOfFirstEvent().toSeconds());    	
     }
-      
+
+    @Test
+    // jlittle-ptc: Added to validate changes in https://github.com/microsoft/gctoolkit/issues/433
+    // Fails without changes, passes with changes.
+    public void psYoungNoDetailsTest() {
+    	String[] lines = {
+    			"13.563: [GC (Allocation Failure)  886080K->31608K(1986432K), 0.0392109 secs]",
+    	};
+    	
+        List<JVMEvent> jvmEvents = feedParser(lines);
+        assertEquals(1, jvmEvents.size());
+        
+        assertTrue(jvmEvents.get(0) instanceof PSYoungGen);
+
+        PSYoungGen evt = (PSYoungGen) jvmEvents.get(0);
+        assertMemoryPoolValues(evt.getHeap(), 886080, 1986432, 31608, 1986432);
+    }
+    
     @Override
     protected Diarizer diarizer() {
         return new PreUnifiedDiarizer();

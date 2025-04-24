@@ -1583,6 +1583,8 @@ public class GenerationalHeapParser extends PreUnifiedGCLogParser implements Sim
         publish(collection);
     }
 
+    // This might have the same issue as psYoungNoDetails based on the index, but without a sample line
+    // I can't validate it, so I'm leaving it as is.  May need to change offset from 4 to 7.
     public void psFull(GCLogTrace trace, String line) {
         FullGC collection;
         GCCause cause = trace.gcCause();
@@ -1610,7 +1612,6 @@ public class GenerationalHeapParser extends PreUnifiedGCLogParser implements Sim
         }
     }
 
-    //
     public void psYoungGenReferenceProcessingSplit(GCLogTrace trace, String line) {
         scavengeTimeStamp = getClock();
         gcCauseForwardReference = trace.gcCause();
