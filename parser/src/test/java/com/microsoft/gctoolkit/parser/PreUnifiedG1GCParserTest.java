@@ -8,12 +8,18 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import com.microsoft.gctoolkit.event.GCCause;
+import com.microsoft.gctoolkit.event.g1gc.ConcurrentScanRootRegion;
+import com.microsoft.gctoolkit.event.g1gc.G1Cleanup;
+import com.microsoft.gctoolkit.event.g1gc.G1ConcurrentCleanup;
+import com.microsoft.gctoolkit.event.g1gc.G1ConcurrentMark;
 import com.microsoft.gctoolkit.event.g1gc.G1Mixed;
+import com.microsoft.gctoolkit.event.g1gc.G1Remark;
 import com.microsoft.gctoolkit.event.g1gc.G1Young;
 import com.microsoft.gctoolkit.event.g1gc.G1YoungInitialMark;
 import com.microsoft.gctoolkit.event.jvm.JVMEvent;
 import com.microsoft.gctoolkit.jvm.Diarizer;
 import com.microsoft.gctoolkit.parser.jvm.PreUnifiedDiarizer;
+import com.microsoft.gctoolkit.time.DateTimeStamp;
 
 public class PreUnifiedG1GCParserTest extends ParserTest {
 
@@ -28,29 +34,112 @@ public class PreUnifiedG1GCParserTest extends ParserTest {
         return new PreUnifiedG1GCParser();
     };
 
-    @Test
-    // jlittle-ptc: Added to validate changes in https://github.com/microsoft/gctoolkit/issues/433
-    // Fails without changes, passes with changes.
-    public void testJava8PreUnifiedG1GCYoungEvents() {
-    	String[] lines = new String[] {
-    		    "0.867: [GC pause (G1 Evacuation Pause) (young) 52816K->9563K(1024M), 0.0225122 secs]",
-    		    "5.478: [GC pause (young) 8878K->5601K(13M), 0.0027650 secs]",
-    		    "1566.108: [GC pause (mixed) 7521K->5701K(13M), 0.0030090 secs]",
-    			"1834339.155: [GC pause (G1 Evacuation Pause) (mixed) 309M->141M(1111M), 0.0188779 secs]"
-    	};
+	/**
+	 * jlittle-ptc: Collection of different pre-unified events found in a log generated without -XX:+PrintGCDetails enabled.
+	 * 
+	 * Tests to ensure all events are parsed correctly.
+	 */
+	@Test
+	void testPreUnifiedG1GCLinesNoDetails() {
+		String[] lines = {
+				// 0 - G1Young
+				"1.303: [GC pause (G1 Evacuation Pause) (young) 57260K->14150K(1024M), 0.0148808 secs]",
+								
+				// 1 - ConcurrentScanRootRegion
+				"1.496: [GC concurrent-root-region-scan-start]",
+				"1.499: [GC concurrent-root-region-scan-end, 0.0033801 secs]",
+								
+				// 2 - G1ConcurrentMark
+				"1.499: [GC concurrent-mark-start]",
+				"1.509: [GC concurrent-mark-end, 0.0096200 secs]",
+				
+				// 3 - G1Remark
+				"1.509: [GC remark, 0.0045439 secs]",				
+				
+				// 4 - G1Cleanup
+				"1.513: [GC cleanup 15686K->13638K(1024M), 0.0014924 secs]",
 
+				// 5 - G1ConcurrentCleanup
+				"1.515: [GC concurrent-cleanup-start]",
+				"1.515: [GC concurrent-cleanup-end, 0.0000053 secs]",
+				
+				// 6 - G1Mixed
+				"24.383: [GC pause (G1 Evacuation Pause) (mixed) 269M->153M(1149M), 0.0457592 secs]",
+				
+				// 7 - G1 Mixed
+    		    "1566.108: [GC pause (mixed) 7521K->5701K(13M), 0.0030090 secs]",				
+				
+				// Currently Ignored
+				//"1.488: [GC pause (Metadata GC Threshold) (young) (initial-mark) 31558K->14662K(1024M), 0.0073758 secs]",
+				//"1469798.061: [GC pause (G1 Humongous Allocation) (young) (initial-mark) 397M->167M(1089M), 0.0313965 secs]",
+
+		};
+		
+		int expectedEventCount = 8;
+		
     	List<JVMEvent> jvmEvents = feedParser(lines);
-    	assertEquals(4, jvmEvents.size());
+    	assertEquals(jvmEvents.size(), expectedEventCount);
     	
-    	// First two lines are G1Young, followed by G1Mixed
-    	assertMemoryPoolValues(((G1Young) jvmEvents.get(0)).getHeap(), 52816, 1024*1024, 9563, 1024*1024);
-    	assertMemoryPoolValues(((G1Young) jvmEvents.get(1)).getHeap(), 8878, 13*1024, 5601, 13*1024);
+		// 0 - G1Young
+    	assertTrue(jvmEvents.get(0) instanceof G1Young);
+    	G1Young evt0 = ((G1Young) jvmEvents.get(0));
+    	assertEquals(evt0.getDateTimeStamp(), new DateTimeStamp(1.303));
+    	assertEquals(evt0.getGCCause(), GCCause.G1_EVACUATION_PAUSE);
+    	assertMemoryPoolValues(evt0.getHeap(), 57260, 1024*M, 14150, 1024*M);
+    	assertDoubleEquals(evt0.getDuration(), 0.0148808);
     	
-    	assertMemoryPoolValues(((G1Mixed) jvmEvents.get(2)).getHeap(), 7521, 13*1024, 5701, 13*1024);
-    	assertMemoryPoolValues(((G1Mixed) jvmEvents.get(3)).getHeap(), 309*1024, 1111*1024, 141*1024, 1111*1024);
+		// 1 - ConcurrentScanRootRegion - Duration/Timestamp only.
+    	assertTrue(jvmEvents.get(1) instanceof ConcurrentScanRootRegion);
+    	ConcurrentScanRootRegion evt1 = ((ConcurrentScanRootRegion) jvmEvents.get(1));
+    	assertEquals(evt1.getDateTimeStamp(), new DateTimeStamp(1.496));
+    	assertDoubleEquals(evt1.getDuration(), 0.0033801);
     	
-    }
+		// 2 - G1ConcurrentMark - Duration/Timestamp only
+    	assertTrue(jvmEvents.get(2) instanceof G1ConcurrentMark);
+    	G1ConcurrentMark evt2 = ((G1ConcurrentMark) jvmEvents.get(2));
+    	assertEquals(evt2.getDateTimeStamp(), new DateTimeStamp(1.499));
+    	assertDoubleEquals(evt2.getDuration(), 0.0096200);
 
+		// 3 - G1Remark - Duration/Timestamp only
+    	assertTrue(jvmEvents.get(3) instanceof G1Remark);
+    	G1Remark evt3 = ((G1Remark) jvmEvents.get(3));
+    	assertEquals(evt3.getDateTimeStamp(), new DateTimeStamp(1.509));
+    	assertDoubleEquals(evt3.getDuration(), 0.0045439);
+    	
+		// 4 - G1Cleanup
+    	assertTrue(jvmEvents.get(4) instanceof G1Cleanup);
+    	G1Cleanup evt4 = ((G1Cleanup) jvmEvents.get(4));
+    	assertEquals(evt4.getDateTimeStamp(), new DateTimeStamp(1.513));    	
+    	assertMemoryPoolValues(evt4.getHeap(), 15686, 1024*M, 13638, 1024*M);
+    	assertDoubleEquals(evt4.getDuration(), 0.0014924);
+    	
+		// 5 - G1ConcurrentCleanup - Duration/Timestamp only
+    	assertTrue(jvmEvents.get(5) instanceof G1ConcurrentCleanup);
+    	G1ConcurrentCleanup evt5 = ((G1ConcurrentCleanup) jvmEvents.get(5));
+    	assertEquals(evt5.getDateTimeStamp(), new DateTimeStamp(1.515));    	
+    	assertDoubleEquals(evt5.getDuration(), 0.0000053);
+    	
+		// 6 - G1Mixed
+    	assertTrue(jvmEvents.get(6) instanceof G1Mixed);
+    	G1Mixed evt6 = ((G1Mixed) jvmEvents.get(6));
+    	assertEquals(evt6.getDateTimeStamp(), new DateTimeStamp(24.383));
+    	assertMemoryPoolValues(evt6.getHeap(), 269*M, 1149*M, 153*M, 1149*M);
+    	assertDoubleEquals(evt6.getDuration(), 0.0457592);
+    	
+		// 7 - G1Mixed
+    	assertTrue(jvmEvents.get(7) instanceof G1Mixed);
+    	G1Mixed evt7 = ((G1Mixed) jvmEvents.get(7));
+    	assertEquals(evt7.getDateTimeStamp(), new DateTimeStamp(1566.108));
+    	assertMemoryPoolValues(evt7.getHeap(), 7521, 13*M, 5701, 13*M);
+    	assertDoubleEquals(evt7.getDuration(), 0.0030090);    	
+
+	}
+    
+    /*
+     * jlittle-ptc: We could probably avoid a whole bunch of duplicated code in the following event checks with some thought,
+     * but for now, they're quick and sufficient for testing. 
+     */
+    
 	@Test
 	void testG1DetailedEvacuationPauseEvent() {
 		String[] lines = {
@@ -91,12 +180,14 @@ public class PreUnifiedG1GCParserTest extends ParserTest {
 		// 0 - G1Young
     	assertTrue(jvmEvents.get(0) instanceof G1Young);
     	G1Young evt0 = ((G1Young) jvmEvents.get(0));
-    	assertEquals(evt0.getGCCause(), GCCause.G1_EVACUATION_PAUSE);
+    	assertEquals(evt0.getDateTimeStamp(), new DateTimeStamp("2025-03-23T03:46:46.582+0000", 27.619));
+    	assertEquals(evt0.getGCCause(), GCCause.G1_EVACUATION_PAUSE);    	
+    	// Memory Pools
     	assertMemoryPoolValues(evt0.getHeap(), (long) (539.6*M), 10*G, (long) (128.5*M), 10*G);
     	assertMemoryPoolValues(evt0.getEden(), 468*M, 468*M, 0, 448*M);
-    	assertEquals(evt0.getDuration(), 0.0552009);
-    	
-    	// TODO: What else do we pull out of the block that would be verifiable?	
+    	assertSurvivorMemoryPoolValues(evt0.getSurvivor(), 44*M, 64*M);    	
+    	assertDoubleEquals(evt0.getDuration(), 0.0552009);
+    	assertCPUSummaryValues(evt0.getCpuSummary(), 0.27, 0.01, 0.05);
 	}
 	
 	@Test
@@ -139,12 +230,14 @@ public class PreUnifiedG1GCParserTest extends ParserTest {
 		// 0 - G1YoungInitialMark
     	assertTrue(jvmEvents.get(0) instanceof G1YoungInitialMark);
     	G1YoungInitialMark evt0 = ((G1YoungInitialMark) jvmEvents.get(0));
+    	assertEquals(evt0.getDateTimeStamp(), new DateTimeStamp("2025-03-23T03:46:27.139+0000", 8.176));    	
     	assertEquals(evt0.getGCCause(), GCCause.METADATA_GENERATION_THRESHOLD);
+    	// Memory Pools    	
     	assertMemoryPoolValues(evt0.getHeap(), (long) (222.4*M), 10*G, (long) (19.6*M), 10*G);
     	assertMemoryPoolValues(evt0.getEden(), 224*M, 512*M, 0, 492*M);
-    	assertEquals(evt0.getDuration(), 0.0286166);
-    	
-    	// TODO: What else do we pull out of the block that would be verifiable?
+    	assertSurvivorMemoryPoolValues(evt0.getSurvivor(), 0, 20*M);    	
+    	assertDoubleEquals(evt0.getDuration(), 0.0286166);
+    	assertCPUSummaryValues(evt0.getCpuSummary(), 0.07, 0.02, 0.03);
 	}
 
 	@Test
@@ -187,12 +280,14 @@ public class PreUnifiedG1GCParserTest extends ParserTest {
 		// 0 - G1YoungInitialMark
     	assertTrue(jvmEvents.get(0) instanceof G1YoungInitialMark);
     	G1YoungInitialMark evt0 = ((G1YoungInitialMark) jvmEvents.get(0));
+    	assertEquals(evt0.getDateTimeStamp(), new DateTimeStamp("2025-04-18T20:35:53.067+0000", 2306974.104));
     	assertEquals(evt0.getGCCause(), GCCause.JAVA_LANG_SYSTEM);
+    	// Memory Pools
     	assertMemoryPoolValues(evt0.getHeap(), (long) (988.7*M), 10*G, (long) (843.8*M), 10*G);
     	assertMemoryPoolValues(evt0.getEden(), 148*M, 6136*M, 0, 6136*M);
-    	assertEquals(evt0.getDuration(), 0.0081646);
-    	
-    	// TODO: What else do we pull out of the block that would be verifiable?		
+    	assertSurvivorMemoryPoolValues(evt0.getSurvivor(), 8192, 8192);
+    	assertDoubleEquals(evt0.getDuration(), 0.0081646);
+    	assertCPUSummaryValues(evt0.getCpuSummary(), 0.03, 0.00, 0.01);
 	}
 	
 	@Test
@@ -235,12 +330,14 @@ public class PreUnifiedG1GCParserTest extends ParserTest {
 		// 0 - G1YoungInitialMark
     	assertTrue(jvmEvents.get(0) instanceof G1Young);
     	G1Young evt0 = ((G1Young) jvmEvents.get(0));
+    	assertEquals(evt0.getDateTimeStamp(), new DateTimeStamp("2025-03-23T03:47:20.309+0000", 61.346));
     	assertEquals(evt0.getGCCause(), GCCause.GC_LOCKER);
+    	// Memory Pools
     	assertMemoryPoolValues(evt0.getHeap(), (long) (646.8*M), 10*G, (long) (475.6*M), 10*G);
     	assertMemoryPoolValues(evt0.getEden(), 236*M, 400*M, 0, 848*M);
-    	assertEquals(evt0.getDuration(), 0.1288985);
-    	
-    	// TODO: What else do we pull out of the block that would be verifiable?				
+    	assertSurvivorMemoryPoolValues(evt0.getSurvivor(), 112*M, 44*M);
+    	assertDoubleEquals(evt0.getDuration(), 0.1288985);
+    	assertCPUSummaryValues(evt0.getCpuSummary(), 0.59, 0.05, 0.13);
 	}
 
 	@Test
@@ -283,12 +380,14 @@ public class PreUnifiedG1GCParserTest extends ParserTest {
 		// 0 - G1Mixed
     	assertTrue(jvmEvents.get(0) instanceof G1Mixed);
     	G1Mixed evt0 = ((G1Mixed) jvmEvents.get(0));
+    	assertEquals(evt0.getDateTimeStamp(), new DateTimeStamp(879630.318));
     	assertEquals(evt0.getGCCause(), GCCause.G1_EVACUATION_PAUSE);
+    	// Memory Pools
     	assertMemoryPoolValues(evt0.getHeap(), (long) (6712.4*M), 7232*M, (long) (6366.2*M), 7232*M);
     	assertMemoryPoolValues(evt0.getEden(), 340*M, 340*M, 0, 340*M);
-    	assertEquals(evt0.getDuration(), 0.0266434);
-    	
-    	// TODO: What else do we pull out of the block that would be verifiable?				
+    	assertSurvivorMemoryPoolValues(evt0.getSurvivor(), 20*M, 20*M);
+    	assertDoubleEquals(evt0.getDuration(), 0.0266434);
+    	assertCPUSummaryValues(evt0.getCpuSummary(), 0.27, 0.00, 0.03);    	
 	}
 	
 }
