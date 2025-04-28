@@ -782,6 +782,8 @@ class G1GCForwardReference extends ForwardReference {
         if (toSpaceExhausted) collection.toSpaceExhausted();
         if (hasReferenceGCSummary())
             collection.add(generateReferenceGCSummary());
+        if (survivorRecord != null)
+            collection.add(survivorRecord);
         collection.addCPUSummary(getCPUSummary());
         return collection;
     }
