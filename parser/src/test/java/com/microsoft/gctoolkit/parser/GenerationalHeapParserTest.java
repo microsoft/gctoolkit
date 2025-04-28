@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.parser;
 
+import com.microsoft.gctoolkit.event.GCCause;
 import com.microsoft.gctoolkit.event.generational.AbortablePreClean;
 import com.microsoft.gctoolkit.event.generational.CMSRemark;
 import com.microsoft.gctoolkit.event.generational.ConcurrentMark;
@@ -11,11 +12,16 @@ import com.microsoft.gctoolkit.event.generational.ConcurrentReset;
 import com.microsoft.gctoolkit.event.generational.ConcurrentSweep;
 import com.microsoft.gctoolkit.event.generational.FullGC;
 import com.microsoft.gctoolkit.event.generational.InitialMark;
+import com.microsoft.gctoolkit.event.generational.PSFullGC;
 import com.microsoft.gctoolkit.event.generational.PSYoungGen;
 import com.microsoft.gctoolkit.event.generational.ParNew;
+import com.microsoft.gctoolkit.event.generational.SystemGC;
+import com.microsoft.gctoolkit.event.generational.YoungGC;
 import com.microsoft.gctoolkit.event.jvm.JVMEvent;
 import com.microsoft.gctoolkit.jvm.Diarizer;
 import com.microsoft.gctoolkit.parser.jvm.PreUnifiedDiarizer;
+import com.microsoft.gctoolkit.time.DateTimeStamp;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -230,6 +236,170 @@ public class GenerationalHeapParserTest extends ParserTest {
         assertMemoryPoolValues(evt.getHeap(), 886080, 1986432, 31608, 1986432);
     }
     
+	@Test
+	void testGenerationalNoDetailsLines() {
+		String[] lines = {
+				// 0 - Normal GC
+				"75.240: [GC 525312K->16552K(2013696K), 0.1105640 secs]",
+				
+				// 1 - Full GC
+				"8357.379: [Full GC 1379524K->1236761K(2787392K), 43.3665438 secs]",
+				
+				// 2 - InitialMark
+				"25293.283: [GC 2548071K(3028408K), 0.0743383 secs]"
+		};
+		
+		int expectedEventCount = 3;
+		
+    	List<JVMEvent> jvmEvents = feedParser(lines);
+    	assertEquals(jvmEvents.size(), expectedEventCount);
+    	
+		// 0 - YoungGC
+    	assertTrue(jvmEvents.get(0) instanceof YoungGC);
+    	YoungGC evt0 = ((YoungGC) jvmEvents.get(0));
+    	assertEquals(evt0.getDateTimeStamp(), new DateTimeStamp(75.240));
+    	assertMemoryPoolValues(evt0.getHeap(), 525312, 2013696, 16552, 2013696);
+    	assertDoubleEquals(evt0.getDuration(), 0.1105640);
+
+		// 1 - FullGC
+    	assertTrue(jvmEvents.get(1) instanceof FullGC);
+    	FullGC evt1 = ((FullGC) jvmEvents.get(1));
+    	assertEquals(evt1.getDateTimeStamp(), new DateTimeStamp(8357.379));
+    	assertMemoryPoolValues(evt1.getHeap(), 1379524, 2787392, 1236761, 2787392);
+    	assertDoubleEquals(evt1.getDuration(), 43.3665438);
+    	
+    	// 2 - InitialMark
+    	assertTrue(jvmEvents.get(2) instanceof InitialMark);
+    	InitialMark evt2 = ((InitialMark) jvmEvents.get(2));
+    	assertEquals(evt2.getDateTimeStamp(), new DateTimeStamp(25293.283));
+    	assertMemoryPoolValues(evt2.getHeap(), 2548071, 3028408, 2548071, 3028408);
+    	assertDoubleEquals(evt2.getDuration(), 0.0743383);		    	
+	}
+	
+	@Test
+	void testCMSGenerationalNoDetailsLines() {
+		String[] lines = {
+				"13.563: [GC (Allocation Failure)  886080K->31608K(1986432K), 0.0392109 secs]",
+				
+				// Currently Ignored
+				//"10.254: [GC (CMS Initial Mark)  460775K(1986432K), 0.0346332 secs]",
+				//"15.423: [GC (CMS Final Remark)  168951K(1986432K), 0.0388223 secs]"
+		};
+		
+		int expectedEventCount = 1;
+		
+    	List<JVMEvent> jvmEvents = feedParser(lines);
+    	assertEquals(jvmEvents.size(), expectedEventCount);
+    	
+		// 0 - PSYoungGen
+    	assertTrue(jvmEvents.get(0) instanceof PSYoungGen);
+    	PSYoungGen evt0 = ((PSYoungGen) jvmEvents.get(0));
+    	assertEquals(evt0.getDateTimeStamp(), new DateTimeStamp(13.563));
+    	assertMemoryPoolValues(evt0.getHeap(), 886080, 1986432, 31608, 1986432);
+    	assertDoubleEquals(evt0.getDuration(), 0.0392109);
+	}
+    
+	@Test
+	void testGenerationalDetailsLines() {
+		String[] lines = {
+				// 0 - PSFullGC
+				"2021-12-17T13:34:54.484+0000: 11.445: [Full GC (Metadata GC Threshold) [PSYoungGen: 19070K->0K(475648K)] [ParOldGen: 0K->18752K(1086976K)] 19070K->18752K(1562624K), [Metaspace: 20797K->20797K(1069056K)], 0.3274726 secs] [Times: user=0.11 sys=0.20, real=0.33 secs] ",
+				
+				// 1 - PSYoungGen
+				"2021-12-17T13:35:02.874+0000: 19.835: [GC (Metadata GC Threshold) [PSYoungGen: 189709K->8219K(475648K)] 208461K->26971K(1562624K), 0.1027594 secs] [Times: user=0.09 sys=0.10, real=0.10 secs] ",
+				
+				// 2 - PSYoungGen
+				"2021-12-17T13:35:24.328+0000: 41.289: [GC (Allocation Failure) [PSYoungGen: 408064K->37889K(475648K)] 442767K->72593K(1562624K), 0.2413144 secs] [Times: user=0.00 sys=0.24, real=0.24 secs] ",
+				
+				// 3 - PSYoungGen
+				"2021-12-17T13:36:02.418+0000: 79.379: [GC (System.gc()) [PSYoungGen: 169657K->10443K(423936K)] 329477K->179021K(1510912K), 0.1649078 secs] [Times: user=0.02 sys=0.11, real=0.16 secs] ",
+				
+				// 4 - SystemGC
+				"2021-12-17T13:36:02.583+0000: 79.544: [Full GC (System.gc()) [PSYoungGen: 10443K->0K(423936K)] [ParOldGen: 168577K->168475K(1086976K)] 179021K->168475K(1510912K), [Metaspace: 119955K->118885K(1155072K)], 1.2929194 secs] [Times: user=0.98 sys=0.25, real=1.29 secs] ",
+				
+				// 5 - PSFullGC
+				"2021-12-17T14:58:05.098+0000: 5002.059: [Full GC (Ergonomics) [PSYoungGen: 60759K->0K(414208K)] [ParOldGen: 974100K->1024865K(1086976K)] 1034860K->1024865K(1501184K), [Metaspace: 154915K->154915K(1187840K)], 0.7945447 secs] [Times: user=0.68 sys=0.06, real=0.79 secs] "
+		};
+		
+		int expectedEventCount = 6;
+		
+    	List<JVMEvent> jvmEvents = feedParser(lines);
+    	assertEquals(jvmEvents.size(), expectedEventCount);
+    	
+		// 0 - PSFullGC
+    	assertTrue(jvmEvents.get(0) instanceof PSFullGC);
+    	PSFullGC evt0 = ((PSFullGC) jvmEvents.get(0));
+    	assertEquals(evt0.getDateTimeStamp(), new DateTimeStamp("2021-12-17T13:34:54.484+0000", 11.445));
+    	assertEquals(evt0.getGCCause(), GCCause.METADATA_GENERATION_THRESHOLD);
+    	// Memory Pools
+    	assertMemoryPoolValues(evt0.getHeap(), 19070, 1562624, 18752, 1562624);
+    	assertMemoryPoolValues(evt0.getYoung(), 19070, 475648, 0, 475648);
+    	assertMemoryPoolValues(evt0.getTenured(), 0, 1086976, 18752, 1086976);
+    	assertMemoryPoolValues(evt0.getPermOrMetaspace(), 20797, 1069056, 20797, 1069056);
+    	assertDoubleEquals(evt0.getDuration(), 0.3274726);
+		assertCPUSummaryValues(evt0.getCpuSummary(), 0.11, 0.20, 0.33);
+		
+		// 1 - PSYoungGen
+    	assertTrue(jvmEvents.get(1) instanceof PSYoungGen);
+    	PSYoungGen evt1 = ((PSYoungGen) jvmEvents.get(1));
+    	assertEquals(evt1.getDateTimeStamp(), new DateTimeStamp("2021-12-17T13:35:02.874+0000", 19.835));
+    	assertEquals(evt1.getGCCause(), GCCause.METADATA_GENERATION_THRESHOLD);
+    	// Memory Pools
+    	assertMemoryPoolValues(evt1.getHeap(), 208461, 1562624, 26971, 1562624);
+    	assertMemoryPoolValues(evt1.getYoung(), 189709, 475648, 8219, 475648);
+    	assertDoubleEquals(evt1.getDuration(), 0.1027594);
+		assertCPUSummaryValues(evt1.getCpuSummary(), 0.09, 0.10, 0.10);	
+
+		// 2 - PSYoungGen
+    	assertTrue(jvmEvents.get(2) instanceof PSYoungGen);
+    	PSYoungGen evt2 = ((PSYoungGen) jvmEvents.get(2));
+    	assertEquals(evt2.getDateTimeStamp(), new DateTimeStamp("2021-12-17T13:35:24.328+0000", 41.289));
+    	assertEquals(evt2.getGCCause(), GCCause.ALLOCATION_FAILURE);
+    	// Memory Pools
+    	assertMemoryPoolValues(evt2.getHeap(), 442767, 1562624, 72593, 1562624);
+    	assertMemoryPoolValues(evt2.getYoung(), 408064, 475648, 37889, 475648);
+    	assertDoubleEquals(evt2.getDuration(), 0.2413144);
+		assertCPUSummaryValues(evt2.getCpuSummary(), 0.0, 0.24, 0.24);	
+		
+		// 3 - PSYoungGen (SystemGC)
+    	assertTrue(jvmEvents.get(3) instanceof PSYoungGen);
+    	PSYoungGen evt3 = ((PSYoungGen) jvmEvents.get(3));
+    	assertEquals(evt3.getDateTimeStamp(), new DateTimeStamp("2021-12-17T13:36:02.418+0000", 79.379));
+    	assertEquals(evt3.getGCCause(), GCCause.JAVA_LANG_SYSTEM);
+    	// Memory Pools
+    	assertMemoryPoolValues(evt3.getHeap(), 329477, 1510912, 179021, 1510912);
+    	assertMemoryPoolValues(evt3.getYoung(), 169657, 423936, 10443, 423936);
+    	assertDoubleEquals(evt3.getDuration(), 0.1649078);
+		assertCPUSummaryValues(evt3.getCpuSummary(), 0.02, 0.11, 0.16);	
+		
+		// 4 - PSFullGC (SystemGC)
+    	assertTrue(jvmEvents.get(4) instanceof SystemGC);
+    	SystemGC evt4 = ((SystemGC) jvmEvents.get(4));
+    	assertEquals(evt4.getDateTimeStamp(), new DateTimeStamp("2021-12-17T13:36:02.583+0000", 79.544));
+    	assertEquals(evt4.getGCCause(), GCCause.JAVA_LANG_SYSTEM);
+    	// Memory Pools
+    	assertMemoryPoolValues(evt4.getHeap(), 179021, 1510912, 168475, 1510912);
+    	assertMemoryPoolValues(evt4.getYoung(), 10443, 423936, 0, 423936);
+    	assertMemoryPoolValues(evt4.getTenured(), 168577, 1086976, 168475, 1086976);
+    	assertMemoryPoolValues(evt4.getPermOrMetaspace(), 119955, 1155072, 118885, 1155072);
+    	assertDoubleEquals(evt4.getDuration(), 1.2929194);
+		assertCPUSummaryValues(evt4.getCpuSummary(), 0.98, 0.25, 1.29);
+
+		// 5 - PSFullGC (Ergonomics)
+    	assertTrue(jvmEvents.get(5) instanceof PSFullGC);
+    	PSFullGC evt5 = ((PSFullGC) jvmEvents.get(5));
+    	assertEquals(evt5.getDateTimeStamp(), new DateTimeStamp("2021-12-17T14:58:05.098+0000", 5002.059));
+    	assertEquals(evt5.getGCCause(), GCCause.ADAPTIVE_SIZE_POLICY);
+    	// Memory Pools
+    	assertMemoryPoolValues(evt5.getHeap(), 1034860, 1501184, 1024865, 1501184);
+    	assertMemoryPoolValues(evt5.getYoung(), 60759, 414208, 0, 414208);
+    	assertMemoryPoolValues(evt5.getTenured(), 974100, 1086976, 1024865, 1086976);
+    	assertMemoryPoolValues(evt5.getPermOrMetaspace(), 154915, 1187840, 154915, 1187840);
+    	assertDoubleEquals(evt5.getDuration(), 0.7945447);
+		assertCPUSummaryValues(evt5.getCpuSummary(), 0.68, 0.06, 0.79);				
+	}
+
+	
     @Override
     protected Diarizer diarizer() {
         return new PreUnifiedDiarizer();
