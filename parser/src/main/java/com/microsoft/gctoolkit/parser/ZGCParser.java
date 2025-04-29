@@ -534,25 +534,33 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
     }
 
     private void memorySummary(GCLogTrace trace, String s) {
-        ZGCCollectionType type = ZGCCollectionType.get(trace.getGroup(1));
+    	long gcID = trace.getLongGroup(1);
+        ZGCCollectionType type = ZGCCollectionType.get(trace.getGroup(2));
+        
         switch (type) {
             case FULL:
+            	// Legacy ZGC Logs generated with -Xlog:gc instead of -Xlog:gc* won't have started a cycle, so we 
+            	// have to create the forward reference here.
+            	// This does not apply to Generational logs as they log two lines for each cycle.
+            	if (forwardReference == null) 
+                    forwardReference = new ZGCForwardReference(getClock(), gcID, trace.gcCause(3,0), type, ZGCPhase.FULL);
+            	
                 ((ZGCForwardReference)forwardReference).setMemorySummary(
                     new ZGCMemorySummary(
-                            trace.toKBytes(3),
-                            trace.toKBytes(6)));
+                            trace.toKBytes(4),
+                            trace.toKBytes(7)));
                 break;
             case MINOR:
                 ((ZGCMinorForwardReference)forwardReference).setMemorySummary(
                         new ZGCMemorySummary(
-                                trace.toKBytes(3),
-                                trace.toKBytes(6)));
+                                trace.toKBytes(4),
+                                trace.toKBytes(7)));
                 break;
             case MAJOR:
                 ((ZGCMajorForwardReference)forwardReference).setMemorySummary(
                         new ZGCMemorySummary(
-                                trace.toKBytes(3),
-                                trace.toKBytes(6)));
+                                trace.toKBytes(4),
+                                trace.toKBytes(7)));
                 break;
         }
 

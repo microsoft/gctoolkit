@@ -2,8 +2,10 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.parser;
 
+import com.microsoft.gctoolkit.event.GCCause;
 import com.microsoft.gctoolkit.event.jvm.JVMEvent;
 import com.microsoft.gctoolkit.event.zgc.FullZGCCycle;
+import com.microsoft.gctoolkit.event.zgc.MajorZGCCycle;
 import com.microsoft.gctoolkit.event.zgc.ZGCAllocatedSummary;
 import com.microsoft.gctoolkit.event.zgc.ZGCGarbageSummary;
 import com.microsoft.gctoolkit.event.zgc.ZGCLiveSummary;
@@ -13,6 +15,8 @@ import com.microsoft.gctoolkit.event.zgc.ZGCMetaspaceSummary;
 import com.microsoft.gctoolkit.event.zgc.ZGCReclaimSummary;
 import com.microsoft.gctoolkit.jvm.Diarizer;
 import com.microsoft.gctoolkit.parser.jvm.UnifiedDiarizer;
+import com.microsoft.gctoolkit.time.DateTimeStamp;
+
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -30,6 +34,8 @@ public class ZGCParserTest extends ParserTest {
         return new ZGCParser();
     }
 
+    final long M = 1024;
+    
     @Test
     public void infoLevelZGCCycle() {
 
@@ -134,6 +140,72 @@ public class ZGCParserTest extends ParserTest {
         }
     }
 
+	@Test
+	void testLegacyZGCNoDetailsLines() {
+		String[] lines = {
+				// 0 - FullZGCCycle
+				"[1.295s][info][gc] GC(0) Garbage Collection (Metadata GC Threshold) 90M(1%)->58M(1%)",
+
+				// 1 - FullZGCCycle
+				"[23.507s][info][gc] GC(3) Garbage Collection (Warmup) 826M(10%)->168M(2%)"
+		};
+	
+        int expectedEventCount = 2;
+
+        List<JVMEvent> jvmEvents = feedParser(lines);
+        assertEquals(jvmEvents.size(), expectedEventCount);
+		
+        // 0 - FullZGCCycle
+        assertTrue(jvmEvents.get(0) instanceof FullZGCCycle); 
+        FullZGCCycle evt0 = (FullZGCCycle) jvmEvents.get(0);
+        assertEquals(evt0.getDateTimeStamp(), new DateTimeStamp(1.295));
+        assertEquals(evt0.getGCCause(), GCCause.METADATA_GENERATION_THRESHOLD);
+        assertZGCMemorySummary(evt0.getMemorySummary(), 90*M, 58*M);
+
+        // 1 - FullZGCCycle
+        assertTrue(jvmEvents.get(1) instanceof FullZGCCycle); 
+        FullZGCCycle evt1 = (FullZGCCycle) jvmEvents.get(1);
+        assertEquals(evt1.getDateTimeStamp(), new DateTimeStamp(23.507));
+        assertEquals(evt1.getGCCause(), GCCause.WARMUP);
+        assertZGCMemorySummary(evt1.getMemorySummary(), 826*M, 168*M);        
+	}
+
+	@Test
+	void testGenerationalZGCNoDetailsLines() {
+		String[] lines = {
+				// 0 - MajorZGCCycle
+				"[4.252s][info][gc] GC(2) Major Collection (Metadata GC Threshold)",
+				"[4.366s][info][gc] GC(2) Major Collection (Metadata GC Threshold) 384M(5%)->186M(2%) 0.114s",
+				
+				// 1 - MajorZGCCycle
+				"[36.326s][info][gc] GC(3) Major Collection (Warmup)",
+				"[36.423s][info][gc] GC(3) Major Collection (Warmup) 730M(9%)->258M(3%) 0.097s"
+		};
+	
+        int expectedEventCount = 2;
+
+        List<JVMEvent> jvmEvents = feedParser(lines);
+        assertEquals(jvmEvents.size(), expectedEventCount);
+		
+        // 0 - MajorZGCCycle
+        assertTrue(jvmEvents.get(0) instanceof MajorZGCCycle); 
+        MajorZGCCycle evt0 = (MajorZGCCycle) jvmEvents.get(0);
+        assertEquals(evt0.getDateTimeStamp(), new DateTimeStamp(4.252));
+        assertEquals(evt0.getGCCause(), GCCause.METADATA_GENERATION_THRESHOLD);
+        assertZGCMemorySummary(evt0.getMemorySummary(), 384*M, 186*M);
+        // Uncomment this check once PR #438 is merged.
+        // assertDoubleEquals(evt0.getDuration(), 0.114);
+
+        // 1 - MajorZGCCycle
+        assertTrue(jvmEvents.get(1) instanceof MajorZGCCycle); 
+        MajorZGCCycle evt1 = (MajorZGCCycle) jvmEvents.get(1);
+        assertEquals(evt1.getDateTimeStamp(), new DateTimeStamp(36.326));
+        assertEquals(evt1.getGCCause(), GCCause.WARMUP);
+        assertZGCMemorySummary(evt1.getMemorySummary(), 730*M, 258*M);        
+        // Uncomment this check once PR #438 is merged.
+        // assertDoubleEquals(evt1.getDuration(), 0.097);
+	}
+
     private boolean checkZGCMemoryPoolSummary(ZGCMemoryPoolSummary summary, long capacity, long free, long used) {
         return summary.getCapacity() == capacity && summary.getFree() == free && summary.getUsed() == used;
     }
@@ -165,4 +237,11 @@ public class ZGCParserTest extends ParserTest {
     private int toInt(double value, int significantDigits) {
         return (int)(value * (double)significantDigits);
     }
+    
+	private void assertZGCMemorySummary(ZGCMemorySummary summary, long before, long after) {
+		assertNotNull(summary);
+		assertEquals(summary.getOccupancyBefore(), before);
+		assertEquals(summary.getOccupancyAfter(), after);		
+	}
+
 }
