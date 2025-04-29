@@ -82,15 +82,17 @@ public class UnifiedGenerationalParserTest extends ParserTest {
     }
 
     private static final String[] serial = {
-            "factorization-serialgc-tip.log"
+            "factorization-serialgc-tip.log",
+            "factorization-serialgc-jdk21.log"
     };
 
     private static final int[] serialNumberOfDifferentCollectors = {
-            2,
+            2, 2
     };
 
     private static final int[][] serialCounts = {
             //  0,   1,    2,     3,     4,     5,     6,    7,    8,     9,      10,     11,      12, 13, 14, 15, 16, 17
-            {   0,  13,    0,     0,     0,     0,     0,    0,    0,     0,       4,      0,       0,  0,  0,  0,  0,  0},
+            {   0,  13,    0,     0,     0,     0,     0,    0,    0,     0,       4,      0,       0,  0,  0,  0,  0,  0}, // 17
+            {   0, 812,    0,     0,     0,     0,     0,    0,    0,     0,      24,      0,       0,  0,  0,  0,  0,  0}, // 835
     };
 }

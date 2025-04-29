@@ -7,6 +7,7 @@ import com.microsoft.gctoolkit.event.GCCause;
 import com.microsoft.gctoolkit.event.GarbageCollectionTypes;
 import com.microsoft.gctoolkit.event.MemoryPoolSummary;
 import com.microsoft.gctoolkit.event.ReferenceGCSummary;
+import com.microsoft.gctoolkit.event.jvm.SurvivorRecord;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
 
 public abstract class GenerationalGCPauseEvent extends GenerationalGCEvent {
@@ -23,6 +24,7 @@ public abstract class GenerationalGCPauseEvent extends GenerationalGCEvent {
     private double stringTableProcessingTime;
     private double symbolAndStringTableProcessingTime;
     private BinaryTreeDictionary binaryTreeDictionary;
+    private SurvivorRecord survivorRecord;
 
     private CPUSummary cpuSummary;
 
@@ -112,6 +114,14 @@ public abstract class GenerationalGCPauseEvent extends GenerationalGCEvent {
         this.symbolTableProcessingTime = symbolTable;
         this.stringTableProcessingTime = stringTable;
         this.symbolAndStringTableProcessingTime = symbolAndStringTable;
+    }
+
+    public void add(SurvivorRecord record) {
+        this.survivorRecord = record;
+    }
+
+    public SurvivorRecord getSurvivorRecord() {
+        return survivorRecord;
     }
 
     public double getClassUnloadingProcessingTime() {
