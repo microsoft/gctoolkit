@@ -281,12 +281,13 @@ public class GenerationalHeapParserTest extends ParserTest {
 		String[] lines = {
 				"13.563: [GC (Allocation Failure)  886080K->31608K(1986432K), 0.0392109 secs]",
 				
+				"23.331: [Full GC (Metadata GC Threshold)  17386K->16928K(415232K), 0.0498462 secs]"
 				// Currently Ignored
 				//"10.254: [GC (CMS Initial Mark)  460775K(1986432K), 0.0346332 secs]",
 				//"15.423: [GC (CMS Final Remark)  168951K(1986432K), 0.0388223 secs]"
 		};
 		
-		int expectedEventCount = 1;
+		int expectedEventCount = 2;
 		
     	List<JVMEvent> jvmEvents = feedParser(lines);
     	assertEquals(jvmEvents.size(), expectedEventCount);
@@ -297,6 +298,13 @@ public class GenerationalHeapParserTest extends ParserTest {
     	assertEquals(evt0.getDateTimeStamp(), new DateTimeStamp(13.563));
     	assertMemoryPoolValues(evt0.getHeap(), 886080, 1986432, 31608, 1986432);
     	assertDoubleEquals(evt0.getDuration(), 0.0392109);
+    	
+    	// 1 - PSFullGC
+    	assertTrue(jvmEvents.get(1) instanceof FullGC);
+    	FullGC evt1 = ((FullGC) jvmEvents.get(1));
+    	assertEquals(evt1.getDateTimeStamp(), new DateTimeStamp(23.331));
+    	assertMemoryPoolValues(evt1.getHeap(), 17386, 415232, 16928, 415232);
+    	assertDoubleEquals(evt1.getDuration(), 0.0498462);
 	}
     
 	@Test

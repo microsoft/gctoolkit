@@ -1583,8 +1583,8 @@ public class GenerationalHeapParser extends PreUnifiedGCLogParser implements Sim
         publish(collection);
     }
 
-    // This might have the same issue as psYoungNoDetails based on the index, but without a sample line
-    // I can't validate it, so I'm leaving it as is.  May need to change offset from 4 to 7.
+    // #433 - Offset for this call needed to be incremented by 3 to 7 (previously 4)
+    //23.331: [Full GC (Metadata GC Threshold)  17386K->16928K(415232K), 0.0498462 secs]
     public void psFull(GCLogTrace trace, String line) {
         FullGC collection;
         GCCause cause = trace.gcCause();
@@ -1593,11 +1593,11 @@ public class GenerationalHeapParser extends PreUnifiedGCLogParser implements Sim
         } else {
             collection = new FullGC(trace.getDateTimeStamp(), cause, trace.getDuration());
         }
-        collection.add(trace.getOccupancyBeforeAfterWithMemoryPoolSizeSummary(4));
+        collection.add(trace.getOccupancyBeforeAfterWithMemoryPoolSizeSummary(7));
         publish(collection);
     }
 
-    // #433 - Offset for this call needed to be incremented by 3. (previously 4)
+    // #433 - Offset for this call needed to be incremented by 3 to 7. (previously 4)
     //13.563: [GC (Allocation Failure)  886080K->31608K(1986432K), 0.0392109 secs]
     public void psYoungNoDetails(GCLogTrace trace, String line) {
         GCCause cause = trace.gcCause();
