@@ -86,18 +86,18 @@ public class ZGCParserTest extends ParserTest {
             assertEquals(zgc.getGcId(), 2L);
 
             assertEquals(0.0710d, zgc.getDuration(),0.001d);
-            assertEquals(toInt(32.121d, 1000), toInt(zgc.getDateTimeStamp().getTimeStamp(), 1000));
+            assertEquals(toInt(32.121d, 1000), toInt(zgc.getDateTimeStamp().toSeconds(), 1000));
             assertEquals("Metadata GC Threshold", zgc.getGCCause().getLabel());
             // Durations
-            assertEquals(32.121d, zgc.getPauseMarkStartTimeStamp().getTimeStamp(),  0.001d);
-            assertEquals(32.122d, zgc.getConcurrentMarkTimeStamp().getTimeStamp(), 0.001d);
-            assertEquals(32.166d, zgc.getConcurrentMarkFreeTimeStamp().getTimeStamp(), 0.001d);
-            assertEquals(32.166d, zgc.getPauseMarkEndTimeStamp().getTimeStamp(), 0.001d);
-            assertEquals(32.167d, zgc.getConcurrentProcessNonStrongReferencesTimeStamp().getTimeStamp(), 0.002d);
-            assertEquals(32.172d, zgc.getConcurrentResetRelocationSetTimeStamp().getTimeStamp(), 0.001d);
-            assertEquals(32.172d, zgc.getConcurrentSelectRelocationSetTimeStamp().getTimeStamp(), 0.001d);
-            assertEquals(32.179d, zgc.getPauseRelocateStartTimeStamp().getTimeStamp(), 0.001d);
-            assertEquals(32.179d, zgc.getConcurrentRelocateTimeStamp().getTimeStamp(), 0.001d);
+            assertEquals(32.121d, zgc.getPauseMarkStartTimeStamp().toSeconds(),  0.001d);
+            assertEquals(32.122d, zgc.getConcurrentMarkTimeStamp().toSeconds(), 0.001d);
+            assertEquals(32.166d, zgc.getConcurrentMarkFreeTimeStamp().toSeconds(), 0.001d);
+            assertEquals(32.166d, zgc.getPauseMarkEndTimeStamp().toSeconds(), 0.001d);
+            assertEquals(32.167d, zgc.getConcurrentProcessNonStrongReferencesTimeStamp().toSeconds(), 0.002d);
+            assertEquals(32.172d, zgc.getConcurrentResetRelocationSetTimeStamp().toSeconds(), 0.001d);
+            assertEquals(32.172d, zgc.getConcurrentSelectRelocationSetTimeStamp().toSeconds(), 0.001d);
+            assertEquals(32.179d, zgc.getPauseRelocateStartTimeStamp().toSeconds(), 0.001d);
+            assertEquals(32.179d, zgc.getConcurrentRelocateTimeStamp().toSeconds(), 0.001d);
 
             assertEquals(toInt(0.023d, 1000), toInt(zgc.getPauseMarkStartDuration(), 1000));
             assertEquals(toInt(44.623d, 1000), toInt(zgc.getConcurrentMarkDuration(), 1000));
@@ -193,8 +193,7 @@ public class ZGCParserTest extends ParserTest {
         assertEquals(evt0.getDateTimeStamp(), new DateTimeStamp(4.252));
         assertEquals(evt0.getGCCause(), GCCause.METADATA_GENERATION_THRESHOLD);
         assertZGCMemorySummary(evt0.getMemorySummary(), 384*M, 186*M);
-        // Uncomment this check once PR #438 is merged.
-        // assertDoubleEquals(evt0.getDuration(), 0.114);
+        assertDoubleEquals(evt0.getDuration(), 0.114);
 
         // 1 - MajorZGCCycle
         assertTrue(jvmEvents.get(1) instanceof MajorZGCCycle); 
@@ -202,8 +201,7 @@ public class ZGCParserTest extends ParserTest {
         assertEquals(evt1.getDateTimeStamp(), new DateTimeStamp(36.326));
         assertEquals(evt1.getGCCause(), GCCause.WARMUP);
         assertZGCMemorySummary(evt1.getMemorySummary(), 730*M, 258*M);        
-        // Uncomment this check once PR #438 is merged.
-        // assertDoubleEquals(evt1.getDuration(), 0.097);
+        assertDoubleEquals(evt1.getDuration(), 0.097);
 	}
 
     private boolean checkZGCMemoryPoolSummary(ZGCMemoryPoolSummary summary, long capacity, long free, long used) {
