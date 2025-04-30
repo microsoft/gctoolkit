@@ -9,7 +9,7 @@ import java.util.logging.Logger;
 import static com.microsoft.gctoolkit.parser.CommonTestHelper.captureTest;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class GenerationalHeapParserRulesTest implements SimplePatterns, SerialPatterns, ParallelPatterns, CMSPatterns, ICMSPatterns {
+public class GenerationalHeapParserRulesTest implements SimplePatterns, SerialPatterns, ParallelPatterns, CMSPatterns, ICMSPatterns, TenuredPatterns {
 
     private static final Logger LOGGER = Logger.getLogger(GenerationalHeapParserRulesTest.class.getName());
 
@@ -250,7 +250,9 @@ public class GenerationalHeapParserRulesTest implements SimplePatterns, SerialPa
 //            CMF_LARGE_BLOCK,
 //            //this rule must be evaluated before CONCURRENT_PHASE_END_BLOCK
 //            ABORT_PRECLEAN_DUE_TO_TIME_CLAUSE,
-            PRECLEAN_REFERENCE
+            PRECLEAN_REFERENCE,
+            TENURING_SUMMARY,
+            TENURING_AGE_BREAKDOWN
     };
 
     private String[][] lines = {
@@ -591,6 +593,12 @@ public class GenerationalHeapParserRulesTest implements SimplePatterns, SerialPa
 //            },
             {
                 "2016-04-01T15:03:42.171-0700: 11025.637: [Preclean SoftReferences, 0.0000530 secs]2016-04-01T15:03:42.172-0700: 11025.637: [Preclean WeakReferences, 0.0006860 secs]2016-04-01T15:03:42.172-0700: 11025.638: [Preclean FinalReferences, 0.0005450 secs]2016-04-01T15:03:42.173-0700: 11025.639: [Preclean PhantomReferences, 0.0000230 secs]2016-04-01T15:03:42.197-0700: 11025.663: [CMS-concurrent-preclean: 0.025/0.026 secs] [Times: user=0.04 sys=0.01, real=0.03 secs]"
+            },
+            {
+                "[10.749s][debug][gc,age       ] GC(0) Desired survivor size 1572864 bytes, new threshold 15 (max threshold 15)\n"
+            },
+            {
+                "[10.754s][trace][gc,age       ] GC(0) - age   1:    2579584 bytes,    2579584 total"
             }
     };
 }

@@ -4,6 +4,7 @@ package com.microsoft.gctoolkit.parser;
 
 import com.microsoft.gctoolkit.event.CPUSummary;
 import com.microsoft.gctoolkit.event.GCCause;
+import com.microsoft.gctoolkit.event.jvm.SurvivorRecord;
 import com.microsoft.gctoolkit.parser.jvm.Decorators;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
 
@@ -15,6 +16,7 @@ public class ForwardReference {
     private double duration = -1.0d;
     private GCCause gcCause = GCCause.UNKNOWN_GCCAUSE;
     private CPUSummary cpuSummary = null;
+    SurvivorRecord survivorRecord = null;
 
     ForwardReference(Decorators decorators, int id) {
         this.gcID = id;
@@ -69,4 +71,17 @@ public class ForwardReference {
         return decorators;
     }
 
+    public void survivorRecord(SurvivorRecord survivorRecord) {
+        this.survivorRecord = survivorRecord;
+    }
+
+    public void addAgeBreakout(int age, long volume) {
+        if (this.survivorRecord == null)
+            return;
+        this.survivorRecord.add(age, volume);
+    }
+
+    public SurvivorRecord getSurvivorRecord() {
+        return this.survivorRecord;
+    }
 }

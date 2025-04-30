@@ -366,13 +366,16 @@ public class PreUnifiedG1GCParser extends PreUnifiedGCLogParser implements G1GCP
     //2014-02-22T10:49:26.508-0100: 7.498: [GC pause (G1 Evacuation Pause) (mixed), 0.0026410 secs]
     //26.893: [GC pause (G1 Evacuation Pause) (young) (to-space exhausted), 0.1709670 secs]
     //115.421: [GC pause (G1 Evacuation Pause) (young) (initial-mark) (to-space exhausted), 0.0476190 secs]
+    //2025-03-23T03:57:20.841+0000: 661.878: [GC pause (System.gc()) (young) (initial-mark), 0.0502295 secs]
     private void processYoungGenCollection(GCLogTrace trace, String line) {
         boolean initialMark = trace.contains(8, "initial-mark");
         boolean tospaceExhausted = trace.contains(trace.groupCount() - 2, "to-space");
 
         if (trace.contains(7, "young")) {
             if (initialMark)
-                forwardReference = new G1YoungInitialMark(trace.getDateTimeStamp(), trace.gcCause(3, 0), trace.getDoubleGroup(trace.groupCount()));
+            	// jlittle-ptc: Cause was misaligned, originally pointed to group 3, but seems to be consistently in group 6.
+            	// which is default for trace.gcCause(), and would match with other off-by-3 issues I've found.
+                forwardReference = new G1YoungInitialMark(trace.getDateTimeStamp(), trace.gcCause(), trace.getDoubleGroup(trace.groupCount()));
             else
                 forwardReference = new G1Young(trace.getDateTimeStamp(), trace.gcCause(), trace.getDoubleGroup(trace.groupCount()));
             if (tospaceExhausted)
@@ -390,6 +393,7 @@ public class PreUnifiedG1GCParser extends PreUnifiedGCLogParser implements G1GCP
     //1566.108: [GC pause (mixed) 7521K->5701K(13M), 0.0030090 secs]
     //549.243: [GC pause (young) (initial-mark) 9521K->7824K(13M), 0.0021590 secs]
     //0.867: [GC pause (G1 Evacuation Pause) (young) 52816K->9563K(1024M), 0.0225122 secs]
+	//1834339.155: [GC pause (G1 Evacuation Pause) (mixed) 309M->141M(1111M), 0.0188779 secs]
     private void processYoung(GCLogTrace trace, String line) {
     	// #433 - All offsets in method incremented by 3 as they weren't matching the correct groups.
         MemoryPoolSummary summary = trace.getOccupancyBeforeAfterWithMemoryPoolSizeSummary(12);
@@ -398,6 +402,9 @@ public class PreUnifiedG1GCParser extends PreUnifiedGCLogParser implements G1GCP
             if (trace.getGroup(9) == null)
                 collection = new G1Young(getClock(), trace.gcCause(), trace.getPauseTime());
             else {
+            	// Sample lines not currently parsed:
+            	//1.488: [GC pause (Metadata GC Threshold) (young) (initial-mark) 31558K->14662K(1024M), 0.0073758 secs]
+            	//2439412.011: [GC pause (G1 Humongous Allocation) (young) (initial-mark) 616M->187M(1131M), 0.0484678 secs]
                 trace.notYetImplemented();
                 return;
             }

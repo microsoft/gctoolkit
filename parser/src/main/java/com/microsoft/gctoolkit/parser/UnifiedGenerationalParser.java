@@ -25,6 +25,7 @@ import com.microsoft.gctoolkit.event.generational.ParNew;
 import com.microsoft.gctoolkit.event.generational.SystemGC;
 import com.microsoft.gctoolkit.event.generational.YoungGC;
 import com.microsoft.gctoolkit.event.jvm.JVMTermination;
+import com.microsoft.gctoolkit.event.jvm.SurvivorRecord;
 import com.microsoft.gctoolkit.jvm.Diary;
 import com.microsoft.gctoolkit.message.ChannelName;
 import com.microsoft.gctoolkit.message.JVMEventChannel;
@@ -63,7 +64,7 @@ import static com.microsoft.gctoolkit.event.GarbageCollectionTypes.Remark;
  * - from, to, configured
  * - pause time if it is reported or can be calculated
  */
-public class UnifiedGenerationalParser extends UnifiedGCLogParser implements UnifiedGenerationalPatterns {
+public class UnifiedGenerationalParser extends UnifiedGCLogParser implements UnifiedGenerationalPatterns, TenuredPatterns {
 
     private static final Logger LOGGER = Logger.getLogger(UnifiedGenerationalParser.class.getName());
 
@@ -100,6 +101,8 @@ public class UnifiedGenerationalParser extends UnifiedGCLogParser implements Uni
         parseRules.put(JVM_EXIT, this::jvmExit);
         parseRules.put(END_OF_FILE, this::jvmExit);
         parseRules.put(METASPACE_DETAILED, this::metaSpaceDetails);
+        parseRules.put(TENURING_SUMMARY, this::tenuringSummary);
+        parseRules.put(TENURING_AGE_BREAKDOWN, this::tenuringAgeBreakout);
 
     }
 
@@ -227,6 +230,26 @@ public class UnifiedGenerationalParser extends UnifiedGCLogParser implements Uni
     private void youngDetails(GCLogTrace trace, String line) {
         pauseEvent.setDuration(trace.getDuration() / 1000.d);
         pauseEvent.setHeap(trace.getOccupancyBeforeAfterWithMemoryPoolSizeSummary(2));
+    }
+
+    /**
+     * Capture logged tenuring summary data
+     * @param trace
+     * @param line
+     */
+    private void tenuringSummary(GCLogTrace trace, String line) {
+        if ( pauseEvent != null)
+            pauseEvent.survivorRecord(new SurvivorRecord(getClock(), trace.getLongGroup(1), trace.getIntegerGroup(2), trace.getIntegerGroup(3)));
+    }
+
+    /**
+     * Capture logged age table data
+     * @param trace
+     * @param line
+     */
+    private void tenuringAgeBreakout(GCLogTrace trace, String line) {
+        if (pauseEvent != null)
+            pauseEvent.addAgeBreakout(trace.getIntegerGroup(1), trace.getLongGroup(2));
     }
 
     /**
@@ -449,13 +472,14 @@ public class UnifiedGenerationalParser extends UnifiedGCLogParser implements Uni
                 youngCollection = new PSYoungGen(forwardReference.getStartTime(), forwardReference.getGCCause(), forwardReference.getDuration());
                 break;
             default:
-                LOGGER.warning(forwardReference.getGarbageCollectionType() + " not recognized");
+                throw new IllegalStateException(forwardReference.getGarbageCollectionType() + " not recognized");
         }
 
         fillOutMemoryPoolData(youngCollection, forwardReference);
         fillOutMetaspaceData(youngCollection, forwardReference);
         youngCollection.add(forwardReference.getCPUSummary());
-        // add in reference processing
+        youngCollection.add(forwardReference.getSurvivorRecord());
+        // todo: add in reference processing
         return youngCollection;
     }
 
@@ -519,7 +543,7 @@ public class UnifiedGenerationalParser extends UnifiedGCLogParser implements Uni
                 return buildInitialMark(forwardReference);
             case Remark:
                 return buildRemark(forwardReference);
-            case PSFull: //todo:
+            case PSFull:
             case FullGC:
             case Full:
                 return buildFullGC(forwardReference);
@@ -565,8 +589,7 @@ public class UnifiedGenerationalParser extends UnifiedGCLogParser implements Uni
         if (line.contains("exit"))
             if (line.contains("used")) return true;
         if (line.contains("workers")) return true;
-        if (line.contains("Heap address")) return true;
-        return line.contains("Desired") || line.contains("Age table") || line.contains("- age ");
+        return line.contains("Heap address");
     }
 
     @Override

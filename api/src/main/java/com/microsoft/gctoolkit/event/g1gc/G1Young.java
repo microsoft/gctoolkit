@@ -6,6 +6,7 @@ import com.microsoft.gctoolkit.event.GCCause;
 import com.microsoft.gctoolkit.event.GarbageCollectionTypes;
 import com.microsoft.gctoolkit.event.StatisticalSummary;
 import com.microsoft.gctoolkit.event.UnifiedStatisticalSummary;
+import com.microsoft.gctoolkit.event.jvm.SurvivorRecord;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
 
 import java.util.Iterator;
@@ -36,6 +37,7 @@ public class G1Young extends G1RealPause {
     private StatisticalSummary workerTotal;
     private StatisticalSummary processedBuffersSummary;
     private boolean toSpaceExhausted = false;
+    private SurvivorRecord survivorRecord;
 
     private final Map<String, StatisticalSummary> parallelPhaseSummaries = new ConcurrentHashMap<>();
     private final Map<String, Double> phaseDurations = new ConcurrentHashMap<>();
@@ -194,6 +196,14 @@ public class G1Young extends G1RealPause {
             workerOther = statisticalSummary;
         if (group.endsWith("Total"))
             workerTotal = statisticalSummary;
+    }
+
+    public void add(SurvivorRecord record) {
+        this.survivorRecord = record;
+    }
+
+    public SurvivorRecord getSurvivorRecord() {
+        return survivorRecord;
     }
 
     public StatisticalSummary getWorkerOther() {

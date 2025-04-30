@@ -15,6 +15,7 @@ import com.microsoft.gctoolkit.event.g1gc.G1GCEvent;
 import com.microsoft.gctoolkit.event.g1gc.G1GCPauseEvent;
 import com.microsoft.gctoolkit.event.jvm.JVMEvent;
 import com.microsoft.gctoolkit.event.jvm.JVMTermination;
+import com.microsoft.gctoolkit.event.jvm.SurvivorRecord;
 import com.microsoft.gctoolkit.jvm.Diary;
 import com.microsoft.gctoolkit.message.ChannelName;
 import com.microsoft.gctoolkit.message.JVMEventChannel;
@@ -47,7 +48,7 @@ import static com.microsoft.gctoolkit.event.GarbageCollectionTypes.fromLabel;
  * - pause time if it is reported or can be calculated
  * todo: me
  */
-public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GCPatterns {
+public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GCPatterns, TenuredPatterns {
 
     private static final Logger LOGGER = Logger.getLogger(UnifiedG1GCParser.class.getName());
 
@@ -154,6 +155,8 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
         parseRules.put(REBUILD_FREELIST, this::noop);
         parseRules.put(NEW_CSET, this::noop);
         parseRules.put(RESIZE_TLAB, this::noop);
+        parseRules.put(TENURING_SUMMARY, this::tenuringSummary);
+        parseRules.put(TENURING_AGE_BREAKDOWN, this::tenuringAgeBreakout);
     }
 
     public UnifiedG1GCParser() {
@@ -689,6 +692,25 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
     }
 
     /**
+     * Capture logged tenuring summary data
+     * @param trace
+     * @param line
+     */
+    private void tenuringSummary(GCLogTrace trace, String line) {
+        forwardReference.survivorRecord(new SurvivorRecord(getClock(), trace.getLongGroup(1), trace.getIntegerGroup(2), trace.getIntegerGroup(3)));
+    }
+
+    /**
+     * Capture logged age table data
+     * @param trace
+     * @param line
+     */
+    private void tenuringAgeBreakout(GCLogTrace trace, String line) {
+        notYetImplemented(trace,line);
+        forwardReference.addAgeBreakout(trace.getIntegerGroup(1), trace.getLongGroup(2));
+    }
+
+    /**
      * records a concurrent phase of a concurrent cycle. After the event has been recorded, all other events
      * that occurred during the concurrent event will be recorded.
      * The exception is the Concurrent Undo cycle which causes all concurrent phases to be queued until the
@@ -742,8 +764,6 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
     }
 
     private boolean ignoreFrequentlySeenButUnwantedLines(String line) {
-        if (line.contains("Desired survivor size")) return true;
-        if (line.contains("Age table with threshold")) return true;
         if (line.contains("safepoint")) return true;
         if (line.contains(") Skipped phase ")) return true;
         if (line.contains(" Total                          Min: ")) return true;
@@ -754,7 +774,7 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
         if (line.contains(" StringTable Weak               Min:")) return true;
         if (line.contains(" ResolvedMethodTable Weak       Min:")) return true;
         if (line.contains(" JNI Weak                       Min:")) return true;
-        return line.contains(" - age ");
+        return false;
     }
 
     /**
