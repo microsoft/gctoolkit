@@ -125,11 +125,14 @@ public interface ZGCPatterns extends UnifiedPatterns {
     GCParseRule END_OF_PHASE_SUMMARY_GEN = new GCParseRule("End of Phase Summary", OPT_GEN + "(Old|Young) Generation " + MEMORY_PERCENT + "->" + MEMORY_PERCENT + "\\s*" + PAUSE_TIME);
 
 
+    // Added GCID capture into the following regex to allow creation of forwardReference for legacy, non-detail logs
+    // as without details, the cycle is never initialized.  This only applies to "Full" (Garbage) collection events; 
+    // generational events log a start and end line and are properly initialized.     
     //[3.596s][info ][gc         ] GC(3) Garbage Collection (Warmup) 894M(22%)->186M(5%)
     // or
     // Gen GC
     //[3.596s][info][gc          ] GC(7) Minor Collection (Allocation Rate) 14720M(40%)->2054M(6%) 0.689s
-    GCParseRule MEMORY_SUMMARY = new GCParseRule("Memory Summary", "(Garbage|Minor|Major) Collection " + GenericTokens.GC_CAUSE + MEMORY_PERCENT + "->" + MEMORY_PERCENT + "(?:\\s*" + PAUSE_TIME + ")?");
+    GCParseRule MEMORY_SUMMARY = new GCParseRule("Memory Summary", "GC\\(" + GenericTokens.INT + "\\) (Garbage|Minor|Major) Collection " + GenericTokens.GC_CAUSE + MEMORY_PERCENT + "->" + MEMORY_PERCENT + "(?:\\s*" + PAUSE_TIME + ")?");
 
     /*
     todo: capture and report on these log entries
