@@ -65,7 +65,7 @@ public class DateTimeStamp implements Comparable<DateTimeStamp> {
     private static final String TIME = INTEGER + DECIMAL_POINT + "\\d{3}";
 
     // Unified Tokens
-    private static final String DATE_TAG = "\\[" + DATE + "]";
+    private static final String DATE_TAG = "\\[(" + DATE + ")]";
     private static final String UPTIME_TAG = "\\[(" + TIME + ")s]";
 
     // Pre-unified tokens
@@ -81,15 +81,20 @@ public class DateTimeStamp implements Comparable<DateTimeStamp> {
 
     public static DateTimeStamp fromGCLogLine(String line) {
         Matcher matcher;
-        int captureGroup = 2;
+        int dateCaptureGroup;
+        int ageCaptureGroup;
         if ( line.startsWith("[")) {
             matcher = UNIFIED_DATE_TIMESTAMP.matcher(line);
-            captureGroup = 3;
-        } else
+            dateCaptureGroup = 2;
+            ageCaptureGroup = 4;
+        } else {
             matcher = PREUNIFIED_DATE_TIMESTAMP.matcher(line);
+            dateCaptureGroup = 1;
+            ageCaptureGroup = 2;
+        }
 
         if ( matcher.find())
-            return new DateTimeStamp(dateFromString(matcher.group(1)), ageFromString(matcher.group(captureGroup)));
+            return new DateTimeStamp(dateFromString(matcher.group(dateCaptureGroup)), ageFromString(matcher.group(ageCaptureGroup)));
         else
             return EMPTY_DATE;
     }
