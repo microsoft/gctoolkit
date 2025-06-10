@@ -57,10 +57,15 @@ extends:
     stages:
       - stage: Release_GCToolkit
         jobs:
-        - job: build_gctoolkit
+        - job: build_release_gctoolkit
           workspace:
             clean: all
-          displayName: Build with Maven
+          displayName: Build and Release GCToolkit with Maven
+          templateContext:
+            type: releaseJob
+            isProduction: true
+            # inputs: // no inputs for this release job, we build the library and release it.
+
           steps:
             - checkout: gctoolkit
               path: gctoolkit
@@ -222,7 +227,7 @@ extends:
                 folderlocation: '$(Build.ArtifactStagingDirectory)/staging/com/microsoft/gctoolkit'
                 waitforreleasecompletion: true
                 owners: 'dekeeler@microsoft.com'
-                approvers: 'milderhc@microsoft.com,john.oliver@microsoft.com,dagrieve@microsoft.com,kirk.pepperdine@microsoft.com'
+                approvers: 'maverbur@microsoft.com,john.oliver@microsoft.com'
                 serviceendpointurl: 'https://api.esrp.microsoft.com'
                 mainpublisher: 'ESRPRELPACMAN'
                 domaintenantid: '33e01921-4d64-4f8c-a055-5bdaffd5e33d'
