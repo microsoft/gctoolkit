@@ -72,6 +72,18 @@ extends:
               path: gctoolkit
               clean: true
 
+            # Find out what is installed on the agents...
+            - bash: |
+                echo "Installed Tools and versions:"
+                find /opt/hostedtoolcache -mindepth 1 -maxdepth 2 -type d | while read dir; do
+                  if [[ "$dir" == *jdk* ]]; then
+                    echo "👉 $dir"
+                  else
+                    echo "$dir"
+                  fi
+                done
+              displayName: 'Show installed tools'
+
             # Use modern Java to build
             - task: JavaToolInstaller@0
               inputs:
