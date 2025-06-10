@@ -61,6 +61,11 @@ extends:
           workspace:
             clean: all
           displayName: Build GCToolkit with Maven
+          templateContext:
+            outputs:
+            - output: pipelineArtifact
+              targetPath: $(Build.ArtifactStagingDirectory)/staging
+              artifactName: staged-artifacts
 
           steps:
             - checkout: gctoolkit
@@ -201,11 +206,6 @@ extends:
               workingDirectory: $(Build.ArtifactStagingDirectory)
               displayName: Create sha256sums
 
-            # Upload the staged artifacts to this pipeline for subsequent release job.
-            - task: 1ES.PublishPipelineArtifact@1
-              inputs:
-                targetPath: '$(Build.ArtifactStagingDirectory)/staging'
-                artifactName: staged-artifacts
 
         # Release jobs have to be separated from build jobs for our internal release service to be compliant
         - job: release_gctoolkit_to_maven_central
