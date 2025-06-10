@@ -57,14 +57,10 @@ extends:
     stages:
       - stage: Release_GCToolkit
         jobs:
-        - job: build_release_gctoolkit
+        - job: build_gctoolkit
           workspace:
             clean: all
-          displayName: Build and Release GCToolkit with Maven
-          templateContext:
-            type: releaseJob
-            isProduction: true
-            # inputs: // no inputs for this release job, we build the library and release it.
+          displayName: Build GCToolkit with Maven
 
           steps:
             - checkout: gctoolkit
@@ -205,10 +201,27 @@ extends:
               workingDirectory: $(Build.ArtifactStagingDirectory)
               displayName: Create sha256sums
 
+            # Upload the staged artifacts to this pipeline for subsequent release job.
             - task: 1ES.PublishPipelineArtifact@1
               inputs:
                 targetPath: '$(Build.ArtifactStagingDirectory)/staging'
                 artifactName: staged-artifacts
+
+        # Release jobs have to be separated from build jobs for our internal release service to be compliant
+        - job: release_gctoolkit_to_maven_central
+          dependsOn: build_gctoolkit
+          workspace:
+            clean: all
+          displayName: Release GCToolkit to Maven Central
+          templateContext:
+            type: releaseJob
+            isProduction: true
+            inputs: # Pull the staged artifacts from the build job.
+            - input: PublishPipelineArtifact
+              artifactName: staged-artifacts
+              targetPath: '$(Build.ArtifactStagingDirectory)/staging'
+
+          steps:
 
             - task: EsrpRelease@8
               inputs:
