@@ -20,4 +20,16 @@ public enum ZGCCollectionType {
                 .findFirst()
                 .orElse(null);
     }
+
+    public static ZGCCollectionType fromPhase(ZGCPhase phase){
+        if(phase == ZGCPhase.FULL){
+            return ZGCCollectionType.FULL;
+        } else if (phase == ZGCPhase.MAJOR_YOUNG || phase == ZGCPhase.MAJOR_OLD){
+            return ZGCCollectionType.MAJOR;
+        } else if (phase == ZGCPhase.MINOR_YOUNG){
+            return ZGCCollectionType.MINOR;
+        } else {
+            throw new IllegalArgumentException(String.format("Unknown ZGCPhase: %s", phase));
+        }
+    }
 }

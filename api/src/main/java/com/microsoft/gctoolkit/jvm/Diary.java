@@ -50,6 +50,8 @@ import static com.microsoft.gctoolkit.jvm.SupportedFlags.*;
     TLAB_DATA,                                  // 25
     PRINT_PROMOTION_FAILURE,                    // 26
     PRINT_FLS_STATISTICS                        // 27
+    PRINT_CPU_TIMES                             // 28
+    GENERATIONAL_ZGC                            // 29
  */
 
 public class Diary {
@@ -172,6 +174,10 @@ public class Diary {
 
     public boolean isZGC() {
         return isTrue(SupportedFlags.ZGC);
+    }
+
+    public boolean isGenerationalZGC(){
+        return isTrue(SupportedFlags.GENERATIONAL_ZGC);
     }
 
     public boolean isShenandoah() {

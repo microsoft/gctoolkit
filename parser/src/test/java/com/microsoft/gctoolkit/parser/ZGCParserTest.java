@@ -3,14 +3,7 @@
 package com.microsoft.gctoolkit.parser;
 
 import com.microsoft.gctoolkit.event.jvm.JVMEvent;
-import com.microsoft.gctoolkit.event.zgc.FullZGCCycle;
-import com.microsoft.gctoolkit.event.zgc.ZGCAllocatedSummary;
-import com.microsoft.gctoolkit.event.zgc.ZGCGarbageSummary;
-import com.microsoft.gctoolkit.event.zgc.ZGCLiveSummary;
-import com.microsoft.gctoolkit.event.zgc.ZGCMemoryPoolSummary;
-import com.microsoft.gctoolkit.event.zgc.ZGCMemorySummary;
-import com.microsoft.gctoolkit.event.zgc.ZGCMetaspaceSummary;
-import com.microsoft.gctoolkit.event.zgc.ZGCReclaimSummary;
+import com.microsoft.gctoolkit.event.zgc.*;
 import com.microsoft.gctoolkit.jvm.Diarizer;
 import com.microsoft.gctoolkit.parser.jvm.UnifiedDiarizer;
 import org.junit.jupiter.api.Test;
@@ -75,7 +68,7 @@ public class ZGCParserTest extends ParserTest {
         List<JVMEvent> singleCycle = feedParser(eventLogEntries);
         try {
             assertEquals(1, singleCycle.size());
-            FullZGCCycle zgc = (FullZGCCycle) singleCycle.get(0);
+            ZGCFullCollection zgc = (ZGCFullCollection) singleCycle.get(0);
 
             assertEquals(zgc.getGcId(), 2L);
 

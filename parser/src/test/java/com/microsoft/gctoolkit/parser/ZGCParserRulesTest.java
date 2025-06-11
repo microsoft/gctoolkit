@@ -83,7 +83,9 @@ public class ZGCParserRulesTest implements ZGCPatterns {
             MEMORY_TABLE_ENTRY_SIZE,
             MEMORY_TABLE_ENTRY_OCCUPANCY,
             MEMORY_TABLE_ENTRY_RECLAIMED_PROMOTED,
-            MEMORY_SUMMARY
+            MEMORY_SUMMARY,
+            GENERATION_START,              // 15
+            END_OF_PHASE_SUMMARY_GEN,
     };
 
    private String[][] lines = {
@@ -148,6 +150,19 @@ public class ZGCParserRulesTest implements ZGCPatterns {
            },
            { // 14
                    "[32.193s][info][gc          ] GC(2) Garbage Collection (Metadata GC Threshold) 558M(2%)->126M(0%)",
+           },
+           { // 15
+                   "[2024-11-19T09:48:57.431-0600][info ][gc,phases   ] GC(6) Y: Young Generation (Promote All)",
+                   "[2024-11-19T09:48:42.508-0600][info ][gc,phases   ] GC(3) Y: Young Generation",
+                   "[2024-11-19T09:48:31.984-0600][info][gc,phases   ] GC(0) O: Old Generation",
+                   "[2024-11-19T09:48:52.855-0600][info ][gc,phases   ] GC(5) y: Young Generation"
+           },
+           { // 16
+                   "[2024-11-19T09:48:31.984-0600][info][gc,phases   ] GC(0) Y: Young Generation 88M(1%)->54M(0%) 0.017s",
+                   "[2024-11-19T09:49:02.950-0600][info ][gc,phases   ] GC(6) Y: Young Generation (Promote All) 13184M(80%)->16384M(100%) 5.519s",
+                   "[2024-11-19T09:48:31.997-0600][info][gc,phases   ] GC(0) O: Old Generation 54M(0%)->56M(0%) 0.013s",
+                   "[2024-11-19T09:48:52.821-0600][info ][gc,phases   ] GC(4) y: Young Generation 13310M(81%)->15654M(96%) 4.926s",
+                   "[2025-02-11T13:07:13.256-0800][info][gc,phases   ] GC(7) y: Young Generation 14720M(40%)->2054M(6%) 0.689s",
            }
    };
 
