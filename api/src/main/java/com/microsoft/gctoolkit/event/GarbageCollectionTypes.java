@@ -57,7 +57,7 @@ public enum GarbageCollectionTypes implements LabelledGCEventType {
     Unknown("Unknown"),
     ZGCFull("ZGC FULL"),
     ZGCMajorOld("ZGC Major Old"),
-    ZGCMajorYoung("ZGC Major Old"),
+    ZGCMajorYoung("ZGC Major Young"),
     ZGCMinorYoung("ZGC Minor Young"),
     Shenandoah("Shenandoah");
 
