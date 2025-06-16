@@ -21,7 +21,7 @@ public class ZGCCollection extends GCEvent {
     private ZGCMarkSummary markSummary;
     private ZGCPromotedSummary promotedSummary;
     private ZGCCompactedSummary compactedSummary;
-    private ZGCCollectionType type;
+    private ZGCCycleType type;
     private ZGCPhase phase;
     private OccupancySummary generationUsedSummary;
     private long gcId;
@@ -425,11 +425,11 @@ public class ZGCCollection extends GCEvent {
         return generationUsedSummary;
     }
 
-    public ZGCCollectionType getType() {
+    public ZGCCycleType getType() {
         return type;
     }
 
-    public void setType(ZGCCollectionType type) {
+    public void setType(ZGCCycleType type) {
         this.type = type;
     }
 

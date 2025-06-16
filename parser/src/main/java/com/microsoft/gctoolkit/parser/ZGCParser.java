@@ -24,7 +24,7 @@ import com.microsoft.gctoolkit.event.zgc.ZGCPageSummary;
 import com.microsoft.gctoolkit.event.zgc.ZGCPhase;
 import com.microsoft.gctoolkit.event.zgc.ZGCPromotedSummary;
 import com.microsoft.gctoolkit.event.zgc.ZGCReclaimSummary;
-import com.microsoft.gctoolkit.event.zgc.ZGCCollectionType;
+import com.microsoft.gctoolkit.event.zgc.ZGCCycleType;
 import com.microsoft.gctoolkit.event.zgc.ZGCCollection;
 import com.microsoft.gctoolkit.event.zgc.ZGCMarkSummary;
 import com.microsoft.gctoolkit.event.zgc.ZGCMemoryPoolSummary;
@@ -193,8 +193,8 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
     }
 
     private void cycleStart(GCLogTrace trace, String s) {
-        ZGCCollectionType type = ZGCCollectionType.get(trace.getGroup(2));
-        if(type == ZGCCollectionType.FULL){
+        ZGCCycleType type = ZGCCycleType.get(trace.getGroup(2));
+        if(type == ZGCCycleType.FULL){
             setForwardRefForPhase(
                     ZGCPhase.FULL,
                     new ZGCForwardReference(getClock(), trace.getLongGroup(1), trace.gcCause(3,0), type, ZGCPhase.FULL)
@@ -215,7 +215,7 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
         ZGCPhase phase = ZGCPhase.get(trace.getGroup(2));
         long gcId = trace.getLongGroup(1);
         GCCause gcCause = gcCauseMap.getOrDefault(gcId, GCCause.UNKNOWN_GCCAUSE);
-        ZGCForwardReference forwardReference = new ZGCForwardReference(getClock(), gcId, gcCause, ZGCCollectionType.fromPhase(phase), phase);
+        ZGCForwardReference forwardReference = new ZGCForwardReference(getClock(), gcId, gcCause, ZGCCycleType.fromPhase(phase), phase);
         setForwardRefForPhase(
                 phase,
                 forwardReference
@@ -622,7 +622,7 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
     private static class ZGCForwardReference {
         private final DateTimeStamp startTimeStamp;
         private final GCCause gcCause;
-        private final ZGCCollectionType type;
+        private final ZGCCycleType type;
         private final ZGCPhase phase;
         private final long gcId;
 
@@ -695,7 +695,7 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
         private List<ZGCPageAgeSummary> ageTableSummary;
         private final ZGCMemoryPoolSummaryBuilder memoryPoolSummaryBuilder;
 
-        public ZGCForwardReference(DateTimeStamp dateTimeStamp, long gcId, GCCause cause, ZGCCollectionType type, ZGCPhase phase) {
+        public ZGCForwardReference(DateTimeStamp dateTimeStamp, long gcId, GCCause cause, ZGCCycleType type, ZGCPhase phase) {
             this.startTimeStamp = dateTimeStamp;
             this.gcId = gcId;
             this.gcCause = cause;
