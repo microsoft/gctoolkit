@@ -3,7 +3,14 @@
 package com.microsoft.gctoolkit.parser;
 
 import com.microsoft.gctoolkit.event.jvm.JVMEvent;
-import com.microsoft.gctoolkit.event.zgc.*;
+import com.microsoft.gctoolkit.event.zgc.ZGCAllocatedSummary;
+import com.microsoft.gctoolkit.event.zgc.ZGCFullCollection;
+import com.microsoft.gctoolkit.event.zgc.ZGCGarbageSummary;
+import com.microsoft.gctoolkit.event.zgc.ZGCLiveSummary;
+import com.microsoft.gctoolkit.event.zgc.ZGCMemoryPoolSummary;
+import com.microsoft.gctoolkit.event.zgc.ZGCMemorySummary;
+import com.microsoft.gctoolkit.event.zgc.ZGCMetaspaceSummary;
+import com.microsoft.gctoolkit.event.zgc.ZGCReclaimSummary;
 import com.microsoft.gctoolkit.jvm.Diarizer;
 import com.microsoft.gctoolkit.parser.jvm.UnifiedDiarizer;
 import org.junit.jupiter.api.Test;
