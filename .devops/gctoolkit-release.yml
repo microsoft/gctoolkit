@@ -42,7 +42,7 @@ extends:
   template: v1/1ES.Official.PipelineTemplate.yml@1esPipelines
   parameters:
     pool:
-      name: JEG-azurelinux-x64-release
+      name: JEG-test-pool
       os: linux
     sdl:
       sourceAnalysisPool:
