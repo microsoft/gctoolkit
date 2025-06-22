@@ -483,4 +483,12 @@ public class DateTimeStampTest {
         assertThrows(IllegalStateException.class, () -> onlyDate.after(onlyTime));
     }
 
+    @Test 
+    void shouldParseGCLogLineWithBrackets() {
+        final String dateTimeString = "2025-05-08T11:07:55.681+0530";
+        final String gcLogLine = "[" + dateTimeString + "][gc,phases   ] GC(4)   Other: 0.2ms";
+        final DateTimeStamp dateTimeStamp = DateTimeStamp.fromGCLogLine(gcLogLine);
+        final ZonedDateTime expected = ZonedDateTime.from(formatter.parse(dateTimeString));
+        assertTrue(expected.isEqual(dateTimeStamp.getDateTime()));
+    }
 }
