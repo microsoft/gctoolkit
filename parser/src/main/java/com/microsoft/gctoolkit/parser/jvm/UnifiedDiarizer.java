@@ -173,21 +173,26 @@ public class UnifiedDiarizer implements Diarizer {
      */
     private void discoverCollector(String line) {
 
-        if ( ZGC_TAG.parse(line) != null || CYCLE_START.parse(line) != null) {
+        if (CYCLE_START.parse(line) != null) {
+            String cycleType = CYCLE_START.parse(line).getGroup(2);
             diary.setTrue(ZGC);
-            diary.setFalse(DEFNEW, SERIAL, PARALLELGC, PARALLELOLDGC, PARNEW, CMS, ICMS, G1GC, RSET_STATS, SHENANDOAH, CMS_DEBUG_LEVEL_1, PRE_JDK70_40, JDK70, JDK80, TENURING_DISTRIBUTION, MAX_TENURING_THRESHOLD_VIOLATION, TLAB_DATA, PRINT_PROMOTION_FAILURE, PRINT_FLS_STATISTICS);
+            if(cycleType.equals("Minor") || cycleType.equals("Major"))
+                diary.setTrue(GENERATIONAL_ZGC);
+            else
+                diary.setFalse(GENERATIONAL_ZGC);
+            diary.setFalse(DEFNEW, SERIAL, PARALLELGC, PARALLELOLDGC, PARNEW, CMS, ICMS, G1GC, RSET_STATS, SHENANDOAH, CMS_DEBUG_LEVEL_1, PRE_JDK70_40, JDK70, JDK80, TENURING_DISTRIBUTION, MAX_TENURING_THRESHOLD_VIOLATION, TLAB_DATA, PRINT_PROMOTION_FAILURE, PRINT_FLS_STATISTICS, ADAPTIVE_SIZING);
             return;
         }
 
         if ( SHENANDOAH_TAG.parse(line) != null) {
             diary.setTrue(SHENANDOAH);
-            diary.setFalse(DEFNEW, SERIAL, PARALLELGC, PARALLELOLDGC, PARNEW, CMS, ICMS, G1GC, RSET_STATS, ZGC, CMS_DEBUG_LEVEL_1, PRE_JDK70_40, JDK70, JDK80, TENURING_DISTRIBUTION, MAX_TENURING_THRESHOLD_VIOLATION, TLAB_DATA, PRINT_PROMOTION_FAILURE, PRINT_FLS_STATISTICS, PRINT_HEAP_AT_GC);
+            diary.setFalse(DEFNEW, SERIAL, PARALLELGC, PARALLELOLDGC, PARNEW, CMS, ICMS, G1GC, RSET_STATS, ZGC, CMS_DEBUG_LEVEL_1, PRE_JDK70_40, JDK70, JDK80, TENURING_DISTRIBUTION, MAX_TENURING_THRESHOLD_VIOLATION, TLAB_DATA, PRINT_PROMOTION_FAILURE, PRINT_FLS_STATISTICS, PRINT_HEAP_AT_GC, GENERATIONAL_ZGC);
             return;
         }
 
         if (G1_TAG.parse(line) != null || line.contains("G1 Evacuation Pause") || (line.contains("Humongous regions: "))) {
             diary.setTrue(G1GC);
-            diary.setFalse(DEFNEW, SERIAL, PARALLELGC, PARALLELOLDGC, PARNEW, CMS, ICMS, ZGC, SHENANDOAH, CMS_DEBUG_LEVEL_1, PRE_JDK70_40, JDK70, JDK80, TLAB_DATA, PRINT_PROMOTION_FAILURE, PRINT_FLS_STATISTICS);
+            diary.setFalse(DEFNEW, SERIAL, PARALLELGC, PARALLELOLDGC, PARNEW, CMS, ICMS, ZGC, SHENANDOAH, CMS_DEBUG_LEVEL_1, PRE_JDK70_40, JDK70, JDK80, TLAB_DATA, PRINT_PROMOTION_FAILURE, PRINT_FLS_STATISTICS, GENERATIONAL_ZGC);
             return;
         }
 
@@ -195,7 +200,7 @@ public class UnifiedDiarizer implements Diarizer {
                 PARNEW_TAG.parse(line) != null ||
                 line.contains("ParNew")) {
             diary.setTrue(PARNEW, CMS);
-            diary.setFalse(DEFNEW, SERIAL, PARALLELGC, PARALLELOLDGC, ICMS, CMS_DEBUG_LEVEL_1, G1GC, ZGC, SHENANDOAH, PRE_JDK70_40, JDK70, JDK80, RSET_STATS);
+            diary.setFalse(DEFNEW, SERIAL, PARALLELGC, PARALLELOLDGC, ICMS, CMS_DEBUG_LEVEL_1, G1GC, ZGC, SHENANDOAH, PRE_JDK70_40, JDK70, JDK80, RSET_STATS, GENERATIONAL_ZGC);
             return;
         }
 
@@ -203,13 +208,13 @@ public class UnifiedDiarizer implements Diarizer {
                 line.contains("ParOldGen") ||
                 line.contains("PSYoungGen")) {
             diary.setTrue(PARALLELGC, PARALLELOLDGC, GC_CAUSE);
-            diary.setFalse(DEFNEW, SERIAL, PARNEW, CMS, ICMS, CMS_DEBUG_LEVEL_1, G1GC, ZGC, SHENANDOAH, PRE_JDK70_40, JDK70, JDK80, RSET_STATS);
+            diary.setFalse(DEFNEW, SERIAL, PARNEW, CMS, ICMS, CMS_DEBUG_LEVEL_1, G1GC, ZGC, SHENANDOAH, PRE_JDK70_40, JDK70, JDK80, RSET_STATS, GENERATIONAL_ZGC);
             return;
         }
 
         if (SERIAL_TAG.parse(line) != null || line.contains("DefNew")) {
             diary.setTrue(DEFNEW, SERIAL, GC_CAUSE);
-            diary.setFalse(PARALLELGC, PARALLELOLDGC, PARNEW, CMS, ICMS, CMS_DEBUG_LEVEL_1, G1GC, ZGC, SHENANDOAH, PRE_JDK70_40, JDK70, JDK80, RSET_STATS);
+            diary.setFalse(PARALLELGC, PARALLELOLDGC, PARNEW, CMS, ICMS, CMS_DEBUG_LEVEL_1, G1GC, ZGC, SHENANDOAH, PRE_JDK70_40, JDK70, JDK80, RSET_STATS, GENERATIONAL_ZGC);
             return;
         }
     }

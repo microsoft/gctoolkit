@@ -20,6 +20,12 @@ public interface ZGCPatterns extends UnifiedPatterns {
     //[3.558s][info ][gc,start       ] GC(3) Garbage Collection (Warmup)
     GCParseRule CYCLE_START = new GCParseRule("CYCLE_START", "GC\\(" + GenericTokens.INT + "\\) (Garbage|Major|Minor) Collection " + GenericTokens.GC_CAUSE + "$");
 
+    // [2024-11-19T09:48:57.431-0600][info ][gc,phases   ] GC(6) Y: Young Generation (Promote All)
+    // [2024-11-19T09:48:42.508-0600][info ][gc,phases   ] GC(3) Y: Young Generation
+    // [2024-11-19T09:48:31.984-0600][info][gc,phases   ] GC(0) O: Old Generation
+    // [2024-11-19T09:48:52.855-0600][info ][gc,phases   ] GC(5) y: Young Generation
+    GCParseRule GENERATION_START = new GCParseRule("Generation Start", "GC\\(" + GenericTokens.INT + "\\) " + OPT_GEN + "(Young|Old) Generation(?: \\([a-zA-Z ]+\\))?$");
+
     //[3.559s][info ][gc,phases      ] GC(3) Pause Mark Start 0.460ms
     //[3.574s][info ][gc,phases      ] GC(3) Pause Mark End 0.830ms
     //[3.583s][info ][gc,phases      ] GC(3) Pause Relocate Start 0.794ms
@@ -101,11 +107,8 @@ public interface ZGCPatterns extends UnifiedPatterns {
 
     // Gen ZGC
     // [info][gc,heap     ] GC(2) O: Old Generation Statistics:
-    GCParseRule MARK_OLD_GEN_HEAP_STATS = new GCParseRule("Mark Old Gen Stats", OPT_GEN + "Old Generation Statistics");
-
-    // Gen ZGC
     // [info][gc,heap     ] GC(4) Y: Young Generation Statistics:
-    GCParseRule MARK_YOUNG_GEN_HEAP_STATS = new GCParseRule("Mark Young Gen Stats", OPT_GEN + "Young Generation Statistics");
+    GCParseRule MARK_GEN_HEAP_STATS = new GCParseRule("Mark Gen Stats", OPT_GEN + "(Old|Young) Generation Statistics");
 
     //[3.596s][info ][gc,heap        ] GC(3)      Live:         -                 8M (0%)            8M (0%)            8M (0%)             -                  -
     //[3.596s][info ][gc,heap        ] GC(3) Allocated:         -               172M (4%)          172M (4%)          376M (9%)             -                  -
@@ -122,14 +125,15 @@ public interface ZGCPatterns extends UnifiedPatterns {
 
     // [info][gc,phases   ] GC(58) Y: Young Generation 16052M(44%)->3022M(8%) 1.017s
     // [info][gc,phases   ] GC(58) O: Old Generation 3022M(8%)->5486M(15%) 1.757s
-    GCParseRule END_OF_PHASE_SUMMARY_GEN = new GCParseRule("End of Phase Summary", OPT_GEN + "(Old|Young) Generation " + MEMORY_PERCENT + "->" + MEMORY_PERCENT + "\\s*" + PAUSE_TIME);
+    // [2024-11-19T09:49:02.950-0600][info ][gc,phases   ] GC(6) Y: Young Generation (Promote All) 13184M(80%)->16384M(100%) 5.519s
+    GCParseRule END_OF_PHASE_SUMMARY_GEN = new GCParseRule("End of Phase Summary", OPT_GEN + "(Old|Young) Generation(?: \\([a-zA-Z ]+\\))? " + MEMORY_PERCENT + "->" + MEMORY_PERCENT + "\\s*" + PAUSE_TIME);
 
 
     //[3.596s][info ][gc         ] GC(3) Garbage Collection (Warmup) 894M(22%)->186M(5%)
     // or
     // Gen GC
     //[3.596s][info][gc          ] GC(7) Minor Collection (Allocation Rate) 14720M(40%)->2054M(6%) 0.689s
-    GCParseRule MEMORY_SUMMARY = new GCParseRule("Memory Summary", "(Garbage|Minor|Major) Collection " + GenericTokens.GC_CAUSE + MEMORY_PERCENT + "->" + MEMORY_PERCENT + "(?:\\s*" + PAUSE_TIME + ")?");
+    GCParseRule MEMORY_SUMMARY = new GCParseRule("Memory Summary", "GC\\("+ GenericTokens.INT + "\\)\\s*(Garbage|Minor|Major) Collection " + GenericTokens.GC_CAUSE + MEMORY_PERCENT + "->" + MEMORY_PERCENT + "(?:\\s*" + PAUSE_TIME + ")?");
 
     /*
     todo: capture and report on these log entries

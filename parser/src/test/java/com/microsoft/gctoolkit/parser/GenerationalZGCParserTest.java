@@ -2,24 +2,9 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.parser;
 
+import com.microsoft.gctoolkit.event.GarbageCollectionTypes;
 import com.microsoft.gctoolkit.event.jvm.JVMEvent;
-import com.microsoft.gctoolkit.event.zgc.MajorZGCCycle;
-import com.microsoft.gctoolkit.event.zgc.MinorZGCCycle;
-import com.microsoft.gctoolkit.event.zgc.OccupancySummary;
-import com.microsoft.gctoolkit.event.zgc.ZGCPageAgeSummary;
-import com.microsoft.gctoolkit.event.zgc.ZGCAllocatedSummary;
-import com.microsoft.gctoolkit.event.zgc.ZGCCompactedSummary;
-import com.microsoft.gctoolkit.event.zgc.ZGCCycle;
-import com.microsoft.gctoolkit.event.zgc.ZGCGarbageSummary;
-import com.microsoft.gctoolkit.event.zgc.ZGCHeapCapacitySummary;
-import com.microsoft.gctoolkit.event.zgc.ZGCLiveSummary;
-import com.microsoft.gctoolkit.event.zgc.ZGCMemoryPoolSummary;
-import com.microsoft.gctoolkit.event.zgc.ZGCMemorySummary;
-import com.microsoft.gctoolkit.event.zgc.ZGCMetaspaceSummary;
-import com.microsoft.gctoolkit.event.zgc.ZGCPageSummary;
-import com.microsoft.gctoolkit.event.zgc.ZGCPromotedSummary;
-import com.microsoft.gctoolkit.event.zgc.ZGCReclaimSummary;
-import com.microsoft.gctoolkit.event.zgc.ZGCReferenceSummary;
+import com.microsoft.gctoolkit.event.zgc.*;
 import com.microsoft.gctoolkit.jvm.Diarizer;
 import com.microsoft.gctoolkit.parser.jvm.UnifiedDiarizer;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
@@ -138,21 +123,20 @@ public class GenerationalZGCParserTest extends ParserTest {
 
         };
 
-        List<JVMEvent> singleCycle = feedParser(eventLogEntries);
+        List<JVMEvent> singleYoungSingleOld = feedParser(eventLogEntries);
         try {
-            assertEquals(1, singleCycle.size());
-            MajorZGCCycle zgc = (MajorZGCCycle) singleCycle.get(0);
+            assertEquals(2, singleYoungSingleOld.size());
 
-            assertEquals(zgc.getGcId(), 1L);
+            ZGCYoungCollection young = (ZGCYoungCollection) singleYoungSingleOld.get(0);
 
-            assertEquals(toInt(0.1039d,1000), toInt(zgc.getDuration(),1000));
-            assertEquals(toInt(1.739307979476E9, 1000), toInt(zgc.getDateTimeStamp().getTimeStamp(), 1000));
-            assertEquals("Metadata GC Threshold", zgc.getGCCause().getLabel());
+            assertEquals(young.getGcId(), 1L);
+            assertEquals(toInt(0.075d, 1000), toInt(young.getDuration(),1000));
+            assertEquals(toInt(1.739307979476E9, 1000), toInt(young.getDateTimeStamp().getTimeStamp(), 1000));
+            assertEquals("Metadata GC Threshold", young.getGCCause().getLabel());
 
             /*
              * Young Phase Checks
              */
-            ZGCCycle young = zgc.getYoungCycle();
             // Durations
             assertTrue(checkDateTimeStampMatch("2025-02-11T13:06:19.476-0800", 0.023, young.getPauseMarkStartTimeStamp()));
             assertTrue(checkDateTimeStampMatch("2025-02-11T13:06:19.534-0800", 57.581, young.getConcurrentMarkTimeStamp()));
@@ -182,7 +166,7 @@ public class GenerationalZGCParserTest extends ParserTest {
 
             assertTrue(checkZGCMetaSpaceSummary(young.getMetaspaceSummary(),36, 37, 1088));
 
-            assertTrue(checkUsedSummary(young.getUsedOccupancySummary(), 296, 308, 240, 76));
+            assertTrue(checkUsedSummary(young.getGenerationUsedSummary(), 296, 308, 240, 76));
             assertTrue(checkLiveSummary(young.getLiveSummary(), 24, 24, 24));
             assertTrue(checkGarbageSummary(young.getGarbageSummary(), 271, 203, 31));
             assertTrue(checkAllocatedSummary(young.getAllocatedSummary(), 12, 12, 19));
@@ -220,7 +204,13 @@ public class GenerationalZGCParserTest extends ParserTest {
             /*
              * Old Phase Checks
              */
-            ZGCCycle old = zgc.getOldCycle();
+            ZGCOldCollection old = (ZGCOldCollection) singleYoungSingleOld.get(1);
+
+            assertEquals(old.getGcId(), 1L);
+            assertEquals(toInt(0.029d, 1000), toInt(old.getDuration(),1000));
+            assertEquals(toInt(1.739307979476E9, 1000), toInt(old.getDateTimeStamp().getTimeStamp(), 1000));
+            assertEquals("Metadata GC Threshold", old.getGCCause().getLabel());
+
             // Durations
             assertTrue(checkDateTimeStampMatch("2025-02-11T13:06:19.553-0800", 1.286, old.getConcurrentMarkTimeStamp()));
             assertTrue(checkDateTimeStampMatch("2025-02-11T13:06:19.553-0800", 0.017, old.getPauseMarkEndTimeStamp()));
@@ -263,7 +253,7 @@ public class GenerationalZGCParserTest extends ParserTest {
 
             assertEquals(125 * 1024, old.getForwardingUsage());
 
-            assertTrue(checkUsedSummary(old.getUsedOccupancySummary(), 0, 0, 0, 0));
+            assertTrue(checkUsedSummary(old.getGenerationUsedSummary(), 0, 0, 0, 0));
             assertTrue(checkLiveSummary(old.getLiveSummary(), 0, 0, 0));
             assertTrue(checkGarbageSummary(old.getGarbageSummary(), 0, 0, 0));
             assertTrue(checkAllocatedSummary(old.getAllocatedSummary(), 0, 0, 0));
@@ -348,18 +338,14 @@ public class GenerationalZGCParserTest extends ParserTest {
         List<JVMEvent> singleCycle = feedParser(eventLogEntries);
         try {
             assertEquals(1, singleCycle.size());
-            MinorZGCCycle zgc = (MinorZGCCycle) singleCycle.get(0);
+            ZGCYoungCollection young = (ZGCYoungCollection) singleCycle.get(0);
 
-            assertEquals(zgc.getGcId(), 7L);
+            assertEquals(young.getGcId(), 7L);
 
-            assertEquals(toInt(0.690d,1000), toInt(zgc.getDuration(),1000));
-            assertTrue(checkDateTimeStampMatch("2025-02-11T13:07:12.566-0800", 0, zgc.getDateTimeStamp()));
-            assertEquals("Allocation Rate", zgc.getGCCause().getLabel());
+            assertEquals(toInt(0.689d,1000), toInt(young.getDuration(),1000));
+            assertTrue(checkDateTimeStampMatch("2025-02-11T13:07:12.566-0800", 0, young.getDateTimeStamp()));
+            assertEquals("Allocation Rate", young.getGCCause().getLabel());
 
-            /*
-             * Young Phase Checks
-             */
-            ZGCCycle young = zgc.getYoungCycle();
             // Durations
             assertTrue(checkDateTimeStampMatch("2025-02-11T13:07:12.566-0800", 0.025, young.getPauseMarkStartTimeStamp()));
             assertTrue(checkDateTimeStampMatch("2025-02-11T13:07:13.042-0800", 475.464, young.getConcurrentMarkTimeStamp()));
@@ -389,7 +375,7 @@ public class GenerationalZGCParserTest extends ParserTest {
 
             assertTrue(checkZGCMetaSpaceSummary(young.getMetaspaceSummary(),100, 101, 1152));
 
-            assertTrue(checkUsedSummary(young.getUsedOccupancySummary(), 14132, 14900, 12364, 1466));
+            assertTrue(checkUsedSummary(young.getGenerationUsedSummary(), 14132, 14900, 12364, 1466));
             assertTrue(checkLiveSummary(young.getLiveSummary(), 120, 120, 120));
             assertTrue(checkGarbageSummary(young.getGarbageSummary(), 14011, 11457, 2));
             assertTrue(checkAllocatedSummary(young.getAllocatedSummary(), 768, 786, 1343));
@@ -427,6 +413,225 @@ public class GenerationalZGCParserTest extends ParserTest {
         } catch (Throwable t) {
             fail(t);
         }
+    }
+
+    @Test
+    public void testMultipleConcurrentCycles() {
+        String[] eventLogEntries = {
+                "[2024-11-19T09:48:42.508-0600][info ][gc          ] GC(3) Major Collection (Warmup)",
+                "[2024-11-19T09:48:42.508-0600][info ][gc,task     ] GC(3) Using 3 Workers for Young Generation",
+                "[2024-11-19T09:48:42.508-0600][info ][gc,task     ] GC(3) Using 1 Workers for Old Generation",
+                "[2024-11-19T09:48:42.508-0600][info ][gc,phases   ] GC(3) Y: Young Generation",
+                "[2024-11-19T09:48:42.509-0600][info ][gc,phases   ] GC(3) Y: Pause Mark Start (Major) 0.005ms",
+                "[2024-11-19T09:48:45.908-0600][info ][gc,phases   ] GC(3) Y: Concurrent Mark 3399.497ms",
+                "[2024-11-19T09:48:45.908-0600][info ][gc,phases   ] GC(3) Y: Pause Mark End 0.016ms",
+                "[2024-11-19T09:48:45.908-0600][info ][gc,phases   ] GC(3) Y: Concurrent Mark Free 0.000ms",
+                "[2024-11-19T09:48:45.908-0600][info ][gc,phases   ] GC(3) Y: Concurrent Reset Relocation Set 0.054ms",
+                "[2024-11-19T09:48:45.910-0600][info ][gc,reloc    ] GC(3) Y: Using tenuring threshold: 4 (Computed)",
+                "[2024-11-19T09:48:46.044-0600][info ][gc,phases   ] GC(3) Y: Concurrent Select Relocation Set 135.227ms",
+                "[2024-11-19T09:48:46.045-0600][info ][gc,phases   ] GC(3) Y: Pause Relocate Start 0.024ms",
+                "[2024-11-19T09:48:47.878-0600][info ][gc,phases   ] GC(3) Y: Concurrent Relocate 1829.530ms",
+                "[2024-11-19T09:48:47.878-0600][info ][gc,alloc    ] GC(3) Y:                         Mark Start        Mark End      Relocate Start    Relocate End",
+                "[2024-11-19T09:48:47.878-0600][info ][gc,alloc    ] GC(3) Y: Allocation Stalls:          0                38               0                0",
+                "[2024-11-19T09:48:47.879-0600][info ][gc,load     ] GC(3) Y: Load: 22.08 (184%) / 8.18 (68%) / 4.99 (42%)",
+                "[2024-11-19T09:48:47.879-0600][info ][gc,mmu      ] GC(3) Y: MMU: 2ms/98.8%, 5ms/99.5%, 10ms/99.8%, 20ms/99.9%, 50ms/99.9%, 100ms/100.0%",
+                "[2024-11-19T09:48:47.879-0600][info ][gc,marking  ] GC(3) Y: Mark: 2 stripe(s), 10 proactive flush(es), 1 terminate flush(es), 0 completion(s), 0 continuation(s)",
+                "[2024-11-19T09:48:47.879-0600][info ][gc,marking  ] GC(3) Y: Mark Stack Usage: 32M",
+                "[2024-11-19T09:48:47.879-0600][info ][gc,nmethod  ] GC(3) Y: NMethods: 5348 registered, 0 unregistered",
+                "[2024-11-19T09:48:47.879-0600][info ][gc,metaspace] GC(3) Y: Metaspace: 45M used, 46M committed, 1088M reserved",
+                "[2024-11-19T09:48:47.879-0600][info ][gc,reloc    ] GC(3) Y:                        Candidates     Selected     In-Place         Size        Empty    Relocated",
+                "[2024-11-19T09:48:47.879-0600][info ][gc,reloc    ] GC(3) Y: Small Pages:                 4449         2921            0        8898M         664M        1107M",
+                "[2024-11-19T09:48:47.879-0600][info ][gc,reloc    ] GC(3) Y: Medium Pages:                   2            1            0          64M           0M           0M",
+                "[2024-11-19T09:48:47.879-0600][info ][gc,reloc    ] GC(3) Y: Large Pages:                    0            0            0           0M           0M           0M",
+                "[2024-11-19T09:48:47.879-0600][info ][gc,reloc    ] GC(3) Y: Forwarding Usage: 600M",
+                "[2024-11-19T09:48:47.879-0600][info ][gc,reloc    ] GC(3) Y: Age Table:",
+                "[2024-11-19T09:48:47.879-0600][info ][gc,reloc    ] GC(3) Y:                    Live             Garbage             Small              Medium             Large",
+                "[2024-11-19T09:48:47.879-0600][info ][gc,reloc    ] GC(3) Y: Eden            1710M (10%)        6677M (41%)       4194 / 2878           0 / 0              0 / 0",
+                "[2024-11-19T09:48:47.879-0600][info ][gc,reloc    ] GC(3) Y: Survivor 1       266M (2%)          137M (1%)         202 / 39             0 / 0              0 / 0",
+                "[2024-11-19T09:48:47.879-0600][info ][gc,reloc    ] GC(3) Y: Survivor 2        77M (0%)           44M (0%)          45 / 3              1 / 1              0 / 0",
+                "[2024-11-19T09:48:47.883-0600][info ][gc,reloc    ] GC(3) Y: Survivor 3        12M (0%)           35M (0%)           8 / 1              1 / 0              0 / 0",
+                "[2024-11-19T09:48:47.883-0600][info ][gc,heap     ] GC(3) Y: Min Capacity: 8M(0%)",
+                "[2024-11-19T09:48:47.883-0600][info ][gc,heap     ] GC(3) Y: Max Capacity: 16384M(100%)",
+                "[2024-11-19T09:48:47.883-0600][info ][gc,heap     ] GC(3) Y: Soft Max Capacity: 16384M(100%)",
+                "[2024-11-19T09:48:47.883-0600][info ][gc,heap     ] GC(3) Y: Heap Statistics:",
+                "[2024-11-19T09:48:47.883-0600][info ][gc,heap     ] GC(3) Y:                Mark Start          Mark End        Relocate Start      Relocate End           High               Low",
+                "[2024-11-19T09:48:47.883-0600][info ][gc,heap     ] GC(3) Y:  Capacity:     8962M (55%)       16384M (100%)      16384M (100%)      16384M (100%)      16384M (100%)       8962M (55%)",
+                "[2024-11-19T09:48:47.883-0600][info ][gc,heap     ] GC(3) Y:      Free:     7422M (45%)           0M (0%)          468M (3%)         3080M (19%)        7422M (45%)           0M (0%)",
+                "[2024-11-19T09:48:47.883-0600][info ][gc,heap     ] GC(3) Y:      Used:     8962M (55%)       16384M (100%)      15916M (97%)       13304M (81%)       16384M (100%)       8962M (55%)",
+                "[2024-11-19T09:48:47.883-0600][info ][gc,heap     ] GC(3) Y: Young Generation Statistics:",
+                "[2024-11-19T09:48:47.883-0600][info ][gc,heap     ] GC(3) Y:                Mark Start          Mark End        Relocate Start      Relocate End",
+                "[2024-11-19T09:48:47.883-0600][info ][gc,heap     ] GC(3) Y:      Used:     8962M (55%)       16384M (100%)      15916M (97%)       13304M (81%)",
+                "[2024-11-19T09:48:47.883-0600][info ][gc,heap     ] GC(3) Y:      Live:         -              2067M (13%)        2067M (13%)        2067M (13%)",
+                "[2024-11-19T09:48:47.883-0600][info ][gc,heap     ] GC(3) Y:   Garbage:         -              6894M (42%)        6230M (38%)          53M (0%)",
+                "[2024-11-19T09:48:47.883-0600][info ][gc,heap     ] GC(3) Y: Allocated:         -              7422M (45%)        7618M (46%)       11183M (68%)",
+                "[2024-11-19T09:48:47.883-0600][info ][gc,heap     ] GC(3) Y: Reclaimed:         -                  -               664M (4%)         6841M (42%)",
+                "[2024-11-19T09:48:47.883-0600][info ][gc,heap     ] GC(3) Y:  Promoted:         -                  -                 0M (0%)            0M (0%)",
+                "[2024-11-19T09:48:47.883-0600][info ][gc,heap     ] GC(3) Y: Compacted:         -                  -                  -              1768M (11%)",
+                "[2024-11-19T09:48:47.883-0600][info ][gc,phases   ] GC(3) Y: Young Generation 8962M(55%)->13304M(81%) 5.370s",
+                "[2024-11-19T09:48:47.883-0600][info ][gc,phases   ] GC(3) O: Old Generation",
+                "[2024-11-19T09:48:47.883-0600][info ][gc          ] GC(4) Minor Collection (Allocation Stall)",
+                "[2024-11-19T09:48:47.883-0600][info ][gc,task     ] GC(4) Using 3 Workers for Young Generation",
+                "[2024-11-19T09:48:47.883-0600][info ][gc,phases   ] GC(4) y: Young Generation",
+                "[2024-11-19T09:48:47.902-0600][info ][gc,phases   ] GC(4) y: Pause Mark Start 0.009ms",
+                "[2024-11-19T09:48:48.014-0600][info ][gc,phases   ] GC(3) O: Concurrent Mark 131.401ms",
+                "[2024-11-19T09:48:48.051-0600][info ][gc,phases   ] GC(3) O: Pause Mark End 0.011ms",
+                "[2024-11-19T09:48:48.051-0600][info ][gc,phases   ] GC(3) O: Concurrent Mark Free 0.001ms",
+                "[2024-11-19T09:48:48.088-0600][info ][gc,phases   ] GC(3) O: Concurrent Process Non-Strong 37.017ms",
+                "[2024-11-19T09:48:48.088-0600][info ][gc,phases   ] GC(3) O: Concurrent Reset Relocation Set 0.000ms",
+                "[2024-11-19T09:48:48.091-0600][info ][gc,phases   ] GC(3) O: Concurrent Select Relocation Set 2.566ms",
+                "[2024-11-19T09:48:50.579-0600][info ][gc,phases   ] GC(4) y: Concurrent Mark 2673.028ms",
+                "[2024-11-19T09:48:50.579-0600][info ][gc,phases   ] GC(4) y: Pause Mark End 0.009ms",
+                "[2024-11-19T09:48:50.579-0600][info ][gc,phases   ] GC(4) y: Concurrent Mark Free 0.000ms",
+                "[2024-11-19T09:48:50.579-0600][info ][gc,phases   ] GC(4) y: Concurrent Reset Relocation Set 0.205ms",
+                "[2024-11-19T09:48:50.580-0600][info ][gc,reloc    ] GC(4) y: Using tenuring threshold: 2 (Computed)",
+                "[2024-11-19T09:48:50.707-0600][info ][gc,phases   ] GC(4) y: Concurrent Select Relocation Set 128.026ms",
+                "[2024-11-19T09:48:50.709-0600][info ][gc,phases   ] GC(4) y: Pause Relocate Start 0.013ms",
+                "[2024-11-19T09:48:52.806-0600][info ][gc,phases   ] GC(4) y: Concurrent Relocate 2096.795ms",
+                "[2024-11-19T09:48:52.809-0600][info ][gc,alloc    ] GC(4) y:                         Mark Start        Mark End      Relocate Start    Relocate End",
+                "[2024-11-19T09:48:52.809-0600][info ][gc,alloc    ] GC(4) y: Allocation Stalls:          0                37               54               0",
+                "[2024-11-19T09:48:52.809-0600][info ][gc,load     ] GC(4) y: Load: 24.64 (205%) / 8.94 (75%) / 5.27 (44%)",
+                "[2024-11-19T09:48:52.809-0600][info ][gc,mmu      ] GC(4) y: MMU: 2ms/98.8%, 5ms/99.5%, 10ms/99.8%, 20ms/99.9%, 50ms/99.9%, 100ms/100.0%",
+                "[2024-11-19T09:48:52.809-0600][info ][gc,marking  ] GC(4) y: Mark: 2 stripe(s), 10 proactive flush(es), 1 terminate flush(es), 0 completion(s), 0 continuation(s)",
+                "[2024-11-19T09:48:52.809-0600][info ][gc,marking  ] GC(4) y: Mark Stack Usage: 32M",
+                "[2024-11-19T09:48:52.809-0600][info ][gc,nmethod  ] GC(4) y: NMethods: 5329 registered, 373 unregistered",
+                "[2024-11-19T09:48:52.809-0600][info ][gc,metaspace] GC(4) y: Metaspace: 46M used, 46M committed, 1088M reserved",
+                "[2024-11-19T09:48:52.809-0600][info ][gc,reloc    ] GC(4) y:                        Candidates     Selected     In-Place         Size        Empty    Relocated",
+                "[2024-11-19T09:48:52.809-0600][info ][gc,reloc    ] GC(4) y: Small Pages:                 6654         4106           13       13308M         402M        1531M",
+                "[2024-11-19T09:48:52.809-0600][info ][gc,reloc    ] GC(4) y: Medium Pages:                   2            1            1          64M           0M           0M",
+                "[2024-11-19T09:48:52.809-0600][info ][gc,reloc    ] GC(4) y: Large Pages:                    0            0            0           0M           0M           0M",
+                "[2024-11-19T09:48:52.809-0600][info ][gc,reloc    ] GC(4) y: Forwarding Usage: 841M",
+                "[2024-11-19T09:48:52.809-0600][info ][gc,reloc    ] GC(4) y: Age Table:",
+                "[2024-11-19T09:48:52.809-0600][info ][gc,reloc    ] GC(4) y:                    Live             Garbage             Small              Medium             Large",
+                "[2024-11-19T09:48:52.809-0600][info ][gc,reloc    ] GC(4) y: Eden            2373M (14%)        8800M (54%)       5587 / 4007           0 / 0              0 / 0",
+                "[2024-11-19T09:48:52.809-0600][info ][gc,reloc    ] GC(4) y: Survivor 1      1635M (10%)          84M (1%)         860 / 7              0 / 0              0 / 0",
+                "[2024-11-19T09:48:52.809-0600][info ][gc,reloc    ] GC(4) y: Survivor 2       113M (1%)          194M (1%)         154 / 87             0 / 0              0 / 0",
+                "[2024-11-19T09:48:52.809-0600][info ][gc,reloc    ] GC(4) y: Survivor 3        76M (0%)           45M (0%)          45 / 3              1 / 1              0 / 0",
+                "[2024-11-19T09:48:52.809-0600][info ][gc,reloc    ] GC(4) y: Survivor 4        12M (0%)           35M (0%)           8 / 2              1 / 0              0 / 0",
+                "[2024-11-19T09:48:52.809-0600][info ][gc,heap     ] GC(4) y: Min Capacity: 8M(0%)",
+                "[2024-11-19T09:48:52.809-0600][info ][gc,heap     ] GC(4) y: Max Capacity: 16384M(100%)",
+                "[2024-11-19T09:48:52.813-0600][info ][gc,heap     ] GC(4) y: Soft Max Capacity: 16384M(100%)",
+                "[2024-11-19T09:48:52.813-0600][info ][gc,heap     ] GC(4) y: Heap Statistics:",
+                "[2024-11-19T09:48:52.813-0600][info ][gc,heap     ] GC(4) y:                Mark Start          Mark End        Relocate Start      Relocate End           High               Low",
+                "[2024-11-19T09:48:52.813-0600][info ][gc,heap     ] GC(4) y:  Capacity:    16384M (100%)      16384M (100%)      16384M (100%)      16384M (100%)      16384M (100%)      16384M (100%)",
+                "[2024-11-19T09:48:52.817-0600][info ][gc,heap     ] GC(4) y:      Free:     3012M (18%)           0M (0%)            0M (0%)          730M (4%)         4170M (25%)           0M (0%)",
+                "[2024-11-19T09:48:52.817-0600][info ][gc,heap     ] GC(4) y:      Used:    13372M (82%)       16384M (100%)      16384M (100%)      15654M (96%)       16384M (100%)      12214M (75%)",
+                "[2024-11-19T09:48:52.817-0600][info ][gc,heap     ] GC(4) y: Young Generation Statistics:",
+                "[2024-11-19T09:48:52.817-0600][info ][gc,heap     ] GC(4) y:                Mark Start          Mark End        Relocate Start      Relocate End",
+                "[2024-11-19T09:48:52.821-0600][info ][gc,heap     ] GC(4) y:      Used:    13372M (82%)       16384M (100%)      16260M (99%)       15400M (94%)",
+                "[2024-11-19T09:48:52.821-0600][info ][gc,heap     ] GC(4) y:      Live:         -              4210M (26%)        4105M (25%)        4009M (24%)",
+                "[2024-11-19T09:48:52.821-0600][info ][gc,heap     ] GC(4) y:   Garbage:         -              9161M (56%)        8740M (53%)          87M (1%)",
+                "[2024-11-19T09:48:52.821-0600][info ][gc,heap     ] GC(4) y: Allocated:         -              3012M (18%)        3414M (21%)       11303M (69%)",
+                "[2024-11-19T09:48:52.821-0600][info ][gc,heap     ] GC(4) y: Reclaimed:         -                  -               420M (3%)         9073M (55%)",
+                "[2024-11-19T09:48:52.821-0600][info ][gc,heap     ] GC(4) y:  Promoted:         -                  -               105M (1%)          201M (1%)",
+                "[2024-11-19T09:48:52.821-0600][info ][gc,heap     ] GC(4) y: Compacted:         -                  -                  -              2352M (14%)",
+                "[2024-11-19T09:48:52.821-0600][info ][gc,phases   ] GC(4) y: Young Generation 13310M(81%)->15654M(96%) 4.926s",
+                "[2024-11-19T09:48:52.821-0600][info ][gc          ] GC(4) Minor Collection (Allocation Stall) 13310M(81%)->15734M(96%) 4.938s",
+                "[2024-11-19T09:48:52.821-0600][info ][gc,task     ] GC(3) O: Using 3 Workers for Old Generation",
+                "[2024-11-19T09:48:52.853-0600][info ][gc,task     ] GC(3) O: Using 1 Workers for Old Generation",
+                "[2024-11-19T09:48:52.855-0600][info ][gc,phases   ] GC(3) O: Concurrent Remap Roots 33.641ms",
+                "[2024-11-19T09:48:52.855-0600][info ][gc,phases   ] GC(3) O: Pause Relocate Start 0.006ms",
+                "[2024-11-19T09:48:52.855-0600][info ][gc          ] GC(5) Minor Collection (Allocation Rate)",
+                "[2024-11-19T09:48:52.855-0600][info ][gc,task     ] GC(5) Using 3 Workers for Young Generation",
+                "[2024-11-19T09:48:52.855-0600][info ][gc,phases   ] GC(5) y: Young Generation",
+                "[2024-11-19T09:48:52.860-0600][info ][gc,phases   ] GC(5) y: Pause Mark Start 0.004ms",
+                "[2024-11-19T09:48:52.868-0600][info ][gc,phases   ] GC(3) O: Concurrent Relocate 12.604ms",
+                "[2024-11-19T09:48:55.559-0600][info ][gc,phases   ] GC(5) y: Concurrent Mark 2695.516ms",
+                "[2024-11-19T09:48:55.559-0600][info ][gc,phases   ] GC(5) y: Pause Mark End 0.013ms",
+                "[2024-11-19T09:48:55.559-0600][info ][gc,phases   ] GC(5) y: Concurrent Mark Free 0.000ms",
+                "[2024-11-19T09:48:55.559-0600][info ][gc,phases   ] GC(5) y: Concurrent Reset Relocation Set 0.377ms",
+                "[2024-11-19T09:48:55.561-0600][info ][gc,reloc    ] GC(5) y: Using tenuring threshold: 2 (Computed)",
+                "[2024-11-19T09:48:55.828-0600][info ][gc,phases   ] GC(5) y: Concurrent Select Relocation Set 268.261ms",
+                "[2024-11-19T09:48:55.830-0600][info ][gc,phases   ] GC(5) y: Pause Relocate Start 0.005ms",
+                "[2024-11-19T09:48:57.412-0600][info ][gc,phases   ] GC(5) y: Concurrent Relocate 1581.464ms",
+                "[2024-11-19T09:48:57.415-0600][info ][gc,alloc    ] GC(5) y:                         Mark Start        Mark End      Relocate Start    Relocate End",
+                "[2024-11-19T09:48:57.415-0600][info ][gc,alloc    ] GC(5) y: Allocation Stalls:          0                65               33               0",
+                "[2024-11-19T09:48:57.415-0600][info ][gc,load     ] GC(5) y: Load: 25.07 (209%) / 9.29 (77%) / 5.42 (45%)",
+                "[2024-11-19T09:48:57.415-0600][info ][gc,mmu      ] GC(5) y: MMU: 2ms/98.8%, 5ms/99.5%, 10ms/99.8%, 20ms/99.9%, 50ms/99.9%, 100ms/100.0%",
+                "[2024-11-19T09:48:57.415-0600][info ][gc,marking  ] GC(5) y: Mark: 2 stripe(s), 10 proactive flush(es), 1 terminate flush(es), 0 completion(s), 0 continuation(s)",
+                "[2024-11-19T09:48:57.415-0600][info ][gc,marking  ] GC(5) y: Mark Stack Usage: 32M",
+                "[2024-11-19T09:48:57.415-0600][info ][gc,nmethod  ] GC(5) y: NMethods: 5407 registered, 0 unregistered",
+                "[2024-11-19T09:48:57.415-0600][info ][gc,metaspace] GC(5) y: Metaspace: 46M used, 46M committed, 1088M reserved",
+                "[2024-11-19T09:48:57.415-0600][info ][gc,reloc    ] GC(5) y:                        Candidates     Selected     In-Place         Size        Empty    Relocated",
+                "[2024-11-19T09:48:57.415-0600][info ][gc,reloc    ] GC(5) y: Small Pages:                 7818         4111            2       15636M        1020M        1285M",
+                "[2024-11-19T09:48:57.415-0600][info ][gc,reloc    ] GC(5) y: Medium Pages:                   0            0            0           0M           0M           0M",
+                "[2024-11-19T09:48:57.418-0600][info ][gc,reloc    ] GC(5) y: Large Pages:                    0            0            0           0M           0M           0M",
+                "[2024-11-19T09:48:57.418-0600][info ][gc,reloc    ] GC(5) y: Forwarding Usage: 705M",
+                "[2024-11-19T09:48:57.418-0600][info ][gc,reloc    ] GC(5) y: Age Table:",
+                "[2024-11-19T09:48:57.418-0600][info ][gc,reloc    ] GC(5) y:                    Live             Garbage             Small              Medium             Large",
+                "[2024-11-19T09:48:57.418-0600][info ][gc,reloc    ] GC(5) y: Eden            2017M (12%)        9514M (58%)       5766 / 4091           0 / 0              0 / 0",
+                "[2024-11-19T09:48:57.418-0600][info ][gc,reloc    ] GC(5) y: Survivor 1      2356M (14%)          39M (0%)        1198 / 2              0 / 0              0 / 0",
+                "[2024-11-19T09:48:57.418-0600][info ][gc,reloc    ] GC(5) y: Survivor 2      1477M (9%)          230M (1%)         854 / 18             0 / 0              0 / 0",
+                "[2024-11-19T09:48:57.418-0600][info ][gc,heap     ] GC(5) y: Min Capacity: 8M(0%)",
+                "[2024-11-19T09:48:57.418-0600][info ][gc,heap     ] GC(5) y: Max Capacity: 16384M(100%)",
+                "[2024-11-19T09:48:57.418-0600][info ][gc,heap     ] GC(5) y: Soft Max Capacity: 16384M(100%)",
+                "[2024-11-19T09:48:57.419-0600][info ][gc,heap     ] GC(5) y: Heap Statistics:",
+                "[2024-11-19T09:48:57.419-0600][info ][gc,heap     ] GC(5) y:                Mark Start          Mark End        Relocate Start      Relocate End           High               Low",
+                "[2024-11-19T09:48:57.419-0600][info ][gc,heap     ] GC(5) y:  Capacity:    16384M (100%)      16384M (100%)      16384M (100%)      16384M (100%)      16384M (100%)      16384M (100%)",
+                "[2024-11-19T09:48:57.419-0600][info ][gc,heap     ] GC(5) y:      Free:      494M (3%)            0M (0%)            0M (0%)         3288M (20%)        6336M (39%)           0M (0%)",
+                "[2024-11-19T09:48:57.419-0600][info ][gc,heap     ] GC(5) y:      Used:    15890M (97%)       16384M (100%)      16384M (100%)      13096M (80%)       16384M (100%)      10048M (61%)",
+                "[2024-11-19T09:48:57.422-0600][info ][gc,heap     ] GC(5) y: Young Generation Statistics:",
+                "[2024-11-19T09:48:57.422-0600][info ][gc,heap     ] GC(5) y:                Mark Start          Mark End        Relocate Start      Relocate End",
+                "[2024-11-19T09:48:57.422-0600][info ][gc,heap     ] GC(5) y:      Used:    15636M (95%)       16130M (98%)       14524M (89%)       11180M (68%)",
+                "[2024-11-19T09:48:57.422-0600][info ][gc,heap     ] GC(5) y:      Live:         -              5852M (36%)        4426M (27%)        4374M (27%)",
+                "[2024-11-19T09:48:57.422-0600][info ][gc,heap     ] GC(5) y:   Garbage:         -              9783M (60%)        8583M (52%)          47M (0%)",
+                "[2024-11-19T09:48:57.422-0600][info ][gc,heap     ] GC(5) y: Allocated:         -               494M (3%)         1514M (9%)         6758M (41%)",
+                "[2024-11-19T09:48:57.422-0600][info ][gc,heap     ] GC(5) y: Reclaimed:         -                  -              1200M (7%)         9736M (59%)",
+                "[2024-11-19T09:48:57.422-0600][info ][gc,heap     ] GC(5) y:  Promoted:         -                  -              1425M (9%)         1477M (9%)",
+                "[2024-11-19T09:48:57.422-0600][info ][gc,heap     ] GC(5) y: Compacted:         -                  -                  -              1995M (12%)",
+                "[2024-11-19T09:48:57.422-0600][info ][gc,phases   ] GC(5) y: Young Generation 15890M(97%)->13096M(80%) 4.560s",
+                "[2024-11-19T09:48:57.422-0600][info ][gc          ] GC(5) Minor Collection (Allocation Rate) 15882M(97%)->13144M(80%) 4.567s",
+                "[2024-11-19T09:48:57.422-0600][info ][gc,alloc    ] GC(3) O:                         Mark Start        Mark End      Relocate Start    Relocate End",
+                "[2024-11-19T09:48:57.423-0600][info ][gc,alloc    ] GC(3) O: Allocation Stalls:          0                0                0                0",
+                "[2024-11-19T09:48:57.423-0600][info ][gc,load     ] GC(3) O: Load: 25.07 (209%) / 9.29 (77%) / 5.42 (45%)",
+                "[2024-11-19T09:48:57.427-0600][info ][gc,mmu      ] GC(3) O: MMU: 2ms/98.8%, 5ms/99.5%, 10ms/99.8%, 20ms/99.9%, 50ms/99.9%, 100ms/100.0%",
+                "[2024-11-19T09:48:57.427-0600][info ][gc,marking  ] GC(3) O: Mark: 1 stripe(s), 1 proactive flush(es), 1 terminate flush(es), 0 completion(s), 0 continuation(s)",
+                "[2024-11-19T09:48:57.427-0600][info ][gc,marking  ] GC(3) O: Mark Stack Usage: 0M",
+                "[2024-11-19T09:48:57.427-0600][info ][gc,nmethod  ] GC(3) O: NMethods: 5407 registered, 0 unregistered",
+                "[2024-11-19T09:48:57.427-0600][info ][gc,metaspace] GC(3) O: Metaspace: 46M used, 46M committed, 1088M reserved",
+                "[2024-11-19T09:48:57.427-0600][info ][gc,ref      ] GC(3) O:                       Encountered   Discovered     Enqueued",
+                "[2024-11-19T09:48:57.427-0600][info ][gc,ref      ] GC(3) O: Soft References:             4553            0            0",
+                "[2024-11-19T09:48:57.427-0600][info ][gc,ref      ] GC(3) O: Weak References:            11144            0            0",
+                "[2024-11-19T09:48:57.427-0600][info ][gc,ref      ] GC(3) O: Final References:             936            0            0",
+                "[2024-11-19T09:48:57.427-0600][info ][gc,ref      ] GC(3) O: Phantom References:          8720            0            0",
+                "[2024-11-19T09:48:57.427-0600][info ][gc,heap     ] GC(3) O: Min Capacity: 8M(0%)",
+                "[2024-11-19T09:48:57.427-0600][info ][gc,heap     ] GC(3) O: Max Capacity: 16384M(100%)",
+                "[2024-11-19T09:48:57.427-0600][info ][gc,heap     ] GC(3) O: Soft Max Capacity: 16384M(100%)",
+                "[2024-11-19T09:48:57.427-0600][info ][gc,heap     ] GC(3) O: Heap Statistics:",
+                "[2024-11-19T09:48:57.427-0600][info ][gc,heap     ] GC(3) O:                Mark Start          Mark End        Relocate Start      Relocate End           High               Low",
+                "[2024-11-19T09:48:57.427-0600][info ][gc,heap     ] GC(3) O:  Capacity:     8962M (55%)       16384M (100%)      16384M (100%)      16384M (100%)      16384M (100%)       8962M (55%)",
+                "[2024-11-19T09:48:57.431-0600][info ][gc,heap     ] GC(3) O:      Free:     7422M (45%)        2516M (15%)         502M (3%)          484M (3%)         7422M (45%)           0M (0%)",
+                "[2024-11-19T09:48:57.431-0600][info ][gc,heap     ] GC(3) O:      Used:     8962M (55%)       13868M (85%)       15882M (97%)       15900M (97%)       16384M (100%)       8962M (55%)",
+                "[2024-11-19T09:48:57.431-0600][info ][gc,heap     ] GC(3) O: Old Generation Statistics:",
+                "[2024-11-19T09:48:57.431-0600][info ][gc,heap     ] GC(3) O:                Mark Start          Mark End        Relocate Start      Relocate End",
+                "[2024-11-19T09:48:57.431-0600][info ][gc,heap     ] GC(3) O:      Used:        0M (0%)            0M (0%)          254M (2%)          254M (2%)",
+                "[2024-11-19T09:48:57.431-0600][info ][gc,heap     ] GC(3) O:      Live:         -                 0M (0%)            0M (0%)            0M (0%)",
+                "[2024-11-19T09:48:57.431-0600][info ][gc,heap     ] GC(3) O:   Garbage:         -                 0M (0%)            0M (0%)            0M (0%)",
+                "[2024-11-19T09:48:57.431-0600][info ][gc,heap     ] GC(3) O: Allocated:         -                 0M (0%)          254M (2%)          254M (2%)",
+                "[2024-11-19T09:48:57.431-0600][info ][gc,heap     ] GC(3) O: Reclaimed:         -                  -                 0M (0%)            0M (0%)",
+                "[2024-11-19T09:48:57.431-0600][info ][gc,heap     ] GC(3) O: Compacted:         -                  -                  -                 0M (0%)",
+                "[2024-11-19T09:48:57.431-0600][info ][gc,phases   ] GC(3) O: Old Generation 13310M(81%)->15900M(97%) 9.540s",
+                "[2024-11-19T09:48:57.431-0600][info ][gc          ] GC(3) Major Collection (Warmup) 8960M(55%)->13184M(80%) 14.923s",
+        };
+        List<JVMEvent> events = feedParser(eventLogEntries);
+
+        assertEquals(4, events.size());
+
+        ZGCYoungCollection majorYoung = (ZGCYoungCollection) events.get(0);
+        assertEquals(3L, majorYoung.getGcId());
+        assertEquals(GarbageCollectionTypes.ZGCMajorYoung, majorYoung.getGarbageCollectionType());
+
+        ZGCYoungCollection minorYoungA = (ZGCYoungCollection) events.get(1);
+        assertEquals(4L, minorYoungA.getGcId());
+        assertEquals(GarbageCollectionTypes.ZGCMinorYoung, minorYoungA.getGarbageCollectionType());
+
+        ZGCYoungCollection minorYoungB = (ZGCYoungCollection) events.get(2);
+        assertEquals(5L, minorYoungB.getGcId());
+        assertEquals(GarbageCollectionTypes.ZGCMinorYoung, minorYoungB.getGarbageCollectionType());
+
+        ZGCOldCollection majorOld = (ZGCOldCollection) events.get(3);
+        assertEquals(3L, majorOld.getGcId());
+        assertEquals(GarbageCollectionTypes.ZGCMajorOld, majorOld.getGarbageCollectionType());
+
     }
 
     private boolean checkReferenceSummary(ZGCReferenceSummary refSummary, long encounderted, long discovered, long enqueued) {

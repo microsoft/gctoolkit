@@ -10,22 +10,22 @@ import com.microsoft.gctoolkit.event.GarbageCollectionTypes;
 import com.microsoft.gctoolkit.event.jvm.JVMEvent;
 import com.microsoft.gctoolkit.event.jvm.JVMTermination;
 import com.microsoft.gctoolkit.event.zgc.ZGCPageAgeSummary;
-import com.microsoft.gctoolkit.event.zgc.MinorZGCCycle;
 import com.microsoft.gctoolkit.event.zgc.ZGCAllocatedSummary;
-import com.microsoft.gctoolkit.event.zgc.FullZGCCycle;
 import com.microsoft.gctoolkit.event.zgc.ZGCGarbageSummary;
 import com.microsoft.gctoolkit.event.zgc.ZGCHeapCapacitySummary;
 import com.microsoft.gctoolkit.event.zgc.ZGCLiveSummary;
-import com.microsoft.gctoolkit.event.zgc.MajorZGCCycle;
 import com.microsoft.gctoolkit.event.zgc.OccupancySummary;
 import com.microsoft.gctoolkit.event.zgc.ZGCCompactedSummary;
+import com.microsoft.gctoolkit.event.zgc.ZGCFullCollection;
+import com.microsoft.gctoolkit.event.zgc.ZGCYoungCollection;
+import com.microsoft.gctoolkit.event.zgc.ZGCOldCollection;
 import com.microsoft.gctoolkit.event.zgc.ZGCNMethodSummary;
 import com.microsoft.gctoolkit.event.zgc.ZGCPageSummary;
 import com.microsoft.gctoolkit.event.zgc.ZGCPhase;
 import com.microsoft.gctoolkit.event.zgc.ZGCPromotedSummary;
 import com.microsoft.gctoolkit.event.zgc.ZGCReclaimSummary;
-import com.microsoft.gctoolkit.event.zgc.ZGCCollectionType;
-import com.microsoft.gctoolkit.event.zgc.ZGCCycle;
+import com.microsoft.gctoolkit.event.zgc.ZGCCycleType;
+import com.microsoft.gctoolkit.event.zgc.ZGCCollection;
 import com.microsoft.gctoolkit.event.zgc.ZGCMarkSummary;
 import com.microsoft.gctoolkit.event.zgc.ZGCMemoryPoolSummary;
 import com.microsoft.gctoolkit.event.zgc.ZGCMetaspaceSummary;
@@ -44,6 +44,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.HashMap;
 import java.util.function.BiConsumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -66,17 +67,13 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
     private final boolean debugging = Boolean.getBoolean("microsoft.debug");
     private final boolean develop = Boolean.getBoolean("microsoft.develop");
 
-    private ZForwardReference forwardReference;
+    private final ZGCForwardReference[] forwardReferences = new ZGCForwardReference[3];
+    private final HashMap<Long, GCCause> gcCauseMap = new HashMap<>(2);
 
-    private final long[] markStart = new long[3];
-    private final long[] markEnd = new long[3];
-    private final long[] relocateStart = new long[3];
-    private final long[] relocateEnd = new long[3];
     private final long[] heapCapacity = new long[3];
 
     private final MRUQueue<GCParseRule, BiConsumer<GCLogTrace, String>> parseRules;
-    private boolean oldGenHeapStats = false;
-    private boolean youngGenHeapStats = false;
+    private boolean genHeapStats = false;
 
     //Implement all capture methods
     {
@@ -102,14 +99,13 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
         // Generation ("gen") ZGC only options
         parseRules.put(LOAD_GEN, this::loadGen);
         parseRules.put(REFERENCE_PROCESSING_GEN, this::referenceProcessingGen);
-        parseRules.put(END_OF_PHASE_SUMMARY_GEN, this::endOfPhaseMemorySummary);
+        parseRules.put(END_OF_PHASE_SUMMARY_GEN, this::generationEnd);
         parseRules.put(PAGES_GEN, this::pageSummary);
         parseRules.put(FORWARDING_USAGE_GEN, this::forwardingUsage);
         parseRules.put(AGE_TABLE_GEN, this::ageTable);
+        parseRules.put(GENERATION_START, this::generationStart);
 
-        // Phase change rules
-        parseRules.put(MARK_OLD_GEN_HEAP_STATS, this::markOldGenHeapStats);
-        parseRules.put(MARK_YOUNG_GEN_HEAP_STATS, this::markYoungGenHeapStats);
+        parseRules.put(MARK_GEN_HEAP_STATS, this::markGenHeapStats);
     }
 
     public ZGCParser() {}
@@ -123,20 +119,9 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
      * This marks the phase we're in for memory stats. Generation ZGC will provide heap capacity
      * as well as old and young gen capacities. This enables the Young gen phase
      */
-    private void markYoungGenHeapStats(GCLogTrace gcLogTrace, String s) {
-        this.youngGenHeapStats = true;
-        this.oldGenHeapStats = false;
+    private void markGenHeapStats(GCLogTrace gcLogTrace, String s) {
+        this.genHeapStats = true;
     }
-
-    /**
-     * This marks the phase we're in for memory stats. Generation ZGC will provide heap capacity
-     * as well as old and young gen capacities. This enables the Old gen phase
-     */
-    private void markOldGenHeapStats(GCLogTrace gcLogTrace, String s) {
-        this.youngGenHeapStats = false;
-        this.oldGenHeapStats = true;
-    }
-
 
     @Override
     public String getName() {
@@ -178,37 +163,65 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
         switch (zgcPhase) {
             // No phase information, legacy ZGC
             case FULL:
-                return (ZGCForwardReference) forwardReference;
+                return forwardReferences[0];
             case MAJOR_YOUNG:
-                return ((ZGCMajorForwardReference)forwardReference).getYoungGeneration();
-            case MAJOR_OLD:
-                return ((ZGCMajorForwardReference)forwardReference).getOldGeneration();
             case MINOR_YOUNG:
-                return ((ZGCMinorForwardReference)forwardReference).getYoungGeneration();
+                return forwardReferences[1];
+            case MAJOR_OLD:
+                return forwardReferences[2];
+            default:
+                throw new RuntimeException("Unknown phase " + zgcPhase);
         }
+    }
 
-        // Should never reach (should convert to switch expression)
-        throw new RuntimeException("Unknown phase " + zgcPhase);
+    private void setForwardRefForPhase(ZGCPhase zgcPhase, ZGCForwardReference forwardReference){
+        switch (zgcPhase) {
+            // No phase information, legacy ZGC
+            case FULL:
+                forwardReferences[0] = forwardReference;
+                break;
+            case MAJOR_YOUNG:
+            case MINOR_YOUNG:
+                forwardReferences[1] = forwardReference;
+                break;
+            case MAJOR_OLD:
+                forwardReferences[2] = forwardReference;
+                break;
+            default:
+                throw new RuntimeException("Unknown phase " + zgcPhase);
+        }
     }
 
     private void cycleStart(GCLogTrace trace, String s) {
-        ZGCCollectionType type = ZGCCollectionType.get(trace.getGroup(2));
-
-        switch (type) {
-            case FULL:
-                // FULL, Legacy ZGC
-                forwardReference = new ZGCForwardReference(getClock(), trace.getLongGroup(1), trace.gcCause(3,0), type, ZGCPhase.FULL);
-                break;
-            case MINOR:
-                // MINOR, young only collection
-                forwardReference = new ZGCMinorForwardReference(getClock(), trace.getLongGroup(1), trace.gcCause(3,0), type);
-                break;
-            case MAJOR:
-                // MAJOR, young and old gen collection
-                forwardReference = new ZGCMajorForwardReference(getClock(), trace.getLongGroup(1), trace.gcCause(3,0), type);
-                break;
+        ZGCCycleType type = ZGCCycleType.get(trace.getGroup(2));
+        if(type == ZGCCycleType.FULL){
+            setForwardRefForPhase(
+                    ZGCPhase.FULL,
+                    new ZGCForwardReference(getClock(), trace.getLongGroup(1), trace.gcCause(3,0), type, ZGCPhase.FULL)
+            );
+        }
+        else {
+            // The cycle start message gives us the gc cause, which we need to create the GCEvent in generationStart
+            // When we get a cycle start, store the gc cause for later use
+            gcCauseMap.put(trace.getLongGroup(1), trace.gcCause(1, 2));
         }
     }
+
+    private void generationStart(GCLogTrace trace, String line){
+        if(!diary.isGenerationalZGC()){
+            LOGGER.severe("generationStart rule was matched, but log file isn't generational ZGC. This should be impossible.");
+            return;
+        }
+        ZGCPhase phase = ZGCPhase.get(trace.getGroup(2));
+        long gcId = trace.getLongGroup(1);
+        GCCause gcCause = gcCauseMap.getOrDefault(gcId, GCCause.UNKNOWN_GCCAUSE);
+        ZGCForwardReference forwardReference = new ZGCForwardReference(getClock(), gcId, gcCause, ZGCCycleType.fromPhase(phase), phase);
+        setForwardRefForPhase(
+                phase,
+                forwardReference
+        );
+    }
+
 
     private void pausePhase(GCLogTrace trace, String s) {
         ZGCForwardReference ref = getForwardRefForPhase(trace.getZCollectionPhase());
@@ -421,26 +434,25 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
         }
     }
 
-    private void captureAtIndex(GCLogTrace trace, int index) {
-        // temporary holder of marking info to get set on fwdref
-        markStart[index] = trace.toKBytes(3);
-        markEnd[index] = trace.toKBytes(6);
-        relocateStart[index] = trace.toKBytes(9);
-        relocateEnd[index] = trace.toKBytes(12);
+    private void captureAtIndex(GCLogTrace trace, int index, ZGCMemoryPoolSummaryBuilder memoryPoolSummaryBuilder) {
+        memoryPoolSummaryBuilder.setMarkStart(index, trace.toKBytes(3));
+        memoryPoolSummaryBuilder.setMarkEnd(index, trace.toKBytes(6));
+        memoryPoolSummaryBuilder.setRelocateStart(index, trace.toKBytes(9));
+        memoryPoolSummaryBuilder.setRelocateEnd(index, trace.toKBytes(12));
     }
 
     private void sizeEntry(GCLogTrace trace, String s) {
         ZGCPhase phase = trace.getZCollectionPhase();
         ZGCForwardReference ref = getForwardRefForPhase(phase);
 
-        if (oldGenHeapStats || youngGenHeapStats) {
+        if (genHeapStats) {
             if ("Used".equals(trace.getGroup(2))){
                 OccupancySummary summary = new OccupancySummary(
                         trace.toKBytes(3),
                         trace.toKBytes(6),
                         trace.toKBytes(9),
                         trace.toKBytes(12));
-                ref.setUsed(phase, summary);
+                ref.setGenerationUsedSummary(phase, summary);
             } else {
                 trace.notYetImplemented();
             }
@@ -449,16 +461,17 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
 
         switch (trace.getGroup(2)) {
             case "Capacity":
-                captureAtIndex(trace, 0);
+                captureAtIndex(trace, 0, ref.memoryPoolSummaryBuilder);
                 break;
             case "Free":
-                captureAtIndex(trace, 1);
+                captureAtIndex(trace, 1, ref.memoryPoolSummaryBuilder);
                 break;
             case "Used":
-                ref.setMarkStart(new ZGCMemoryPoolSummary(markStart[0], markStart[1], trace.toKBytes(3)));
-                ref.setMarkEnd(new ZGCMemoryPoolSummary(markEnd[0], markEnd[1], trace.toKBytes(6)));
-                ref.setRelocateStart(new ZGCMemoryPoolSummary(relocateStart[0], relocateStart[1], trace.toKBytes(9)));
-                ref.setRelocateEnd(new ZGCMemoryPoolSummary(relocateEnd[0], relocateEnd[1], trace.toKBytes(12)));
+                captureAtIndex(trace, 2, ref.memoryPoolSummaryBuilder);
+                ref.setMarkStart(ref.memoryPoolSummaryBuilder.buildMarkStart());
+                ref.setMarkEnd(ref.memoryPoolSummaryBuilder.buildMarkEnd());
+                ref.setRelocateStart(ref.memoryPoolSummaryBuilder.buildRelocateStart());
+                ref.setRelocateEnd(ref.memoryPoolSummaryBuilder.buildRelocateEnd());
                 break;
             default:
                 LOGGER.warning(trace.getGroup(2) + "not recognized, Heap Occupancy/size is is ignored. Please report this with the GC log");
@@ -510,9 +523,8 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
     private void compacted(GCLogTrace trace, String s) {
         ZGCForwardReference ref = getForwardRefForPhase(trace.getZCollectionPhase());
 
-        // Exit both young and old gen stats, reset for next cycle
-        this.oldGenHeapStats = false;
-        this.youngGenHeapStats = false;
+        // Exit gen stats, reset for next cycle
+        this.genHeapStats = false;
         ref.setCompactedSummary(
                 new ZGCCompactedSummary(
                         trace.toKBytes(2)
@@ -520,9 +532,10 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
         );
     }
 
-    private void endOfPhaseMemorySummary(GCLogTrace trace, String s) {
+    private void generationEnd(GCLogTrace trace, String s) {
         ZGCForwardReference ref = getForwardRefForPhase(trace.getZCollectionPhase());
 
+        genHeapStats = false;
         ref.setMemorySummary(
                 new ZGCMemorySummary(
                         trace.toKBytes(3),
@@ -531,42 +544,24 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
         if (trace.getGroup(9) != null) {
             ref.setGcDuration(trace.getSeconds(9));
         }
+
+        publish(ref.getGCEVent(getClock()));
     }
 
     private void memorySummary(GCLogTrace trace, String s) {
-        ZGCCollectionType type = ZGCCollectionType.get(trace.getGroup(1));
-        switch (type) {
-            case FULL:
-                ((ZGCForwardReference)forwardReference).setMemorySummary(
+        if(diary.isGenerationalZGC()){
+            long gcId = trace.getLongGroup(1);
+            gcCauseMap.remove(gcId);
+        } else {
+            ZGCForwardReference forwardReference = getForwardRefForPhase(ZGCPhase.FULL);
+            forwardReference.setMemorySummary(
                     new ZGCMemorySummary(
-                            trace.toKBytes(3),
-                            trace.toKBytes(6)));
-                break;
-            case MINOR:
-                ((ZGCMinorForwardReference)forwardReference).setMemorySummary(
-                        new ZGCMemorySummary(
-                                trace.toKBytes(3),
-                                trace.toKBytes(6)));
-                break;
-            case MAJOR:
-                ((ZGCMajorForwardReference)forwardReference).setMemorySummary(
-                        new ZGCMemorySummary(
-                                trace.toKBytes(3),
-                                trace.toKBytes(6)));
-                break;
+                            trace.toKBytes(4),
+                            trace.toKBytes(7)));
+            publish(forwardReference.getGCEVent(getClock()));
         }
-
-        // Clean up / reset temp variables
-        Arrays.fill(markStart, 0L);
-        Arrays.fill(markEnd, 0L);
-        Arrays.fill(relocateStart, 0L);
-        Arrays.fill(relocateEnd, 0L);
+        // TODO - Get rid of this?
         Arrays.fill(heapCapacity, 0L);
-        oldGenHeapStats = false;
-        youngGenHeapStats = false;
-
-        // TODO: Consider using logging cycle duration instead of timestamps
-        publish();
     }
 
 
@@ -580,132 +575,54 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
         LOGGER.log(Level.WARNING, "Missing initial record for: {0}", line);
     }
 
-    public void publish() {
-        publish(forwardReference.getGCEVent(getClock()));
-    }
-
     public void publish(JVMEvent event) {
         super.publish(ChannelName.ZGC_PARSER_OUTBOX, event);
-        forwardReference = null;
     }
 
-    private interface ZForwardReference {
-        GCEvent getGCEVent(DateTimeStamp endTime);
+    private static class ZGCMemoryPoolSummaryBuilder {
+        private final long[] markStart = new long[3];
+        private final long[] markEnd = new long[3];
+        private final long[] relocateStart = new long[3];
+        private final long[] relocateEnd = new long[3];
+
+        public void setMarkStart(int index, long value){
+            markStart[index] = value;
+        }
+
+        public void setMarkEnd(int index, long value){
+            markEnd[index] = value;
+        }
+
+        public void setRelocateStart(int index, long value){
+            relocateStart[index] = value;
+        }
+
+        public void setRelocateEnd(int index, long value){
+            relocateEnd[index] = value;
+        }
+
+        public ZGCMemoryPoolSummary buildMarkStart(){
+            return new ZGCMemoryPoolSummary(markStart[0], markStart[1], markStart[2]);
+        }
+
+        public ZGCMemoryPoolSummary buildMarkEnd(){
+            return new ZGCMemoryPoolSummary(markEnd[0], markEnd[1], markEnd[2]);
+        }
+
+        public ZGCMemoryPoolSummary buildRelocateStart(){
+            return new ZGCMemoryPoolSummary(relocateStart[0], relocateStart[1], relocateStart[2]);
+        }
+
+        public ZGCMemoryPoolSummary buildRelocateEnd(){
+            return new ZGCMemoryPoolSummary(relocateEnd[0], relocateEnd[1], relocateEnd[2]);
+        }
+
     }
 
-    private static class ZGCMinorForwardReference implements ZForwardReference {
+    private static class ZGCForwardReference {
         private final DateTimeStamp startTimeStamp;
         private final GCCause gcCause;
-        private final ZGCCollectionType type;
-        private final long gcId;
-        private ZGCMemorySummary cycleMemorySummary;
-
-        // Holds single reference to minor collection stats
-        private ZGCForwardReference youngGeneration;
-
-        public ZGCMinorForwardReference(DateTimeStamp dateTimeStamp, long gcId, GCCause cause, ZGCCollectionType type) {
-            this.startTimeStamp = dateTimeStamp;
-            this.gcCause = cause;
-            this.type = type;
-            this.gcId = gcId;
-
-            youngGeneration = new ZGCForwardReference(dateTimeStamp, gcId, cause, type, ZGCPhase.MINOR_YOUNG);
-        }
-
-        public ZGCForwardReference getYoungGeneration() {
-            return youngGeneration;
-        }
-
-        @Override
-        public GCEvent getGCEVent(DateTimeStamp endTime) {
-            GarbageCollectionTypes gcType = GarbageCollectionTypes.Unknown;
-            switch (type) {
-                case FULL:
-                    gcType = GarbageCollectionTypes.ZGCFull;
-                    break;
-                case MINOR:
-                    gcType = GarbageCollectionTypes.ZGCMinor;
-                    break;
-                case MAJOR:
-                    gcType = GarbageCollectionTypes.ZGCMajor;
-                    break;
-            }
-
-            MinorZGCCycle cycle = new MinorZGCCycle(startTimeStamp, gcType, gcCause, endTime.minus(startTimeStamp));
-            cycle.setYoungCycle(youngGeneration.getZGCCycle(endTime));
-            cycle.setMemorySummary(cycleMemorySummary);
-            cycle.setGcId(gcId);
-
-            return cycle;
-        }
-
-        public void setMemorySummary(ZGCMemorySummary cycleMemorySummary) {
-            this.cycleMemorySummary = cycleMemorySummary;
-        }
-    }
-
-    private static class ZGCMajorForwardReference implements ZForwardReference {
-        private final DateTimeStamp startTimeStamp;
-        private final GCCause gcCause;
-        private final ZGCCollectionType type;
-        private final long gcId;
-        private ZGCMemorySummary cycleMemorySummary;
-
-        // Holds two references to minor and major collection stats
-        private final ZGCForwardReference youngGeneration;
-        private final ZGCForwardReference oldGeneration;
-
-        public ZGCMajorForwardReference(DateTimeStamp dateTimeStamp, long gcId, GCCause cause, ZGCCollectionType type) {
-            this.startTimeStamp = dateTimeStamp;
-            this.gcCause = cause;
-            this.type = type;
-            this.gcId = gcId;
-
-            youngGeneration = new ZGCForwardReference(dateTimeStamp, gcId, cause, type, ZGCPhase.MAJOR_YOUNG);
-            oldGeneration = new ZGCForwardReference(dateTimeStamp, gcId, cause, type, ZGCPhase.MAJOR_OLD);
-        }
-
-        public ZGCForwardReference getYoungGeneration() {
-            return youngGeneration;
-        }
-
-        public ZGCForwardReference getOldGeneration() {
-            return oldGeneration;
-        }
-
-        public void setMemorySummary(ZGCMemorySummary cycleMemorySummary) {
-            this.cycleMemorySummary = cycleMemorySummary;
-        }
-
-        @Override
-        public GCEvent getGCEVent(DateTimeStamp endTime) {
-            GarbageCollectionTypes gcType = GarbageCollectionTypes.Unknown;
-            switch (type) {
-                case FULL:
-                    gcType = GarbageCollectionTypes.ZGCFull;
-                    break;
-                case MINOR:
-                    gcType = GarbageCollectionTypes.ZGCMinor;
-                    break;
-                case MAJOR:
-                    gcType = GarbageCollectionTypes.ZGCMajor;
-                    break;
-            }
-
-            MajorZGCCycle cycle = new MajorZGCCycle(startTimeStamp, gcType, gcCause, endTime.minus(startTimeStamp));
-            cycle.setYoungCycle(youngGeneration.getZGCCycle(endTime));
-            cycle.setOldCycle(oldGeneration.getZGCCycle(endTime));
-            cycle.setMemorySummary(cycleMemorySummary);
-            cycle.setGcId(gcId);
-
-            return cycle;
-        }
-    }
-
-    private static class ZGCForwardReference implements ZForwardReference {
-        private final DateTimeStamp startTimeStamp;
-        private final GCCause gcCause;
-        private final ZGCCollectionType type;
+        private final ZGCCycleType type;
         private final ZGCPhase phase;
         private final long gcId;
 
@@ -765,7 +682,7 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
         private ZGCPromotedSummary promotedSummary;
         private ZGCCompactedSummary compactedSummary;
         private Double gcDuration;
-        private OccupancySummary usedOccupancySummary;
+        private OccupancySummary generationUsedSummary;
         private ZGCReferenceSummary softRefSummary;
         private ZGCReferenceSummary weakRefSummary;
         private ZGCReferenceSummary finalRefSummary;
@@ -776,44 +693,38 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
         private ZGCPageSummary largePageSummary;
         private long forwardingUsage;
         private List<ZGCPageAgeSummary> ageTableSummary;
+        private final ZGCMemoryPoolSummaryBuilder memoryPoolSummaryBuilder;
 
-        public ZGCForwardReference(DateTimeStamp dateTimeStamp, long gcId, GCCause cause, ZGCCollectionType type, ZGCPhase phase) {
+        public ZGCForwardReference(DateTimeStamp dateTimeStamp, long gcId, GCCause cause, ZGCCycleType type, ZGCPhase phase) {
             this.startTimeStamp = dateTimeStamp;
             this.gcId = gcId;
             this.gcCause = cause;
             this.type = type;
             this.phase = phase;
+            this.memoryPoolSummaryBuilder = new ZGCMemoryPoolSummaryBuilder();
         }
 
-        @Override
         public GCEvent getGCEVent(DateTimeStamp endTime) {
-            GarbageCollectionTypes gcType = GarbageCollectionTypes.Unknown;
-            switch (type) {
+            ZGCCollection cycle;
+            double duration = (gcDuration != null) ? gcDuration : endTime.minus(startTimeStamp);
+
+            switch (phase) {
                 case FULL:
-                    gcType = GarbageCollectionTypes.ZGCFull;
+                    cycle = new ZGCFullCollection(startTimeStamp, GarbageCollectionTypes.ZGCFull, gcCause, duration);
                     break;
-                case MINOR:
-                    gcType = GarbageCollectionTypes.ZGCMinor;
+                case MINOR_YOUNG:
+                    cycle = new ZGCYoungCollection(startTimeStamp, GarbageCollectionTypes.ZGCMinorYoung, gcCause, duration);
                     break;
-                case MAJOR:
-                    gcType = GarbageCollectionTypes.ZGCMajor;
+                case MAJOR_YOUNG:
+                    cycle = new ZGCYoungCollection(startTimeStamp, GarbageCollectionTypes.ZGCMajorYoung, gcCause, duration);
                     break;
+                case MAJOR_OLD:
+                    cycle = new ZGCOldCollection(startTimeStamp, GarbageCollectionTypes.ZGCMajorOld, gcCause, duration);
+                    break;
+                default:
+                    throw new RuntimeException("Unknown GC phase: " + phase);
             }
 
-            // Duration recorded by GC
-            FullZGCCycle fullZGCCycle;
-            ZGCCycle delegate = getZGCCycle(endTime);
-            if (gcDuration != null){
-                fullZGCCycle = new FullZGCCycle(startTimeStamp, gcType, gcCause, gcDuration, delegate);
-            } else {
-                fullZGCCycle = new FullZGCCycle(startTimeStamp, gcType, gcCause, endTime.minus(startTimeStamp), delegate);
-            }
-
-            return fullZGCCycle;
-        }
-
-        public ZGCCycle getZGCCycle(DateTimeStamp endTime) {
-            ZGCCycle cycle = new ZGCCycle();
             cycle.setGcId(gcId);
             cycle.setType(type);
             cycle.setPhase(phase);
@@ -835,7 +746,7 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
             cycle.setConcurrentRemapRoots(concurrentRemapRootsStart, concurrentRemapRootsDuration);
             cycle.setPromotedSummary(promotedSummary);
             cycle.setCompactedSummary(compactedSummary);
-            cycle.setusedOccupancySummary(usedOccupancySummary);
+            cycle.setGenerationUsedSummary(generationUsedSummary);
             cycle.setSoftRefSummary(softRefSummary);
             cycle.setWeakRefSummary(weakRefSummary);
             cycle.setFinalRefSummary(finalRefSummary);
@@ -1067,7 +978,7 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
             this.gcDuration = gcDuration;
         }
 
-        public void setUsed(ZGCPhase phase, OccupancySummary summary) {
+        public void setGenerationUsedSummary(ZGCPhase phase, OccupancySummary summary) {
             switch (phase) {
                 case FULL:
                     // does not apply to non generational GC
@@ -1075,7 +986,7 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
                 case MAJOR_YOUNG:
                 case MAJOR_OLD:
                 case MINOR_YOUNG:
-                    this.usedOccupancySummary = summary;
+                    this.generationUsedSummary = summary;
                     break;
             }
         }

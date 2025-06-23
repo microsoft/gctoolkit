@@ -37,6 +37,8 @@ public enum SupportedFlags {
     PRINT_PROMOTION_FAILURE,                    // 26
     PRINT_FLS_STATISTICS,                       // 27
     
-    PRINT_CPU_TIMES								// 28
+    PRINT_CPU_TIMES,                            // 28
+
+    GENERATIONAL_ZGC,                           // 29
 
 }

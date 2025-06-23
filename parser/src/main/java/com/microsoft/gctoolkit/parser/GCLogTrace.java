@@ -11,14 +11,11 @@ import com.microsoft.gctoolkit.event.UnifiedCountSummary;
 import com.microsoft.gctoolkit.event.UnifiedStatisticalSummary;
 import com.microsoft.gctoolkit.event.jvm.MetaspaceRecord;
 import com.microsoft.gctoolkit.event.jvm.PermGenSummary;
-import com.microsoft.gctoolkit.event.zgc.ZGCCollectionType;
 import com.microsoft.gctoolkit.event.zgc.ZGCPhase;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
-
-import static com.microsoft.gctoolkit.event.zgc.ZGCPhase.FULL;
 
 /**
  * Class that represents a chunk of GC log that we are attempting to match to a

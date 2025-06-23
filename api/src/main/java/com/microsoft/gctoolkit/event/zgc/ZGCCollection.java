@@ -1,10 +1,13 @@
 package com.microsoft.gctoolkit.event.zgc;
 
+import com.microsoft.gctoolkit.event.GCCause;
+import com.microsoft.gctoolkit.event.GCEvent;
+import com.microsoft.gctoolkit.event.GarbageCollectionTypes;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
 
 import java.util.List;
 
-public class ZGCCycle {
+public class ZGCCollection extends GCEvent {
     private DateTimeStamp markRootsStart;
     private double markRootsDuration;
     private DateTimeStamp markFollowStart;
@@ -18,9 +21,9 @@ public class ZGCCycle {
     private ZGCMarkSummary markSummary;
     private ZGCPromotedSummary promotedSummary;
     private ZGCCompactedSummary compactedSummary;
-    private ZGCCollectionType type;
+    private ZGCCycleType type;
     private ZGCPhase phase;
-    private OccupancySummary usedOccupancySummary;
+    private OccupancySummary generationUsedSummary;
     private long gcId;
     private DateTimeStamp pauseMarkStartTimeStamp;
     private double pauseMarkStartDuration;
@@ -67,6 +70,24 @@ public class ZGCCycle {
     private ZGCPageSummary largePageSummary;
     private long forwardingUsage;
     private List<ZGCPageAgeSummary> ageTableSummary;
+
+    public ZGCCollection(DateTimeStamp timeStamp, GarbageCollectionTypes gcType, GCCause cause, double duration) {
+        super(timeStamp, gcType, cause, duration);
+    }
+
+    public ZGCCollection(DateTimeStamp timeStamp, double duration) {
+        super(timeStamp, duration);
+    }
+
+    public ZGCCollection(DateTimeStamp timeStamp, GCCause cause, double duration) {
+        super(timeStamp, cause, duration);
+    }
+
+    public ZGCCollection(DateTimeStamp timeStamp, GarbageCollectionTypes gcType, double duration) {
+        super(timeStamp, gcType, duration);
+    }
+
+
 
     public ZGCReferenceSummary getSoftRefSummary() {
         return softRefSummary;
@@ -395,20 +416,20 @@ public class ZGCCycle {
         this.compactedSummary = compactedSummary;
     }
 
-    public void setusedOccupancySummary(OccupancySummary usedOccupancySummary) {
+    public void setGenerationUsedSummary(OccupancySummary usedOccupancySummary) {
 
-        this.usedOccupancySummary = usedOccupancySummary;
+        this.generationUsedSummary = usedOccupancySummary;
     }
 
-    public OccupancySummary getUsedOccupancySummary() {
-        return usedOccupancySummary;
+    public OccupancySummary getGenerationUsedSummary() {
+        return generationUsedSummary;
     }
 
-    public ZGCCollectionType getType() {
+    public ZGCCycleType getType() {
         return type;
     }
 
-    public void setType(ZGCCollectionType type) {
+    public void setType(ZGCCycleType type) {
         this.type = type;
     }
 
