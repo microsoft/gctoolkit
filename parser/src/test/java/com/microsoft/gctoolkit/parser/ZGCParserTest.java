@@ -377,7 +377,7 @@ public class ZGCParserTest extends ParserTest {
         assertTrue(jvmEvents.get(0) instanceof ZGCYoungCollection); 
         ZGCYoungCollection evt0 = (ZGCYoungCollection) jvmEvents.get(0);
         assertEquals(new DateTimeStamp(0.990), evt0.getDateTimeStamp());
-        //assertEquals(GCCause.METADATA_GENERATION_THRESHOLD, evt0.getGCCause());
+        assertEquals(GCCause.METADATA_GENERATION_THRESHOLD, evt0.getGCCause());
         assertEquals(ZGCPhase.MAJOR_YOUNG, evt0.getPhase());
         assertZGCMemorySummary(evt0.getMemorySummary(), 86*M, 54*M);
         assertDoubleEquals(evt0.getDuration(), 0.022);
@@ -386,7 +386,7 @@ public class ZGCParserTest extends ParserTest {
         assertTrue(jvmEvents.get(1) instanceof ZGCOldCollection); 
         ZGCOldCollection evt1 = (ZGCOldCollection) jvmEvents.get(1);
         assertEquals(new DateTimeStamp(1.012), evt1.getDateTimeStamp());
-        //assertEquals(GCCause.WARMUP, evt1.getGCCause());
+        assertEquals(GCCause.METADATA_GENERATION_THRESHOLD, evt1.getGCCause());
         assertEquals(ZGCPhase.MAJOR_OLD, evt1.getPhase());
         assertZGCMemorySummary(evt1.getMemorySummary(), 54*M, 56*M);        
         assertDoubleEquals(evt1.getDuration(), 0.050);

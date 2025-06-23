@@ -207,21 +207,20 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
         		setForwardRefForPhase(
         				ZGCPhase.MINOR_YOUNG, 
         				new ZGCForwardReference(getClock(), trace.getLongGroup(1), trace.gcCause(3,0), type, ZGCPhase.MINOR_YOUNG));        		
-        	}        		
+        	} 
+        		
         } 
         
-        else if(type == ZGCCycleType.FULL){
+        if(type == ZGCCycleType.FULL){
             setForwardRefForPhase(
                     ZGCPhase.FULL,
                     new ZGCForwardReference(getClock(), trace.getLongGroup(1), trace.gcCause(3,0), type, ZGCPhase.FULL)
             );
-        } 
-        
-        else {
+        } else {
             // The cycle start message gives us the gc cause, which we need to create the GCEvent in generationStart
             // When we get a cycle start, store the gc cause for later use
             gcCauseMap.put(trace.getLongGroup(1), trace.gcCause(1, 2));
-        }
+        }         
     }
 
     private void generationStart(GCLogTrace trace, String line){
