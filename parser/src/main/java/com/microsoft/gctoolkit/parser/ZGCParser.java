@@ -571,13 +571,16 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
             
             if (gcCauseMap.containsKey(gcId)) {
             	gcCauseMap.remove(gcId);
-            } else {
-            	// No-details logging does not populate the gcCauseMap above, and we need to publish the event when encountered.
-        		ZGCCycleType type = ZGCCycleType.get(trace.getGroup(2));
-            	ZGCForwardReference forwardReference = ZGCCycleType.MAJOR.equals(type) ? 
+            } 
+            
+            // We use the lack of a MemorySummary in the forwardReference as a sign that this is the case and
+            // that we need to publish a Generational no-details event.
+       		ZGCCycleType type = ZGCCycleType.get(trace.getGroup(2));
+           	ZGCForwardReference forwardReference = ZGCCycleType.MAJOR.equals(type) ? 
             			getForwardRefForPhase(ZGCPhase.MAJOR_YOUNG) :
             			getForwardRefForPhase(ZGCPhase.MINOR_YOUNG);
-            	
+           	
+           	if (forwardReference != null && !forwardReference.hasMemorySummary()) {
                 forwardReference.setMemorySummary(
                         new ZGCMemorySummary(
                                 trace.toKBytes(4),
@@ -926,6 +929,10 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
             this.memorySummary = summary;
         }
 
+        public boolean hasMemorySummary() {
+        	return this.memorySummary != null;
+        }
+        
         public void setMetaspaceSummary(ZGCMetaspaceSummary summary) {
             this.metaspaceSummary = summary;
         }
