@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.parser;
 
+import com.microsoft.gctoolkit.event.GCCause;
 import com.microsoft.gctoolkit.event.jvm.JVMEvent;
 import com.microsoft.gctoolkit.event.zgc.ZGCAllocatedSummary;
 import com.microsoft.gctoolkit.event.zgc.ZGCFullCollection;
@@ -10,9 +11,13 @@ import com.microsoft.gctoolkit.event.zgc.ZGCLiveSummary;
 import com.microsoft.gctoolkit.event.zgc.ZGCMemoryPoolSummary;
 import com.microsoft.gctoolkit.event.zgc.ZGCMemorySummary;
 import com.microsoft.gctoolkit.event.zgc.ZGCMetaspaceSummary;
+import com.microsoft.gctoolkit.event.zgc.ZGCPhase;
 import com.microsoft.gctoolkit.event.zgc.ZGCReclaimSummary;
+import com.microsoft.gctoolkit.event.zgc.ZGCYoungCollection;
 import com.microsoft.gctoolkit.jvm.Diarizer;
 import com.microsoft.gctoolkit.parser.jvm.UnifiedDiarizer;
+import com.microsoft.gctoolkit.time.DateTimeStamp;
+
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -20,6 +25,8 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ZGCParserTest extends ParserTest {
+
+    final long M = 1024;
 
     @Override
     protected Diarizer diarizer() {
@@ -80,18 +87,18 @@ public class ZGCParserTest extends ParserTest {
             assertEquals(zgc.getGcId(), 2L);
 
             assertEquals(0.0710d, zgc.getDuration(),0.001d);
-            assertEquals(toInt(32.121d, 1000), toInt(zgc.getDateTimeStamp().getTimeStamp(), 1000));
+            assertEquals(toInt(32.121d, 1000), toInt(zgc.getDateTimeStamp().toSeconds(), 1000));
             assertEquals("Metadata GC Threshold", zgc.getGCCause().getLabel());
             // Durations
-            assertEquals(32.121d, zgc.getPauseMarkStartTimeStamp().getTimeStamp(),  0.001d);
-            assertEquals(32.122d, zgc.getConcurrentMarkTimeStamp().getTimeStamp(), 0.001d);
-            assertEquals(32.166d, zgc.getConcurrentMarkFreeTimeStamp().getTimeStamp(), 0.001d);
-            assertEquals(32.166d, zgc.getPauseMarkEndTimeStamp().getTimeStamp(), 0.001d);
-            assertEquals(32.167d, zgc.getConcurrentProcessNonStrongReferencesTimeStamp().getTimeStamp(), 0.002d);
-            assertEquals(32.172d, zgc.getConcurrentResetRelocationSetTimeStamp().getTimeStamp(), 0.001d);
-            assertEquals(32.172d, zgc.getConcurrentSelectRelocationSetTimeStamp().getTimeStamp(), 0.001d);
-            assertEquals(32.179d, zgc.getPauseRelocateStartTimeStamp().getTimeStamp(), 0.001d);
-            assertEquals(32.179d, zgc.getConcurrentRelocateTimeStamp().getTimeStamp(), 0.001d);
+            assertEquals(32.121d, zgc.getPauseMarkStartTimeStamp().toSeconds(),  0.001d);
+            assertEquals(32.122d, zgc.getConcurrentMarkTimeStamp().toSeconds(), 0.001d);
+            assertEquals(32.166d, zgc.getConcurrentMarkFreeTimeStamp().toSeconds(), 0.001d);
+            assertEquals(32.166d, zgc.getPauseMarkEndTimeStamp().toSeconds(), 0.001d);
+            assertEquals(32.167d, zgc.getConcurrentProcessNonStrongReferencesTimeStamp().toSeconds(), 0.002d);
+            assertEquals(32.172d, zgc.getConcurrentResetRelocationSetTimeStamp().toSeconds(), 0.001d);
+            assertEquals(32.172d, zgc.getConcurrentSelectRelocationSetTimeStamp().toSeconds(), 0.001d);
+            assertEquals(32.179d, zgc.getPauseRelocateStartTimeStamp().toSeconds(), 0.001d);
+            assertEquals(32.179d, zgc.getConcurrentRelocateTimeStamp().toSeconds(), 0.001d);
 
             assertEquals(toInt(0.023d, 1000), toInt(zgc.getPauseMarkStartDuration(), 1000));
             assertEquals(toInt(44.623d, 1000), toInt(zgc.getConcurrentMarkDuration(), 1000));
@@ -133,7 +140,79 @@ public class ZGCParserTest extends ParserTest {
             fail(t);
         }
     }
+    
+    @Test
+	void testLegacyZGCNoDetailsLines() {
+		String[] lines = {
+				// 0 - FullZGCCycle
+				"[1.295s][info][gc] GC(0) Garbage Collection (Metadata GC Threshold) 90M(1%)->58M(1%)",
 
+				// 1 - FullZGCCycle
+				"[23.507s][info][gc] GC(3) Garbage Collection (Warmup) 826M(10%)->168M(2%)"
+		};
+
+        int expectedEventCount = 2;
+
+        List<JVMEvent> jvmEvents = feedParser(lines);
+        assertEquals(expectedEventCount, jvmEvents.size());
+
+        // 0 - ZGCFullCollection
+        assertTrue(jvmEvents.get(0) instanceof ZGCFullCollection); 
+        ZGCFullCollection evt0 = (ZGCFullCollection) jvmEvents.get(0);
+        assertEquals(evt0.getDateTimeStamp(), new DateTimeStamp(1.295));
+        assertEquals(evt0.getGCCause(), GCCause.METADATA_GENERATION_THRESHOLD);
+        assertZGCMemorySummary(evt0.getMemorySummary(), 90*M, 58*M);
+
+        // 1 - ZGCFullCollection
+        assertTrue(jvmEvents.get(1) instanceof ZGCFullCollection); 
+        ZGCFullCollection evt1 = (ZGCFullCollection) jvmEvents.get(1);
+        assertEquals(new DateTimeStamp(23.507), evt1.getDateTimeStamp());
+        assertEquals(GCCause.WARMUP, evt1.getGCCause());
+        assertZGCMemorySummary(evt1.getMemorySummary(), 826*M, 168*M);        
+	}
+
+	@Test
+	void testGenerationalZGCNoDetailsLines() {
+		String[] lines = {
+				// 0 - ZGCYoungCollection(Major)
+				"[4.252s][info][gc] GC(2) Major Collection (Metadata GC Threshold)",
+				"[4.366s][info][gc] GC(2) Major Collection (Metadata GC Threshold) 384M(5%)->186M(2%) 0.114s",
+
+				// 1 - ZGCYoungCollection(Major)
+				"[36.326s][info][gc] GC(3) Major Collection (Warmup)",
+				"[36.423s][info][gc] GC(3) Major Collection (Warmup) 730M(9%)->258M(3%) 0.097s"
+		};
+
+        int expectedEventCount = 2;
+
+        List<JVMEvent> jvmEvents = feedParser(lines);
+        assertEquals(jvmEvents.size(), expectedEventCount);
+
+        // 0 - ZGCYoungCollection
+        assertTrue(jvmEvents.get(0) instanceof ZGCYoungCollection); 
+        ZGCYoungCollection evt0 = (ZGCYoungCollection) jvmEvents.get(0);
+        assertEquals(new DateTimeStamp(4.252), evt0.getDateTimeStamp());
+        assertEquals(GCCause.METADATA_GENERATION_THRESHOLD, evt0.getGCCause());
+        assertEquals(ZGCPhase.MAJOR_YOUNG, evt0.getPhase());
+        assertZGCMemorySummary(evt0.getMemorySummary(), 384*M, 186*M);
+        assertDoubleEquals(evt0.getDuration(), 0.114);
+
+        // 1 - ZGCYoungCollection(Major)
+        assertTrue(jvmEvents.get(1) instanceof ZGCYoungCollection); 
+        ZGCYoungCollection evt1 = (ZGCYoungCollection) jvmEvents.get(1);
+        assertEquals(new DateTimeStamp(36.326), evt1.getDateTimeStamp());
+        assertEquals(GCCause.WARMUP, evt1.getGCCause());
+        assertEquals(ZGCPhase.MAJOR_YOUNG, evt0.getPhase());
+        assertZGCMemorySummary(evt1.getMemorySummary(), 730*M, 258*M);        
+        assertDoubleEquals(evt1.getDuration(), 0.097);
+	}
+
+	private void assertZGCMemorySummary(ZGCMemorySummary summary, long before, long after) {
+		assertNotNull(summary);
+		assertEquals(summary.getOccupancyBefore(), before);
+		assertEquals(summary.getOccupancyAfter(), after);		
+	}
+    
     private boolean checkZGCMemoryPoolSummary(ZGCMemoryPoolSummary summary, long capacity, long free, long used) {
         return summary.getCapacity() == capacity && summary.getFree() == free && summary.getUsed() == used;
     }

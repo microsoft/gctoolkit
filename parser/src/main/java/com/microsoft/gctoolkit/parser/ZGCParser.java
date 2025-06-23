@@ -194,12 +194,29 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
 
     private void cycleStart(GCLogTrace trace, String s) {
         ZGCCycleType type = ZGCCycleType.get(trace.getGroup(2));
-        if(type == ZGCCycleType.FULL){
+        
+        if (diary.isGenerationalZGC()) {
+        	// cycleStart ends up being called for ZGC logging with no details, but did not handle this situation.  
+        	// It is not clear if there is any differentiation between Young/Old Phases in no-details logging, so I've made
+        	// an assumption here that we're strictly dealing with Young collections until we have sample logging otherwise.
+        	if (ZGCCycleType.MAJOR.equals(type)) {
+        		setForwardRefForPhase(
+        				ZGCPhase.MAJOR_YOUNG, 
+        				new ZGCForwardReference(getClock(), trace.getLongGroup(1), trace.gcCause(3,0), type, ZGCPhase.MAJOR_YOUNG));
+        	} else if (ZGCCycleType.MINOR.equals(type)) {
+        		setForwardRefForPhase(
+        				ZGCPhase.MINOR_YOUNG, 
+        				new ZGCForwardReference(getClock(), trace.getLongGroup(1), trace.gcCause(3,0), type, ZGCPhase.MINOR_YOUNG));        		
+        	}        		
+        } 
+        
+        else if(type == ZGCCycleType.FULL){
             setForwardRefForPhase(
                     ZGCPhase.FULL,
                     new ZGCForwardReference(getClock(), trace.getLongGroup(1), trace.gcCause(3,0), type, ZGCPhase.FULL)
             );
-        }
+        } 
+        
         else {
             // The cycle start message gives us the gc cause, which we need to create the GCEvent in generationStart
             // When we get a cycle start, store the gc cause for later use
@@ -549,11 +566,36 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
     }
 
     private void memorySummary(GCLogTrace trace, String s) {
-        if(diary.isGenerationalZGC()){
+        if (diary.isGenerationalZGC()) {
             long gcId = trace.getLongGroup(1);
-            gcCauseMap.remove(gcId);
+            
+            if (gcCauseMap.containsKey(gcId)) {
+            	gcCauseMap.remove(gcId);
+            } else {
+            	// No-details logging does not populate the gcCauseMap above, and we need to publish the event when encountered.
+        		ZGCCycleType type = ZGCCycleType.get(trace.getGroup(2));
+            	ZGCForwardReference forwardReference = ZGCCycleType.MAJOR.equals(type) ? 
+            			getForwardRefForPhase(ZGCPhase.MAJOR_YOUNG) :
+            			getForwardRefForPhase(ZGCPhase.MINOR_YOUNG);
+            	
+                forwardReference.setMemorySummary(
+                        new ZGCMemorySummary(
+                                trace.toKBytes(4),
+                                trace.toKBytes(7)));
+                publish(forwardReference.getGCEVent(getClock()));
+            }
         } else {
             ZGCForwardReference forwardReference = getForwardRefForPhase(ZGCPhase.FULL);
+            
+        	// For Legacy ZGC (Java 17, non-generational) with no details (gc instead of gc*), only a single line
+        	// is logged per event. As such, getForwardRefForPhase will return NULL. 
+        	if (forwardReference == null) {
+        		// Forward reference has not yet been created, so we'll create it now
+        		ZGCCycleType type = ZGCCycleType.get(trace.getGroup(2));
+        		forwardReference = new ZGCForwardReference(
+        				getClock(), trace.getLongGroup(1), trace.gcCause(3,0), type, ZGCPhase.FULL);
+        	}
+        	
             forwardReference.setMemorySummary(
                     new ZGCMemorySummary(
                             trace.toKBytes(4),
