@@ -12,7 +12,7 @@ variables:
   JAVA_HOME_11_X64: /usr/lib/jvm/msopenjdk-11
 
 pool:
-  name: JEG-mariner2.0-x64-release
+  name: JEG-azurelinux-x64-release
 
 steps:
   - task: JavaToolInstaller@0
