@@ -27,7 +27,6 @@ public class DataSourceVerticle extends AbstractVerticle {
     private String id;
     // Listener for processing data source messages.
     final private DataSourceChannelListener processor;
-    private volatile boolean alreadyUndeployed = false;
 
     /**
      * Constructor for DataSourceVerticle.
