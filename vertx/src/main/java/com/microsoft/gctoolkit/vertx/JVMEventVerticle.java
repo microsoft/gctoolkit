@@ -27,7 +27,6 @@ public class JVMEventVerticle extends AbstractVerticle {
     final private JVMEventChannelListener processor;
     // ID of the verticle.
     private String id;
-    private volatile boolean alreadyUndeployed = false;
 
     /**
      * Constructor for JVMEventVerticle.
