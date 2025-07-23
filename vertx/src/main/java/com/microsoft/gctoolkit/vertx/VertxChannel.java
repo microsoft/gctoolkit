@@ -47,12 +47,13 @@ public class VertxChannel {
      * Closes the Vert.x instance.
      */
     public void close() {
-        vertx().close(result -> {
-            if (result.succeeded()) {
-                LOGGER.log(Level.FINE, "Vertx: closed");
-            } else {
-                LOGGER.log(Level.FINE, "Vertx: close failed", result.cause());
-            }
-        });
+        vertx().close()
+            .onComplete(ar -> {
+                if (ar.succeeded()) {
+                    LOGGER.log(Level.FINE, "Vertx: closed");
+                } else {
+                    LOGGER.log(Level.FINE, "Vertx: close failed", ar.cause());
+                }
+            });
     }
 }

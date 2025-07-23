@@ -27,6 +27,7 @@ public class DataSourceVerticle extends AbstractVerticle {
     private String id;
     // Listener for processing data source messages.
     final private DataSourceChannelListener processor;
+    private volatile boolean alreadyUndeployed = false;
 
     /**
      * Constructor for DataSourceVerticle.
@@ -57,10 +58,9 @@ public class DataSourceVerticle extends AbstractVerticle {
         try {
             vertx.eventBus().<String>consumer(inbox, message -> {
                 processor.receive(message.body());
-                if (GCLogFile.END_OF_DATA_SENTINEL.equals(message.body())) {
-                    vertx.undeploy(id);
-                }
-            }).completionHandler(result -> {promise.complete();});
+                // Removed vertx.undeploy(id) to avoid double-undeploy
+            }).completion()
+              .onComplete(ar -> promise.complete());
         } catch(Throwable t) {
             LOGGER.log(Level.WARNING,"Vertx: processing DataSource failed",t);
         }
