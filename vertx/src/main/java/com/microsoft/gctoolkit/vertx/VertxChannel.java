@@ -52,7 +52,7 @@ public class VertxChannel {
                 if (ar.succeeded()) {
                     LOGGER.log(Level.FINE, "Vertx: closed");
                 } else {
-                    LOGGER.log(Level.FINE, "Vertx: close failed", ar.cause());
+                    LOGGER.log(Level.INFO, "Vertx: close failed", ar.cause());
                 }
             });
     }
