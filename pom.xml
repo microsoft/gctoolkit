@@ -385,10 +385,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-changes-plugin</artifactId>
-                <!-- TODO This configuration is only for when we produce GitHub published reports -->
                 <configuration>
-                    <githubAPIScheme>https</githubAPIScheme>
-                    <githubAPIPort>443</githubAPIPort>
                     <includeOpenIssues>false</includeOpenIssues>
                     <onlyCurrentVersion>false</onlyCurrentVersion>
                 </configuration>
@@ -396,8 +393,6 @@
                     <reportSet>
                         <reports>
                             <report>changes</report>
-                            <!-- TODO -->
-                            <!-- <report>github-report</report> -->
                         </reports>
                     </reportSet>
                 </reportSets>
