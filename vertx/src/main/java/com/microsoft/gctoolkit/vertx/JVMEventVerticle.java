@@ -59,13 +59,11 @@ public class JVMEventVerticle extends AbstractVerticle {
             try {
                 processor.receive(event);
             } catch (Throwable t) {
-                // Throwable is caught because we don't want the processor to blow up the message bus.
                 LOGGER.log(Level.WARNING, "Vertx: processing JVMEvent failed", t);
             }
-            if (event instanceof JVMTermination) {
-                vertx.undeploy(id);
-            }
-        }).completionHandler(result -> {promise.complete();});
+            // Removed vertx.undeploy(id) to avoid double-undeploy
+        }).completion()
+          .onComplete(ar -> promise.complete());
     }
 
     @Override
