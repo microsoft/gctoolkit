@@ -29,10 +29,11 @@ public class VertxDataSourceChannel extends VertxChannel implements DataSourceCh
     public void registerListener(DataSourceParser listener) {
         final DataSourceVerticle processor = new DataSourceVerticle(vertx(), listener.channel().getName(), listener);
         CountDownLatch latch = new CountDownLatch(1);
-        vertx().deployVerticle(processor, state -> {
-            processor.setID((state.succeeded()) ? state.result() : "");
-            latch.countDown();
-        });
+        vertx().deployVerticle(processor)
+            .onComplete(ar -> {
+                processor.setID(ar.succeeded() ? ar.result() : "");
+                latch.countDown();
+            });
         try {
             latch.await();
         } catch (InterruptedException e) {
