@@ -572,20 +572,9 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
             	gcCauseMap.remove(gcId);
             } 
             
-            // We use the lack of a MemorySummary in the forwardReference as a sign that this is the case and
-            // that we need to publish a Generational no-details event.
-       		ZGCCycleType type = ZGCCycleType.get(trace.getGroup(2));
-           	ZGCForwardReference forwardReference = ZGCCycleType.MAJOR.equals(type) ? 
-            			getForwardRefForPhase(ZGCPhase.MAJOR_YOUNG) :
-            			getForwardRefForPhase(ZGCPhase.MINOR_YOUNG);
-           	
-           	if (forwardReference != null && !forwardReference.hasMemorySummary()) {
-                forwardReference.setMemorySummary(
-                        new ZGCMemorySummary(
-                                trace.toKBytes(4),
-                                trace.toKBytes(7)));
-                publish(forwardReference.getGCEVent(getClock()));
-            }
+            // Publish a non-detailed generational event if present.
+            publishIfMemorySummaryMissing(trace);
+            
         } else {
             ZGCForwardReference forwardReference = getForwardRefForPhase(ZGCPhase.FULL);
             
@@ -607,8 +596,27 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
         // TODO - Get rid of this?
         Arrays.fill(heapCapacity, 0L);
     }
-
-
+    
+    private void publishIfMemorySummaryMissing(GCLogTrace trace) {
+    	if (trace == null)
+    		return;
+    	
+        // We use the lack of a MemorySummary in the forwardReference as a sign
+    	// that we need to publish a Generational no-details event.
+   		ZGCCycleType cycleType = ZGCCycleType.get(trace.getGroup(2));
+    	ZGCForwardReference forwardReference = ZGCCycleType.MAJOR.equals(cycleType) ? 
+    			getForwardRefForPhase(ZGCPhase.MAJOR_YOUNG) :
+    			getForwardRefForPhase(ZGCPhase.MINOR_YOUNG);
+    	
+    	if (forwardReference != null && !forwardReference.hasMemorySummary()) {
+            forwardReference.setMemorySummary(
+                    new ZGCMemorySummary(
+                            trace.toKBytes(4),
+                            trace.toKBytes(7)));
+            publish(forwardReference.getGCEVent(getClock()));    		
+    	}
+    }
+    
     private void log(String line) {
         GCToolKit.LOG_DEBUG_MESSAGE(() -> "ZGCHeapParser missed: " + line);
 
