@@ -10,6 +10,9 @@ module com.microsoft.gctoolkit.parser {
 
     exports com.microsoft.gctoolkit.parser to
             com.microsoft.gctoolkit.api;
+    
+    exports com.microsoft.gctoolkit.parser to
+            com.microsoft.gctoolkit.integration.shared;
 
     exports com.microsoft.gctoolkit.parser.io to
             com.microsoft.gctoolkit.api;
