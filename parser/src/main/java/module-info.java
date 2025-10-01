@@ -9,7 +9,8 @@ module com.microsoft.gctoolkit.parser {
     requires java.logging;
 
     exports com.microsoft.gctoolkit.parser to
-            com.microsoft.gctoolkit.api;
+            com.microsoft.gctoolkit.api,
+            com.microsoft.gctoolkit.integration;
 
     exports com.microsoft.gctoolkit.parser.io to
             com.microsoft.gctoolkit.api;
