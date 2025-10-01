@@ -6,6 +6,6 @@ public abstract class SharedAggregation extends Aggregation {
 
     public double getRuntimeDuration() { return super.estimatedRuntime(); }
     // added for testing
-    public twoRuntimeReport: com.microsoft.gctoolkit.integration.shared.TwoRuntimeReport
+    public TwoRuntimeReport report;
 
 }
