@@ -6,10 +6,16 @@ package com.microsoft.gctoolkit.parser.vmops;
 import com.microsoft.gctoolkit.event.jvm.Safepoint;
 import com.microsoft.gctoolkit.parser.AbstractLogTrace;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
+// added for testing
+import com.microsoft.gctoolkit.parser.unified.GenZPatterns;
+import com.microsoft.gctoolkit.parser.unified.ZGCPatterns;
 
 import java.util.regex.Matcher;
 
 public class SafepointTrace extends AbstractLogTrace {
+    // added for testing
+    public GenZPatterns testonly1;
+    public ZGCPatterns testonly2;
 
     public SafepointTrace(Matcher matcher) {
         super(matcher);
