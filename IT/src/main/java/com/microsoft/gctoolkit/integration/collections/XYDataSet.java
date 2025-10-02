@@ -5,11 +5,11 @@ import java.util.List;
 import java.util.OptionalDouble;
 import java.util.stream.Stream;
 // added for testing
-import com.microsoft.gctoolkit.parser.UnifiedG1GCParser;
+//import com.microsoft.gctoolkit.parser.UnifiedG1GCParser;
 
 public class XYDataSet {
     // added for testing
-    public UnifiedG1GCParser testonly;
+    //public UnifiedG1GCParser testonly;
 
     private final List<com.microsoft.gctoolkit.integration.collections.XYDataSet.Point> dataSeries;
 
