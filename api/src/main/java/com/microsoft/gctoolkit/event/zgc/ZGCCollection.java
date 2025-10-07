@@ -23,7 +23,7 @@ public class ZGCCollection extends GCEvent {
     private ZGCCompactedSummary compactedSummary;
     private ZGCCycleType type;
     private ZGCPhase phase;
-    private OccupancySummary generationUsedSummary;
+    private ZGCUsedSummary usedSummary;
     private long gcId;
     private DateTimeStamp pauseMarkStartTimeStamp;
     private double pauseMarkStartDuration;
@@ -59,7 +59,7 @@ public class ZGCCollection extends GCEvent {
     private ZGCLiveSummary liveSummary;
     private ZGCAllocatedSummary allocatedSummary;
     private ZGCGarbageSummary garbageSummary;
-    private ZGCReclaimSummary reclaimSummary;
+    private ZGCReclaimedSummary reclaimedSummary;
     private ZGCMemorySummary memorySummary;
     private ZGCMetaspaceSummary metaspaceSummary;
     private ZGCHeapCapacitySummary heapCapacitySummary;
@@ -304,12 +304,12 @@ public class ZGCCollection extends GCEvent {
         this.garbageSummary = summary;
     }
 
-    public ZGCReclaimSummary getReclaimSummary() {
-        return reclaimSummary;
+    public ZGCReclaimedSummary getReclaimedSummary() {
+        return reclaimedSummary;
     }
 
-    public void setReclaimSummary(ZGCReclaimSummary summary) {
-        this.reclaimSummary = summary;
+    public void setReclaimedSummary(ZGCReclaimedSummary summary) {
+        this.reclaimedSummary = summary;
     }
 
     public ZGCMemorySummary getMemorySummary() {
@@ -416,13 +416,13 @@ public class ZGCCollection extends GCEvent {
         this.compactedSummary = compactedSummary;
     }
 
-    public void setGenerationUsedSummary(OccupancySummary usedOccupancySummary) {
+    public void setUsedSummary(ZGCUsedSummary usedZGCUsedSummary) {
 
-        this.generationUsedSummary = usedOccupancySummary;
+        this.usedSummary = usedZGCUsedSummary;
     }
 
-    public OccupancySummary getGenerationUsedSummary() {
-        return generationUsedSummary;
+    public ZGCUsedSummary getUsedSummary() {
+        return usedSummary;
     }
 
     public ZGCCycleType getType() {
