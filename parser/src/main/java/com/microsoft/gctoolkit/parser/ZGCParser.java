@@ -14,7 +14,7 @@ import com.microsoft.gctoolkit.event.zgc.ZGCAllocatedSummary;
 import com.microsoft.gctoolkit.event.zgc.ZGCGarbageSummary;
 import com.microsoft.gctoolkit.event.zgc.ZGCHeapCapacitySummary;
 import com.microsoft.gctoolkit.event.zgc.ZGCLiveSummary;
-import com.microsoft.gctoolkit.event.zgc.OccupancySummary;
+import com.microsoft.gctoolkit.event.zgc.ZGCUsedSummary;
 import com.microsoft.gctoolkit.event.zgc.ZGCCompactedSummary;
 import com.microsoft.gctoolkit.event.zgc.ZGCFullCollection;
 import com.microsoft.gctoolkit.event.zgc.ZGCYoungCollection;
@@ -23,7 +23,7 @@ import com.microsoft.gctoolkit.event.zgc.ZGCNMethodSummary;
 import com.microsoft.gctoolkit.event.zgc.ZGCPageSummary;
 import com.microsoft.gctoolkit.event.zgc.ZGCPhase;
 import com.microsoft.gctoolkit.event.zgc.ZGCPromotedSummary;
-import com.microsoft.gctoolkit.event.zgc.ZGCReclaimSummary;
+import com.microsoft.gctoolkit.event.zgc.ZGCReclaimedSummary;
 import com.microsoft.gctoolkit.event.zgc.ZGCCycleType;
 import com.microsoft.gctoolkit.event.zgc.ZGCCollection;
 import com.microsoft.gctoolkit.event.zgc.ZGCMarkSummary;
@@ -463,12 +463,12 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
 
         if (genHeapStats) {
             if ("Used".equals(trace.getGroup(2))){
-                OccupancySummary summary = new OccupancySummary(
+                ZGCUsedSummary summary = new ZGCUsedSummary(
                         trace.toKBytes(3),
                         trace.toKBytes(6),
                         trace.toKBytes(9),
                         trace.toKBytes(12));
-                ref.setGenerationUsedSummary(phase, summary);
+                ref.setUsedSummary(phase, summary);
             } else {
                 trace.notYetImplemented();
             }
@@ -520,8 +520,8 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
         ZGCForwardReference ref = getForwardRefForPhase(trace.getZCollectionPhase());
 
         if ("Reclaimed".equals(trace.getGroup(2))) {
-            ref.setReclaimSummary(
-                    new ZGCReclaimSummary(
+            ref.setReclaimedSummary(
+                    new ZGCReclaimedSummary(
                             trace.toKBytes(3),
                             trace.toKBytes(6)
                     )
@@ -711,7 +711,7 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
         private ZGCLiveSummary liveSummary;
         private ZGCAllocatedSummary allocatedSummary;
         private ZGCGarbageSummary garbageSummary;
-        private ZGCReclaimSummary reclaimSummary;
+        private ZGCReclaimedSummary reclaimedSummary;
         private ZGCMemorySummary memorySummary;
         private ZGCMetaspaceSummary metaspaceSummary;
         private ZGCMarkSummary markSummary;
@@ -734,7 +734,7 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
         private ZGCPromotedSummary promotedSummary;
         private ZGCCompactedSummary compactedSummary;
         private Double gcDuration;
-        private OccupancySummary generationUsedSummary;
+        private ZGCUsedSummary usedSummary;
         private ZGCReferenceSummary softRefSummary;
         private ZGCReferenceSummary weakRefSummary;
         private ZGCReferenceSummary finalRefSummary;
@@ -798,7 +798,7 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
             cycle.setConcurrentRemapRoots(concurrentRemapRootsStart, concurrentRemapRootsDuration);
             cycle.setPromotedSummary(promotedSummary);
             cycle.setCompactedSummary(compactedSummary);
-            cycle.setGenerationUsedSummary(generationUsedSummary);
+            cycle.setUsedSummary(usedSummary);
             cycle.setSoftRefSummary(softRefSummary);
             cycle.setWeakRefSummary(weakRefSummary);
             cycle.setFinalRefSummary(finalRefSummary);
@@ -813,7 +813,7 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
             cycle.setLiveSummary(liveSummary);
             cycle.setAllocatedSummary(allocatedSummary);
             cycle.setGarbageSummary(garbageSummary);
-            cycle.setReclaimSummary(reclaimSummary);
+            cycle.setReclaimedSummary(reclaimedSummary);
             cycle.setMemorySummary(memorySummary);
             cycle.setMetaspaceSummary(metaspaceSummary);
             cycle.setLoadAverages(load);
@@ -928,8 +928,8 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
             this.garbageSummary = summary;
         }
 
-        public void setReclaimSummary(ZGCReclaimSummary summary) {
-            reclaimSummary = summary;
+        public void setReclaimedSummary(ZGCReclaimedSummary summary) {
+            reclaimedSummary = summary;
         }
 
         public void setMemorySummary(ZGCMemorySummary summary) {
@@ -1034,7 +1034,7 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
             this.gcDuration = gcDuration;
         }
 
-        public void setGenerationUsedSummary(ZGCPhase phase, OccupancySummary summary) {
+        public void setUsedSummary(ZGCPhase phase, ZGCUsedSummary summary) {
             switch (phase) {
                 case FULL:
                     // does not apply to non generational GC
@@ -1042,7 +1042,7 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
                 case MAJOR_YOUNG:
                 case MAJOR_OLD:
                 case MINOR_YOUNG:
-                    this.generationUsedSummary = summary;
+                    this.usedSummary = summary;
                     break;
             }
         }

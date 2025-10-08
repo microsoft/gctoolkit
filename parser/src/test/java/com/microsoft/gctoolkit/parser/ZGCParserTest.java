@@ -13,7 +13,7 @@ import com.microsoft.gctoolkit.event.zgc.ZGCMemorySummary;
 import com.microsoft.gctoolkit.event.zgc.ZGCMetaspaceSummary;
 import com.microsoft.gctoolkit.event.zgc.ZGCOldCollection;
 import com.microsoft.gctoolkit.event.zgc.ZGCPhase;
-import com.microsoft.gctoolkit.event.zgc.ZGCReclaimSummary;
+import com.microsoft.gctoolkit.event.zgc.ZGCReclaimedSummary;
 import com.microsoft.gctoolkit.event.zgc.ZGCYoungCollection;
 import com.microsoft.gctoolkit.jvm.Diarizer;
 import com.microsoft.gctoolkit.parser.jvm.UnifiedDiarizer;
@@ -123,7 +123,7 @@ public class ZGCParserTest extends ParserTest {
             assertTrue(checkAllocatedSummary(zgc.getAllocatedSummary(), 18432, 20480, 18432));
             assertTrue(checkGarbageSummary(zgc.getGarbageSummary(), 497664, 456704, 35840));
 
-            assertTrue(checkReclaimSummary(zgc.getReclaimSummary(), 40960, 460800));
+            assertTrue(checkReclaimSummary(zgc.getReclaimedSummary(), 40960, 460800));
             assertTrue(checkMemorySummary(zgc.getMemorySummary(), 571392, 129024));
 
             assertEquals(7.28, zgc.getLoadAverageAt(1));
@@ -419,8 +419,8 @@ public class ZGCParserTest extends ParserTest {
         return summary.getMarkEnd() == markEnd && summary.getRelocateStart() == relocateStart && summary.getRelocateEnd() == relocateEnd;
     }
 
-    private boolean checkReclaimSummary(ZGCReclaimSummary summary, long relocateStart, long relocateEnd) {
-        return summary.getReclaimStart() == relocateStart && summary.getReclaimEnd() == relocateEnd;
+    private boolean checkReclaimSummary(ZGCReclaimedSummary summary, long relocateStart, long relocateEnd) {
+        return summary.getRelocateStart() == relocateStart && summary.getRelocateEnd() == relocateEnd;
     }
 
     private boolean checkMemorySummary(ZGCMemorySummary summary, long relocateStart, long relocateEnd) {

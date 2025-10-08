@@ -166,12 +166,12 @@ public class GenerationalZGCParserTest extends ParserTest {
 
             assertTrue(checkZGCMetaSpaceSummary(young.getMetaspaceSummary(),36, 37, 1088));
 
-            assertTrue(checkUsedSummary(young.getGenerationUsedSummary(), 296, 308, 240, 76));
+            assertTrue(checkUsedSummary(young.getUsedSummary(), 296, 308, 240, 76));
             assertTrue(checkLiveSummary(young.getLiveSummary(), 24, 24, 24));
             assertTrue(checkGarbageSummary(young.getGarbageSummary(), 271, 203, 31));
             assertTrue(checkAllocatedSummary(young.getAllocatedSummary(), 12, 12, 19));
 
-            assertTrue(checkReclaimSummary(young.getReclaimSummary(), 68, 239));
+            assertTrue(checkReclaimSummary(young.getReclaimedSummary(), 68, 239));
             assertTrue(checkPromotedSummary(young.getPromotedSummary(), 0, 0));
             assertTrue(checkCompactedSummary(young.getCompactedSummary(), 10));
 
@@ -253,12 +253,12 @@ public class GenerationalZGCParserTest extends ParserTest {
 
             assertEquals(125 * 1024, old.getForwardingUsage());
 
-            assertTrue(checkUsedSummary(old.getGenerationUsedSummary(), 0, 0, 0, 0));
+            assertTrue(checkUsedSummary(old.getUsedSummary(), 0, 0, 0, 0));
             assertTrue(checkLiveSummary(old.getLiveSummary(), 0, 0, 0));
             assertTrue(checkGarbageSummary(old.getGarbageSummary(), 0, 0, 0));
             assertTrue(checkAllocatedSummary(old.getAllocatedSummary(), 0, 0, 0));
 
-            assertTrue(checkReclaimSummary(old.getReclaimSummary(), 0, 0));
+            assertTrue(checkReclaimSummary(old.getReclaimedSummary(), 0, 0));
             assertNull(old.getPromotedSummary());
             assertTrue(checkCompactedSummary(old.getCompactedSummary(), 0));
 
@@ -375,12 +375,12 @@ public class GenerationalZGCParserTest extends ParserTest {
 
             assertTrue(checkZGCMetaSpaceSummary(young.getMetaspaceSummary(),100, 101, 1152));
 
-            assertTrue(checkUsedSummary(young.getGenerationUsedSummary(), 14132, 14900, 12364, 1466));
+            assertTrue(checkUsedSummary(young.getUsedSummary(), 14132, 14900, 12364, 1466));
             assertTrue(checkLiveSummary(young.getLiveSummary(), 120, 120, 120));
             assertTrue(checkGarbageSummary(young.getGarbageSummary(), 14011, 11457, 2));
             assertTrue(checkAllocatedSummary(young.getAllocatedSummary(), 768, 786, 1343));
 
-            assertTrue(checkReclaimSummary(young.getReclaimSummary(), 2554, 14009));
+            assertTrue(checkReclaimSummary(young.getReclaimedSummary(), 2554, 14009));
             assertTrue(checkPromotedSummary(young.getPromotedSummary(), 0, 0));
             assertTrue(checkCompactedSummary(young.getCompactedSummary(), 104));
 
@@ -638,8 +638,8 @@ public class GenerationalZGCParserTest extends ParserTest {
         return refSummary.getEncountered() == encounderted && refSummary.getDiscovered() == discovered && refSummary.getEnqueued() == enqueued;
     }
 
-    private boolean checkUsedSummary(OccupancySummary summary, long markStart, long markEnd, long relocateStart, long relocateEnd) {
-        return summary.getMarkStart() == (markStart * 1024) && summary.getMarkEnd() == (markEnd * 1024) && summary.getReclaimStart() == (relocateStart * 1024) && summary.getReclaimEnd() == (relocateEnd * 1024);
+    private boolean checkUsedSummary(ZGCUsedSummary summary, long markStart, long markEnd, long relocateStart, long relocateEnd) {
+        return summary.getMarkStart() == (markStart * 1024) && summary.getMarkEnd() == (markEnd * 1024) && summary.getRelocateStart() == (relocateStart * 1024) && summary.getRelocateEnd() == (relocateEnd * 1024);
     }
 
     private boolean checkDateTimeStampMatch(String expected, double offsetMs, DateTimeStamp dateTimeStamp) {
@@ -687,8 +687,8 @@ public class GenerationalZGCParserTest extends ParserTest {
         return summary.getMarkEnd() == (markEnd * 1024) && summary.getRelocateStart() == (relocateStart * 1024) && summary.getRelocateEnd() == (relocateEnd * 1024);
     }
 
-    private boolean checkReclaimSummary(ZGCReclaimSummary summary, long relocateStart, long relocateEnd) {
-        return summary.getReclaimStart() == (relocateStart * 1024) && summary.getReclaimEnd() == (relocateEnd * 1024);
+    private boolean checkReclaimSummary(ZGCReclaimedSummary summary, long relocateStart, long relocateEnd) {
+        return summary.getRelocateStart() == (relocateStart * 1024) && summary.getRelocateEnd() == (relocateEnd * 1024);
     }
 
     private boolean checkPromotedSummary(ZGCPromotedSummary summary, long relocateStart, long relocateEnd) {
