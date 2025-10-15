@@ -8,6 +8,8 @@ import com.microsoft.gctoolkit.parser.unified.UnifiedLoggingLevel;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
 
 import java.util.TreeSet;
+// added for testing
+import com.microsoft.gctoolkit.parser.jvm.JVMFlags;
 
 import static com.microsoft.gctoolkit.jvm.SupportedFlags.GC_CAUSE;
 import static com.microsoft.gctoolkit.jvm.SupportedFlags.*;
@@ -22,6 +24,8 @@ import static com.microsoft.gctoolkit.parser.unified.ZGCPatterns.ZGC_TAG;
 //ShenandoahPatterns, ZGCPatterns, UnifiedG1GCPatterns, UnifiedGenerationalPatterns,
 public class UnifiedDiarizer implements Diarizer {
 
+    // added for testing
+    private JVMFlags testonly;
     private static final int CYCLES_TO_EXAMINE_BEFORE_GIVING_UP = 10;
     private static final int CYCLES_TO_EXAMINE_FOR_SAFEPOINT = 2;
 
