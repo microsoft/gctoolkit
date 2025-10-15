@@ -6,9 +6,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+// added for testing
+import com.microsoft.gctoolkit.parser.collection.RuleSet;
 
 public class LogLineFilter {
 
+    private RuleSet testonly;
     private static final Logger LOGGER = Logger.getLogger(LogLineFilter.class.getName());
 
     //Define a regex prefix to remove from the logging statement
