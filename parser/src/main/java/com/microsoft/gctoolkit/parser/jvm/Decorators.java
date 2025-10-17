@@ -66,7 +66,7 @@ public class Decorators {
 
     int numberOfDecorators;
 
-    private Matcher decoratorMatcher = null;
+    private String[] decoratorGroups;
     private String tags;
 
     public Decorators(String line) {
@@ -74,24 +74,22 @@ public class Decorators {
     }
 
     private void extractValues(String line) {
-
         if (!line.startsWith("["))
             return;
 
-        decoratorMatcher = UnifiedLoggingTokens.DECORATORS.matcher(line);
+        Matcher decoratorMatcher = UnifiedLoggingTokens.DECORATORS.matcher(line);
         if (!decoratorMatcher.find()) {
             return;
         }
 
-        for ( int i = 1; i <= decoratorMatcher.groupCount(); i++) {
-            if ( decoratorMatcher.group(i) != null)
+        // Retrieving a group from a matcher calls substring each time
+        // Store all the groups in an array ahead of time to avoid paying this cost unnecessarily
+        decoratorGroups = new String[11];
+        for (int i = 1; i <= decoratorMatcher.groupCount(); i++) {
+            String group = decoratorMatcher.group(i);
+            decoratorGroups[i] = group;
+            if ( group != null)
                 numberOfDecorators++;
-        }
-
-        Matcher tagMatcher = UnifiedLoggingTokens.TAGS.matcher(line);
-        if (tagMatcher.find()) {
-            numberOfDecorators++;
-            tags = String.join(",", Arrays.asList(tagMatcher.group(1).trim().split(",")));
         }
     }
 
@@ -100,10 +98,11 @@ public class Decorators {
 
     public ZonedDateTime getDateStamp() {
         try {
-            String value = decoratorMatcher.group(1);
+            String value = decoratorGroups[1];
             if (value != null) {
                 TemporalAccessor temporalAccessor = formatter.parse(value.substring(1, value.length()-1));
-                return ZonedDateTime.from(temporalAccessor);            }
+                return ZonedDateTime.from(temporalAccessor);
+            }
         } catch (NullPointerException npe) {
             LOGGER.log(Level.SEVERE, npe.getMessage(), npe);
         }
@@ -111,7 +110,7 @@ public class Decorators {
     }
 
     public double getUpTime() {
-        String value = decoratorMatcher.group(2);
+        String value = decoratorGroups[2];
         if (value != null) {
             value = value.replace(",", ".");
             return Double.parseDouble(unboxValue(value, 1));
@@ -121,10 +120,10 @@ public class Decorators {
 
     private long extractClock(int groupIndex, long threshold) {
         long clockReading = -1L;
-        String stringValue = decoratorMatcher.group(groupIndex);
+        String stringValue = decoratorGroups[groupIndex];
         if (stringValue != null) {
             clockReading = Long.parseLong(unboxValue(stringValue, 2));
-            if (decoratorMatcher.group(groupIndex + 1) == null)
+            if (decoratorGroups[groupIndex + 1] == null)
                 if (clockReading < threshold)
                     clockReading = -1L;
         }
@@ -136,9 +135,9 @@ public class Decorators {
     }
 
     public long getUptimeMillis() {
-        String value = decoratorMatcher.group(4);
+        String value = decoratorGroups[4];
         if (value == null) {
-            value = decoratorMatcher.group(3);
+            value = decoratorGroups[3];
         }
         if (value != null) {
             long longValue = Long.parseLong(unboxValue(value, 2));
@@ -153,9 +152,9 @@ public class Decorators {
     }
 
     public long getUptimeNano() {
-        String value = decoratorMatcher.group(6);
+        String value = decoratorGroups[6];
         if (value == null) {
-            value = decoratorMatcher.group(5);
+            value = decoratorGroups[5];
         }
         if (value != null) {
             long longValue = Long.parseLong(unboxValue(value, 2));
@@ -166,7 +165,7 @@ public class Decorators {
     }
 
     public int getPid() {
-        String value = decoratorMatcher.group(7);
+        String value = decoratorGroups[7];
         if (value != null) {
             return Integer.parseInt(unboxValue(value));
         }
@@ -174,7 +173,7 @@ public class Decorators {
     }
 
     public int getTid() {
-        String value = decoratorMatcher.group(8);
+        String value = decoratorGroups[8];
         if (value != null) {
             return Integer.parseInt(unboxValue(value));
         }
@@ -182,7 +181,7 @@ public class Decorators {
     }
 
     public Optional<UnifiedLoggingLevel> getLogLevel() {
-        String level = decoratorMatcher.group(9);
+        String level = decoratorGroups[9];
         if (level != null)
             try {
                 return Optional.of(UnifiedLoggingLevel.valueOf(unboxValue(level)));
@@ -211,10 +210,13 @@ public class Decorators {
     }
 
     public boolean tagsContain(String tagList) {
-        return tags.contains(tagList);
+        return getTags().contains(tagList);
     }
 
     public String getTags() {
+        if (tags == null && decoratorGroups[10] != null) {
+            tags = String.join(",", Arrays.asList(unboxValue(decoratorGroups[10]).trim().split(",")));
+        }
         return tags;
     }
 }
