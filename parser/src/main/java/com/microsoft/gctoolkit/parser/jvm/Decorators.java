@@ -88,7 +88,7 @@ public class Decorators {
         for (int i = 1; i <= decoratorMatcher.groupCount(); i++) {
             String group = decoratorMatcher.group(i);
             decoratorGroups[i] = group;
-            if ( group != null)
+            if (group != null)
                 numberOfDecorators++;
         }
     }
