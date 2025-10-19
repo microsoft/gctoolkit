@@ -32,6 +32,7 @@ public interface UnifiedLoggingTokens extends GenericTokens {
     String TIME_NANOS = "\\[\\d+ns\\]";
     String PID_TID = "\\[\\d+\\]";
     String UNIFIED_LOG_LEVEL_BLOCK = "\\[(?:error|warning|info|debug|trace|develop) *\\]";
+    // We combine TAGS with the DECORATORS for performance reasons.
     String TAGS = "\\[[a-z0-9,. ]+\\]";
     Pattern DECORATORS = Pattern.compile("^(" + DATE_STAMP + ")?(" + UPTIME + ")?(" + TIME_MILLIS + ")?(" + TIME_MILLIS + ")?(" + TIME_NANOS + ")?(" + TIME_NANOS + ")?(" + PID_TID + ")?(" + PID_TID + ")?(" + UNIFIED_LOG_LEVEL_BLOCK + ")?(" + TAGS + ")?");
 
