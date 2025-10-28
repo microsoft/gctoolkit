@@ -9,9 +9,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+// added for testing
+import com.microsoft.gctoolkit.parser.unified.ZGCPatterns;
 
 public class MRUQueue<K, V> implements Map<K, V>, Iterable<K> {
 
+    // added for testing
+    private ZGCPatterns testonly;
     private final HashMap<K, V> entries;
     private final LinkedList<K> keys;
 
