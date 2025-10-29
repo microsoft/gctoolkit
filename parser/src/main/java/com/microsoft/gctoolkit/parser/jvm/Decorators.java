@@ -64,6 +64,17 @@ public class Decorators {
     private static final long TWENTY_YEARS_IN_MILLIS = 731L * 24L * 60L * 60L * 1000L;
     private static final long TWENTY_YEARS_IN_NANO = 731L * 24L * 60L * 60L * 1000L;
 
+    private static final int DATE_STAMP_GROUP = 1;
+    private static final int UPTIME_GROUP = 2;
+    private static final int TIME_MILLIS_OR_MAYBE_UPTIME_MILLIS_GROUP = 3;
+    private static final int UPTIME_MILLIS_GROUP = 4;
+    private static final int TIME_NANOS_OR_MAYBE_UPTIME_NANOS_GROUP = 5;
+    private static final int UPTIME_NANOS_GROUP = 6;
+    private static final int PID_GROUP = 7;
+    private static final int TID_GROUP = 8;
+    private static final int LOG_LEVEL_GROUP = 9;
+    private static final int TAGS_GROUP = 10;
+
     int numberOfDecorators;
 
     private String[] decoratorGroups;
@@ -98,7 +109,7 @@ public class Decorators {
 
     public ZonedDateTime getDateStamp() {
         try {
-            String value = decoratorGroups[1];
+            String value = decoratorGroups[DATE_STAMP_GROUP];
             if (value != null) {
                 TemporalAccessor temporalAccessor = formatter.parse(value.substring(1, value.length()-1));
                 return ZonedDateTime.from(temporalAccessor);
@@ -110,7 +121,7 @@ public class Decorators {
     }
 
     public double getUpTime() {
-        String value = decoratorGroups[2];
+        String value = decoratorGroups[UPTIME_GROUP];
         if (value != null) {
             value = value.replace(",", ".");
             return Double.parseDouble(unboxValue(value, 1));
@@ -131,13 +142,13 @@ public class Decorators {
     }
 
     public long getTimeMillis() {
-        return extractClock(3, TWENTY_YEARS_IN_MILLIS);
+        return extractClock(TIME_MILLIS_OR_MAYBE_UPTIME_MILLIS_GROUP, TWENTY_YEARS_IN_MILLIS);
     }
 
     public long getUptimeMillis() {
-        String value = decoratorGroups[4];
+        String value = decoratorGroups[UPTIME_MILLIS_GROUP];
         if (value == null) {
-            value = decoratorGroups[3];
+            value = decoratorGroups[TIME_MILLIS_OR_MAYBE_UPTIME_MILLIS_GROUP];
         }
         if (value != null) {
             long longValue = Long.parseLong(unboxValue(value, 2));
@@ -148,13 +159,13 @@ public class Decorators {
     }
 
     public long getTimeNano() {
-        return extractClock(5, TWENTY_YEARS_IN_NANO);
+        return extractClock(TIME_NANOS_OR_MAYBE_UPTIME_NANOS_GROUP, TWENTY_YEARS_IN_NANO);
     }
 
     public long getUptimeNano() {
-        String value = decoratorGroups[6];
+        String value = decoratorGroups[UPTIME_NANOS_GROUP];
         if (value == null) {
-            value = decoratorGroups[5];
+            value = decoratorGroups[TIME_NANOS_OR_MAYBE_UPTIME_NANOS_GROUP];
         }
         if (value != null) {
             long longValue = Long.parseLong(unboxValue(value, 2));
@@ -165,7 +176,7 @@ public class Decorators {
     }
 
     public int getPid() {
-        String value = decoratorGroups[7];
+        String value = decoratorGroups[PID_GROUP];
         if (value != null) {
             return Integer.parseInt(unboxValue(value));
         }
@@ -173,7 +184,7 @@ public class Decorators {
     }
 
     public int getTid() {
-        String value = decoratorGroups[8];
+        String value = decoratorGroups[TID_GROUP];
         if (value != null) {
             return Integer.parseInt(unboxValue(value));
         }
@@ -181,7 +192,7 @@ public class Decorators {
     }
 
     public Optional<UnifiedLoggingLevel> getLogLevel() {
-        String level = decoratorGroups[9];
+        String level = decoratorGroups[LOG_LEVEL_GROUP];
         if (level != null)
             try {
                 return Optional.of(UnifiedLoggingLevel.valueOf(unboxValue(level)));
@@ -214,8 +225,10 @@ public class Decorators {
     }
 
     public String getTags() {
-        if (tags == null && decoratorGroups[10] != null) {
-            tags = String.join(",", Arrays.asList(unboxValue(decoratorGroups[10]).trim().split(",")));
+        if (tags == null && decoratorGroups[TAGS_GROUP] != null) {
+            tags = String.join(",", Arrays.asList(
+                    unboxValue(decoratorGroups[TAGS_GROUP]).trim().split(",")
+            ));
         }
         return tags;
     }
