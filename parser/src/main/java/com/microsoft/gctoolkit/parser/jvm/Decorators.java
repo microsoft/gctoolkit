@@ -64,16 +64,16 @@ public class Decorators {
     private static final long TWENTY_YEARS_IN_MILLIS = 731L * 24L * 60L * 60L * 1000L;
     private static final long TWENTY_YEARS_IN_NANO = 731L * 24L * 60L * 60L * 1000L;
 
-    private static final int DATE_STAMP_GROUP = 1;
-    private static final int UPTIME_GROUP = 2;
-    private static final int TIME_MILLIS_OR_MAYBE_UPTIME_MILLIS_GROUP = 3;
-    private static final int UPTIME_MILLIS_GROUP = 4;
-    private static final int TIME_NANOS_OR_MAYBE_UPTIME_NANOS_GROUP = 5;
-    private static final int UPTIME_NANOS_GROUP = 6;
-    private static final int PID_GROUP = 7;
-    private static final int TID_GROUP = 8;
-    private static final int LOG_LEVEL_GROUP = 9;
-    private static final int TAGS_GROUP = 10;
+    private static final int DATE_STAMP_GROUP = 0;
+    private static final int UPTIME_GROUP = 1;
+    private static final int TIME_MILLIS_OR_MAYBE_UPTIME_MILLIS_GROUP = 2;
+    private static final int UPTIME_MILLIS_GROUP = 3;
+    private static final int TIME_NANOS_OR_MAYBE_UPTIME_NANOS_GROUP = 4;
+    private static final int UPTIME_NANOS_GROUP = 5;
+    private static final int PID_GROUP = 6;
+    private static final int TID_GROUP = 7;
+    private static final int LOG_LEVEL_GROUP = 8;
+    private static final int TAGS_GROUP = 9;
 
     int numberOfDecorators;
 
@@ -95,10 +95,10 @@ public class Decorators {
 
         // Retrieving a group from a matcher calls substring each time
         // Store all the groups in an array ahead of time to avoid paying this cost unnecessarily
-        decoratorGroups = new String[11];
+        decoratorGroups = new String[decoratorMatcher.groupCount()];
         for (int i = 1; i <= decoratorMatcher.groupCount(); i++) {
             String group = decoratorMatcher.group(i);
-            decoratorGroups[i] = group;
+            decoratorGroups[i-1] = group;
             if (group != null)
                 numberOfDecorators++;
         }
