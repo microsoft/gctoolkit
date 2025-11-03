@@ -32,10 +32,9 @@ public interface UnifiedLoggingTokens extends GenericTokens {
     String TIME_NANOS = "\\[\\d+ns\\]";
     String PID_TID = "\\[\\d+\\]";
     String UNIFIED_LOG_LEVEL_BLOCK = "\\[(?:error|warning|info|debug|trace|develop) *\\]";
-    Pattern DECORATORS = Pattern.compile("(" + DATE_STAMP + ")?(" + UPTIME + ")?(" + TIME_MILLIS + ")?(" + TIME_MILLIS + ")?(" + TIME_NANOS + ")?(" + TIME_NANOS + ")?(" + PID_TID + ")?(" + PID_TID + ")?(" + UNIFIED_LOG_LEVEL_BLOCK + ")?");
-    //Using zero-width negative lookbehind to miss capturing records formatted like [0x1f03].
-    //[0.081s][trace][safepoint] Thread: 0x00007fd0d2006800  [0x1f03] State: _at_safepoint _has_called_back 0 _at_poll_safepoint 0
-    Pattern TAGS = Pattern.compile(".*(?<=^|\\])\\[([a-z0-9,. ]+)\\]");
+    // We combine TAGS with the DECORATORS for performance reasons.
+    String TAGS = "\\[[a-z0-9,. ]+\\]";
+    Pattern DECORATORS = Pattern.compile("^(" + DATE_STAMP + ")?(" + UPTIME + ")?(" + TIME_MILLIS + ")?(" + TIME_MILLIS + ")?(" + TIME_NANOS + ")?(" + TIME_NANOS + ")?(" + PID_TID + ")?(" + PID_TID + ")?(" + UNIFIED_LOG_LEVEL_BLOCK + ")?(" + TAGS + ")?");
 
     String UNIFIED_META_RECORD = "Metaspace: " + BEFORE_AFTER_CONFIGURED;
     String WORKER_SUMMARY_REAL = "Min:\\s+" + TIME + ", Avg:\\s+" + TIME + ", Max:\\s+" + TIME + ", Diff:\\s+" + TIME + ", Sum:\\s+" + TIME + ", Workers:\\s+" + COUNTER;

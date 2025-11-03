@@ -64,9 +64,20 @@ public class Decorators {
     private static final long TWENTY_YEARS_IN_MILLIS = 731L * 24L * 60L * 60L * 1000L;
     private static final long TWENTY_YEARS_IN_NANO = 731L * 24L * 60L * 60L * 1000L;
 
+    private static final int DATE_STAMP_GROUP = 0;
+    private static final int UPTIME_GROUP = 1;
+    private static final int TIME_MILLIS_OR_MAYBE_UPTIME_MILLIS_GROUP = 2;
+    private static final int UPTIME_MILLIS_GROUP = 3;
+    private static final int TIME_NANOS_OR_MAYBE_UPTIME_NANOS_GROUP = 4;
+    private static final int UPTIME_NANOS_GROUP = 5;
+    private static final int PID_GROUP = 6;
+    private static final int TID_GROUP = 7;
+    private static final int LOG_LEVEL_GROUP = 8;
+    private static final int TAGS_GROUP = 9;
+
     int numberOfDecorators;
 
-    private Matcher decoratorMatcher = null;
+    private String[] decoratorGroups;
     private String tags;
 
     public Decorators(String line) {
@@ -74,24 +85,22 @@ public class Decorators {
     }
 
     private void extractValues(String line) {
-
         if (!line.startsWith("["))
             return;
 
-        decoratorMatcher = UnifiedLoggingTokens.DECORATORS.matcher(line);
+        Matcher decoratorMatcher = UnifiedLoggingTokens.DECORATORS.matcher(line);
         if (!decoratorMatcher.find()) {
             return;
         }
 
-        for ( int i = 1; i <= decoratorMatcher.groupCount(); i++) {
-            if ( decoratorMatcher.group(i) != null)
+        // Retrieving a group from a matcher calls substring each time
+        // Store all the groups in an array ahead of time to avoid paying this cost unnecessarily
+        decoratorGroups = new String[decoratorMatcher.groupCount()];
+        for (int i = 1; i <= decoratorMatcher.groupCount(); i++) {
+            String group = decoratorMatcher.group(i);
+            decoratorGroups[i-1] = group;
+            if (group != null)
                 numberOfDecorators++;
-        }
-
-        Matcher tagMatcher = UnifiedLoggingTokens.TAGS.matcher(line);
-        if (tagMatcher.find()) {
-            numberOfDecorators++;
-            tags = String.join(",", Arrays.asList(tagMatcher.group(1).trim().split(",")));
         }
     }
 
@@ -100,10 +109,11 @@ public class Decorators {
 
     public ZonedDateTime getDateStamp() {
         try {
-            String value = decoratorMatcher.group(1);
+            String value = decoratorGroups[DATE_STAMP_GROUP];
             if (value != null) {
                 TemporalAccessor temporalAccessor = formatter.parse(value.substring(1, value.length()-1));
-                return ZonedDateTime.from(temporalAccessor);            }
+                return ZonedDateTime.from(temporalAccessor);
+            }
         } catch (NullPointerException npe) {
             LOGGER.log(Level.SEVERE, npe.getMessage(), npe);
         }
@@ -111,7 +121,7 @@ public class Decorators {
     }
 
     public double getUpTime() {
-        String value = decoratorMatcher.group(2);
+        String value = decoratorGroups[UPTIME_GROUP];
         if (value != null) {
             value = value.replace(",", ".");
             return Double.parseDouble(unboxValue(value, 1));
@@ -121,10 +131,10 @@ public class Decorators {
 
     private long extractClock(int groupIndex, long threshold) {
         long clockReading = -1L;
-        String stringValue = decoratorMatcher.group(groupIndex);
+        String stringValue = decoratorGroups[groupIndex];
         if (stringValue != null) {
             clockReading = Long.parseLong(unboxValue(stringValue, 2));
-            if (decoratorMatcher.group(groupIndex + 1) == null)
+            if (decoratorGroups[groupIndex + 1] == null)
                 if (clockReading < threshold)
                     clockReading = -1L;
         }
@@ -132,13 +142,13 @@ public class Decorators {
     }
 
     public long getTimeMillis() {
-        return extractClock(3, TWENTY_YEARS_IN_MILLIS);
+        return extractClock(TIME_MILLIS_OR_MAYBE_UPTIME_MILLIS_GROUP, TWENTY_YEARS_IN_MILLIS);
     }
 
     public long getUptimeMillis() {
-        String value = decoratorMatcher.group(4);
+        String value = decoratorGroups[UPTIME_MILLIS_GROUP];
         if (value == null) {
-            value = decoratorMatcher.group(3);
+            value = decoratorGroups[TIME_MILLIS_OR_MAYBE_UPTIME_MILLIS_GROUP];
         }
         if (value != null) {
             long longValue = Long.parseLong(unboxValue(value, 2));
@@ -149,13 +159,13 @@ public class Decorators {
     }
 
     public long getTimeNano() {
-        return extractClock(5, TWENTY_YEARS_IN_NANO);
+        return extractClock(TIME_NANOS_OR_MAYBE_UPTIME_NANOS_GROUP, TWENTY_YEARS_IN_NANO);
     }
 
     public long getUptimeNano() {
-        String value = decoratorMatcher.group(6);
+        String value = decoratorGroups[UPTIME_NANOS_GROUP];
         if (value == null) {
-            value = decoratorMatcher.group(5);
+            value = decoratorGroups[TIME_NANOS_OR_MAYBE_UPTIME_NANOS_GROUP];
         }
         if (value != null) {
             long longValue = Long.parseLong(unboxValue(value, 2));
@@ -166,7 +176,7 @@ public class Decorators {
     }
 
     public int getPid() {
-        String value = decoratorMatcher.group(7);
+        String value = decoratorGroups[PID_GROUP];
         if (value != null) {
             return Integer.parseInt(unboxValue(value));
         }
@@ -174,7 +184,7 @@ public class Decorators {
     }
 
     public int getTid() {
-        String value = decoratorMatcher.group(8);
+        String value = decoratorGroups[TID_GROUP];
         if (value != null) {
             return Integer.parseInt(unboxValue(value));
         }
@@ -182,7 +192,7 @@ public class Decorators {
     }
 
     public Optional<UnifiedLoggingLevel> getLogLevel() {
-        String level = decoratorMatcher.group(9);
+        String level = decoratorGroups[LOG_LEVEL_GROUP];
         if (level != null)
             try {
                 return Optional.of(UnifiedLoggingLevel.valueOf(unboxValue(level)));
@@ -211,10 +221,15 @@ public class Decorators {
     }
 
     public boolean tagsContain(String tagList) {
-        return tags.contains(tagList);
+        return getTags().contains(tagList);
     }
 
     public String getTags() {
+        if (tags == null && decoratorGroups[TAGS_GROUP] != null) {
+            tags = String.join(",", Arrays.asList(
+                    unboxValue(decoratorGroups[TAGS_GROUP]).trim().split(",")
+            ));
+        }
         return tags;
     }
 }
