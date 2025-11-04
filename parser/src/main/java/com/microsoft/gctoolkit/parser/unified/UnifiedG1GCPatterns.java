@@ -54,7 +54,7 @@ public interface UnifiedG1GCPatterns extends UnifiedPatterns {
     //[90.452s][info ][gc           ] GC(1459) Pause Young (G1 Evacuation Pause) 574M->4M(953M) 2.065ms
     GCParseRule YOUNG_DETAILS = new GCParseRule("YOUNG_DETAILS", "Pause " + YOUNG_COLLECTION_TYPES + " (\\(" + YOUNG_COLLECTION_SUB_TYPE + "\\) )?" + GC_CAUSE + BEFORE_AFTER_CONFIGURED_PAUSE);
 
-    GCParseRule HEAP_REGION_SIZE = new GCParseRule("HEAP_REGION_SIZE", "Heap region size: " + MEMORY_SIZE);
+    GCParseRule HEAP_REGION_SIZE = new GCParseRule("HEAP_REGION_SIZE", "Heap [Rr]egion [Ss]ize: " + MEMORY_SIZE);
 
     GCParseRule HEAP_SIZE = new GCParseRule("HEAP_SIZE", "Minimum heap " + COUNTER + "  Initial heap " + COUNTER + "  Maximum heap " + COUNTER);
 
