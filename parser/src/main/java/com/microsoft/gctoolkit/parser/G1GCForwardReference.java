@@ -542,15 +542,10 @@ class G1GCForwardReference extends ForwardReference {
         MemoryPoolSummary young = getMemoryPoolSummary(YOUNG_OCCUPANCY_BEFORE_COLLECTION);
         MemoryPoolSummary eden = getMemoryPoolSummary(EDEN_OCCUPANCY_BEFORE_COLLECTION);
         SurvivorMemoryPoolSummary survivor = getSurvivorMemoryPoolSummary();
-        MemoryPoolSummary tenured = getMemoryPoolSummary(OLD_OCCUPANCY_BEFORE_COLLECTION);
+        MemoryPoolSummary old = getMemoryPoolSummary(OLD_OCCUPANCY_BEFORE_COLLECTION);
         MemoryPoolSummary humongous = getMemoryPoolSummary(HUMONGOUS_OCCUPANCY_BEFORE_COLLECTION);
         collection.addHeapRegionSize(heapRegionSize);
-        if (heap != null && eden != null && survivor != null) {
-            collection.addMemorySummary(eden, survivor, heap);
-        } else if (eden == null && survivor == null && heap != null) {
-            collection.addMemorySummary(heap);
-        } //else
-        //need to consider other possible combinations.
+        collection.addMemorySummary(eden, survivor, old, humongous, heap);
     }
 
     /*
@@ -564,7 +559,9 @@ class G1GCForwardReference extends ForwardReference {
     private static final int METASPACE_RESERVED_AFTER_COLLECTION = 31;
      */
     private void fillInMetaspaceStats(G1GCPauseEvent collection) {
-        collection.addPermOrMetaSpaceRecord(getMemoryPoolSummary(METASPACE_OCCUPANCY_BEFORE_COLLECTION));
+        collection.addPermOrMetaSpaceRecord(
+                getMemoryPoolSummary(METASPACE_OCCUPANCY_BEFORE_COLLECTION),
+                getMemoryPoolSummary(CLASSSPACE_OCCUPANCY_BEFORE_COLLECTION));
     }
 
 
