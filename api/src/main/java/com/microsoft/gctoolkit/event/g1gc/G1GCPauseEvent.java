@@ -18,8 +18,11 @@ public abstract class G1GCPauseEvent extends G1GCEvent {
 
     private MemoryPoolSummary eden;
     private SurvivorMemoryPoolSummary survivor;
+    private MemoryPoolSummary old;
+    private MemoryPoolSummary humongous;
     private MemoryPoolSummary heap;
     private MemoryPoolSummary permOrMetaspace;
+    private MemoryPoolSummary classSpace;
     private ReferenceGCSummary referenceGCSummary = null;
 
     private RegionSummary edenRegion;
@@ -45,8 +48,25 @@ public abstract class G1GCPauseEvent extends G1GCEvent {
         this.addMemorySummary(null, null, heap);
     }
 
+    public void addMemorySummary(MemoryPoolSummary eden,
+                                 SurvivorMemoryPoolSummary survivor,
+                                 MemoryPoolSummary old,
+                                 MemoryPoolSummary humongous,
+                                 MemoryPoolSummary heap) {
+        this.eden = eden;
+        this.survivor = survivor;
+        this.old = old;
+        this.humongous = humongous;
+        this.heap = heap;
+    }
+
     public void addPermOrMetaSpaceRecord(MemoryPoolSummary permOrMetaspaceRecord) {
-        permOrMetaspace = permOrMetaspaceRecord;
+       addPermOrMetaSpaceRecord(permOrMetaspaceRecord, null);
+    }
+
+    public void addPermOrMetaSpaceRecord(MemoryPoolSummary permOrMetaspaceRecord, MemoryPoolSummary classSpace) {
+        this.permOrMetaspace = permOrMetaspaceRecord;
+        this.classSpace =  classSpace;
     }
 
     public void addCPUSummary(CPUSummary summary) {
@@ -95,6 +115,18 @@ public abstract class G1GCPauseEvent extends G1GCEvent {
 
     public MemoryPoolSummary getPermOrMetaspace() {
         return this.permOrMetaspace;
+    }
+
+    public MemoryPoolSummary getHumongous() {
+        return humongous;
+    }
+
+    public MemoryPoolSummary getOld() {
+        return old;
+    }
+
+    public MemoryPoolSummary getClassSpace() {
+        return classSpace;
     }
 
     public MemoryPoolSummary getTenured() {

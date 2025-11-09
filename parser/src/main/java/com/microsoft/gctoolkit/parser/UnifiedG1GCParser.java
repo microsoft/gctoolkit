@@ -549,7 +549,7 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
         forwardReference.setMetaspaceSizeAfterCollection(metaspace.getSizeAfterCollection());
         MemoryPoolSummary classSpace = trace.getEnlargedMetaSpaceRecord(17);
         forwardReference.setClassspaceOccupancyBeforeCollection(classSpace.getOccupancyBeforeCollection());
-        forwardReference.setClassspaceCommittedAfterCollection(classSpace.getOccupancyAfterCollection());
+        forwardReference.setClassspaceOccupancyAfterCollection(classSpace.getOccupancyAfterCollection());
         forwardReference.setClassspaceSizeAfterCollection(classSpace.getSizeAfterCollection());
     }
 
