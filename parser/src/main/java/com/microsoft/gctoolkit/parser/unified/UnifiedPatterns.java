@@ -8,7 +8,9 @@ import com.microsoft.gctoolkit.parser.GCParseRule;
 
 public interface UnifiedPatterns extends UnifiedLoggingTokens {
 
-    GCParseRule CPU_BREAKOUT = new GCParseRule("CPU_BREAKOUT", "User=" + TIME + "s Sys=" + TIME + "s Real=" + TIME + "s");
+	// Note: end of line marker added to address unexpected match of the following line in Serial logging:
+	// Adaptive Heap Sizing: GC Overhead: 100. User=0.090000s Sys=0.000000s Real=0.080000s, Time since last GC=0.090000s
+    GCParseRule CPU_BREAKOUT = new GCParseRule("CPU_BREAKOUT", "User=" + TIME + "s Sys=" + TIME + "s Real=" + TIME + "s$");
 
     GCParseRule GC_COUNT = new GCParseRule("GC_COUNT", " GC\\((" + INTEGER + ")\\) ");
 

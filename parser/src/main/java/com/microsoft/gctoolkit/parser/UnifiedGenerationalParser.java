@@ -113,7 +113,7 @@ public class UnifiedGenerationalParser extends UnifiedGCLogParser implements Uni
             "Sweep", Concurrent_Sweep,
             "Reset", Concurrent_Reset
     );
-
+    
     public UnifiedGenerationalParser() {
     }
 
@@ -161,6 +161,7 @@ public class UnifiedGenerationalParser extends UnifiedGCLogParser implements Uni
     private GenerationalForwardReference concurrentCyclePauseEvent = null;
     private GenerationalForwardReference concurrentEvent = null;
     private boolean inConcurrentPhase = false;
+    private int currentGcId = -1;
 
     private void tag(GCLogTrace trace, String line) {
         noop();
@@ -180,6 +181,7 @@ public class UnifiedGenerationalParser extends UnifiedGCLogParser implements Uni
             return;
         }
         pauseEvent.setStartTime(getClock());
+    	currentGcId = pauseEvent.getGcID();
         pauseEvent.setGCCause(trace.gcCause(1, 0));
     }
 
@@ -228,8 +230,32 @@ public class UnifiedGenerationalParser extends UnifiedGCLogParser implements Uni
     }
 
     private void youngDetails(GCLogTrace trace, String line) {
+    	boolean isNoDetailsEvent = false;
+    	int gcid = GCLogParser.GCID_COUNTER.parse(line).getIntegerGroup(1);
+    	
+    	if (pauseEvent == null && gcid > currentGcId) {
+        	// #457 - Unified-Parallel file without details doesn't trigger youngHeader(). 
+        	// As a result pauseEvent never gets initialized.  We'll do it manually here.    		
+    		
+    		// Dependent capture groups in youngHeader() should be the same, so we can just
+    		// call it to initialize pauseEvent rather than duplicating code.
+    		youngHeader(trace, line);
+    		
+    		// Track that we've created the event here.
+    		isNoDetailsEvent = true;
+    	} 
+    	
         pauseEvent.setDuration(trace.getDuration() / 1000.d);
         pauseEvent.setHeap(trace.getOccupancyBeforeAfterWithMemoryPoolSizeSummary(2));
+        
+        if (isNoDetailsEvent && !diary.isPrintCPUTimes()) {
+        	// #457 - Unified-Parallel-NoDetails doesn't write out CPU summary.  We have to 
+        	// publish the event manually in this case. 
+        	// This code should only be called if we also initialized the pauseEvent in the 
+        	// same context.
+        	publish(buildPauseEvent(pauseEvent));
+        	pauseEvent = null;
+        }
     }
 
     /**
@@ -341,12 +367,38 @@ public class UnifiedGenerationalParser extends UnifiedGCLogParser implements Uni
             pauseEvent = new GenerationalForwardReference(FullGC, new Decorators(line), super.GCID_COUNTER.parse(line).getIntegerGroup(1));
             pauseEvent.setStartTime(getClock());
         }
+        
         pauseEvent.setGCCause(trace.gcCause(1, 0));
+    	currentGcId = pauseEvent.getGcID();        
     }
 
     private void fullGCSummary(GCLogTrace trace, String line) {
+    	boolean isNoDetailsEvent = false;
+    	int gcid = GCLogParser.GCID_COUNTER.parse(line).getIntegerGroup(1);
+    	
+    	if (pauseEvent == null && gcid > currentGcId) {
+        	// #457 - Unified-Parallel file doesn't trigger fullGC() to create pauseEvent. 
+        	// We'll do it manually here.
+    		
+    		// Dependent capture groups in fullGC() should be the same, so we can just
+    		// call fullGC() to initialize the pauseEvent rather than duplicating code.
+    		fullGC(trace, line);
+    		
+    		// Track that we've created the pauseEvent in this context.
+    		isNoDetailsEvent = true;
+    	}     	
+    	
         pauseEvent.setHeap(trace.getOccupancyBeforeAfterWithMemoryPoolSizeSummary(2));
         pauseEvent.setDuration(trace.getDuration() / 1000.0d);
+        
+        if (isNoDetailsEvent && !diary.isPrintCPUTimes()) {
+        	// #457 - Unified-Parallel-NoDetails doesn't write out CPU summary, so we
+        	// have to publish the event manually in this case. 
+        	// This code should only be called if we also initialized the pauseEvent 
+        	// in the same context.        	
+        	publish(buildPauseEvent(pauseEvent));
+        	pauseEvent = null;
+        }
     }
 
     private void fullGCPhase(GCLogTrace trace, String line) {

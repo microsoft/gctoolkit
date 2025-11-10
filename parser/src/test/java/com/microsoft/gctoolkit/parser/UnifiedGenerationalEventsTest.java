@@ -3,6 +3,7 @@
 package com.microsoft.gctoolkit.parser;
 
 
+import com.microsoft.gctoolkit.event.GCCause;
 import com.microsoft.gctoolkit.event.MemoryPoolSummary;
 import com.microsoft.gctoolkit.event.generational.AbortablePreClean;
 import com.microsoft.gctoolkit.event.generational.CMSRemark;
@@ -83,6 +84,70 @@ public class UnifiedGenerationalEventsTest extends ParserTest {
         }
     }
 
+    @Test
+    public void testParallelNoDetails() {
+    	// Note: This test case will fail if the "Using Parallel" line is not included! There is no 
+    	// unique way to identify these lines as being Unified-Parallel on their own. (Collides with 
+    	// Serial)
+    	String[] lines = new String[] {
+    			"[0.352s][info][gc] Using Parallel",
+    			"[1.887s][info][gc] GC(0) Pause Young (Metadata GC Threshold) 516M->42M(7065M) 14.443ms",
+    			"[1.916s][info][gc] GC(1) Pause Full (Metadata GC Threshold) 42M->42M(7065M) 29.072ms",
+    			"[16.280s][info][gc] GC(6) Pause Young (Allocation Failure) 1914M->108M(7065M) 24.541ms",
+    			"[153.018s][info][gc] GC(18) Pause Full (Ergonomics) 5282M->5016M(12150M) 4779.361ms",
+    			"[6529.878s][info][gc] GC(121) Pause Young (GCLocker Initiated GC) 9210M->7586M(12157M) 34.814ms"    			
+    	};
+    	
+    	List<JVMEvent> jvmEvents = feedParser(lines);
+    	
+    	assertEquals(5, jvmEvents.size());
+    	
+    	try {
+        	// Event 0 - PSYoungGen
+        	PSYoungGen evt0 = (PSYoungGen) jvmEvents.get(0);
+        	assertEquals(GCCause.METADATA_GENERATION_THRESHOLD, evt0.getGCCause());
+        	MemoryPoolSummary heapSummary = evt0.getHeap();
+        	assertEquals(516*1024, heapSummary.getOccupancyBeforeCollection());
+        	assertEquals(42*1024, heapSummary.getOccupancyAfterCollection());
+        	assertEquals(7065*1024, heapSummary.getSizeAfterCollection());
+        	
+        	// Event 1 - FullGC
+        	FullGC evt1 = (FullGC) jvmEvents.get(1);
+        	assertEquals(GCCause.METADATA_GENERATION_THRESHOLD, evt1.getGCCause());
+        	heapSummary = evt1.getHeap();
+        	assertEquals(42*1024, heapSummary.getOccupancyBeforeCollection());
+        	assertEquals(42*1024, heapSummary.getOccupancyAfterCollection());
+        	assertEquals(7065*1024, heapSummary.getSizeAfterCollection());
+    		
+        	// Event 2 - PSYoungGen
+        	PSYoungGen evt2 = (PSYoungGen) jvmEvents.get(2);
+        	assertEquals(GCCause.ALLOCATION_FAILURE, evt2.getGCCause());
+        	heapSummary = evt2.getHeap();
+        	assertEquals(1914*1024, heapSummary.getOccupancyBeforeCollection());
+        	assertEquals(108*1024, heapSummary.getOccupancyAfterCollection());
+        	assertEquals(7065*1024, heapSummary.getSizeAfterCollection());
+        	
+        	// Event 3 - FullGC
+        	FullGC evt3 = (FullGC) jvmEvents.get(3);
+        	assertEquals(GCCause.ADAPTIVE_SIZE_POLICY, evt3.getGCCause());
+        	heapSummary = evt3.getHeap();
+        	assertEquals(5282*1024, heapSummary.getOccupancyBeforeCollection());
+        	assertEquals(5016*1024, heapSummary.getOccupancyAfterCollection());
+        	assertEquals(12150*1024, heapSummary.getSizeAfterCollection());
+
+        	// Event 4 - PSYoungGen
+        	PSYoungGen evt4 = (PSYoungGen) jvmEvents.get(4);
+        	assertEquals(GCCause.GC_LOCKER, evt4.getGCCause());
+        	heapSummary = evt4.getHeap();
+        	assertEquals(9210*1024, heapSummary.getOccupancyBeforeCollection());
+        	assertEquals(7586*1024, heapSummary.getOccupancyAfterCollection());
+        	assertEquals(12157*1024, heapSummary.getSizeAfterCollection());
+
+    	} catch (ClassCastException cce) {
+    		fail(cce.getMessage());
+    	}
+    }
+    
     @Test
     public void testParallelFUllCollection() {
         String[] lines = new String[]{
