@@ -35,10 +35,11 @@ public class VertxJVMEventChannel extends VertxChannel implements JVMEventChanne
     public void registerListener(JVMEventChannelListener listener) {
         final JVMEventVerticle processor = new JVMEventVerticle(vertx(), listener.channel().getName(), listener);
         CountDownLatch latch = new CountDownLatch(1);
-        vertx().deployVerticle(processor, state -> {
-            processor.setID((state.succeeded()) ? state.result() : "");
-            latch.countDown();
-        });
+        vertx().deployVerticle(processor)
+            .onComplete(ar -> {
+                processor.setID(ar.succeeded() ? ar.result() : "");
+                latch.countDown();
+            });
 
         try {
             latch.await();
