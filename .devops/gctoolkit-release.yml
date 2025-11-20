@@ -167,7 +167,7 @@ extends:
               displayName: 'Remove .sha1 and .md5 files'
               workingDirectory: $(Build.ArtifactStagingDirectory)
 
-            # ESRP Sign all jars in the semantickernel-java directory
+            # ESRP Sign all jars in the gctoolkit staging directory
             - task: SFP.build-tasks.custom-build-task-1.EsrpCodeSigning@5
               displayName: ESRP Java JAR Signing
               inputs:
@@ -206,7 +206,7 @@ extends:
                 MaxRetryAttempts: '5'
                 VerboseLogin: true
 
-            # gpg sign all artifacts in the semantickernel-java directory
+            # gpg sign all artifacts in the gctoolkit staging directory
             # this will create a .asc file for each file in the directory. This is a detached signature
             # required to publish into Maven Central.
             - bash: |
