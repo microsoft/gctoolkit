@@ -42,7 +42,7 @@ extends:
   template: v1/1ES.Official.PipelineTemplate.yml@1esPipelines
   parameters:
     pool:
-      name: JEG-test-pool
+      name: JEG-test-pool-x64
       os: linux
     sdl:
       sourceAnalysisPool:
