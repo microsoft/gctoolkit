@@ -30,11 +30,6 @@ public abstract class GCLogParser implements DataSourceParser, SharedPatterns {
      */
     public static final String END_OF_DATA_SENTINEL = GCLogFile.END_OF_DATA_SENTINEL;
 
-    // TODO: GCID_COUNTER should be in SharedPatterns, not here.
-    /**
-     * Rule for parsing the GCID counter.
-     */
-    public static final GCParseRule GCID_COUNTER = new GCParseRule("GCID_COUNTER", " GC\\((\\d+)\\) ");
     private JVMEventChannel consumer;
     protected Diary diary;
     private DateTimeStamp clock = new DateTimeStamp(DateTimeStamp.EPOC, 0.0d);
@@ -246,9 +241,54 @@ public abstract class GCLogParser implements DataSourceParser, SharedPatterns {
      * @param line the line to parse.
      * @return the extracted GCID, or -1 if not found.
      */
-    int extractGCID(String line) {
-        GCLogTrace trace = GCID_COUNTER.parse(line);
-        return (trace != null) ? trace.getIntegerGroup(1) : -1;
+    static int extractGCID(String line) {
+        long packed = extractGCCycleIdAndTextualLength(line);
+        if (packed == -1) {
+            return -1;
+        }
+        return extractGCCycleId(packed);
+    }
+
+    /**
+     * Returns a packed long containing two ints:
+     * - the GC cycle id in the high bytes
+     * - the length of the text containing the GC cycle id,e.g. 'GC(10)'
+     * See {@link #extractGCCycleId(long)} and {@link #extractGCCycleIdTextualLength(long)}
+     */
+    protected static long extractGCCycleIdAndTextualLength(String line) {
+        if (!line.contains("GC(")) {
+            return -1;
+        }
+        // [2025-10-21T16:44:29.311+0200][3645.640s] GC(35) Pause Young (Allocation Failure)
+        // we search for the value between parenthesis
+        int start = line.indexOf('(');
+        int end = line.indexOf(')', start);
+        if (start == -1 || end == -1) {
+            return -1;
+        }
+        try {
+            int gcId = Integer.parseInt(line, start + 1, end, 10);
+            // add the closing parenthesis to the length
+            int endToReturn = end + 1;
+            // pack the two ints in a long
+            return (((long) gcId) << 32) | (endToReturn & 0xFFFFFFFFL);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to extract gc cycle id from " + line, e);
+        }
+    }
+
+    protected static int extractGCCycleId(long packedGcCycleIdAndEnd) {
+        if (packedGcCycleIdAndEnd == -1) {
+            return -1;
+        }
+        return (int) (packedGcCycleIdAndEnd >> 32);
+    }
+
+    protected static int extractGCCycleIdTextualLength(long packedGcCycleIdAndEnd) {
+        if (packedGcCycleIdAndEnd == -1) {
+            return 0;
+        }
+        return (int) packedGcCycleIdAndEnd;
     }
 
     /**
