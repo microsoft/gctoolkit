@@ -15,7 +15,7 @@ import java.util.regex.Matcher;
 public class SafepointTrace extends AbstractLogTrace {
     // added for testing
     public GenZPatterns testonly1;
-    public ZGCPatterns testonly2;
+    //public ZGCPatterns testonly2;
 
     public SafepointTrace(Matcher matcher) {
         super(matcher);

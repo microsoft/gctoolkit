@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.aggregator;
 
+import com.microsoft.gctoolkit.GCToolKit;
 import com.microsoft.gctoolkit.event.jvm.JVMEvent;
 import com.microsoft.gctoolkit.event.jvm.JVMTermination;
 
@@ -60,6 +61,9 @@ import java.util.function.Consumer;
  * @param <A> The type of Aggregation
  */
 public abstract class Aggregator<A extends Aggregation> {
+
+    // added for testing
+    //private GCToolKit testonly;
 
     private final A aggregation;
     private Runnable completionTask;

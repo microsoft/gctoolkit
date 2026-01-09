@@ -10,8 +10,8 @@ import java.util.regex.Pattern;
 import com.microsoft.gctoolkit.parser.collection.RuleSet;
 
 public class LogLineFilter {
-
-    private RuleSet testonly;
+    // add for testing
+    //private RuleSet testonly;
     private static final Logger LOGGER = Logger.getLogger(LogLineFilter.class.getName());
 
     //Define a regex prefix to remove from the logging statement

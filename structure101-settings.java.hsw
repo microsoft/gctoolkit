@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<local-project language="java" version="7.0.24466" xml-version="3" flavor="j2se">
+  <property name="parse-archive-in-archive" value="false" />
+  <property name="include-injected-dependency" value="false" />
+  <property name="relative-to" value="const(THIS_FILE)" />
+  <property name="action-set-mod" value="1" />
+  <property name="force-classpath" value="false" />
+  <property name="detail-mode" value="true" />
+  <property name="hide-deprecated" value="false" />
+  <property name="resolve-name-clashes" value="true" />
+  <property name="project-excluded" />
+  <property name="show-needs-to-compile" value="false" />
+  <property name="project-type" value="classpath" />
+  <property name="hide-externals" value="true" />
+  <classpath>
+    <classpathentry kind="lib" path="api/target/classes" module="gctoolkit-api" displaymodule="gctoolkit-api" />
+    <classpathentry kind="lib" path="vertx/target/classes" module="gctoolkit-vertx" displaymodule="gctoolkit-vertx" />
+    <classpathentry kind="lib" path="sample/target/classes" module="gctoolkit-sample" displaymodule="gctoolkit-sample" />
+    <classpathentry kind="lib" path="parser/target/classes" module="gctoolkit-parser" displaymodule="gctoolkit-parser" />
+    <classpathentry kind="lib" path="IT/target/classes" module="gctoolkit-integration" displaymodule="gctoolkit-integration" />
+  </classpath>
+  <pom-root-files />
+  <modules>
+    <module name="gctoolkit" kind="ide-project" />
+    <module name="gctoolkit-gclogs" kind="ide-project" />
+    <module name="gctoolkit-api" kind="ide-project" />
+    <module name="gctoolkit-vertx" kind="ide-project">
+      <requires name="gctoolkit-api" kind="ide-project" />
+    </module>
+    <module name="gctoolkit-parser" kind="ide-project">
+      <requires name="gctoolkit-api" kind="ide-project" />
+    </module>
+    <module name="gctoolkit-sample" kind="ide-project">
+      <requires name="gctoolkit-api" kind="ide-project" />
+      <requires name="gctoolkit-parser" kind="ide-project" />
+      <requires name="gctoolkit-vertx" kind="ide-project" />
+    </module>
+    <module name="gctoolkit-integration" kind="ide-project">
+      <requires name="gctoolkit-api" kind="ide-project" />
+      <requires name="gctoolkit-parser" kind="ide-project" />
+      <requires name="gctoolkit-vertx" kind="ide-project" />
+    </module>
+  </modules>
+  <modules-in-scope>
+    <module name="gctoolkit-gclogs" />
+    <module name="gctoolkit-api" />
+    <module name="gctoolkit-vertx" />
+    <module name="gctoolkit-parser" />
+    <module name="gctoolkit-sample" />
+    <module name="gctoolkit-integration" />
+    <module name="gctoolkit" />
+  </modules-in-scope>
+  <excludes>
+    <exclude expression="*.*&amp;amp;*" active="true" />
+  </excludes>
+  <restructuring>
+    <set version="3" name="Action list 1" hiview="Codemap" active="true" todo="false" list="0" />
+  </restructuring>
+  <grid-set sep="." version="7.0.24466" />
+</local-project>

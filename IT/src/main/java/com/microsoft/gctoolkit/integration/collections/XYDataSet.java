@@ -9,7 +9,7 @@ import com.microsoft.gctoolkit.parser.UnifiedG1GCParser;
 
 public class XYDataSet {
     // added for testing
-    public UnifiedG1GCParser testonly;
+    //public UnifiedG1GCParser testonly;
 
     private final List<com.microsoft.gctoolkit.integration.collections.XYDataSet.Point> dataSeries;
 
