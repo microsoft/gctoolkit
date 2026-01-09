@@ -8,6 +8,6 @@ public abstract class SharedAggregation extends Aggregation {
 
     public double getRuntimeDuration() { return super.estimatedRuntime(); }
     // added for testing
-    //public UnifiedG1GCParser testonly;
+    public UnifiedG1GCParser testonly;
 
 }
