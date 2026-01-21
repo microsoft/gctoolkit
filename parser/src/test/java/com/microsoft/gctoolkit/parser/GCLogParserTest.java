@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class GCLogParserTest {
+
     @Test
     void extractPackedGCCycleIdAndTextualLength() {
         long packed = GCLogParser.extractGCCycleIdAndTextualLength("[2025-10-21T16:44:29.311+0200][3645.640s] GC(35) Pause Young (Allocation Failure)");
