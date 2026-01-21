@@ -252,7 +252,7 @@ public abstract class GCLogParser implements DataSourceParser, SharedPatterns {
     /**
      * Returns a packed long containing two ints:
      * - the GC cycle id in the high bytes
-     * - the length of the text containing the GC cycle id,e.g. 'GC(10)'
+     * - the length of the text containing the GC cycle id, e.g. 'GC(10)'
      * See {@link #extractGCCycleId(long)} and {@link #extractGCCycleIdTextualLength(long)}
      */
     protected static long extractGCCycleIdAndTextualLength(String line) {
