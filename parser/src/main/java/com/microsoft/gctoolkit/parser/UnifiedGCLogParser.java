@@ -41,6 +41,7 @@ public abstract class UnifiedGCLogParser extends GCLogParser {
 
     public UnifiedGCLogParser() {}
 
+    @Override
     protected void advanceClock(String record) {
         try {
             DateTimeStamp now = new Decorators(record).getDateTimeStamp();
