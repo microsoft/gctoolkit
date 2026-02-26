@@ -23,7 +23,7 @@
 #
 # Slash command to evaluate whether an issue or pull request is still relevant to the project
 #
-# gh-aw-metadata: {"schema_version":"v1","frontmatter_hash":"a4f42fa7fac19c93420ea390cb61efb6510aed1c7e16a39913fec9982866722a","compiler_version":"v0.50.4"}
+# gh-aw-metadata: {"schema_version":"v1","frontmatter_hash":"b521aea4f3e295ac50ea3ceb02279672256fa9cb308d9b1846130e3464d97214","compiler_version":"v0.50.4"}
 
 name: "Relevance Check Agent"
 "on":
@@ -53,6 +53,10 @@ name: "Relevance Check Agent"
     types:
     - created
     - edited
+  # roles: # Roles processed as role check in pre-activation job
+  # - admin # Roles processed as role check in pre-activation job
+  # - maintainer # Roles processed as role check in pre-activation job
+  # - write # Roles processed as role check in pre-activation job
 
 permissions: {}
 
@@ -65,7 +69,9 @@ jobs:
   activation:
     needs: pre_activation
     if: >
-      (needs.pre_activation.outputs.activated == 'true') && ((github.event_name == 'issues') && ((startsWith(github.event.issue.body, '/relevance-check ')) ||
+      (needs.pre_activation.outputs.activated == 'true') && (((github.event_name == 'issues' || github.event_name == 'issue_comment' ||
+      github.event_name == 'pull_request' || github.event_name == 'pull_request_review_comment' || github.event_name == 'discussion' ||
+      github.event_name == 'discussion_comment') && ((github.event_name == 'issues') && ((startsWith(github.event.issue.body, '/relevance-check ')) ||
       (github.event.issue.body == '/relevance-check')) || (github.event_name == 'issue_comment') && (((startsWith(github.event.comment.body, '/relevance-check ')) ||
       (github.event.comment.body == '/relevance-check')) && (github.event.issue.pull_request == null)) || (github.event_name == 'issue_comment') &&
       (((startsWith(github.event.comment.body, '/relevance-check ')) || (github.event.comment.body == '/relevance-check')) &&
@@ -74,7 +80,9 @@ jobs:
       (github.event_name == 'pull_request') && ((startsWith(github.event.pull_request.body, '/relevance-check ')) ||
       (github.event.pull_request.body == '/relevance-check')) || (github.event_name == 'discussion') && ((startsWith(github.event.discussion.body, '/relevance-check ')) ||
       (github.event.discussion.body == '/relevance-check')) || (github.event_name == 'discussion_comment') &&
-      ((startsWith(github.event.comment.body, '/relevance-check ')) || (github.event.comment.body == '/relevance-check')))
+      ((startsWith(github.event.comment.body, '/relevance-check ')) || (github.event.comment.body == '/relevance-check')))) ||
+      (!(github.event_name == 'issues' || github.event_name == 'issue_comment' || github.event_name == 'pull_request' ||
+      github.event_name == 'pull_request_review_comment' || github.event_name == 'discussion' || github.event_name == 'discussion_comment')))
     runs-on: ubuntu-slim
     permissions:
       contents: read
@@ -1054,7 +1062,9 @@ jobs:
 
   pre_activation:
     if: >
-      (github.event_name == 'issues') && ((startsWith(github.event.issue.body, '/relevance-check ')) || (github.event.issue.body == '/relevance-check')) ||
+      ((github.event_name == 'issues' || github.event_name == 'issue_comment' || github.event_name == 'pull_request' ||
+      github.event_name == 'pull_request_review_comment' || github.event_name == 'discussion' || github.event_name == 'discussion_comment') &&
+      ((github.event_name == 'issues') && ((startsWith(github.event.issue.body, '/relevance-check ')) || (github.event.issue.body == '/relevance-check')) ||
       (github.event_name == 'issue_comment') && (((startsWith(github.event.comment.body, '/relevance-check ')) ||
       (github.event.comment.body == '/relevance-check')) && (github.event.issue.pull_request == null)) || (github.event_name == 'issue_comment') &&
       (((startsWith(github.event.comment.body, '/relevance-check ')) || (github.event.comment.body == '/relevance-check')) &&
@@ -1063,7 +1073,9 @@ jobs:
       (github.event_name == 'pull_request') && ((startsWith(github.event.pull_request.body, '/relevance-check ')) ||
       (github.event.pull_request.body == '/relevance-check')) || (github.event_name == 'discussion') && ((startsWith(github.event.discussion.body, '/relevance-check ')) ||
       (github.event.discussion.body == '/relevance-check')) || (github.event_name == 'discussion_comment') &&
-      ((startsWith(github.event.comment.body, '/relevance-check ')) || (github.event.comment.body == '/relevance-check'))
+      ((startsWith(github.event.comment.body, '/relevance-check ')) || (github.event.comment.body == '/relevance-check')))) ||
+      (!(github.event_name == 'issues' || github.event_name == 'issue_comment' || github.event_name == 'pull_request' ||
+      github.event_name == 'pull_request_review_comment' || github.event_name == 'discussion' || github.event_name == 'discussion_comment'))
     runs-on: ubuntu-slim
     permissions:
       discussions: write
