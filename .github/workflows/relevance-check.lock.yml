@@ -23,7 +23,7 @@
 #
 # Slash command to evaluate whether an issue or pull request is still relevant to the project
 #
-# gh-aw-metadata: {"schema_version":"v1","frontmatter_hash":"b521aea4f3e295ac50ea3ceb02279672256fa9cb308d9b1846130e3464d97214","compiler_version":"v0.50.4"}
+# gh-aw-metadata: {"schema_version":"v1","frontmatter_hash":"c1b52a65adb02523a67f41be357fbf5eb23c4d2eddaf94fef9309a109b3c5d5c","compiler_version":"v0.50.4"}
 
 name: "Relevance Check Agent"
 "on":
@@ -345,7 +345,7 @@ jobs:
             const awInfo = {
               engine_id: "copilot",
               engine_name: "GitHub Copilot CLI",
-              model: "claude-opus-4.6",
+              model: "claude-sonnet-4",
               version: "",
               agent_version: "0.0.417",
               cli_version: "v0.50.4",
@@ -699,7 +699,7 @@ jobs:
         env:
           COPILOT_AGENT_RUNNER_TYPE: STANDALONE
           COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
-          COPILOT_MODEL: claude-opus-4.6
+          COPILOT_MODEL: claude-sonnet-4
           GH_AW_MCP_CONFIG: /home/runner/.copilot/mcp-config.json
           GH_AW_PROMPT: /tmp/gh-aw/aw-prompts/prompt.txt
           GH_AW_SAFE_OUTPUTS: ${{ env.GH_AW_SAFE_OUTPUTS }}
@@ -919,7 +919,7 @@ jobs:
         env:
           COPILOT_AGENT_RUNNER_TYPE: STANDALONE
           COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
-          COPILOT_MODEL: claude-opus-4.6
+          COPILOT_MODEL: claude-sonnet-4
           GH_AW_PROMPT: /tmp/gh-aw/aw-prompts/prompt.txt
           GITHUB_HEAD_REF: ${{ github.head_ref }}
           GITHUB_REF_NAME: ${{ github.ref_name }}
@@ -1138,7 +1138,7 @@ jobs:
     timeout-minutes: 15
     env:
       GH_AW_ENGINE_ID: "copilot"
-      GH_AW_ENGINE_MODEL: "claude-opus-4.6"
+      GH_AW_ENGINE_MODEL: "claude-sonnet-4"
       GH_AW_WORKFLOW_ID: "relevance-check"
       GH_AW_WORKFLOW_NAME: "Relevance Check Agent"
     outputs:
