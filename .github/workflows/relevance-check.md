@@ -26,7 +26,7 @@ You are a relevance evaluator for the **${{ github.repository }}** repository. A
 
 The triggering content is:
 
-"${{ needs.activation.outputs.text }}"
+"${{ steps.sanitized.outputs.text }}"
 
 ## Instructions
 
