@@ -3,6 +3,7 @@ description: "Slash command to evaluate whether an issue or pull request is stil
 on:
   slash_command:
     name: relevance-check
+  roles: [admin, maintainer, write]
 engine:
   id: copilot
   model: claude-opus-4.6
