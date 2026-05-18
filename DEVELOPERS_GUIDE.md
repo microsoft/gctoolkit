@@ -8,6 +8,8 @@ GCToolkit is comprised of 3 Java modules, vertx, parser, and api. This document 
 Additionally, GCToolkit contains several components that perform the heavy lifting. These components include, a framework to interact with data sources, diary, data source bus, parsers, and event source bus and finally, a framework to support the aggregation of events.
 The purpose of this document is to provide a brief description of each of these components to aid in the further development of this toolkit.
 
+If you are preparing a contribution, start with [CONTRIBUTING.md](CONTRIBUTING.md) for issue, build, test, and pull request guidance.
+
 ![GCToolkit Design](images/gctoolkit_design.png)
 Fig 1. GCToolKit Component Map
 
