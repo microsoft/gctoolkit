@@ -3,17 +3,16 @@
 package com.microsoft.gctoolkit.parser.jvm;
 
 import com.microsoft.gctoolkit.parser.unified.UnifiedLoggingLevel;
-import com.microsoft.gctoolkit.parser.unified.UnifiedLoggingTokens;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
 
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.TemporalAccessor;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Decorators {
 
@@ -39,7 +38,7 @@ public class Decorators {
      * For example, [1.361s][info][gc,heap]. This reads uptime of 1.361 seconds. The tag for the log record
      * is gc.heap at the info level.
      *
-     * At issue is that uptime and timemillis are, on the surface, indistinguishable. The same is true with
+     * At issue is that timemillis and uptimemillis are, on the surface, indistinguishable. The same is true with
      * timenanos and uptimenanos as well as with pid and tid. The following logic can be used to help differentiate
      * indistinguishable decorators.
      *
@@ -60,6 +59,11 @@ public class Decorators {
 
     private static final Logger LOGGER = Logger.getLogger(Decorators.class.getName());
 
+    // cheap optim, assume that most logs are at info or debug level and thus put those at the head of the list
+    private static final List<String> LEVELS = List.of("info", "debug", "error", "warning", "trace", "develop");
+    // not the same as UnifiedLoggingTokens.TAGS as there is no literal brackets here
+    private static final Pattern TAGS = Pattern.compile("[a-z0-9,. ]+");
+
     // This is to help differentiate between JVM running time and wall clock time.
     private static final long TWENTY_YEARS_IN_MILLIS = 731L * 24L * 60L * 60L * 1000L;
     private static final long TWENTY_YEARS_IN_NANO = 731L * 24L * 60L * 60L * 1000L;
@@ -75,9 +79,8 @@ public class Decorators {
     private static final int LOG_LEVEL_GROUP = 8;
     private static final int TAGS_GROUP = 9;
 
-    int numberOfDecorators;
-
-    private String[] decoratorGroups;
+    private final String[] decoratorGroups = new String[TAGS_GROUP + 1];
+    private int numberOfDecorators;
     private String tags;
 
     public Decorators(String line) {
@@ -85,34 +88,166 @@ public class Decorators {
     }
 
     private void extractValues(String line) {
-        if (!line.startsWith("["))
-            return;
-
-        Matcher decoratorMatcher = UnifiedLoggingTokens.DECORATORS.matcher(line);
-        if (!decoratorMatcher.find()) {
+        if (line.charAt(0) != '[') {
             return;
         }
-
-        // Retrieving a group from a matcher calls substring each time
-        // Store all the groups in an array ahead of time to avoid paying this cost unnecessarily
-        decoratorGroups = new String[decoratorMatcher.groupCount()];
-        for (int i = 1; i <= decoratorMatcher.groupCount(); i++) {
-            String group = decoratorMatcher.group(i);
-            decoratorGroups[i-1] = group;
-            if (group != null)
+        // don't assign fields until we are done parsing, to avoid inconsistent state
+        int numberOfDecorators = 0;
+        for (int i = 0; i < line.length() - 1; i++) {
+            if (line.charAt(i) == ']') {
                 numberOfDecorators++;
+                if (line.charAt(i + 1) == ' ') {
+                    // end of decorators
+                    break;
+                }
+            }
         }
-    }
+        if (numberOfDecorators == 0) {
+            return;
+        }
 
-    // For some reason, ISO_DATE_TIME doesn't like that time-zone is -0100. It wants -01:00.
-    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+        int cursor = 0;
+        int searchFor = DATE_STAMP_GROUP;
+        for (int i = 0; i < numberOfDecorators; i++) {
+            int endOfDecorator = line.indexOf(']', cursor);
+            if (line.charAt(cursor) != '[' || endOfDecorator == -1) {
+                // malformed, exit
+                return;
+            }
+            String currentDecoratorValue = line.substring(cursor + 1, endOfDecorator);
+            cursor = endOfDecorator + 1;
+
+            // get a line with all decorators with:
+            // java -Xlog:gc+heap=debug:stdout:time,uptime,timemillis,uptimemillis,timenanos,uptimenanos,pid,tid,level,tags -version
+            switch (searchFor) {
+                case DATE_STAMP_GROUP: // 2025-11-12T23:14:35.406+0100
+                {
+                    searchFor = UPTIME_GROUP;
+                    // check if the first decorator is a date, by checking the expected length
+                    if (currentDecoratorValue.length() == 28) {
+                        decoratorGroups[DATE_STAMP_GROUP] = currentDecoratorValue;
+                        break;
+                    }
+                    // fallthrough
+                }
+                case UPTIME_GROUP: // 0.008s
+                {
+                    searchFor = TIME_MILLIS_OR_MAYBE_UPTIME_MILLIS_GROUP;
+                    // there is always 1 integer digit, dot, 3 decimal digits and 's'
+                    if (currentDecoratorValue.length() >= 6
+                        && currentDecoratorValue.charAt(currentDecoratorValue.length() - 1) == 's'
+                        && Character.isDigit(currentDecoratorValue.charAt(currentDecoratorValue.length() - 2))
+                        && Character.isDigit(currentDecoratorValue.charAt(currentDecoratorValue.length() - 3))
+                        && Character.isDigit(currentDecoratorValue.charAt(currentDecoratorValue.length() - 4))
+                        && currentDecoratorValue.charAt(currentDecoratorValue.length() - 5) == '.'
+                    ) {
+                        currentDecoratorValue = currentDecoratorValue.substring(0, currentDecoratorValue.length() - 1);
+                        decoratorGroups[UPTIME_GROUP] = currentDecoratorValue;
+                        break;
+                    }
+                    // fallthrough
+                }
+                case TIME_MILLIS_OR_MAYBE_UPTIME_MILLIS_GROUP: // 1762985675406ms
+                    // fallthrough, as we don't know yet what we are looking for and those are similar in shape
+                case UPTIME_MILLIS_GROUP: // 8ms
+                {
+                    searchFor += 1;
+                    if (currentDecoratorValue.length() >= 3
+                        && currentDecoratorValue.endsWith("ms")
+                        && Character.isDigit(currentDecoratorValue.charAt(currentDecoratorValue.length() - 3))) {
+                        int idx = decoratorGroups[TIME_MILLIS_OR_MAYBE_UPTIME_MILLIS_GROUP] == null
+                                ? TIME_MILLIS_OR_MAYBE_UPTIME_MILLIS_GROUP
+                                : UPTIME_MILLIS_GROUP;
+                        decoratorGroups[idx] = currentDecoratorValue;
+                        break;
+                    }
+                    // fallthrough
+                }
+
+                case TIME_NANOS_OR_MAYBE_UPTIME_NANOS_GROUP: // 322653519219000ns
+                    // fallthrough, same as above
+                case UPTIME_NANOS_GROUP: { // 8344208ns
+                    searchFor += 1;
+                    if (currentDecoratorValue.length() >= 3
+                        && currentDecoratorValue.endsWith("ns")
+                        && Character.isDigit(currentDecoratorValue.charAt(currentDecoratorValue.length() - 3))) {
+                        int idx = decoratorGroups[TIME_NANOS_OR_MAYBE_UPTIME_NANOS_GROUP] == null
+                                ? TIME_NANOS_OR_MAYBE_UPTIME_NANOS_GROUP
+                                : UPTIME_NANOS_GROUP;
+                        decoratorGroups[idx] = currentDecoratorValue;
+                        break;
+                    }
+                    // fallthrough
+                }
+                case PID_GROUP: // 69050
+                    // fallthrough
+                case TID_GROUP: // 6147
+                {
+                    searchFor += 1;
+                    if (currentDecoratorValue.chars().allMatch(Character::isDigit)) {
+                        int idx = decoratorGroups[PID_GROUP] == null
+                                ? PID_GROUP
+                                : TID_GROUP;
+                        decoratorGroups[idx] = currentDecoratorValue;
+                        break;
+                    }
+                    // fallthrough
+                }
+                case LOG_LEVEL_GROUP: // debug
+                {
+                    searchFor = TAGS_GROUP;
+                    String trimmed = currentDecoratorValue.trim();
+                    if (LEVELS.contains(trimmed)) {
+                        decoratorGroups[LOG_LEVEL_GROUP] = trimmed;
+                        break;
+                    }
+                    // fallthrough
+                }
+                case TAGS_GROUP: // gc,heap
+                {
+                    String trimmed = currentDecoratorValue.trim();
+                    if (TAGS.matcher(trimmed).find()) {
+                        decoratorGroups[TAGS_GROUP] = trimmed;
+                    }
+                    break;
+                    // no fallthrough here... :)
+                }
+                default:
+                    // we shouldn't be searching for decorators anymore, so the line is malformed, thus we exit
+                    return;
+            }
+        }
+        // now we can assign
+        this.numberOfDecorators = numberOfDecorators;
+    }
 
     public ZonedDateTime getDateStamp() {
         try {
             String value = decoratorGroups[DATE_STAMP_GROUP];
             if (value != null) {
-                TemporalAccessor temporalAccessor = formatter.parse(value.substring(1, value.length()-1));
-                return ZonedDateTime.from(temporalAccessor);
+                // we know that value has the correct length already, so just check the expected format
+                if (
+                        value.charAt(4) != '-'
+                        || value.charAt(7) != '-'
+                        || value.charAt(10) != 'T'
+                        || value.charAt(13) != ':'
+                        || value.charAt(16) != ':'
+                        || value.charAt(19) != '.'
+                        || (value.charAt(23) != '+' && value.charAt(23) != '-')) {
+                    throw new IllegalArgumentException("Invalid data, should match yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+                }
+                int year = Integer.parseInt(value, 0, 4, 10);
+                int month = Integer.parseInt(value, 5, 7, 10);
+                int day = Integer.parseInt(value, 8, 10, 10);
+                int hour = Integer.parseInt(value, 11, 13, 10);
+                int minute = Integer.parseInt(value, 14, 16, 10);
+                int second = Integer.parseInt(value, 17, 19, 10);
+                int millis = Integer.parseInt(value, 20, 23, 10);
+                char sign = value.charAt(23);
+                int hoursOffset = Integer.parseInt(value, 24, 26, 10);
+                hoursOffset = sign == '-' ? -hoursOffset : hoursOffset;
+                int minutesOffset = Integer.parseInt(value, 26, 28, 10);
+                return ZonedDateTime.of(year, month, day, hour, minute, second, millis * 1000 * 1000, ZoneOffset.ofHoursMinutes(hoursOffset, minutesOffset));
             }
         } catch (NullPointerException npe) {
             LOGGER.log(Level.SEVERE, npe.getMessage(), npe);
@@ -123,8 +258,8 @@ public class Decorators {
     public double getUpTime() {
         String value = decoratorGroups[UPTIME_GROUP];
         if (value != null) {
-            value = value.replace(",", ".");
-            return Double.parseDouble(unboxValue(value, 1));
+            value = value.replace(',', '.');
+            return Double.parseDouble(value);
         }
         return -1.0d;
     }
@@ -213,7 +348,7 @@ public class Decorators {
     }
 
     private String unboxValue(String boxedValue, int postFix) {
-        return boxedValue.substring(1, boxedValue.length() - (1 + postFix));
+        return boxedValue.substring(0, boxedValue.length() - postFix);
     }
 
     private String unboxValue(String boxedValue) {
