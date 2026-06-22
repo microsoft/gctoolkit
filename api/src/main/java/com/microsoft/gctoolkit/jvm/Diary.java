@@ -54,6 +54,13 @@ import static com.microsoft.gctoolkit.jvm.SupportedFlags.*;
     GENERATIONAL_ZGC                            // 29
  */
 
+/**
+ * Records discovered GC log feature states while a log is being diarized.
+ *
+ * <p>Each {@link SupportedFlags} entry is tracked as true, false, or unknown so
+ * parser selection and event-source discovery can defer decisions until enough
+ * log evidence has been observed.</p>
+ */
 public class Diary {
 
     private final TripleState[] states;
