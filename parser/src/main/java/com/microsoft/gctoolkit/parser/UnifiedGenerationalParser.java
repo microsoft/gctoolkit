@@ -171,11 +171,11 @@ public class UnifiedGenerationalParser extends UnifiedGCLogParser implements Uni
         if (pauseEvent != null)
             LOGGER.warning("Young pause event not recorded: " + pauseEvent.getGcID());
         if (diary.isCMS())
-            pauseEvent = new GenerationalForwardReference(ParNew, new Decorators(line), super.GCID_COUNTER.parse(line).getIntegerGroup(1));
+            pauseEvent = new GenerationalForwardReference(ParNew, new Decorators(line), extractGCID(line));
         else if (diary.isPSYoung())
-            pauseEvent = new GenerationalForwardReference(PSYoungGen, new Decorators(line), super.GCID_COUNTER.parse(line).getIntegerGroup(1));
+            pauseEvent = new GenerationalForwardReference(PSYoungGen, new Decorators(line), extractGCID(line));
         else if (diary.isSerialFull())
-            pauseEvent = new GenerationalForwardReference(DefNew, new Decorators(line), super.GCID_COUNTER.parse(line).getIntegerGroup(1));
+            pauseEvent = new GenerationalForwardReference(DefNew, new Decorators(line), extractGCID(line));
         else {
             LOGGER.warning("Unrecognized collection phase -> " + line);
             return;
@@ -287,7 +287,7 @@ public class UnifiedGenerationalParser extends UnifiedGCLogParser implements Uni
     private void initialMark(GCLogTrace trace, String line) {
         if (concurrentCyclePauseEvent != null)
             LOGGER.warning("Pause event not completely recorded: " + pauseEvent.getGcID());
-        concurrentCyclePauseEvent = new GenerationalForwardReference(InitialMark, new Decorators(line), GCID_COUNTER.parse(line).getIntegerGroup(1));
+        concurrentCyclePauseEvent = new GenerationalForwardReference(InitialMark, new Decorators(line), extractGCID(line));
         concurrentCyclePauseEvent.setStartTime(getClock());
     }
 
@@ -304,7 +304,7 @@ public class UnifiedGenerationalParser extends UnifiedGCLogParser implements Uni
             LOGGER.warning("Unknown concurrent phase: " + line);
             return;
         }
-        concurrentEvent = new GenerationalForwardReference(gcType, new Decorators(line), GCID_COUNTER.parse(line).getIntegerGroup(1));
+        concurrentEvent = new GenerationalForwardReference(gcType, new Decorators(line), extractGCID(line));
         concurrentEvent.setStartTime(getClock());
         inConcurrentPhase = true;
     }
@@ -325,7 +325,7 @@ public class UnifiedGenerationalParser extends UnifiedGCLogParser implements Uni
     private void remark(GCLogTrace trace, String line) {
         if (concurrentCyclePauseEvent != null)
             LOGGER.warning("Pause event not recorded and is about to be lost: " + pauseEvent.getGcID());
-        concurrentCyclePauseEvent = new GenerationalForwardReference(Remark, new Decorators(line), GCID_COUNTER.parse(line).getIntegerGroup(1));
+        concurrentCyclePauseEvent = new GenerationalForwardReference(Remark, new Decorators(line), extractGCID(line));
         concurrentCyclePauseEvent.setStartTime(getClock());
     }
 
@@ -354,9 +354,9 @@ public class UnifiedGenerationalParser extends UnifiedGCLogParser implements Uni
     private void fullGC(GCLogTrace trace, String line) {
         if (pauseEvent == null) {
             if (diary.isPSOldGen())
-                pauseEvent = new GenerationalForwardReference(PSFull, new Decorators(line), super.GCID_COUNTER.parse(line).getIntegerGroup(1));
+                pauseEvent = new GenerationalForwardReference(PSFull, new Decorators(line), extractGCID(line));
             else
-                pauseEvent = new GenerationalForwardReference(FullGC, new Decorators(line), super.GCID_COUNTER.parse(line).getIntegerGroup(1));
+                pauseEvent = new GenerationalForwardReference(FullGC, new Decorators(line), extractGCID(line));
             pauseEvent.setStartTime(getClock());
         } else if (pauseEvent.getGarbageCollectionType() == ParNew) {
             pauseEvent.convertToConcurrentModeFailure();
@@ -364,7 +364,7 @@ public class UnifiedGenerationalParser extends UnifiedGCLogParser implements Uni
             pauseEvent.convertToSerialFull();
         } else if (pauseEvent.getGarbageCollectionType() != ConcurrentModeFailure) {
             LOGGER.warning("Maybe Full Pause event not recorded: " + pauseEvent.getGcID()); //todo: difficult to know if this is a full or a CMF
-            pauseEvent = new GenerationalForwardReference(FullGC, new Decorators(line), super.GCID_COUNTER.parse(line).getIntegerGroup(1));
+            pauseEvent = new GenerationalForwardReference(FullGC, new Decorators(line), extractGCID(line));
             pauseEvent.setStartTime(getClock());
         }
         
@@ -436,10 +436,9 @@ public class UnifiedGenerationalParser extends UnifiedGCLogParser implements Uni
     private ArrayList<GenerationalGCPauseEvent> cache = new ArrayList<>();
 
     private void cpuBreakout(GCLogTrace trace, String line) {
-        GCLogTrace gcidTrace = GCID_COUNTER.parse(line);
-        if (gcidTrace != null) {
+        int gcid = extractGCID(line);
+        if (gcid != -1) {
             CPUSummary cpuSummary = new CPUSummary(trace.getDoubleGroup(1), trace.getDoubleGroup(2), trace.getDoubleGroup(3));
-            int gcid = gcidTrace.getIntegerGroup(1);
             // There are 3 cases to consider.
             // - pause event outside of a concurrent cycle
             // - pause event that is part of the concurrent cycle
