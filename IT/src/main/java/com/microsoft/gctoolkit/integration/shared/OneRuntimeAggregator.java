@@ -6,11 +6,9 @@ import com.microsoft.gctoolkit.aggregator.EventSource;
 
 @Aggregates({EventSource.G1GC,EventSource.GENERATIONAL,EventSource.SHENANDOAH,EventSource.ZGC})
 public class OneRuntimeAggregator extends Aggregator<OneRuntimeReport> {
-    /**
-     * Subclass only.
-     *
-     * @param aggregation The Aggregation that {@literal @}Collates this Aggregator
-     */
+    /// Subclass only.
+    ///
+    /// @param aggregation The Aggregation that `@`Collates this Aggregator
     public OneRuntimeAggregator(OneRuntimeReport aggregation) {
         super(aggregation);
     }

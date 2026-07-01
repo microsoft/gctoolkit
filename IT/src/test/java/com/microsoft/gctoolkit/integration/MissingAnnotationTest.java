@@ -22,7 +22,7 @@ public class MissingAnnotationTest {
 
     @SuppressWarnings("unchecked")
     private void workFlow(Aggregation aggregation, Class clazz) {
-        GCToolKit gcToolKit = new GCToolKit();
+        var gcToolKit = new GCToolKit();
         // Load our test aggregation instead of calling GCToolKit::loadAggregationsFromServiceLoader
         gcToolKit.loadAggregation(aggregation);
         JavaVirtualMachine machine = null;
@@ -46,7 +46,7 @@ public class MissingAnnotationTest {
         workFlow(new MissingEventSource(), MissingAnnotationTest.MissingEventSource.class);
     }
 
-    /************* Aggregator/Aggregation with missing Collates annotation */
+    /// *********** Aggregator/Aggregation with missing Collates annotation
     public static class MissingAnnotationAggregation extends Aggregation {
 
         @Override
@@ -68,7 +68,7 @@ public class MissingAnnotationTest {
         }
     }
 
-    /************* Aggregator/Aggregation with missing Aggregates annotation */
+    /// *********** Aggregator/Aggregation with missing Aggregates annotation
     @Collates(MissingAnnotationAggregator.class)
     public static class MissingEventSource extends Aggregation {
         @Override

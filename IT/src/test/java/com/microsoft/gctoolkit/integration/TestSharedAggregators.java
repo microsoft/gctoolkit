@@ -21,10 +21,10 @@ public class TestSharedAggregators {
 
     @Test
     public void compareRuntimeDurations() {
-        TestLogFile logFile = new TestLogFile(testLog);
+        var logFile = new TestLogFile(testLog);
         Path gcLogFile = logFile.getFile().toPath();
         GCLogFile log = new SingleGCLogFile(gcLogFile);
-        GCToolKit toolKit = new GCToolKit();
+        var toolKit = new GCToolKit();
         toolKit.loadAggregationsFromServiceLoader();
         JavaVirtualMachine jvm = null;
         try {

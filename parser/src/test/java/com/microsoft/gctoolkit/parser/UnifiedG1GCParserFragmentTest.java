@@ -6,18 +6,11 @@ import com.microsoft.gctoolkit.event.CPUSummary;
 import com.microsoft.gctoolkit.event.GCCause;
 import com.microsoft.gctoolkit.event.MemoryPoolSummary;
 import com.microsoft.gctoolkit.event.g1gc.G1Young;
-import com.microsoft.gctoolkit.event.jvm.JVMEvent;
 import com.microsoft.gctoolkit.event.jvm.SurvivorRecord;
 import com.microsoft.gctoolkit.jvm.Diarizer;
-import com.microsoft.gctoolkit.parser.diary.TestLogFile;
 import com.microsoft.gctoolkit.parser.jvm.UnifiedDiarizer;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-
-import java.io.IOException;
-import java.nio.file.Path;
-import java.util.Iterator;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -88,11 +81,11 @@ public class UnifiedG1GCParserFragmentTest extends ParserTest {
                 "[2023-12-06T07:32:54.701+0000][613ms] GC(1) User=0.00s Sys=0.00s Real=0.00s"
         };
 
-        List<JVMEvent> jvmEvents = feedParser(lines);
+        var jvmEvents = feedParser(lines);
 
         try {
             Assertions.assertEquals(2, jvmEvents.size());
-            Assertions.assertEquals(G1Young.class, jvmEvents.get(0).getClass());
+            Assertions.assertEquals(G1Young.class, jvmEvents.getFirst().getClass());
             Assertions.assertEquals(G1Young.class, jvmEvents.get(1).getClass());
         } catch(Throwable t) {
             fail(t);
@@ -103,8 +96,9 @@ public class UnifiedG1GCParserFragmentTest extends ParserTest {
     public void testSurvivorRecord() {
         String[] lines = {"[0.016s][info][gc,heap] Heap region size: 1M",
                 "[0.018s][info][gc     ] Using G1",
-                "[0.018s][info][gc,heap,coops] Heap address: 0x00000007fc000000, size: 64 MB, Compressed Oops mode: Zero based, Oop shift amount: 3\n" +
-                "[10.749s][info][gc,start     ] GC(0) Pause Young (Normal) (G1 Evacuation Pause)",
+                """
+                [0.018s][info][gc,heap,coops] Heap address: 0x00000007fc000000, size: 64 MB, Compressed Oops mode: Zero based, Oop shift amount: 3
+                [10.749s][info][gc,start     ] GC(0) Pause Young (Normal) (G1 Evacuation Pause)""",
                 "[10.749s][info][gc,task      ] GC(0) Using 8 workers of 8 for evacuation",
                 "[10.749s][debug][gc,age       ] GC(0) Desired survivor size 1572864 bytes, new threshold 15 (max threshold 15)",
                 "[10.753s][trace][gc,age       ] GC(0) Age table with threshold 15 (max threshold 15)",
@@ -153,12 +147,12 @@ public class UnifiedG1GCParserFragmentTest extends ParserTest {
                 "[10.754s][info ][gc           ] GC(0) Pause Young (Normal) (G1 Evacuation Pause) 23M->5M(64M) 5.662ms",
                 "[10.754s][info ][gc,cpu       ] GC(0) User=0.03s Sys=0.01s Real=0.00s"
         };
-        List<JVMEvent> jvmEvents = feedParser(lines);
+        var jvmEvents = feedParser(lines);
 
         try {
             Assertions.assertEquals(1, jvmEvents.size());
-            Assertions.assertEquals(G1Young.class, jvmEvents.get(0).getClass());
-            G1Young cycle = (G1Young) jvmEvents.get(0);
+            Assertions.assertEquals(G1Young.class, jvmEvents.getFirst().getClass());
+            var cycle = (G1Young) jvmEvents.getFirst();
             SurvivorRecord survivorRecord = cycle.getSurvivorRecord();
             Assertions.assertEquals(1572864, survivorRecord.getDesiredOccupancyAfterCollection());
             Assertions.assertEquals(15, survivorRecord.getMaxTenuringThreshold());

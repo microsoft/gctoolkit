@@ -4,10 +4,8 @@ package com.microsoft.gctoolkit.event;
 
 import com.microsoft.gctoolkit.time.DateTimeStamp;
 
-/**
- * Exemplar
- * 11906.844: [GC pause (young)11906.881: [SoftReference, 0 refs, 0.0000060 secs]11906.881: [WeakReference, 0 refs, 0.0000020 secs]11906.881: [FinalReference, 0 refs, 0.0000010 secs]11906.881: [PhantomReference, 0 refs, 0.0000020 secs]11906.881: [JNI Weak Reference, 0.0002710 secs], 0.03831600 secs]
- */
+/// Exemplar
+/// 11906.844: [GC pause (young)11906.881: [SoftReference, 0 refs, 0.0000060 secs]11906.881: [WeakReference, 0 refs, 0.0000020 secs]11906.881: [FinalReference, 0 refs, 0.0000010 secs]11906.881: [PhantomReference, 0 refs, 0.0000020 secs]11906.881: [JNI Weak Reference, 0.0002710 secs], 0.03831600 secs]
 public class ReferenceGCSummary {
 
     private DateTimeStamp softReferenceDateTimeStamp;

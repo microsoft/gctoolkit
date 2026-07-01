@@ -2,6 +2,8 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.event.zgc;
 
+import org.jspecify.annotations.Nullable;
+
 public class ZGCUsedSummary {
     private final long markStart;
     private final long markEnd;
@@ -31,7 +33,7 @@ public class ZGCUsedSummary {
         return markStart;
     }
 
-    public ZGCUsedSummary sum(ZGCUsedSummary other) {
+    public ZGCUsedSummary sum(@Nullable ZGCUsedSummary other) {
         if (other == null) {
             return this;
         }

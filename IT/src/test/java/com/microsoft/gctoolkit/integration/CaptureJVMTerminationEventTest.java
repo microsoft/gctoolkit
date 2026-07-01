@@ -38,7 +38,7 @@ public class CaptureJVMTerminationEventTest {
          * The log files can be either in text, zip, or gzip format.
          */
         GCLogFile logFile = new SingleGCLogFile(Path.of(gcLogFile));
-        GCToolKit gcToolKit = new GCToolKit();
+        var gcToolKit = new GCToolKit();
 
         /**
          * This call will load all implementations of Aggregator that have been declared in module-info.java.

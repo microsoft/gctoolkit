@@ -2,13 +2,11 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.parser;
 
-/**
- * Patterns in the GC log associated with the Concurrent Mark and Sweep (CMS)
- * Collector.
- * <p>
- * TODO The patterns could be split into separate files, e.g. ParNew, CMF and
- * so on
- */
+/// Patterns in the GC log associated with the Concurrent Mark and Sweep (CMS)
+/// Collector.
+///
+/// TODO The patterns could be split into separate files, e.g. ParNew, CMF and
+/// so on
 public interface CMSPatterns extends SharedPatterns {
 
     //[Rescan (non-parallel) 139439.229:
@@ -33,12 +31,12 @@ public interface CMSPatterns extends SharedPatterns {
     String CARD_SUMMARY = TIMESTAMP + "\\[CMS \\(cardTable: " + COUNTER + " cards, re-scanned " + COUNTER + " cards, " + COUNTER + " iterations\\)";
     String FLS_LARGE_BLOCK_BODY = "CMS: Large block " + MEMORY_ADDRESS;
 
-    /****** Current working set  *************/
+    /// **** Current working set  ************
 
     GCParseRule REMARK_CLAUSE = new GCParseRule("REMARK_CLAUSE", REMARK_BLOCK);
     GCParseRule POOL_OCCUPANCY_HEAP_OCCUPANCY_BLOCK = new GCParseRule("POOL_OCCUPANCY_HEAP_OCCUPANCY_BLOCK", BEFORE_AFTER_CONFIGURED_PAUSE + "\\] " + BEFORE_AFTER_CONFIGURED + ", ");
 
-    /**********  CMS Phase records **********/
+    /// ********  CMS Phase records *********
     //3.307: [GC [1 CMS-initial-mark: 0K(18874368K)] 302009K(20761856K), 0.0994470 secs] [Times: user=0.20 sys=0.00, real=0.10 secs]
     //12.986: [GC[1 CMS-initial-mark: 33532K(62656K)] 49652K(81280K), 0.0014191 secs] [Times: user=0.00 sys=0.00, real=0.00 secs]
     //40.971: [GC (CMS Initial Mark) [1 CMS-initial-mark: 2692K(5376K)] 38078K(354944K), 0.0147940 secs] [Times: user=0.01 sys=0.00, real=0.02 secs]
@@ -52,7 +50,7 @@ public interface CMSPatterns extends SharedPatterns {
     GCParseRule CONCURRENT_PHASE_END_BLOCK = new GCParseRule("CONCURRENT_PHASE_END_BLOCK", CMS_PHASE_END + " " + CPU_SUMMARY);
     GCParseRule ABORT_PRECLEAN_DUE_TO_TIME_CLAUSE = new GCParseRule("ABORT_PRECLEAN_DUE_TO_TIME_CLAUSE", "^" + ABORT_PRECLEAN_DUE_TO_TIME_BLOCK);
 
-    /********** Remark statements **********/
+    /// ******** Remark statements *********
     //, 0.0404150 secs]204737.599: [weak refs processing, 0.0112190 secs] [1 CMS-remark: 30259925K(60327552K)] 30338613K(60768448K), 0.0528880 secs]
     String REMARK_DETAILS_BLOCK = ", " + PAUSE_TIME + "\\]" + WEAK_REF_BLOCK + "(?:" + STRING_TABLE_SCRUB_BLOCK + ")? " + REMARK_BLOCK;
     GCParseRule REMARK_DETAILS = new GCParseRule("REMARK_DETAILS", "^" + REMARK_DETAILS_BLOCK);
@@ -101,7 +99,7 @@ public interface CMSPatterns extends SharedPatterns {
     //11.980: [Rescan (parallel) , 0.0085120 secs]11.988: [weak refs processing, 0.0000210 secs]11.988: [class unloading, 0.0097120 secs]11.998: [scrub symbol & string tables, 0.0073130 secs] [1 CMS-remark: 0K(18874368K)] 28278K(20761856K), 0.0462600 secs]
     GCParseRule PARALLEL_RESCAN_WEAK_CLASS_SCRUB = new GCParseRule("PARALLEL_RESCAN_WEAK_CLASS_SCRUB", "^" + DATE_TIMESTAMP + "\\[Rescan \\(parallel\\) , " + PAUSE_TIME + "\\]" + WEAK_REF_BLOCK + CLASS_UNLOADING_BLOCK + STRING_AND_SYMBOL_SCRUB_BLOCK + " " + REMARK_BLOCK);
 
-    /**********  ParNew records **********/
+    /// ********  ParNew records *********
 
     //48.021: [GC48.021: [ParNew: 306686K->34046K(306688K), 0.3196120 secs] 1341473K->1125818K(8669952K), 0.3197540 secs]
     GCParseRule PARNEW = new GCParseRule("PARNEW", "^(" + GC_PREFIX + ")?" + PARNEW_BLOCK + " " + BEFORE_AFTER_CONFIGURED_PAUSE + "\\]");
@@ -153,7 +151,7 @@ public interface CMSPatterns extends SharedPatterns {
     //(concurrent mode failure)10.103: [SoftReference, 0 refs, 0.0000148 secs]10.103: [WeakReference, 130 refs, 0.0000052 secs]10.103: [FinalReference, 848 refs, 0.0000175 secs]10.103: [PhantomReference, 0 refs, 0 refs, 0.0000029 secs]10.103: [JNI Weak Reference, 0.0000052 secs]: 172902K->6834K(174784K), 0.0106416 secs] 244864K->6834K(253440K), [Metaspace: 11290K->11290K(1058816K)], 0.0116373 secs] [Times: user=0.01 sys=0.01, real=0.01 secs]
     GCParseRule CONCURRENT_MODE_FAILURE_REFERENCE = new GCParseRule("CONCURRENT_MODE_FAILURE_REFERENCE", "^\\(concurrent mode failure\\)" + REFERENCE_RECORDS + ": " + BEFORE_AFTER_CONFIGURED_PAUSE + "\\] " + BEFORE_AFTER_CONFIGURED + ", " + PERM_RECORD + ", " + PAUSE_TIME + "\\]");
 
-    /********** Concurrent Mode Failures (CMF) *********/
+    /// ******** Concurrent Mode Failures (CMF) ********
 
     //12525.344: [Full GC 12525.344: [ParNew
     GCParseRule FULL_PARNEW_START = new GCParseRule("FULL_PARNEW_START", FULL_GC_PREFIX + TIMESTAMP + "\\[ParNew$");
@@ -274,9 +272,9 @@ public interface CMSPatterns extends SharedPatterns {
     //2016-04-01T14:25:57.870-0700: 8761.336: [Full GC (GCLocker Initiated GC)2016-04-01T14:25:57.871-0700: 8761.336: [CMS (concurrent mode failure)2016-04-01T14:25:59.160-0700: 8762.626: [SoftReference, 541 refs, 0.0001800 secs]2016-04-01T14:25:59.160-0700: 8762.626: [WeakReference, 21658 refs, 0.0024960 secs]2016-04-01T14:25:59.163-0700: 8762.628: [FinalReference, 4142 refs, 0.0033170 secs]2016-04-01T14:25:59.166-0700: 8762.632: [PhantomReference, 194 refs, 0.0000550 secs]2016-04-01T14:25:59.166-0700: 8762.632: [JNI Weak Reference, 0.0000220 secs]: 4186495K->665385K(4218880K), 3.8356980 secs] 4448832K->665385K(5946048K), [CMS Perm : 417612K->417612K(1048576K)], 3.8379940 secs] [Times: user=3.84 sys=0.02, real=3.83 secs]
     GCParseRule FULL_GC_REFERENCE_CMF = new GCParseRule("FULL_GC_REFERENCE_CMF", FULL_GC_PREFIX + DATE_TIMESTAMP + "\\[CMS \\(concurrent mode failure\\)" + REFERENCE_RECORDS + ": " + BEFORE_AFTER_CONFIGURED_PAUSE + "\\] " + BEFORE_AFTER_CONFIGURED + ", " + PERM_RECORD + ", " + PAUSE_TIME);
 
-    /**********
-     * Record with debug information
-     * *********/
+    /// ********
+    /// Record with debug information
+    /// ********
 
     String CMS_SCANNING = TIMESTAMP + "\\[(?:CMS|Tenured)( \\(concurrent mode failure\\))?Finished (generational|perm) space scanning in " + INTEGER + "th thread: " + PAUSE_TIME;
     //257.311: [GC 257.311: [ParNew (promotion failed): 1887488K->1887488K(1887488K), 20.7438090 secs]26278.055: [CMSFinished generational space scanning in 0th thread: 50.866 sec

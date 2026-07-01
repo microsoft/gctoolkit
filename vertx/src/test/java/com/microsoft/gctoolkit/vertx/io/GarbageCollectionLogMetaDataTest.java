@@ -32,7 +32,7 @@ public class GarbageCollectionLogMetaDataTest {
     public void testSingleLogInZip() {
         try {
             Path path = new TestLogFile("gc.log.zip").getFile().toPath();
-            SingleLogFileMetadata metaData = new SingleLogFileMetadata(path);
+            var metaData = new SingleLogFileMetadata(path);
             assertEquals(1, metaData.getNumberOfFiles());
             assertFalse(metaData.isGZip());
             assertTrue(metaData.isZip());
@@ -47,7 +47,7 @@ public class GarbageCollectionLogMetaDataTest {
     public void testRotatingLogs() {
         try {
             Path path = new TestLogFile("rotating.zip").getFile().toPath();
-            RotatingLogFileMetadata metaData = new RotatingLogFileMetadata(path);
+            var metaData = new RotatingLogFileMetadata(path);
             assertEquals(2, metaData.getNumberOfFiles());
             assertFalse(metaData.isGZip());
             assertTrue(metaData.isZip());
@@ -62,7 +62,7 @@ public class GarbageCollectionLogMetaDataTest {
     public void testZippedDirectoryWithRotatingLog() {
         try {
             Path path = new TestLogFile("rotating_directory.zip").getFile().toPath();
-            RotatingLogFileMetadata metaData = new RotatingLogFileMetadata(path);
+            var metaData = new RotatingLogFileMetadata(path);
             assertEquals(2, metaData.getNumberOfFiles());
             assertFalse(metaData.isGZip());
             assertTrue(metaData.isZip());
@@ -77,7 +77,7 @@ public class GarbageCollectionLogMetaDataTest {
     public void testGZipFile() {
         try {
             Path path = new TestLogFile("gc.log.gz").getFile().toPath();
-            SingleLogFileMetadata metaData = new SingleLogFileMetadata(path);
+            var metaData = new SingleLogFileMetadata(path);
             assertEquals(1, metaData.getNumberOfFiles());
             assertTrue(metaData.isGZip());
             assertFalse(metaData.isZip());
@@ -95,7 +95,7 @@ public class GarbageCollectionLogMetaDataTest {
     public void testGZipTarFile() {
         try {
             Path path = new TestLogFile("gc.log.tar.gz").getFile().toPath();
-            SingleLogFileMetadata metaData = new SingleLogFileMetadata(path);
+            var metaData = new SingleLogFileMetadata(path);
             assertEquals(1, metaData.getNumberOfFiles());
             assertTrue(metaData.isGZip());
             assertFalse(metaData.isZip());
@@ -110,7 +110,7 @@ public class GarbageCollectionLogMetaDataTest {
     public void testDirectory() {
         try {
             Path path = new TestLogFile("rotating_directory").getFile().toPath();
-            RotatingLogFileMetadata metaData = new RotatingLogFileMetadata(path);
+            var metaData = new RotatingLogFileMetadata(path);
             assertEquals(2, metaData.getNumberOfFiles());
             assertFalse(metaData.isGZip());
             assertFalse(metaData.isZip());

@@ -9,6 +9,7 @@ module com.microsoft.gctoolkit.vertx {
     requires com.microsoft.gctoolkit.api;
     requires io.vertx.core;
     requires java.logging;
+    requires transitive org.jspecify;
 
     provides com.microsoft.gctoolkit.message.DataSourceChannel with com.microsoft.gctoolkit.vertx.VertxDataSourceChannel;
     provides com.microsoft.gctoolkit.message.JVMEventChannel with com.microsoft.gctoolkit.vertx.VertxJVMEventChannel;

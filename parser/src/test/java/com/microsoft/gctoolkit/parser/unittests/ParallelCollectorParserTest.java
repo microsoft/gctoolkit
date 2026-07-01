@@ -15,7 +15,7 @@ public class ParallelCollectorParserTest extends ParserTest {
 
     @Test
     public void testForDetailsTenuringGCCause170() {
-        int i = 0;
+        var i = 0;
         for ( String name : detailsTenuringGCCause170) {
             try {
                 Path path = new TestLogFile("ps/details/tenuring/gccause/170/" + name).getFile().toPath();
@@ -45,7 +45,7 @@ public class ParallelCollectorParserTest extends ParserTest {
 
     @Test
     public void testForDetails() {
-        int i = 0;
+        var i = 0;
         for ( String name : details) {
             try {
                 Path path = new TestLogFile("ps/details/" + name).getFile().toPath();

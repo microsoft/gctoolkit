@@ -21,6 +21,7 @@ public enum ZGCConcurrentPhases implements LabelledGCEventType {
         return LabelledGCEventType.fromLabel(ZGCConcurrentPhases.class, label);
     }
 
+    @Override
     public String getLabel() {
         return label;
     }

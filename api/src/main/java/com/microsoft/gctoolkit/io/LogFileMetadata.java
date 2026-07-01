@@ -8,9 +8,7 @@ import java.nio.file.Path;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 
-/**
- * Meta-data about a {@link FileDataSource}.
- */
+/// Meta-data about a [FileDataSource].
 public abstract class LogFileMetadata {
 
     private static final Logger LOG = Logger.getLogger(LogFileMetadata.class.getName());
@@ -34,9 +32,9 @@ public abstract class LogFileMetadata {
     }
 
     boolean magic(int field1, int field2) {
-        try (FileInputStream magicByteReader = new FileInputStream(path.toFile())) {
-            int magicByte1 = magicByteReader.read();
-            int magicByte2 = magicByteReader.read();
+        try (var magicByteReader = new FileInputStream(path.toFile())) {
+            var magicByte1 = magicByteReader.read();
+            var magicByte2 = magicByteReader.read();
             return magicByte1 == field1 && magicByte2 == field2;
         } catch (IOException ioe) {
             LOG.warning(ioe.getMessage());
@@ -57,41 +55,31 @@ public abstract class LogFileMetadata {
             fileFormat = FileFormat.PLAINTEXT;
     }
 
-    /**
-     * Return the number of files. Useful if the file is a compressed file which may
-     * contain multiple entries.
-     * @return The number of files in the file.
-     */
+    /// Return the number of files. Useful if the file is a compressed file which may
+    /// contain multiple entries.
+    /// @return The number of files in the file.
     public abstract int getNumberOfFiles();
 
-    /**
-     * {@code true} if the file is a Zip compressed file. 
-     * @return {@code true} if the file is a Zip compressed file.
-     */
+    /// `true` if the file is a Zip compressed file.
+    /// @return `true` if the file is a Zip compressed file.
     public boolean isZip()  {
         return fileFormat == FileFormat.ZIP;
     }
 
-    /**
-     * {@code true} if the file is a GZip compressed file. 
-     * @return {@code true} if the file is a GZip compressed file.
-     */
+    /// `true` if the file is a GZip compressed file.
+    /// @return `true` if the file is a GZip compressed file.
     public boolean isGZip() {
         return fileFormat == FileFormat.GZIP;
     }
 
-    /**
-     * {@code true} if the file is a regular file. 
-     * @return {@code true} if the file is a regular file.
-     */
+    /// `true` if the file is a regular file.
+    /// @return `true` if the file is a regular file.
     public boolean isPlainText() {
         return fileFormat == FileFormat.PLAINTEXT;
     }
 
-    /**
-     * {@code true} if the file is a directory. 
-     * @return {@code true} if the file is a directory.
-     */
+    /// `true` if the file is a directory.
+    /// @return `true` if the file is a directory.
     public boolean isDirectory() {
         return fileFormat == FileFormat.DIRECTORY;
     }

@@ -35,12 +35,10 @@ public class LogLineFilter {
         }
     }
 
-    /**
-     * Some clients store logs with a prefix. Filter the prefix out of the log entry prior to parsing
-     *
-     * @param line A line from the GC log file.
-     * @return The same line without the prefix.
-     */
+    /// Some clients store logs with a prefix. Filter the prefix out of the log entry prior to parsing
+    ///
+    /// @param line A line from the GC log file.
+    /// @return The same line without the prefix.
     public String prefixFilter(String line) {
         if (verbose)
             LOGGER.fine(line);

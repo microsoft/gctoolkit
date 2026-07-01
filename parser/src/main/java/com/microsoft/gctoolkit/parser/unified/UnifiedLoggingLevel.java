@@ -20,19 +20,15 @@ public enum UnifiedLoggingLevel {
         return label;
     }
 
-    /**
-     * @param other logging level to compare this one to
-     * @return whether this logging level is lesser or equal to the other one
-     */
+    /// @param other logging level to compare this one to
+    /// @return whether this logging level is lesser or equal to the other one
     public boolean isLessThanOrEqualTo(UnifiedLoggingLevel other) {
         return this.compareTo(other) <= 0;
     }
 
 
-    /**
-     * @param other logging level to compare this one to
-     * @return whether this logging level is greater or equal to the other one
-     */
+    /// @param other logging level to compare this one to
+    /// @return whether this logging level is greater or equal to the other one
     public boolean isGreaterThanOrEqualTo(UnifiedLoggingLevel other) {
         return this.compareTo(other) >= 0;
     }

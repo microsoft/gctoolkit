@@ -17,16 +17,12 @@ import com.microsoft.gctoolkit.event.generational.PSYoungGen;
 import com.microsoft.gctoolkit.event.generational.ParNew;
 import com.microsoft.gctoolkit.event.generational.SystemGC;
 import com.microsoft.gctoolkit.event.generational.YoungGC;
-import com.microsoft.gctoolkit.event.jvm.JVMEvent;
-import com.microsoft.gctoolkit.event.jvm.SurvivorRecord;
 import com.microsoft.gctoolkit.jvm.Diarizer;
 import com.microsoft.gctoolkit.parser.jvm.PreUnifiedDiarizer;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -57,10 +53,10 @@ public class GenerationalHeapParserTest extends ParserTest {
                         ", 1.9094806 secs] [Times: user=1.91 sys=0.00, real=1.91 secs]"
         };
 
-        List<JVMEvent> jvmEvents = feedParser(lines);
+        var jvmEvents = feedParser(lines);
 
         try {
-            FullGC fgc = (FullGC) jvmEvents.get(0);
+            var fgc = (FullGC) jvmEvents.getFirst();
             Assertions.assertEquals(1.9094806d, fgc.getDuration());
             Assertions.assertEquals(4063232, fgc.getHeap().getSizeAfterCollection());
         } catch(Throwable t) {
@@ -88,13 +84,13 @@ public class GenerationalHeapParserTest extends ParserTest {
                 GCLogParser.END_OF_DATA_SENTINEL
         };
 
-        List<JVMEvent> jvmEvents = feedParser(lines);
+        var jvmEvents = feedParser(lines);
 
         try {
-            InitialMark initialMark = (InitialMark) jvmEvents.get(0);
-            ConcurrentMark concurrentMark = (ConcurrentMark) jvmEvents.get(1);
-            ConcurrentPreClean concurrentPreClean = (ConcurrentPreClean) jvmEvents.get(2);
-            AbortablePreClean abortablePreClean = (AbortablePreClean) jvmEvents.get(3);
+            var initialMark = (InitialMark) jvmEvents.getFirst();
+            var concurrentMark = (ConcurrentMark) jvmEvents.get(1);
+            var concurrentPreClean = (ConcurrentPreClean) jvmEvents.get(2);
+            var abortablePreClean = (AbortablePreClean) jvmEvents.get(3);
         } catch (ClassCastException cce) {
             fail(cce.getMessage());
         }
@@ -118,16 +114,16 @@ public class GenerationalHeapParserTest extends ParserTest {
                 "2016-04-01T15:03:48.139-0700: 11031.605: [CMS-concurrent-reset: 0.027/0.027 secs] [Times: user=0.02 sys=0.00, real=0.03 secs]"
         };
 
-        List<JVMEvent> jvmEvents = feedParser(lines);
+        var jvmEvents = feedParser(lines);
 
         try {
-            InitialMark initialMark = (InitialMark) jvmEvents.get(0);
-            ConcurrentMark concurrentMark = (ConcurrentMark) jvmEvents.get(1);
-            ConcurrentPreClean concurrentPreClean = (ConcurrentPreClean) jvmEvents.get(2);
-            AbortablePreClean abortablePreClean = (AbortablePreClean) jvmEvents.get(3);
-            CMSRemark remark = (CMSRemark) jvmEvents.get(4);
-            ConcurrentSweep sweep = (ConcurrentSweep) jvmEvents.get(5);
-            ConcurrentReset reset = (ConcurrentReset) jvmEvents.get(6);
+            var initialMark = (InitialMark) jvmEvents.getFirst();
+            var concurrentMark = (ConcurrentMark) jvmEvents.get(1);
+            var concurrentPreClean = (ConcurrentPreClean) jvmEvents.get(2);
+            var abortablePreClean = (AbortablePreClean) jvmEvents.get(3);
+            var remark = (CMSRemark) jvmEvents.get(4);
+            var sweep = (ConcurrentSweep) jvmEvents.get(5);
+            var reset = (ConcurrentReset) jvmEvents.get(6);
         } catch (ClassCastException cce) {
             fail(cce.getMessage());
         }
@@ -157,10 +153,10 @@ public class GenerationalHeapParserTest extends ParserTest {
                 {InitialMark.class, ConcurrentMark.class, ConcurrentModeFailure.class}
         };
 
-        for (int i = 0; i < lines.length; i++) {
-            List<JVMEvent> jvmEvents = feedParser(lines[i]);
+        for (var i = 0; i < lines.length; i++) {
+            var jvmEvents = feedParser(lines[i]);
 
-            for (int j = 0; j < eventTypes[i].length; j++) {
+            for (var j = 0; j < eventTypes[i].length; j++) {
                 assertEquals(jvmEvents.get(j).getClass(), eventTypes[i][j]);
             }
             jvmEvents.clear();
@@ -196,7 +192,7 @@ public class GenerationalHeapParserTest extends ParserTest {
                 "84.129: [GC 39935K->23835K(2095040K), 0.0203206 secs"
         };
 
-        List<JVMEvent> jvmEvents = feedParser(lines);
+        var jvmEvents = feedParser(lines);
         assertEquals(24, jvmEvents.size());
         assertEquals(9.089,getParser().diary.getTimeOfFirstEvent().toSeconds());
     }
@@ -215,7 +211,7 @@ public class GenerationalHeapParserTest extends ParserTest {
     			"132380.027: [Full GC [PSYoungGen: 388637K->0K(581376K)] [PSOldGen: 1707204K->1099190K(1708032K)] 2095842K->1099190K(2289408K) [PSPermGen: 103975K->103975K(122880K)], 25.3055946 secs]"
     	};
     	
-        List<JVMEvent> jvmEvents = feedParser(lines);
+        var jvmEvents = feedParser(lines);
         assertEquals(7, jvmEvents.size());
         assertEquals(103.387, getParser().diary.getTimeOfFirstEvent().toSeconds());    	
     }
@@ -228,12 +224,12 @@ public class GenerationalHeapParserTest extends ParserTest {
     			"13.563: [GC (Allocation Failure)  886080K->31608K(1986432K), 0.0392109 secs]",
     	};
     	
-        List<JVMEvent> jvmEvents = feedParser(lines);
+        var jvmEvents = feedParser(lines);
         assertEquals(1, jvmEvents.size());
         
-        assertTrue(jvmEvents.get(0) instanceof PSYoungGen);
+        assertTrue(jvmEvents.getFirst() instanceof PSYoungGen);
 
-        PSYoungGen evt = (PSYoungGen) jvmEvents.get(0);
+        var evt = (PSYoungGen) jvmEvents.getFirst();
         assertMemoryPoolValues(evt.getHeap(), 886080, 1986432, 31608, 1986432);
     }
     
@@ -250,28 +246,28 @@ public class GenerationalHeapParserTest extends ParserTest {
 				"25293.283: [GC 2548071K(3028408K), 0.0743383 secs]"
 		};
 		
-		int expectedEventCount = 3;
+		var expectedEventCount = 3;
 		
-    	List<JVMEvent> jvmEvents = feedParser(lines);
+    	var jvmEvents = feedParser(lines);
     	assertEquals(jvmEvents.size(), expectedEventCount);
     	
 		// 0 - YoungGC
-    	assertTrue(jvmEvents.get(0) instanceof YoungGC);
-    	YoungGC evt0 = ((YoungGC) jvmEvents.get(0));
+    	assertTrue(jvmEvents.getFirst() instanceof YoungGC);
+    	var evt0 = (YoungGC) jvmEvents.getFirst();
     	assertEquals(evt0.getDateTimeStamp(), new DateTimeStamp(75.240));
     	assertMemoryPoolValues(evt0.getHeap(), 525312, 2013696, 16552, 2013696);
     	assertDoubleEquals(evt0.getDuration(), 0.1105640);
 
 		// 1 - FullGC
     	assertTrue(jvmEvents.get(1) instanceof FullGC);
-    	FullGC evt1 = ((FullGC) jvmEvents.get(1));
+    	var evt1 = (FullGC) jvmEvents.get(1);
     	assertEquals(evt1.getDateTimeStamp(), new DateTimeStamp(8357.379));
     	assertMemoryPoolValues(evt1.getHeap(), 1379524, 2787392, 1236761, 2787392);
     	assertDoubleEquals(evt1.getDuration(), 43.3665438);
     	
     	// 2 - InitialMark
     	assertTrue(jvmEvents.get(2) instanceof InitialMark);
-    	InitialMark evt2 = ((InitialMark) jvmEvents.get(2));
+    	var evt2 = (InitialMark) jvmEvents.get(2);
     	assertEquals(evt2.getDateTimeStamp(), new DateTimeStamp(25293.283));
     	assertMemoryPoolValues(evt2.getHeap(), 2548071, 3028408, 2548071, 3028408);
     	assertDoubleEquals(evt2.getDuration(), 0.0743383);		    	
@@ -288,21 +284,21 @@ public class GenerationalHeapParserTest extends ParserTest {
 				//"15.423: [GC (CMS Final Remark)  168951K(1986432K), 0.0388223 secs]"
 		};
 		
-		int expectedEventCount = 2;
+		var expectedEventCount = 2;
 		
-    	List<JVMEvent> jvmEvents = feedParser(lines);
+    	var jvmEvents = feedParser(lines);
     	assertEquals(jvmEvents.size(), expectedEventCount);
     	
 		// 0 - PSYoungGen
-    	assertTrue(jvmEvents.get(0) instanceof PSYoungGen);
-    	PSYoungGen evt0 = ((PSYoungGen) jvmEvents.get(0));
+    	assertTrue(jvmEvents.getFirst() instanceof PSYoungGen);
+    	var evt0 = (PSYoungGen) jvmEvents.getFirst();
     	assertEquals(evt0.getDateTimeStamp(), new DateTimeStamp(13.563));
     	assertMemoryPoolValues(evt0.getHeap(), 886080, 1986432, 31608, 1986432);
     	assertDoubleEquals(evt0.getDuration(), 0.0392109);
     	
     	// 1 - PSFullGC
     	assertTrue(jvmEvents.get(1) instanceof FullGC);
-    	FullGC evt1 = ((FullGC) jvmEvents.get(1));
+    	var evt1 = (FullGC) jvmEvents.get(1);
     	assertEquals(evt1.getDateTimeStamp(), new DateTimeStamp(23.331));
     	assertMemoryPoolValues(evt1.getHeap(), 17386, 415232, 16928, 415232);
     	assertDoubleEquals(evt1.getDuration(), 0.0498462);
@@ -330,14 +326,14 @@ public class GenerationalHeapParserTest extends ParserTest {
 				"2021-12-17T14:58:05.098+0000: 5002.059: [Full GC (Ergonomics) [PSYoungGen: 60759K->0K(414208K)] [ParOldGen: 974100K->1024865K(1086976K)] 1034860K->1024865K(1501184K), [Metaspace: 154915K->154915K(1187840K)], 0.7945447 secs] [Times: user=0.68 sys=0.06, real=0.79 secs] "
 		};
 		
-		int expectedEventCount = 6;
+		var expectedEventCount = 6;
 		
-    	List<JVMEvent> jvmEvents = feedParser(lines);
+    	var jvmEvents = feedParser(lines);
     	assertEquals(jvmEvents.size(), expectedEventCount);
     	
 		// 0 - PSFullGC
-    	assertTrue(jvmEvents.get(0) instanceof PSFullGC);
-    	PSFullGC evt0 = ((PSFullGC) jvmEvents.get(0));
+    	assertTrue(jvmEvents.getFirst() instanceof PSFullGC);
+    	var evt0 = (PSFullGC) jvmEvents.getFirst();
     	assertEquals(evt0.getDateTimeStamp(), new DateTimeStamp("2021-12-17T13:34:54.484+0000", 11.445));
     	assertEquals(evt0.getGCCause(), GCCause.METADATA_GENERATION_THRESHOLD);
     	// Memory Pools
@@ -350,7 +346,7 @@ public class GenerationalHeapParserTest extends ParserTest {
 		
 		// 1 - PSYoungGen
     	assertTrue(jvmEvents.get(1) instanceof PSYoungGen);
-    	PSYoungGen evt1 = ((PSYoungGen) jvmEvents.get(1));
+    	var evt1 = (PSYoungGen) jvmEvents.get(1);
     	assertEquals(evt1.getDateTimeStamp(), new DateTimeStamp("2021-12-17T13:35:02.874+0000", 19.835));
     	assertEquals(evt1.getGCCause(), GCCause.METADATA_GENERATION_THRESHOLD);
     	// Memory Pools
@@ -361,7 +357,7 @@ public class GenerationalHeapParserTest extends ParserTest {
 
 		// 2 - PSYoungGen
     	assertTrue(jvmEvents.get(2) instanceof PSYoungGen);
-    	PSYoungGen evt2 = ((PSYoungGen) jvmEvents.get(2));
+    	var evt2 = (PSYoungGen) jvmEvents.get(2);
     	assertEquals(evt2.getDateTimeStamp(), new DateTimeStamp("2021-12-17T13:35:24.328+0000", 41.289));
     	assertEquals(evt2.getGCCause(), GCCause.ALLOCATION_FAILURE);
     	// Memory Pools
@@ -372,7 +368,7 @@ public class GenerationalHeapParserTest extends ParserTest {
 		
 		// 3 - PSYoungGen (SystemGC)
     	assertTrue(jvmEvents.get(3) instanceof PSYoungGen);
-    	PSYoungGen evt3 = ((PSYoungGen) jvmEvents.get(3));
+    	var evt3 = (PSYoungGen) jvmEvents.get(3);
     	assertEquals(evt3.getDateTimeStamp(), new DateTimeStamp("2021-12-17T13:36:02.418+0000", 79.379));
     	assertEquals(evt3.getGCCause(), GCCause.JAVA_LANG_SYSTEM);
     	// Memory Pools
@@ -383,7 +379,7 @@ public class GenerationalHeapParserTest extends ParserTest {
 		
 		// 4 - PSFullGC (SystemGC)
     	assertTrue(jvmEvents.get(4) instanceof SystemGC);
-    	SystemGC evt4 = ((SystemGC) jvmEvents.get(4));
+    	var evt4 = (SystemGC) jvmEvents.get(4);
     	assertEquals(evt4.getDateTimeStamp(), new DateTimeStamp("2021-12-17T13:36:02.583+0000", 79.544));
     	assertEquals(evt4.getGCCause(), GCCause.JAVA_LANG_SYSTEM);
     	// Memory Pools
@@ -396,7 +392,7 @@ public class GenerationalHeapParserTest extends ParserTest {
 
 		// 5 - PSFullGC (Ergonomics)
     	assertTrue(jvmEvents.get(5) instanceof PSFullGC);
-    	PSFullGC evt5 = ((PSFullGC) jvmEvents.get(5));
+    	var evt5 = (PSFullGC) jvmEvents.get(5);
     	assertEquals(evt5.getDateTimeStamp(), new DateTimeStamp("2021-12-17T14:58:05.098+0000", 5002.059));
     	assertEquals(evt5.getGCCause(), GCCause.ADAPTIVE_SIZE_POLICY);
     	// Memory Pools

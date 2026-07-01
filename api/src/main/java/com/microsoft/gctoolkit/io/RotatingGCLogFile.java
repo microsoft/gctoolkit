@@ -17,28 +17,24 @@ import java.util.Vector;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-/**
- * A collection of rotating GC log files. The collection will contain only those files that can be
- * considered contiguous. The log file segments are ordered, with the current or newest file first.
- */
+/// A collection of rotating GC log files. The collection will contain only those files that can be
+/// considered contiguous. The log file segments are ordered, with the current or newest file first.
 public class RotatingGCLogFile extends GCLogFile {
 
     private static final Logger LOGGER = Logger.getLogger(RotatingGCLogFile.class.getName());
 
-    /**
-     * Use the given path to find rotating log files. If the path is a file, the file name is used to match
-     * other files in the directory. If the path is a directory, all files in the directory are considered.
-     * @param path the path to a rotating log file, or to a directory containing rotating log files.
-     */
+    /// Use the given path to find rotating log files. If the path is a file, the file name is used to match
+    /// other files in the directory. If the path is a directory, all files in the directory are considered.
+    /// @param path the path to a rotating log file, or to a directory containing rotating log files.
     public RotatingGCLogFile(Path path) {
         super(path);
     }
 
     private RotatingLogFileMetadata metaData;
 
+    @Override
     public LogFileMetadata getMetaData() throws IOException {
         if ( metaData == null)
             metaData =  new RotatingLogFileMetadata(getPath());
@@ -70,8 +66,8 @@ public class RotatingGCLogFile extends GCLogFile {
                     return segments.getFirst().stream();
                 default:
                     // This code removes elements from the list of segments, so work on a copy.
-                    LinkedList<GCLogFileSegment> copySegments = new LinkedList<>(segments);
-                    Stream<String> allSegments = Stream.concat(copySegments.removeFirst().stream(), copySegments.removeFirst().stream());
+                    var copySegments = new LinkedList<GCLogFileSegment>(segments);
+                    var allSegments = Stream.concat(copySegments.removeFirst().stream(), copySegments.removeFirst().stream());
                     while (!copySegments.isEmpty())
                         allSegments = Stream.concat(allSegments, copySegments.removeFirst().stream());
                     return allSegments;
@@ -86,9 +82,9 @@ public class RotatingGCLogFile extends GCLogFile {
 
     @SuppressWarnings("resource")
     private Stream<String> streamZipFile() throws IOException {
-        ZipFile zipFile = new ZipFile(path.toFile());
-        List<ZipEntry> entries = zipFile.stream().filter(entry -> !entry.isDirectory()).collect(Collectors.toList());
-        Vector<InputStream> streams = new Vector<>();
+        var zipFile = new ZipFile(path.toFile());
+        var entries = zipFile.stream().filter(entry -> !entry.isDirectory()).collect(Collectors.toList());
+        var streams = new Vector<InputStream>();
 
         try {
             entries
@@ -106,18 +102,16 @@ public class RotatingGCLogFile extends GCLogFile {
             throw uioe.getCause();
         }
 
-        SequenceInputStream sequenceInputStream = new SequenceInputStream(streams.elements());
+        var sequenceInputStream = new SequenceInputStream(streams.elements());
         
         return new BufferedReader(new InputStreamReader(sequenceInputStream)).lines();
     }
 
-    /**
-     * The {@link GCLogFileSegment}s in rotating order. Note that only the contiguous
-     * log file segments are included. Therefore, the number of log file segments may be less than
-     * the files that match the rotating pattern.
-     * @return The log file segments in rotating order.
-     * @throws IOException when there is an IO exception
-     */
+    /// The [GCLogFileSegment]s in rotating order. Note that only the contiguous
+    /// log file segments are included. Therefore, the number of log file segments may be less than
+    /// the files that match the rotating pattern.
+    /// @return The log file segments in rotating order.
+    /// @throws IOException when there is an IO exception
     public List<LogFileSegment> getOrderedGarbageCollectionLogFiles() throws IOException {
         return getMetaData().logFiles().collect(Collectors.toList());
     }

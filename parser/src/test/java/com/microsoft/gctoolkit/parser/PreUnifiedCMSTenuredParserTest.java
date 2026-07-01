@@ -10,18 +10,16 @@ import com.microsoft.gctoolkit.event.generational.ConcurrentPreClean;
 import com.microsoft.gctoolkit.event.generational.ConcurrentReset;
 import com.microsoft.gctoolkit.event.generational.ConcurrentSweep;
 import com.microsoft.gctoolkit.event.generational.InitialMark;
-import com.microsoft.gctoolkit.event.jvm.JVMEvent;
 import com.microsoft.gctoolkit.jvm.Diarizer;
 import com.microsoft.gctoolkit.parser.jvm.PreUnifiedDiarizer;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 public class PreUnifiedCMSTenuredParserTest extends ParserTest {
-    
+
+    @Override
     protected Diarizer diarizer() {
         return new PreUnifiedDiarizer();
     }
@@ -51,13 +49,13 @@ public class PreUnifiedCMSTenuredParserTest extends ParserTest {
                 GCLogParser.END_OF_DATA_SENTINEL
         };
 
-        List<JVMEvent> jvmEvents = feedParser(lines);
+        var jvmEvents = feedParser(lines);
 
         try {
-            InitialMark initialMark = (InitialMark) jvmEvents.get(0);
-            ConcurrentMark concurrentMark = (ConcurrentMark) jvmEvents.get(1);
-            ConcurrentPreClean concurrentPreClean = (ConcurrentPreClean) jvmEvents.get(2);
-            AbortablePreClean abortablePreClean = (AbortablePreClean) jvmEvents.get(3);
+            var initialMark = (InitialMark) jvmEvents.getFirst();
+            var concurrentMark = (ConcurrentMark) jvmEvents.get(1);
+            var concurrentPreClean = (ConcurrentPreClean) jvmEvents.get(2);
+            var abortablePreClean = (AbortablePreClean) jvmEvents.get(3);
         } catch (ClassCastException cce) {
             fail(cce.getMessage());
         }
@@ -82,16 +80,16 @@ public class PreUnifiedCMSTenuredParserTest extends ParserTest {
                 GCLogParser.END_OF_DATA_SENTINEL
         };
 
-        List<JVMEvent> jvmEvents = feedParser(lines);
+        var jvmEvents = feedParser(lines);
 
         try {
-            InitialMark initialMark = (InitialMark) jvmEvents.get(0);
-            ConcurrentMark concurrentMark = (ConcurrentMark) jvmEvents.get(1);
-            ConcurrentPreClean concurrentPreClean = (ConcurrentPreClean) jvmEvents.get(2);
-            AbortablePreClean abortablePreClean = (AbortablePreClean) jvmEvents.get(3);
-            CMSRemark cmsRemark = (CMSRemark) jvmEvents.get(4);
-            ConcurrentSweep concurrentSweep = (ConcurrentSweep) jvmEvents.get(5);
-            ConcurrentReset concurrentReset = (ConcurrentReset) jvmEvents.get(6);
+            var initialMark = (InitialMark) jvmEvents.getFirst();
+            var concurrentMark = (ConcurrentMark) jvmEvents.get(1);
+            var concurrentPreClean = (ConcurrentPreClean) jvmEvents.get(2);
+            var abortablePreClean = (AbortablePreClean) jvmEvents.get(3);
+            var cmsRemark = (CMSRemark) jvmEvents.get(4);
+            var concurrentSweep = (ConcurrentSweep) jvmEvents.get(5);
+            var concurrentReset = (ConcurrentReset) jvmEvents.get(6);
         } catch (ClassCastException cce) {
             fail(cce.getMessage());
         }
@@ -118,16 +116,16 @@ public class PreUnifiedCMSTenuredParserTest extends ParserTest {
                 GCLogParser.END_OF_DATA_SENTINEL
         };
 
-        List<JVMEvent> jvmEvents = feedParser(lines);
+        var jvmEvents = feedParser(lines);
 
         try {
-            InitialMark initialMark = (InitialMark) jvmEvents.get(0);
-            ConcurrentMark concurrentMark = (ConcurrentMark) jvmEvents.get(1);
-            ConcurrentPreClean concurrentPreClean = (ConcurrentPreClean) jvmEvents.get(2);
-            AbortablePreClean abortablePreClean = (AbortablePreClean) jvmEvents.get(3);
-            CMSRemark cmsRemark = (CMSRemark) jvmEvents.get(4);
-            ConcurrentSweep concurrentSweep = (ConcurrentSweep) jvmEvents.get(5);
-            ConcurrentReset concurrentReset = (ConcurrentReset) jvmEvents.get(6);
+            var initialMark = (InitialMark) jvmEvents.getFirst();
+            var concurrentMark = (ConcurrentMark) jvmEvents.get(1);
+            var concurrentPreClean = (ConcurrentPreClean) jvmEvents.get(2);
+            var abortablePreClean = (AbortablePreClean) jvmEvents.get(3);
+            var cmsRemark = (CMSRemark) jvmEvents.get(4);
+            var concurrentSweep = (ConcurrentSweep) jvmEvents.get(5);
+            var concurrentReset = (ConcurrentReset) jvmEvents.get(6);
         } catch (ClassCastException cce) {
             fail(cce.getMessage());
         }
@@ -160,12 +158,12 @@ public class PreUnifiedCMSTenuredParserTest extends ParserTest {
                 "2020-03-27T17:40:46.829+0000: 62609.842: [CMS-concurrent-abortable-preclean: 2.855/3.180 secs] [Times: user=25.14 sys=1.51, real=3.18 secs] "
         };
         
-        List<JVMEvent> jvmEvents = feedParser(lines);
+        var jvmEvents = feedParser(lines);
 
         try {
-            ConcurrentMark concurrentMark = (ConcurrentMark) jvmEvents.get(0);
-            ConcurrentPreClean concurrentPreClean = (ConcurrentPreClean) jvmEvents.get(1);
-            AbortablePreClean abortablePreClean = (AbortablePreClean) jvmEvents.get(2);
+            var concurrentMark = (ConcurrentMark) jvmEvents.getFirst();
+            var concurrentPreClean = (ConcurrentPreClean) jvmEvents.get(1);
+            var abortablePreClean = (AbortablePreClean) jvmEvents.get(2);
         } catch (ClassCastException cce) {
             fail(cce.getMessage());
         }

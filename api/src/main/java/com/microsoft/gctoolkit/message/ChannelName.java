@@ -1,8 +1,6 @@
 package com.microsoft.gctoolkit.message;
 
-/**
- * A list of all of the channel names that are available for publishing on.
- */
+/// A list of all of the channel names that are available for publishing on.
 public enum ChannelName {
 
     DATA_SOURCE("DataSource"),
@@ -25,6 +23,7 @@ public enum ChannelName {
         return name;
     }
 
+    @Override
     public String toString() {
         return getName();
     }

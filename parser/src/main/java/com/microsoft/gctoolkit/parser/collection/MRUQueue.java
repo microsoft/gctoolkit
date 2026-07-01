@@ -2,6 +2,8 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.parser.collection;
 
+import org.jspecify.annotations.Nullable;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -22,7 +24,7 @@ public class MRUQueue<K, V> implements Map<K, V>, Iterable<K> {
 
     @Override
     @SuppressWarnings("unchecked")
-    public V get(Object key) {
+    public @Nullable V get(Object key) {
         keys.remove(key);
         if (key != null) {
             keys.offerFirst((K)key); // unchecked cast
@@ -59,7 +61,7 @@ public class MRUQueue<K, V> implements Map<K, V>, Iterable<K> {
     }
 
     @Override
-    public V remove(Object key) {
+    public @Nullable V remove(Object key) {
         return null;
     }
 

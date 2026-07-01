@@ -4,8 +4,6 @@ package com.microsoft.gctoolkit.event.jvm;
 
 import com.microsoft.gctoolkit.time.DateTimeStamp;
 
-import java.util.ArrayList;
-
 
 public class SurvivorRecord extends JVMEvent {
 

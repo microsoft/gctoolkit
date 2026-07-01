@@ -37,9 +37,9 @@ public class IncrementialConcurrentMarkSweepParserRulesTest implements ICMSPatte
 
     @Test
     public void testiCMSParseRules() {
-        for (int i = 0; i < rules.length; i++)
-            for (int j = 0; j < lines.length; j++) {
-                for (int k = 0; k < lines[j].length; k++) {
+        for (var i = 0; i < rules.length; i++)
+            for (var j = 0; j < lines.length; j++) {
+                for (var k = 0; k < lines[j].length; k++) {
                     GCLogTrace trace = rules[i].parse(lines[j][k]);
                     if (trace != null) {
                         assertEquals(i, j, "rule @" + i + " matched record @" + j + ":" + k);
@@ -56,7 +56,7 @@ public class IncrementialConcurrentMarkSweepParserRulesTest implements ICMSPatte
         assertNotNull(trace);
         if (debugging) {
             LOGGER.fine("matches groups " + trace.groupCount());
-            for (int i = 0; i <= trace.groupCount(); i++) {
+            for (var i = 0; i <= trace.groupCount(); i++) {
                 LOGGER.fine(i + ": " + trace.getGroup(i));
             }
         }

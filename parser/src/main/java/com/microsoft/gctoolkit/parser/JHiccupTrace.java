@@ -2,12 +2,12 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.parser;
 
+import org.jspecify.annotations.Nullable;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- * Class that represents a chunk of a jHiccup log that we are attempting to match to a
- */
+/// Class that represents a chunk of a jHiccup log that we are attempting to match to a
 public class JHiccupTrace {
 
     //0.124,1.004,2.408,HIST
@@ -21,9 +21,9 @@ public class JHiccupTrace {
 
     private final Matcher trace;
 
-    public static JHiccupTrace toTrace(String line) {
+    public static @Nullable JHiccupTrace toTrace(String line) {
         Matcher m = JHICCUP_LOG_ENTRY.matcher(line);
-        return (m == null) ? null : new JHiccupTrace(m);
+        return m == null ? null : new JHiccupTrace(m);
     }
 
     protected JHiccupTrace(Matcher matcher) {

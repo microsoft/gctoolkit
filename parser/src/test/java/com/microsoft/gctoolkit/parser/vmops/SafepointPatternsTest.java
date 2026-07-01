@@ -36,7 +36,7 @@ public class SafepointPatternsTest implements SafepointPatterns {
                 "FindDeadlocks"
         };
 
-        int index = 0;
+        var index = 0;
         for (String line : lines) {
             Safepoint safepoint = TRACE.parse(line).toSafepoint();
             assertNotNull(safepoint);

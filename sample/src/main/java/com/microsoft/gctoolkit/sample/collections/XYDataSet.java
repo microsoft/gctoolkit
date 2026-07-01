@@ -34,25 +34,21 @@ public class XYDataSet {
         return dataSeries.isEmpty();
     }
 
-    /**
-     * Returns an immutable List of the items in this DataSet.
-     */
+    /// Returns an immutable List of the items in this DataSet.
     public List<Point> getItems() {
         return List.copyOf(dataSeries);
     }
 
     public XYDataSet scaleSeries(double scaleFactor) {
-        XYDataSet scaled = new XYDataSet();
+        var scaled = new XYDataSet();
         for (Point item : dataSeries) {
             scaled.add(item.getX(), item.getY().doubleValue() * scaleFactor);
         }
         return scaled;
     }
 
-    /**
-     * Returns the largest Y value in the XYDataSet as an OptionalDouble,
-     * with an empty optional if the dataset is empty.
-     */
+    /// Returns the largest Y value in the XYDataSet as an OptionalDouble,
+    /// with an empty optional if the dataset is empty.
     public OptionalDouble maxOfY() {
         return dataSeries.stream()
                 .map(Point::getY)
@@ -61,9 +57,9 @@ public class XYDataSet {
     }
 
     public XYDataSet scaleAndTranslateXAxis(double scale, double offset) {
-        XYDataSet translatedSeries = new XYDataSet();
+        var translatedSeries = new XYDataSet();
         for (Point dataPoint : dataSeries) {
-            double scaledXCoordinate = (scale * dataPoint.getX().doubleValue()) + offset;
+            var scaledXCoordinate = (scale * dataPoint.getX().doubleValue()) + offset;
             translatedSeries.add(scaledXCoordinate, dataPoint.getY());
         }
         return translatedSeries;

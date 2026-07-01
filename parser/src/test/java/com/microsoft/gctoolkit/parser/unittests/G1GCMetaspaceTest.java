@@ -15,7 +15,7 @@ public class G1GCMetaspaceTest extends ParserTest {
 
     @Test
     public void countMetaspaceRecordsTest() {
-        int i = 0;
+        var i = 0;
         for (String name : details) {
             try {
                 Path path = new TestLogFile("g1gc/details/" + name).getFile().toPath();

@@ -8,7 +8,7 @@ public class ParallelDiarizerTest extends LogDiaryTest {
 
     @Test
     public void testForDetails() {
-        int i = 0;
+        var i = 0;
         for (String name : details) {
             testWith(name, detailsDiary[i], detailsUnknown[i], detailsKnown[i++]);
         }
@@ -16,7 +16,7 @@ public class ParallelDiarizerTest extends LogDiaryTest {
 
     @Test
     public void testFor170GCCause() {
-        int i = 0;
+        var i = 0;
         for (String name : a170gcCause) {
             testWith("ps/details/gccause/170/" + name, a170gcCauseDiary[i], a170gcCauseUnknown[i], a170CauseKnown[i++]);
         }
@@ -24,7 +24,7 @@ public class ParallelDiarizerTest extends LogDiaryTest {
 
     @Test
     public void testFor180GCCause() {
-        int i = 0;
+        var i = 0;
         for (String name : a180gcCause) {
             testWith("ps/details/gccause/180/" + name, a180gcCauseDiary[i], a180gcCauseUnknown[i], a180gcCauseKnown[i++]);
         }
@@ -32,7 +32,7 @@ public class ParallelDiarizerTest extends LogDiaryTest {
 
     @Test
     public void testForDetailsTenuring() {
-        int i = 0;
+        var i = 0;
         for (String name : detailsTenuring) {
             testWith(name, detailsTenuringDiary[i], detailsTenuringUnknown[i], detailsTenuringKnown[i++]);
         }
@@ -40,7 +40,7 @@ public class ParallelDiarizerTest extends LogDiaryTest {
 
     @Test
     public void testForDetailsTenuring80() {
-        int i = 0;
+        var i = 0;
         for (String name : detailsTenuring80) {
             testWith("ps/details/tenuring/gccause/180/" + name, detailsTenuring80Diary[i], detailsTenuring80Unknown[i], detailsTenuring80Known[i++]);
         }
@@ -218,7 +218,7 @@ public class ParallelDiarizerTest extends LogDiaryTest {
 
     @Test
     public void testForDetailsTenuringAdaptiveSizing() {
-        int i = 0;
+        var i = 0;
         for (String name : detailsTenuringAdpativeSizing) {
             testWith(name, detailsTenuringAdaptiveSizingDiary[i], detailsTenuringAdaptiveSizingDiaryUnknown[i], detailsTenuringAdaptiveSizingDiaryKnown[i++]);
         }

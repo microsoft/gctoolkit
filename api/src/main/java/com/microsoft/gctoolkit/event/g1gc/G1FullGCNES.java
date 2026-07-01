@@ -6,9 +6,7 @@ import com.microsoft.gctoolkit.event.GCCause;
 import com.microsoft.gctoolkit.event.GarbageCollectionTypes;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
 
-/**
- * full GC not elsewhere specified on the G1 garbage collector
- */
+/// full GC not elsewhere specified on the G1 garbage collector
 public class G1FullGCNES extends G1FullGC {
     public G1FullGCNES(DateTimeStamp timeStamp, GCCause cause, double pauseTime) {
         this(timeStamp, GarbageCollectionTypes.Full, cause, pauseTime);

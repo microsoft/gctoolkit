@@ -3,7 +3,6 @@
 package com.microsoft.gctoolkit.parser;
 
 import com.microsoft.gctoolkit.event.GCCause;
-import com.microsoft.gctoolkit.event.jvm.JVMEvent;
 import com.microsoft.gctoolkit.event.zgc.ZGCAllocatedSummary;
 import com.microsoft.gctoolkit.event.zgc.ZGCFullCollection;
 import com.microsoft.gctoolkit.event.zgc.ZGCGarbageSummary;
@@ -21,8 +20,6 @@ import com.microsoft.gctoolkit.time.DateTimeStamp;
 
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ZGCParserTest extends ParserTest {
@@ -34,6 +31,7 @@ public class ZGCParserTest extends ParserTest {
         return new UnifiedDiarizer();
     }
 
+    @Override
     protected GCLogParser parser() {
         return new ZGCParser();
     }
@@ -80,10 +78,10 @@ public class ZGCParserTest extends ParserTest {
 
         };
 
-        List<JVMEvent> singleCycle = feedParser(eventLogEntries);
+        var singleCycle = feedParser(eventLogEntries);
         try {
             assertEquals(1, singleCycle.size());
-            ZGCFullCollection zgc = (ZGCFullCollection) singleCycle.get(0);
+            var zgc = (ZGCFullCollection) singleCycle.getFirst();
 
             assertEquals(zgc.getGcId(), 2L);
 
@@ -152,21 +150,21 @@ public class ZGCParserTest extends ParserTest {
 				"[23.507s][info][gc] GC(3) Garbage Collection (Warmup) 826M(10%)->168M(2%)"
 		};
 
-        int expectedEventCount = 2;
+        var expectedEventCount = 2;
 
-        List<JVMEvent> jvmEvents = feedParser(lines);
+        var jvmEvents = feedParser(lines);
         assertEquals(expectedEventCount, jvmEvents.size());
 
         // 0 - ZGCFullCollection
-        assertTrue(jvmEvents.get(0) instanceof ZGCFullCollection); 
-        ZGCFullCollection evt0 = (ZGCFullCollection) jvmEvents.get(0);
+        assertTrue(jvmEvents.getFirst() instanceof ZGCFullCollection); 
+        var evt0 = (ZGCFullCollection) jvmEvents.getFirst();
         assertEquals(evt0.getDateTimeStamp(), new DateTimeStamp(1.295));
         assertEquals(evt0.getGCCause(), GCCause.METADATA_GENERATION_THRESHOLD);
         assertZGCMemorySummary(evt0.getMemorySummary(), 90*M, 58*M);
 
         // 1 - ZGCFullCollection
         assertTrue(jvmEvents.get(1) instanceof ZGCFullCollection); 
-        ZGCFullCollection evt1 = (ZGCFullCollection) jvmEvents.get(1);
+        var evt1 = (ZGCFullCollection) jvmEvents.get(1);
         assertEquals(new DateTimeStamp(23.507), evt1.getDateTimeStamp());
         assertEquals(GCCause.WARMUP, evt1.getGCCause());
         assertZGCMemorySummary(evt1.getMemorySummary(), 826*M, 168*M);        
@@ -214,16 +212,16 @@ public class ZGCParserTest extends ParserTest {
     			"[1.664s][info][gc          ] GC(0) Garbage Collection (Metadata GC Threshold) 124M(2%)->66M(1%)"
     	};
     	
-        int expectedEventCount = 1;
+        var expectedEventCount = 1;
 
-        List<JVMEvent> jvmEvents = feedParser(lines);
+        var jvmEvents = feedParser(lines);
         assertEquals(expectedEventCount, jvmEvents.size());
 
         // 0 - ZGCFullCollection
         // Note: this is just a light-weight check of the event object at this time to make sure there is no confusion between
         // Legacy ZGC logging and Generational ZGC events with some of the changes added to support no-detail logging.
-        assertTrue(jvmEvents.get(0) instanceof ZGCFullCollection); 
-        ZGCFullCollection evt0 = (ZGCFullCollection) jvmEvents.get(0);
+        assertTrue(jvmEvents.getFirst() instanceof ZGCFullCollection); 
+        var evt0 = (ZGCFullCollection) jvmEvents.getFirst();
         assertEquals(new DateTimeStamp(1.641), evt0.getDateTimeStamp());
         assertEquals(GCCause.METADATA_GENERATION_THRESHOLD, evt0.getGCCause());
         assertEquals(ZGCPhase.FULL, evt0.getPhase());
@@ -244,14 +242,14 @@ public class ZGCParserTest extends ParserTest {
 				"[36.423s][info][gc] GC(3) Major Collection (Warmup) 730M(9%)->258M(3%) 0.097s"
 		};
 
-        int expectedEventCount = 2;
+        var expectedEventCount = 2;
 
-        List<JVMEvent> jvmEvents = feedParser(lines);
+        var jvmEvents = feedParser(lines);
         assertEquals(jvmEvents.size(), expectedEventCount);
 
         // 0 - ZGCYoungCollection
-        assertTrue(jvmEvents.get(0) instanceof ZGCYoungCollection); 
-        ZGCYoungCollection evt0 = (ZGCYoungCollection) jvmEvents.get(0);
+        assertTrue(jvmEvents.getFirst() instanceof ZGCYoungCollection); 
+        var evt0 = (ZGCYoungCollection) jvmEvents.getFirst();
         assertEquals(new DateTimeStamp(4.252), evt0.getDateTimeStamp());
         assertEquals(GCCause.METADATA_GENERATION_THRESHOLD, evt0.getGCCause());
         assertEquals(ZGCPhase.MAJOR_YOUNG, evt0.getPhase());
@@ -260,7 +258,7 @@ public class ZGCParserTest extends ParserTest {
 
         // 1 - ZGCYoungCollection(Major)
         assertTrue(jvmEvents.get(1) instanceof ZGCYoungCollection); 
-        ZGCYoungCollection evt1 = (ZGCYoungCollection) jvmEvents.get(1);
+        var evt1 = (ZGCYoungCollection) jvmEvents.get(1);
         assertEquals(new DateTimeStamp(36.326), evt1.getDateTimeStamp());
         assertEquals(GCCause.WARMUP, evt1.getGCCause());
         assertEquals(ZGCPhase.MAJOR_YOUNG, evt1.getPhase());
@@ -366,16 +364,16 @@ public class ZGCParserTest extends ParserTest {
 				"[1.062s][info][gc          ] GC(0) Major Collection (Metadata GC Threshold) 86M(1%)->56M(1%) 0.073s",
 		};
 		
-        int expectedEventCount = 2;
+        var expectedEventCount = 2;
 
-        List<JVMEvent> jvmEvents = feedParser(lines);
+        var jvmEvents = feedParser(lines);
         assertEquals(jvmEvents.size(), expectedEventCount);
 
         // TODO: Only basic testing to make sure no extra events were being created by fixes for no-details logs.
         
         // 0 - ZGCYoungCollection
-        assertTrue(jvmEvents.get(0) instanceof ZGCYoungCollection); 
-        ZGCYoungCollection evt0 = (ZGCYoungCollection) jvmEvents.get(0);
+        assertTrue(jvmEvents.getFirst() instanceof ZGCYoungCollection); 
+        var evt0 = (ZGCYoungCollection) jvmEvents.getFirst();
         assertEquals(new DateTimeStamp(0.990), evt0.getDateTimeStamp());
         assertEquals(GCCause.METADATA_GENERATION_THRESHOLD, evt0.getGCCause());
         assertEquals(ZGCPhase.MAJOR_YOUNG, evt0.getPhase());
@@ -384,7 +382,7 @@ public class ZGCParserTest extends ParserTest {
 
         // 1 - ZGCOldCollection(Major)
         assertTrue(jvmEvents.get(1) instanceof ZGCOldCollection); 
-        ZGCOldCollection evt1 = (ZGCOldCollection) jvmEvents.get(1);
+        var evt1 = (ZGCOldCollection) jvmEvents.get(1);
         assertEquals(new DateTimeStamp(1.012), evt1.getDateTimeStamp());
         assertEquals(GCCause.METADATA_GENERATION_THRESHOLD, evt1.getGCCause());
         assertEquals(ZGCPhase.MAJOR_OLD, evt1.getPhase());

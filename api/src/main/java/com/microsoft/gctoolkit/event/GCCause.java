@@ -2,10 +2,8 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.event;
 
-/**
- * There are causes for Garbage Collection, this is a representation of the
- * causes that a GC log file can hold.
- */
+/// There are causes for Garbage Collection, this is a representation of the
+/// causes that a GC log file can hold.
 public enum GCCause {
     JAVA_LANG_SYSTEM("System.gc()"),
     DIAGNOSTIC_COMMAND("Diagnostic Command"),

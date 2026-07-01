@@ -41,7 +41,7 @@ public class NoModuleIntegrationTest {
          * The log files can be either in text, zip, or gzip format.
          */
         GCLogFile logFile = new SingleGCLogFile(Path.of(gcLogFile));
-        GCToolKit gcToolKit = new GCToolKit();
+        var gcToolKit = new GCToolKit();
 
         gcToolKit.loadDataSourceChannel(new VertxDataSourceChannel());
         gcToolKit.loadJVMEventChannel(new VertxJVMEventChannel());
@@ -63,10 +63,10 @@ public class NoModuleIntegrationTest {
         }
 
         // Retrieves the Aggregation for HeapOccupancyAfterCollectionSummary. This is a time-series aggregation.
-        String message = "The XYDataSet for %s contains %s items.\n";
+        var message = "The XYDataSet for %s contains %s items.\n";
         machine.getAggregation(HeapOccupancyAfterCollectionSummary.class)
                 .map(HeapOccupancyAfterCollectionSummary::get)
-                .ifPresent(summary -> {
+                .ifPresent(summary ->
                     summary.forEach((gcType, dataSet) -> {
                         System.out.printf(message, gcType, dataSet.size());
                         switch (gcType) {
@@ -83,13 +83,12 @@ public class NoModuleIntegrationTest {
                                 Assertions.assertEquals(26,remarkCount,"Remark count");
                                 break;
                             default:
-                                System.out.println(gcType + " not managed");
+                                IO.println(gcType + " not managed");
                                 break;
                         }
-                    });
-                });
+                    }));
 
-        Optional<CollectionCycleCountsSummary> summary = machine.getAggregation(CollectionCycleCountsSummary.class);
+        var summary = machine.getAggregation(CollectionCycleCountsSummary.class);
         // Retrieves the Aggregation for PauseTimeSummary. This is a com.microsoft.gctoolkit.sample.aggregation.RuntimeAggregation.
         machine.getAggregation(PauseTimeSummary.class).ifPresent(pauseTimeSummary -> {
             Assertions.assertEquals( 208.922, pauseTimeSummary.getTotalPauseTime(), 0.001d, "Total Pause Time");

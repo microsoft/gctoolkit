@@ -2,15 +2,13 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.parser;
 
-/**
- * Supported flags
- * -XX:+PrintGCDateStamps
- * -XX:+PrintGCDetails
- * -XX:+PrintTenuringDistribution
- * -XX:+PrintAdaptiveSizePolicy
- * -XX:+PrintReferenceGC
- * -XX:+G1SummarizeRSetStats -XX:+G1SumerizeRsetStatsPeriod=1
- */
+/// Supported flags
+/// -XX:+PrintGCDateStamps
+/// -XX:+PrintGCDetails
+/// -XX:+PrintTenuringDistribution
+/// -XX:+PrintAdaptiveSizePolicy
+/// -XX:+PrintReferenceGC
+/// -XX:+G1SummarizeRSetStats -XX:+G1SumerizeRsetStatsPeriod=1
 
 public interface G1GCPatterns extends G1GCTokens {
 

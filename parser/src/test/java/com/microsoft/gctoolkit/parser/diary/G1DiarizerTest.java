@@ -31,7 +31,7 @@ public class G1DiarizerTest extends LogDiaryTest {
 
     @Test
     public void testForDetails() {
-        int i = 0;
+        var i = 0;
         for (String name : details) {
             testWith(new TestLogFile("g1gc/details/" + name).getFile(), name, detailsDiary[i], detailsUnknown[i], detailsKnown[i++]);
         }
@@ -71,7 +71,7 @@ public class G1DiarizerTest extends LogDiaryTest {
 
     @Test
     public void testForDetailsTenuring() {
-        int i = 0;
+        var i = 0;
         for (String name : detailsTenuring) {
             testWith(new TestLogFile("g1gc/details/tenuring/" + name).getFile(), name, detailsTenuringDiary[i], detailsTenuringUnknown[i], detailsTenuringKnown[i++]);
         }
@@ -99,7 +99,7 @@ public class G1DiarizerTest extends LogDiaryTest {
 
     @Test
     public void testForDetailsTenuringRolling17040() {
-        int i = 0;
+        var i = 0;
         for (String name : detailsTenuringRolling17040) {
             testWith(new TestLogFile("g1gc/details/tenuring/170_45/rolling/" + name).getFile(), name, detailsTenuringRolling17040Diary[i], detailsTenuringRolling17040Unknown[i], detailsTenuringRolling17040Known[i++]);
         }
@@ -131,7 +131,7 @@ public class G1DiarizerTest extends LogDiaryTest {
 
     @Test
     public void testForDetailsTenuring80() {
-        int i = 0;
+        var i = 0;
         for (String name : detailsTenuring80) {
             testWith(new TestLogFile("g1gc/details/tenuring/180/" + name).getFile(), name, detailsTenuring80Diary[i], detailsTenuring80Unknown[i], detailsTenuring80Known[i++]);
         }
@@ -159,7 +159,7 @@ public class G1DiarizerTest extends LogDiaryTest {
 
     @Test
     public void testForDetailsPrintReferenceGC() {
-        int i = 0;
+        var i = 0;
         for (String name : detailsPrintReferenceGC) {
             testWith(new TestLogFile("g1gc/details/reference/" + name).getFile(), name, detailsPrintReferenceGCDiary[i], detailsPrintReferenceGCUnknown[i], detailsPrintReferenceGCKnown[i++]);
         }
@@ -186,7 +186,7 @@ public class G1DiarizerTest extends LogDiaryTest {
 
     @Test
     public void testForDetailsAdaptiveSizeRSet() {
-        int i = 0;
+        var i = 0;
         for (String name : detailsAdaptiveSizeRSet) {
             testWith(new TestLogFile("g1gc/details/adaptivesize/rset/" + name).getFile(), name, detailsAdaptiveSizeRSetDiary[i], detailsAdaptiveSizeRSetUnknown[i], detailsAdaptiveSizeRSetKnown[i++]);
         }
@@ -194,7 +194,7 @@ public class G1DiarizerTest extends LogDiaryTest {
 
     @Test
     public void testUnifiedG1GC() {
-        int i = 0;
+        var i = 0;
         for (String name : unifiedLogs) {
             testWith(new TestLogFile("unified/g1gc/" + name).getFile(), name, unifiedDiary[i], unifiedUnknown[i], unifiedKnown[i++]);
         }

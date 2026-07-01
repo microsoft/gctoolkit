@@ -13,7 +13,7 @@ public class CollectionCycleCountsSummary extends CollectionCycleCountsAggregati
 
     @Override
     public void count(GarbageCollectionTypes gcType) {
-        collectionCycleCounts.computeIfAbsent(gcType, key -> new AtomicInteger()).incrementAndGet();
+        collectionCycleCounts.computeIfAbsent(gcType, _ -> new AtomicInteger()).incrementAndGet();
     }
 
     private static final String FORMAT = "%s : %s%n";

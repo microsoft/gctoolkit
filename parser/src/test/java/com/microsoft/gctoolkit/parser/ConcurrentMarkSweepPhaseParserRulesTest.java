@@ -20,9 +20,9 @@ public class ConcurrentMarkSweepPhaseParserRulesTest implements CMSPatterns {
     @Test
     public void testCMSParseRules() {
         assertEquals(rules.length,lines.length, "rules length != # of groups of lines to be test");
-        for (int i = 0; i < rules.length; i++) {
-            for (int j = 0; j < lines.length; j++) {
-                int captured = captureTest(rules[i], lines[j]);
+        for (var i = 0; i < rules.length; i++) {
+            for (var j = 0; j < lines.length; j++) {
+                var captured = captureTest(rules[i], lines[j]);
                 if (i == j) {
                     assertEquals(captured, lines[j].length, i + " failed to captured it's lines");
                 } else {
@@ -39,7 +39,7 @@ public class ConcurrentMarkSweepPhaseParserRulesTest implements CMSPatterns {
 
     //@Test
     public void testDebugCMSParseRules() {
-        int index = 8;
+        var index = 8;
         for (String line : lines[index])
             evaluate(rules[index], line);
     }
@@ -52,9 +52,9 @@ public class ConcurrentMarkSweepPhaseParserRulesTest implements CMSPatterns {
         trace.notYetImplemented();
         // Enable debugging by setting gctoolkit.debug to true
         GCToolKit.LOG_DEBUG_MESSAGE(() -> {
-            StringBuilder sb = new StringBuilder("matches groups " + trace.groupCount());
-            for (int i = 0; i <= trace.groupCount(); i++) {
-                sb.append(String.format("%n%d : %s", i, trace.getGroup(i))) ;
+            var sb = new StringBuilder("matches groups " + trace.groupCount());
+            for (var i = 0; i <= trace.groupCount(); i++) {
+                sb.append("%n%d : %s".formatted(i, trace.getGroup(i))) ;
             }
             return sb.toString();
         });

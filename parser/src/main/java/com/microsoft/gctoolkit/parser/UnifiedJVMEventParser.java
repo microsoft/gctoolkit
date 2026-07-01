@@ -32,6 +32,7 @@ public class UnifiedJVMEventParser extends UnifiedGCLogParser implements JVMPatt
         return Set.of(EventSource.JVM);
     }
 
+    @Override
     public String getName() {
         return "JavaEventParser";
     }
@@ -60,23 +61,23 @@ public class UnifiedJVMEventParser extends UnifiedGCLogParser implements JVMPatt
 
             else if ((trace = UNIFIED_LOGGING_APPLICATION_TIME.parse(line)) != null) {
                 publish(new ApplicationConcurrentTime(getClock(), trace.getDoubleGroup(1)));
-            } else if (line.equals(END_OF_DATA_SENTINEL) || (JVM_EXIT.parse(line) != null)) {
+            } else if (END_OF_DATA_SENTINEL.equals(line) || (JVM_EXIT.parse(line) != null)) {
                 publish(new JVMTermination(getClock(),diary.getTimeOfFirstEvent()));
             } else if (getClock().getTimeStamp() > timeStamp.getTimeStamp()) {
                 if (isGCPause(line)) gcPause = true;
                 timeStamp = getClock();
             }
 
-        } catch (Throwable t) {
+        } catch (Throwable _) {
             LOGGER.log(Level.FINE, "Missed: {0}", line);
         }
     }
 
     private boolean isGCPause(String line) {
-        return ((line.contains(" Pause Initial Mark")) ||
+        return (line.contains(" Pause Initial Mark")) ||
                 (line.contains(" Remark ")) ||
                 (line.contains(" Pause Young ")) ||
-                (line.contains(" Full ")));
+                (line.contains(" Full "));
     }
 
     @Override

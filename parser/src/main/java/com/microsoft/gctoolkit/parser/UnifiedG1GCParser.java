@@ -38,16 +38,14 @@ import java.util.regex.Pattern;
 
 import static com.microsoft.gctoolkit.event.GarbageCollectionTypes.fromLabel;
 
-/**
- * TODO No reports or views generated from this data yet.
- * <p>
- * Result on
- * - when GC started
- * - type of GC triggered
- * - from, to, configured
- * - pause time if it is reported or can be calculated
- * todo: me
- */
+/// TODO No reports or views generated from this data yet.
+///
+/// Result on
+/// - when GC started
+/// - type of GC triggered
+/// - from, to, configured
+/// - pause time if it is reported or can be calculated
+/// todo: me
 public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GCPatterns, TenuredPatterns {
 
     private static final Logger LOGGER = Logger.getLogger(UnifiedG1GCParser.class.getName());
@@ -167,6 +165,7 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
         return Set.of(EventSource.G1GC);
     }
 
+    @Override
     public String getName() {
         return "UnifiedG1GCParser";
     }
@@ -220,7 +219,7 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
 
     private void setForwardReference(int gcid, String line) {
         if (gcid != -1) {
-            forwardReference = collectionsUnderway.computeIfAbsent(gcid, k -> new G1GCForwardReference(new Decorators(line), gcid));
+            forwardReference = collectionsUnderway.computeIfAbsent(gcid, _ -> new G1GCForwardReference(new Decorators(line), gcid));
             forwardReference.setHeapRegionSize(regionSize);
             forwardReference.setMaxHeapSize(maxHeapSize);
             forwardReference.setMinHeapSize(minHeapSize);
@@ -234,13 +233,12 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
 
     private void noop(GCLogTrace trace, String line) {}
 
-    /*************
-     *
-     * Data Extraction methods
-     */
+    /// ***********
+    ///
+    /// Data Extraction methods
 
     private void cpuBreakout(GCLogTrace trace, String line) {
-        CPUSummary cpuSummary = new CPUSummary(trace.getDoubleGroup(1), trace.getDoubleGroup(2), trace.getDoubleGroup(3));
+        var cpuSummary = new CPUSummary(trace.getDoubleGroup(1), trace.getDoubleGroup(2), trace.getDoubleGroup(3));
         forwardReference.setCPUSummary(cpuSummary);
         try {
             publishPauseEvent(forwardReference.buildEvent());
@@ -252,15 +250,13 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
     // todo: need to drain the queues before terminating...
     // Just in case there isn't a JVM termination event in the log.
     public void endOfFile(GCLogTrace trace, String line) {
-        publish(new JVMTermination((jvmTerminationEventTime.hasTimeStamp()) ? jvmTerminationEventTime : getClock(),diary.getTimeOfFirstEvent()));
+        publish(new JVMTermination(jvmTerminationEventTime.hasTimeStamp() ? jvmTerminationEventTime : getClock(),diary.getTimeOfFirstEvent()));
     }
 
-    /**
-     * following records describe heap before the collection
-     *
-     * @param trace
-     * @param line
-     */
+    /// following records describe heap before the collection
+    ///
+    /// @param trace
+    /// @param line
     private void heapBeforeAfterGCInvocationCount(GCLogTrace trace, String line) {
         if ("before".equals(trace.getGroup(1))) {
             before = true;
@@ -318,18 +314,16 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
         }
     }
 
-    /**
-     * @param trace
-     * @param line
-     */
+    /// @param trace
+    /// @param line
     private void metaClassSpace(GCLogTrace trace, String line) {
         if (before) {
-            if (trace.getGroup(1).equals("Metaspace")) {
+            if ("Metaspace".equals(trace.getGroup(1))) {
                 forwardReference.setMetaspaceOccupancyBeforeCollection(trace.getLongGroup(2));
                 forwardReference.setMetaspaceSizeBeforeCollection(trace.getLongGroup(3));
                 forwardReference.setMetaspaceCommittedBeforeCollection(trace.getLongGroup(4));
                 forwardReference.setMetaspaceReservedBeforeCollection(trace.getLongGroup(5));
-            } else if (trace.getGroup(1).equals("class space")) {
+            } else if ("class space".equals(trace.getGroup(1))) {
                 forwardReference.setClassspaceOccupancyBeforeCollection(trace.getLongGroup(2));
                 forwardReference.setClassspaceSizeBeforeCollection(trace.getLongGroup(3));
                 forwardReference.setClassspaceCommittedBeforeCollection(trace.getLongGroup(4));
@@ -337,12 +331,12 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
             } else
                 trace.notYetImplemented();
         } else {
-            if (trace.getGroup(1).equals("Metaspace")) {
+            if ("Metaspace".equals(trace.getGroup(1))) {
                 forwardReference.setMetaspaceOccupancyAfterCollection(trace.getLongGroup(2));
                 forwardReference.setMetaspaceSizeAfterCollection(trace.getLongGroup(3));
                 forwardReference.setMetaspaceCommittedAfterCollection(trace.getLongGroup(4));
                 forwardReference.setMetaspaceReservedAfterCollection(trace.getLongGroup(5));
-            } else if (trace.getGroup(1).equals("class space")) {
+            } else if ("class space".equals(trace.getGroup(1))) {
                 forwardReference.setClassspaceOccupancyAfterCollection(trace.getLongGroup(2));
                 forwardReference.setClassspaceSizeAfterCollection(trace.getLongGroup(3));
                 forwardReference.setClassspaceCommittedAfterCollection(trace.getLongGroup(4));
@@ -474,12 +468,10 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
         }
     }
 
-    /**
-     * The trace indicates number of active regions before and after the collection. This is then used to provide an
-     * extremely coarse estimate of the amount of live data.
-     * @param trace A chunk of GC log that we are attempting to match to a known GC log pattern
-     * @param line The log line corresponding to the trace
-     */
+    /// The trace indicates number of active regions before and after the collection. This is then used to provide an
+    /// extremely coarse estimate of the amount of live data.
+    /// @param trace A chunk of GC log that we are attempting to match to a known GC log pattern
+    /// @param line The log line corresponding to the trace
     public void regionSummary(GCLogTrace trace, String line) {
         RegionSummary summary = trace.regionSummary();
         switch (trace.getGroup(1)) {
@@ -535,13 +527,11 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
     	}
     }
 
-    /**
-     * Record contains Metaspace broken out to class and non-class space. Since
-     * Metaspace = class space + non-class space, we can ignore the non-class space information (for now)
-     * The space size before the collection can be determined by inspecting the previous record (ignore for now)
-     * @param trace A chunk of GC log that we are attempting to match to a known GC log pattern
-     * @param line The log line corresponding to the trace
-     */
+    /// Record contains Metaspace broken out to class and non-class space. Since
+    /// Metaspace = class space + non-class space, we can ignore the non-class space information (for now)
+    /// The space size before the collection can be determined by inspecting the previous record (ignore for now)
+    /// @param trace A chunk of GC log that we are attempting to match to a known GC log pattern
+    /// @param line The log line corresponding to the trace
     public void metaNonClassClassSpace(GCLogTrace trace, String line) {
         MemoryPoolSummary metaspace = trace.getEnlargedMetaSpaceRecord(1);
         forwardReference.setMetaspaceOccupancyBeforeCollection(metaspace.getOccupancyBeforeCollection());
@@ -555,12 +545,10 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
 
     //Concurrent Mark
 
-    /**
-     * Start of concurrent phases which can be ignored (for now??)
-     *
-     * @param trace
-     * @param line
-     */
+    /// Start of concurrent phases which can be ignored (for now??)
+    ///
+    /// @param trace
+    /// @param line
 
     private void concurrentCycleStart(GCLogTrace trace, String line) {
         forwardReference.setConcurrentCycleStartTime(getClock());
@@ -600,11 +588,9 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
         publishConcurrentEvent(forwardReference.buildConcurrentPhaseEvent());
     }
 
-    /**
-     * this is the start of the records, nothing to be captured.
-     * @param trace
-     * @param line
-     */
+    /// this is the start of the records, nothing to be captured.
+    /// @param trace
+    /// @param line
     private void concurrentMarkInternalPhases(GCLogTrace trace, String line) {
     }
 
@@ -673,50 +659,40 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
             forwardReference.fullPhase(trace.getIntegerGroup(1), trace.getGroup(2), trace.getDurationInSeconds());
     }
 
-    /**
-     * todo: need to process and view this captured data
-     * @param trace
-     * @param line
-     */
+    /// todo: need to process and view this captured data
+    /// @param trace
+    /// @param line
     private void fullClassUnloading(GCLogTrace trace, String line) {
         //forwardReference.fullClassUnloadingDuration(trace.getMillisecondDurationInSeconds());
     }
 
-    /**
-     * todo: need to capture StringTable data (part of remark at debug level)
-     * @param trace
-     * @param line
-     */
+    /// todo: need to capture StringTable data (part of remark at debug level)
+    /// @param trace
+    /// @param line
     private void fullStringSymbolTable(GCLogTrace trace, String line) {
 //        forwardReference.scrubStringSymbolTableDuration(trace.getMillisecondDurationInSeconds());
     }
 
-    /**
-     * Capture logged tenuring summary data
-     * @param trace
-     * @param line
-     */
+    /// Capture logged tenuring summary data
+    /// @param trace
+    /// @param line
     private void tenuringSummary(GCLogTrace trace, String line) {
         forwardReference.survivorRecord(new SurvivorRecord(getClock(), trace.getLongGroup(1), trace.getIntegerGroup(2), trace.getIntegerGroup(3)));
     }
 
-    /**
-     * Capture logged age table data
-     * @param trace
-     * @param line
-     */
+    /// Capture logged age table data
+    /// @param trace
+    /// @param line
     private void tenuringAgeBreakout(GCLogTrace trace, String line) {
         notYetImplemented(trace,line);
         forwardReference.addAgeBreakout(trace.getIntegerGroup(1), trace.getLongGroup(2));
     }
 
-    /**
-     * records a concurrent phase of a concurrent cycle. After the event has been recorded, all other events
-     * that occurred during the concurrent event will be recorded.
-     * The exception is the Concurrent Undo cycle which causes all concurrent phases to be queued until the
-     * undo cycle ends.
-     * @param event
-     */
+    /// records a concurrent phase of a concurrent cycle. After the event has been recorded, all other events
+    /// that occurred during the concurrent event will be recorded.
+    /// The exception is the Concurrent Undo cycle which causes all concurrent phases to be queued until the
+    /// undo cycle ends.
+    /// @param event
     private void publishConcurrentEvent(G1GCConcurrentEvent event) {
         if ( event == null) return;
 
@@ -739,12 +715,10 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
 
     private final Queue<G1GCEvent> eventQueue = new LinkedList<>();
 
-    /**
-     * Events are published in the start time order. If a concurrent cycle has started and it's in a concurrent
-     * phase, the pause event is queued. It will be published when the concurrent phase completes. As each event is
-     * published, it corresponding forward reference is released.
-     * @param event
-     */
+    /// Events are published in the start time order. If a concurrent cycle has started and it's in a concurrent
+    /// phase, the pause event is queued. It will be published when the concurrent phase completes. As each event is
+    /// published, it corresponding forward reference is released.
+    /// @param event
     private void publishPauseEvent(G1GCPauseEvent event) {
         if (event == null) return;
         if ( concurrentPhaseActive) {
@@ -777,12 +751,10 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
         return false;
     }
 
-    /**
-     * Ignore rules we don't need to process.
-     *
-     * @param trace GCLogTrace that hits this log line
-     * @param line  Log line.
-     */
+    /// Ignore rules we don't need to process.
+    ///
+    /// @param trace GCLogTrace that hits this log line
+    /// @param line  Log line.
     private void ignore(GCLogTrace trace, String line) {
         return;
     }

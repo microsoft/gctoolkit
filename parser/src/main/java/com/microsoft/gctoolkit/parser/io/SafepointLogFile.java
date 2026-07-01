@@ -28,10 +28,9 @@ public class SafepointLogFile implements DataSource<String> {
         this.path = path;
     }
 
-    /**
-     * todo: for the moment this diary is empty.
-     * @return a diary
-     */
+    /// todo: for the moment this diary is empty.
+    /// @return a diary
+    @Override
     public Diary diary() {
         return new Diary();
     }
@@ -43,6 +42,7 @@ public class SafepointLogFile implements DataSource<String> {
 
     public Path getPath() { return path; }
 
+    @Override
     public Stream<String> stream() throws IOException {
         if (metadata.isPlainText()) {
             return Files.lines(path);
@@ -55,7 +55,7 @@ public class SafepointLogFile implements DataSource<String> {
     }
 
     Stream<String> streamZipFile() throws IOException {
-        ZipInputStream zipStream = new ZipInputStream(Files.newInputStream(path));
+        var zipStream = new ZipInputStream(Files.newInputStream(path));
         ZipEntry entry;
         do {
             entry = zipStream.getNextEntry();
@@ -64,7 +64,7 @@ public class SafepointLogFile implements DataSource<String> {
     }
 
     Stream<String> streamGZipFile() throws IOException {
-        GZIPInputStream gzipStream = new GZIPInputStream(Files.newInputStream(path));
+        var gzipStream = new GZIPInputStream(Files.newInputStream(path));
         return new BufferedReader(new InputStreamReader(new BufferedInputStream(gzipStream))).lines();
     }
 

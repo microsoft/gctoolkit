@@ -33,7 +33,7 @@ public class ZeroAggregationTest {
          * The log files can be either in text, zip, or gzip format.
          */
         GCLogFile logFile = new SingleGCLogFile(path);
-        GCToolKit gcToolKit = new GCToolKit();
+        var gcToolKit = new GCToolKit();
         // Do not call GCToolKit::loadAggregationsFromServiceLoader
         JavaVirtualMachine machine = null;
         try {
@@ -52,7 +52,7 @@ public class ZeroAggregationTest {
     public void testSuppliedAggregation() {
         Path path = new TestLogFile("cms/defnew/details/defnew.log").getFile().toPath();
         GCLogFile logFile = new SingleGCLogFile(path);
-        GCToolKit gcToolKit = new GCToolKit();
+        var gcToolKit = new GCToolKit();
         // Load our local Aggregation that will not be registered for the given log file
         gcToolKit.loadAggregation(new ZeroAggregationTest.TestAggregation());
         JavaVirtualMachine machine = null;
@@ -84,13 +84,11 @@ public class ZeroAggregationTest {
     @Aggregates(EventSource.G1GC)
     public static class TestAggregator extends Aggregator<TestAggregation> {
 
-        /**
-         * Subclass only.
-         *
-         * @param aggregation The Aggregation that {@literal @}Collates this Aggregator
-         * @see Collates
-         * @see Aggregation
-         */
+        /// Subclass only.
+        ///
+        /// @param aggregation The Aggregation that `@`Collates this Aggregator
+        /// @see Collates
+        /// @see Aggregation
         protected TestAggregator(TestAggregation aggregation) {
             super(aggregation);
         }

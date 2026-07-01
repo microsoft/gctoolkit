@@ -10,55 +10,53 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
-/**
- * An Aggregator consumes a JVMEvent, extracts data from the event, and calls on an
- * Aggregation which collates the data.
- * An Aggregators uses the <code>{@literal @}Aggregates</code> annotation to declare the
- * EventSource(s) of the JVMEvents it handles.
- * The constructor of an Aggregator must call {@link #register(Class, Consumer)}
- * to register the consumer methods of JVMEvents the Aggregator consumes.
- * <p>
- * This example Aggregator aggregates events from the G1GC event source. It consumes
- * and processes four different events. The {@code Consumer} method for each event extracts
- * the cause of the collection and calls the GCCauseAggregation {@code record} method.
- *
- * <pre><code>
- *
- * {@literal @}Collates(GCCauseAggregator)
- * public interface GCCauseAggregation extends Aggregation {
- *     publish(GarbageCollectionType type, GCCause cause);
- * }
- *
- * {@literal @}Aggregates(EventSource.G1GC)
- * public class GCCauseAggregator extends Aggregator{@literal <}GCCauseAggregation{@literal >} {
- *
- *     public GCCauseAggregator(GCCauseAggregation aggregation) {
- *         super(aggregation);
- *         register(G1Young.class, this::process);
- *         register(G1Mixed.class, this::process);
- *         register(G1YoungInitialMark.class, this::process);
- *         register(G1FullGC.class, this::process);
- *     }
- *
- *     private void process(G1Young collection) {
- *         aggregation().publish(GarbageCollectionTypes.Young, collection.getGCCause());
- *     }
- *
- *     private void process(G1Mixed collection) {
- *         aggregation().publish(GarbageCollectionTypes.Mixed, collection.getGCCause());
- *     }
- *
- *     private void process(G1YoungInitialMark collection) {
- *         aggregation().publish(GarbageCollectionTypes.G1GCYoungInitialMark, collection.getGCCause());
- *     }
- *
- *     private void process(G1FullGC collection) {
- *         aggregation().publish(GarbageCollectionTypes.FullGC, collection.getGCCause());
- *     }
- * }
- * </code></pre>
- * @param <A> The type of Aggregation
- */
+/// An Aggregator consumes a JVMEvent, extracts data from the event, and calls on an
+/// Aggregation which collates the data.
+/// An Aggregators uses the ``@`Aggregates` annotation to declare the
+/// EventSource(s) of the JVMEvents it handles.
+/// The constructor of an Aggregator must call [#register(Class, Consumer)]
+/// to register the consumer methods of JVMEvents the Aggregator consumes.
+///
+/// This example Aggregator aggregates events from the G1GC event source. It consumes
+/// and processes four different events. The `Consumer` method for each event extracts
+/// the cause of the collection and calls the GCCauseAggregation `record` method.
+///
+/// ```
+///
+/// `@`Collates(GCCauseAggregator)
+/// public interface GCCauseAggregation extends Aggregation {
+///     publish(GarbageCollectionType type, GCCause cause);
+/// }
+///
+/// `@`Aggregates(EventSource.G1GC)
+/// public class GCCauseAggregator extends Aggregator`<`GCCauseAggregation`>` {
+///
+///     public GCCauseAggregator(GCCauseAggregation aggregation) {
+///         super(aggregation);
+///         register(G1Young.class, this::process);
+///         register(G1Mixed.class, this::process);
+///         register(G1YoungInitialMark.class, this::process);
+///         register(G1FullGC.class, this::process);
+///     }
+///
+///     private void process(G1Young collection) {
+///         aggregation().publish(GarbageCollectionTypes.Young, collection.getGCCause());
+///     }
+///
+///     private void process(G1Mixed collection) {
+///         aggregation().publish(GarbageCollectionTypes.Mixed, collection.getGCCause());
+///     }
+///
+///     private void process(G1YoungInitialMark collection) {
+///         aggregation().publish(GarbageCollectionTypes.G1GCYoungInitialMark, collection.getGCCause());
+///     }
+///
+///     private void process(G1FullGC collection) {
+///         aggregation().publish(GarbageCollectionTypes.FullGC, collection.getGCCause());
+///     }
+/// }
+/// ```
+/// @param A The type of Aggregation
 public abstract class Aggregator<A extends Aggregation> {
 
     private final A aggregation;
@@ -67,53 +65,51 @@ public abstract class Aggregator<A extends Aggregation> {
     /// JVMEventDispatcher manages all the registered events and event consumers
     private final JVMEventDispatcher jvmEventDispatcher = new JVMEventDispatcher();
 
-    /**
-     * Subclass only.
-     * @param aggregation The Aggregation that {@literal @}Collates this Aggregator
-     * @see Collates
-     * @see Aggregation
-     */
+    /// Subclass only.
+    /// @param aggregation The Aggregation that `@`Collates this Aggregator
+    /// @see Collates
+    /// @see Aggregation
     protected Aggregator(A aggregation) {
         this.aggregation = aggregation;
     }
 
-    /**
-     * This method returns the {@link Aggregation} that collates the data
-     * which is collected by this {@code Aggregator}.
-     * @return The Aggregator's corresponding Aggregation
-     */
+    /// This method returns the [Aggregation] that collates the data
+    /// which is collected by this `Aggregator`.
+    /// @return The Aggregator's corresponding Aggregation
     public A aggregation() {
         return aggregation;
     }
 
-    /**
-     * Register a JVMEvent class and the method in the Aggregator sub-class that handles it.
-     * If the JVMEvent class is a super-class of other event types, then the Consumer is called
-     * for all sub-classes of that JVMEvent class, unless a Consumer for a more specific event class
-     * is registered.
-     * <p>
-     * The typical pattern is to call this method from the constructor of the Aggregator sub-class.
-     * <pre>{@code
-     *     register(G1Young.class, this::process);
-     * }</pre>
-     * The {@code Consumer} for this example would be coded as:
-     * <pre>{@code
-     *     private void process(G1Young collection) {...}
-     * }</pre>
-     * Where the body of the method would pull the relevant data from the event
-     * and pass the data on to the Aggregation.
-     * @param eventClass the Class of the JVMEvent type to register.
-     * @param process the handler which processes the event
-     * @param <E> the type of JVMEvent
-     */
+    /// Register a JVMEvent class and the method in the Aggregator sub-class that handles it.
+    /// If the JVMEvent class is a super-class of other event types, then the Consumer is called
+    /// for all sub-classes of that JVMEvent class, unless a Consumer for a more specific event class
+    /// is registered.
+    ///
+    /// The typical pattern is to call this method from the constructor of the Aggregator sub-class.
+    /// ``````
+    ///
+    ///     register(G1Young.class, this::process);
+    ///
+    /// ```
+    /// ```
+    /// The `Consumer` for this example would be coded as:
+    /// ``````
+    ///
+    ///     private void process(G1Young collection) {...}
+    ///
+    /// ```
+    /// ```
+    /// Where the body of the method would pull the relevant data from the event
+    /// and pass the data on to the Aggregation.
+    /// @param eventClass the Class of the JVMEvent type to register.
+    /// @param process the handler which processes the event
+    /// @param E the type of JVMEvent
     protected <E extends JVMEvent> void register(Class<E> eventClass, Consumer<? super E> process) {
         jvmEventDispatcher.register(eventClass, process);
     }
 
-    /**
-     * Call back to be run when the JVMTermination event has been
-     * @param task to be executed
-     */
+    /// Call back to be run when the JVMTermination event has been
+    /// @param task to be executed
     public void onCompletion(Runnable task) {
         this.completionTask = task;
     }
@@ -127,26 +123,22 @@ public abstract class Aggregator<A extends Aggregation> {
         }
     );
 
-    /**
-     * Call a callback when aggregation is completed.
-     */
+    /// Call a callback when aggregation is completed.
     private void complete() {
         if (completionTask != null) {
             executorService.execute(completionTask);
         }
     }
 
-    /**
-     * This method consumes a JVMEvent and dispatches it to the
-     * {@link #register(Class, Consumer) registered consumer}.
-     * @param event an event to be processed
-     */
+    /// This method consumes a JVMEvent and dispatches it to the
+    /// [registered consumer][#register(Class, Consumer)].
+    /// @param event an event to be processed
     public void receive(JVMEvent event) {
         aggregation().updateEventFrequency(event);
 
-        if (event instanceof JVMTermination) {
-            aggregation().timeOfTerminationEvent(((JVMTermination) event).getTimeOfTerminationEvent());
-            aggregation().timeOfFirstEvent(((JVMTermination)event).getTimeOfFirstEvent());
+        if (event instanceof JVMTermination termination) {
+            aggregation().timeOfTerminationEvent(termination.getTimeOfTerminationEvent());
+            aggregation().timeOfFirstEvent(termination.getTimeOfFirstEvent());
         }
         jvmEventDispatcher.dispatch(event);
         if (event instanceof JVMTermination) {
@@ -154,21 +146,17 @@ public abstract class Aggregator<A extends Aggregation> {
         }
     }
 
-    /**
-     * Calculates if this Aggregator aggregates the given event source
-     * @param eventSource to be checked.
-     * @return true is the aggregator aggregates the event source
-     */
+    /// Calculates if this Aggregator aggregates the given event source
+    /// @param eventSource to be checked.
+    /// @return true is the aggregator aggregates the event source
     public boolean aggregates(EventSource eventSource) {
         return (eventSource != null) && aggregates(getClass(), eventSource);
     }
 
-    /**
-     * Calculates if this Aggregator aggregates the given event source.
-     * @param clazz the aggregator
-     * @param targetEventSource the event source to check
-     * @return true is the aggregator aggregates the event source
-     */
+    /// Calculates if this Aggregator aggregates the given event source.
+    /// @param clazz the aggregator
+    /// @param targetEventSource the event source to check
+    /// @return true is the aggregator aggregates the event source
     private boolean aggregates(Class<?> clazz, EventSource targetEventSource) {
         if (clazz != null && clazz != Aggregator.class) {
 

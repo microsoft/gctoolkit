@@ -8,14 +8,12 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
-/**
- * This is a utility class that supports the {@link Aggregator#register(Class, Consumer)} method.
- */
+/// This is a utility class that supports the [Aggregator#register(Class, Consumer)] method.
 public class JVMEventDispatcher {
 
     private final Map<Class<? extends JVMEvent>, Consumer<? super JVMEvent>> eventConsumers = new ConcurrentHashMap<>();
 
-    private final Consumer<? super JVMEvent> nopConsumer = (evt) -> {};
+    private final Consumer<? super JVMEvent> nopConsumer = _ -> {};
 
     @SuppressWarnings("unchecked")
     private <R extends JVMEvent> Consumer<? super JVMEvent> getConsumerForClass(Class<R> eventClass) {
@@ -56,24 +54,20 @@ public class JVMEventDispatcher {
         return nopConsumer;
     }
 
-    /**
-     * Called from {@link Aggregator#register(Class, Consumer)}
-     * @param eventClass A JVMEvent class that the Aggregator captures
-     * @param process A method to call back when an event of type {@code eventClass} is captured.
-     * @param <R> A type of JVMEvent
-     */
+    /// Called from [Aggregator#register(Class, Consumer)]
+    /// @param eventClass A JVMEvent class that the Aggregator captures
+    /// @param process A method to call back when an event of type `eventClass` is captured.
+    /// @param R A type of JVMEvent
     @SuppressWarnings("unchecked")
     public <R extends JVMEvent> void register(Class<R> eventClass, Consumer<? super R> process) {
         eventConsumers.put(eventClass, (Consumer<JVMEvent>)process);
     }
 
-    /**
-     * todo: fix comment for the link below.
-     * Called from {@link Aggregator#receive(JVMEvent)}, this invokes the process method that was
-     * {@link #register(Class, Consumer) registered}.
-     * @param event An event from the parser.
-     * @param <R> the type of JVMEvent.
-     */
+    /// todo: fix comment for the link below.
+    /// Called from [Aggregator#receive(JVMEvent)], this invokes the process method that was
+    /// [registered][#register(Class, Consumer)].
+    /// @param event An event from the parser.
+    /// @param R the type of JVMEvent.
     public <R extends JVMEvent> void dispatch(R event) {
         getConsumerForClass(event.getClass()).accept(event);
     }

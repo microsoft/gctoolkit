@@ -2,11 +2,9 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.parser;
 
-/**
- * Interface that contains String and ParseRule representations of common
- * data types within GC Log data.These tokens are used in Regular Expressions
- * Pattern matching in the GC Log parser(s)
- */
+/// Interface that contains String and ParseRule representations of common
+/// data types within GC Log data.These tokens are used in Regular Expressions
+/// Pattern matching in the GC Log parser(s)
 public interface Tokens {
 
     // Primitives
@@ -77,7 +75,7 @@ public interface Tokens {
     // Reference processing block
     // 11906.881: [SoftReference, 0 refs, 0.0000060 secs]
     // 11906.881: [WeakReference, 0 refs, 0.0000020 secs]
-    // 11906.881: [FinalReference, 0 refs, 0.0000010 secs]
+    // 11906.881: [FinalReference, 0 refs, 0.0000010 ßsecs]
     // 11906.881: [PhantomReference, 0 refs, 0.0000020 secs]
     String REFERENCE_PROCESSING = DATE_TIMESTAMP + "\\[(Soft|Weak|Final)Reference, " + COUNTER + " refs, " + PAUSE_TIME + "\\]";
     GCParseRule SOFT_REFERENCE = new GCParseRule("SOFT_REFERENCE", DATE_TIMESTAMP + "\\[SoftReference, " + COUNTER + " refs, " + PAUSE_TIME + "\\]");

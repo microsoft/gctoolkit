@@ -333,16 +333,12 @@ public class ZGCCollection extends GCEvent {
     }
 
     public double getLoadAverageAt(int time) {
-        switch (time) {
-            case 1:
-                return load[0];
-            case 5:
-                return load[1];
-            case 15:
-                return load[2];
-            default:
-                return 0.0d;
-        }
+        return switch (time) {
+            case 1 -> load[0];
+            case 5 -> load[1];
+            case 15 -> load[2];
+            default -> 0.0d;
+        };
     }
 
     public void setMMU(double[] mmu) {
@@ -350,22 +346,15 @@ public class ZGCCollection extends GCEvent {
     }
 
     public double getMMU(int percentage) {
-        switch (percentage) {
-            case 2:
-                return mmu[0];
-            case 5:
-                return mmu[1];
-            case 10:
-                return mmu[2];
-            case 20:
-                return mmu[3];
-            case 50:
-                return mmu[4];
-            case 100:
-                return mmu[5];
-            default:
-                return 0.0d;
-        }
+        return switch (percentage) {
+            case 2 -> mmu[0];
+            case 5 -> mmu[1];
+            case 10 -> mmu[2];
+            case 20 -> mmu[3];
+            case 50 -> mmu[4];
+            case 100 -> mmu[5];
+            default -> 0.0d;
+        };
     }
 
     public void setConcurrentRemapRoots(DateTimeStamp remapRootsStart, double remapRootsDuration) {

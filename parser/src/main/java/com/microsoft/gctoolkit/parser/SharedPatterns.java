@@ -2,11 +2,9 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.parser;
 
-/**
- * TODO: #157 There needs to be a clearer separation of what is a Token vs what is a SharedPattern
- * <p>
- * Shared generational rules
- */
+/// TODO: #157 There needs to be a clearer separation of what is a Token vs what is a SharedPattern
+///
+/// Shared generational rules
 public interface SharedPatterns extends PreUnifiedTokens {
 
     String WEAK_REF_BLOCK = DATE_TIMESTAMP + "\\[weak refs processing, " + PAUSE_TIME + "\\]";

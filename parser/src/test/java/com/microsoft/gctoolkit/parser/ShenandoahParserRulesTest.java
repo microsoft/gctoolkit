@@ -15,9 +15,9 @@ public class ShenandoahParserRulesTest implements ShenandoahPatterns {
 
    @Test
     public void testParseRules() {
-       for (int i = 0; i < rules.length; i++)
-           for (int j = 0; j < lines.length; j++) {
-               int captured = captureTest(rules[i], lines[j]);
+       for (var i = 0; i < rules.length; i++)
+           for (var j = 0; j < lines.length; j++) {
+               var captured = captureTest(rules[i], lines[j]);
                if (i == j) {
                    assertEquals(captured, lines[j].length, i + " failed to captured it's lines");
                } else {
@@ -29,7 +29,7 @@ public class ShenandoahParserRulesTest implements ShenandoahPatterns {
    }
 
     private int captureTest(GCParseRule rule, String[] lines) {
-        int captureCount = 0;
+        var captureCount = 0;
         for (String line : lines) {
             GCLogTrace trace = rule.parse(line);
             if (rule.parse(line) != null) {
@@ -42,7 +42,7 @@ public class ShenandoahParserRulesTest implements ShenandoahPatterns {
     // Convenience test for debugging single rules
     // @Test
     public void testSingeRule() {
-        int index = 9;
+        var index = 9;
         assertEquals(captureTest(rules[index], lines[index]), lines[index].length);
     }
 
@@ -53,7 +53,7 @@ public class ShenandoahParserRulesTest implements ShenandoahPatterns {
         assertNotNull(trace);
         if (dump) {
             LOGGER.fine("matches groups " + trace.groupCount());
-            for (int i = 0; i <= trace.groupCount(); i++) {
+            for (var i = 0; i <= trace.groupCount(); i++) {
                 LOGGER.fine(i + ": " + trace.getGroup(i));
             }
         }

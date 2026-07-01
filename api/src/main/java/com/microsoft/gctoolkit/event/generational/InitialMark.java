@@ -17,6 +17,7 @@ public class InitialMark extends CMSPauseEvent {
         this(timeStamp, GCCause.UNKNOWN_GCCAUSE, duration);
     }
 
+    @Override
     public void add(MemoryPoolSummary tenured, MemoryPoolSummary heap) {
         this.add(heap.minus(tenured), tenured, heap);
     }

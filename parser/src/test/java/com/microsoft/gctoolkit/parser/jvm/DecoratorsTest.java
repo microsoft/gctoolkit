@@ -42,23 +42,21 @@ public class DecoratorsTest {
             "[2018-04-04T09:10:00.586-0100][0.018s][1522825800586ms][18ms][10026341461044ns][17738937ns][1375][7427][info][gc] Using G1"
     };
 
-    /**
-     * In lines at 0, there are 0 decorators
-     * In lines at 1, there is 1 decorator
-     * In lines at 2, there are 2 decorators
-     * ...
-     */
+    /// In lines at 0, there are 0 decorators
+    /// In lines at 1, there is 1 decorator
+    /// In lines at 2, there are 2 decorators
+    /// ...
     @Test
     public void decoratorsCounts() {
-        for (int i = 0; i < decoratorsLines.length; i++) {
-            Decorators decorators = new Decorators(decoratorsLines[i]);
+        for (var i = 0; i < decoratorsLines.length; i++) {
+            var decorators = new Decorators(decoratorsLines[i]);
             assertEquals(i, decorators.getNumberOfDecorators());
         }
     }
 
     @Test
     public void checkEachValue() {
-        Decorators decorators = new Decorators(decoratorsLines[decoratorsLines.length - 1]);
+        var decorators = new Decorators(decoratorsLines[decoratorsLines.length - 1]);
         assertEquals(ZonedDateTime.parse("2018-04-04T09:10:00.586-01:00"), decorators.getDateStamp());
         assertEquals(18, (int) (decorators.getUpTime() * 1000.0d));
         assertEquals(1522825800586L, decorators.getTimeMillis());
@@ -73,7 +71,7 @@ public class DecoratorsTest {
 
     @Test
     public void decoratorValues() {
-        Decorators decorators = new Decorators(decoratorsValuesTestSupport[0]);
+        var decorators = new Decorators(decoratorsValuesTestSupport[0]);
         assertEquals(1522825800586L, decorators.getTimeMillis(), "timestamp -> ");
         assertEquals(10026341461044L, decorators.getTimeNano(), "timestamp -> ");
         decorators = new Decorators(decoratorsValuesTestSupport[1]);
@@ -475,8 +473,8 @@ public class DecoratorsTest {
 
     @Test
     public void LogFragmentTest() {
-        for ( int index = 0; index < logFragment.length; index++) {
-            Decorators decorators = new Decorators(logFragment[index]);
+        for ( var index = 0; index < logFragment.length; index++) {
+            var decorators = new Decorators(logFragment[index]);
 
             // compare uptime
             assertEquals(expectedTimeStamps[index],decorators.getUpTime());

@@ -16,9 +16,9 @@ public class ZGCParserRulesTest implements ZGCPatterns {
 
    @Test
     public void testZGCParseRules() {
-        for (int i = 0; i < rules.length; i++)
-            for (int j = 0; j < lines.length; j++) {
-                int captured = captureTest(rules[i], lines[j]);
+        for (var i = 0; i < rules.length; i++)
+            for (var j = 0; j < lines.length; j++) {
+                var captured = captureTest(rules[i], lines[j]);
                 if (i == j) {
                     assertEquals(captured, lines[j].length, i + " failed to captured it's lines");
                 } else {
@@ -32,13 +32,13 @@ public class ZGCParserRulesTest implements ZGCPatterns {
     @Test
     public void testUnifiedLoggingDecorators() {
         for (String decoratorLine : decoratorLines) {
-            Decorators decorators = new Decorators(decoratorLine);
+            var decorators = new Decorators(decoratorLine);
             assertTrue(decorators.getNumberOfDecorators() != 0);
         }
     }
 
     private int captureTest(GCParseRule rule, String[] lines) {
-        int captureCount = 0;
+        var captureCount = 0;
         for (String line : lines) {
             GCLogTrace trace = rule.parse(line);
             if (trace != null) {
@@ -51,7 +51,7 @@ public class ZGCParserRulesTest implements ZGCPatterns {
     // Convenience test for debugging single rules
     // @Test
     public void testSingeRule() {
-        int index = 14;
+        var index = 14;
         assertEquals(captureTest(rules[index], lines[index]), lines[index].length);
     }
 
@@ -62,7 +62,7 @@ public class ZGCParserRulesTest implements ZGCPatterns {
       assertNotNull(trace);
         if (dump) {
             LOGGER.fine("matches groups " + trace.groupCount());
-            for (int i = 0; i <= trace.groupCount(); i++) {
+            for (var i = 0; i <= trace.groupCount(); i++) {
                 LOGGER.fine(i + ": " + trace.getGroup(i));
             }
         }

@@ -8,6 +8,7 @@ import com.microsoft.gctoolkit.event.StatisticalSummary;
 import com.microsoft.gctoolkit.event.UnifiedStatisticalSummary;
 import com.microsoft.gctoolkit.event.jvm.SurvivorRecord;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -234,7 +235,7 @@ public class G1Young extends G1RealPause {
         return parallelPhaseSummaries.keySet().iterator();
     }
 
-    public StatisticalSummary parallelPhaseSummaryFor(String phaseName) {
+    public @Nullable StatisticalSummary parallelPhaseSummaryFor(String phaseName) {
         return parallelPhaseSummaries.get(phaseName);
     }
 
@@ -270,7 +271,7 @@ public class G1Young extends G1RealPause {
         return evacuateCSetPhase.keySet().stream();
     }
 
-    public StatisticalSummary evacuateCSetPhaseDuration(String name) {
+    public @Nullable StatisticalSummary evacuateCSetPhaseDuration(String name) {
         return evacuateCSetPhase.get(name);
     }
 

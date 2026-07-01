@@ -14,7 +14,7 @@ public class PreunifiedG1GCParserTest extends ParserTest {
 
     @Test
     public void testForSolarisLogs() {
-        int i = 0;
+        var i = 0;
         for (String name : solaris) {
             try {
                 Path path = new TestLogFile("g1gc/details/solaris/" + name).getFile().toPath();
@@ -41,7 +41,7 @@ public class PreunifiedG1GCParserTest extends ParserTest {
 
     @Test
     public void testForDetailsLogs() {
-        int i = 0;
+        var i = 0;
         for (String name : details) {
             try {
                 Path path = new TestLogFile("g1gc/details/" + name).getFile().toPath();
@@ -75,7 +75,7 @@ public class PreunifiedG1GCParserTest extends ParserTest {
 
     @Test
     public void testForDetailsTenuringLogs() {
-        int i = 0;
+        var i = 0;
         for (String name : detailsTenuring) {
             try {
                 Path path = new TestLogFile("g1gc/details/tenuring/" + name).getFile().toPath();
@@ -125,7 +125,7 @@ public class PreunifiedG1GCParserTest extends ParserTest {
     @Test
     public void testForDetailsReferenceLogs() {
 
-        int i = 0;
+        var i = 0;
         for (String name : detailsReference) {
             try {
                 Path path = new TestLogFile("g1gc/details/reference/" + name).getFile().toPath();

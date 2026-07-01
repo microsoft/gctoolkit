@@ -5,9 +5,7 @@ package com.microsoft.gctoolkit.vertx.io;
 import java.io.File;
 import java.util.Arrays;
 
-/**
- * Abstract the log files location and provide some parsing of the file name scheme.
- */
+/// Abstract the log files location and provide some parsing of the file name scheme.
 public class TestLogFile {
 
     private final File logFile;

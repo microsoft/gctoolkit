@@ -18,81 +18,59 @@ import com.microsoft.gctoolkit.time.DateTimeStamp;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- * Abstract class representing a parser for GC log files.
- * Implements the DataSourceParser and SharedPatterns interfaces.
- */
+/// Abstract class representing a parser for GC log files.
+/// Implements the DataSourceParser and SharedPatterns interfaces.
 public abstract class GCLogParser implements DataSourceParser, SharedPatterns {
 
     private static final Logger LOGGER = Logger.getLogger(GCLogParser.class.getName());
-    /**
-     * Special string to indicate the end of the data in the GC log.
-     */
+    /// Special string to indicate the end of the data in the GC log.
     public static final String END_OF_DATA_SENTINEL = GCLogFile.END_OF_DATA_SENTINEL;
 
     // TODO: GCID_COUNTER should be in SharedPatterns, not here.
-    /**
-     * Rule for parsing the GCID counter.
-     */
+    /// Rule for parsing the GCID counter.
     public static final GCParseRule GCID_COUNTER = new GCParseRule("GCID_COUNTER", " GC\\((\\d+)\\) ");
     private JVMEventChannel consumer;
     protected Diary diary;
     private DateTimeStamp clock = new DateTimeStamp(DateTimeStamp.EPOC, 0.0d);
     private double lastDuration = 0.0d;
 
-    /**
-     * Default constructor.
-     */
+    /// Default constructor.
     public GCLogParser() {}
 
-    /**
-     * Sets the diary and initializes the clock to the time of the first event in the GC log.
-     * @param diary summary of the GC log.
-     */
+    /// Sets the diary and initializes the clock to the time of the first event in the GC log.
+    /// @param diary summary of the GC log.
     @Override
     public void diary(Diary diary) {
         this.diary = diary;
         this.clock = diary.getTimeOfFirstEvent();
     }
 
-    /**
-     * Gets the current clock time.
-     * @return the current DateTimeStamp.
-     */
+    /// Gets the current clock time.
+    /// @return the current DateTimeStamp.
     public DateTimeStamp getClock() {
         return clock;
     }
 
-    /**
-     * Sets the clock to a new value.
-     * @param newValue the new DateTimeStamp value.
-     */
+    /// Sets the clock to a new value.
+    /// @param newValue the new DateTimeStamp value.
     public void setClock(DateTimeStamp newValue) {
         this.clock = newValue;
     }
 
-    /**
-     * Abstract method to get the name of the parser.
-     * @return the name of the parser.
-     */
+    /// Abstract method to get the name of the parser.
+    /// @return the name of the parser.
     public abstract String getName();
 
-    /**
-     * Abstract method to process a trace line from the GC log.
-     * @param trace the trace line to process.
-     */
+    /// Abstract method to process a trace line from the GC log.
+    /// @param trace the trace line to process.
     protected abstract void process(String trace);
 
-    /**
-     * Abstract method to advance the clock based on a record.
-     * @param record the record to use for advancing the clock.
-     */
+    /// Abstract method to advance the clock based on a record.
+    /// @param record the record to use for advancing the clock.
     abstract void advanceClock(String record);
 
-    /**
-     * Advances the clock to the specified time.
-     * @param now the new DateTimeStamp.
-     */
+    /// Advances the clock to the specified time.
+    /// @param now the new DateTimeStamp.
     protected final void advanceClock(DateTimeStamp now) {
         if (now == null)
             return;
@@ -102,81 +80,66 @@ public abstract class GCLogParser implements DataSourceParser, SharedPatterns {
         setClock(now);
     }
 
-    /**
-     * Publishes a JVM event to the specified channel.
-     * @param channel the channel to publish to.
-     * @param event the event to be published.
-     */
+    /// Publishes a JVM event to the specified channel.
+    /// @param channel the channel to publish to.
+    /// @param event the event to be published.
     public void publish(ChannelName channel, JVMEvent event) {
         lastDuration = event.getDuration();
         consumer.publish(channel, event);
     }
 
-    /**
-     * Receives a trace line and processes it.
-     * @param trace the trace line to process.
-     */
+    /// Receives a trace line and processes it.
+    /// @param trace the trace line to process.
+    @Override
     public void receive(String trace) {
-        if (!trace.equals(END_OF_DATA_SENTINEL))
+        if (!END_OF_DATA_SENTINEL.equals(trace))
             advanceClock(trace);
         else
             advanceClock(getClock().add(lastDuration));
         process(trace);
     }
 
-    /**
-     * Checks if the diary indicates a pre-JDK 1.7.0_40 version.
-     * @return true if pre-JDK 1.7.0_40, false otherwise.
-     */
+    /// Checks if the diary indicates a pre-JDK 1.7.0_40 version.
+    /// @return true if pre-JDK 1.7.0_40, false otherwise.
     boolean isPreJDK17040() {
         return diary.isPre70_40();
     }
 
-    /**
-     * Checks if the diary has PrintGCDetails enabled.
-     * @return true if PrintGCDetails is enabled, false otherwise.
-     */
+    /// Checks if the diary has PrintGCDetails enabled.
+    /// @return true if PrintGCDetails is enabled, false otherwise.
     boolean hasPrintGCDetails() {
         return diary.isPrintGCDetails();
     }
 
-    /**
-     * Extracts a MemoryPoolSummary from a GCLogTrace.
-     * @param trace the GCLogTrace to extract from.
-     * @param offset the offset to use.
-     * @return the extracted MemoryPoolSummary.
-     */
+    /// Extracts a MemoryPoolSummary from a GCLogTrace.
+    /// @param trace the GCLogTrace to extract from.
+    /// @param offset the offset to use.
+    /// @return the extracted MemoryPoolSummary.
     MemoryPoolSummary getTotalOccupancyBeforeAfterWithTotalHeapPoolSizeSummary(GCLogTrace trace, int offset) {
         return trace.getOccupancyBeforeAfterWithMemoryPoolSizeSummary(offset);
     }
 
-    /**
-     * Extracts a MemoryPoolSummary from a GCLogTrace.
-     * @param trace the GCLogTrace to extract from.
-     * @param offset the offset to use.
-     * @return the extracted MemoryPoolSummary.
-     */
+    /// Extracts a MemoryPoolSummary from a GCLogTrace.
+    /// @param trace the GCLogTrace to extract from.
+    /// @param offset the offset to use.
+    /// @return the extracted MemoryPoolSummary.
     MemoryPoolSummary getTotalOccupancyWithTotalHeapSizeSummary(GCLogTrace trace, int offset) {
         return trace.getOccupancyWithMemoryPoolSizeSummary(offset);
     }
 
-    /**
-     * Extracts a GCLogTrace from a line using a specified GCParseRule.
-     * @param line the line to parse.
-     * @param rule the GCParseRule to use.
-     * @return the extracted GCLogTrace.
-     */
+    /// Extracts a GCLogTrace from a line using a specified GCParseRule.
+    /// @param line the line to parse.
+    /// @param rule the GCParseRule to use.
+    /// @return the extracted GCLogTrace.
     GCLogTrace extractReferenceBlock(String line, GCParseRule rule) {
         return rule.parse(line);
     }
 
-    /**
-     * Extracts a ReferenceGCSummary from a line.
-     * @param line the line to parse.
-     * @return the extracted ReferenceGCSummary.
-     */
+    /// Extracts a ReferenceGCSummary from a line.
+    /// @param line the line to parse.
+    /// @return the extracted ReferenceGCSummary.
     ReferenceGCSummary extractPrintReferenceGC(String line) {
-        ReferenceGCSummary summary = new ReferenceGCSummary();
+        var summary = new ReferenceGCSummary();
         GCLogTrace trace;
         if ((trace = extractReferenceBlock(line, SOFT_REFERENCE)) != null)
             summary.addSoftReferences(trace.getDateTimeStamp(), trace.getIntegerGroup(6), trace.getDuration());
@@ -199,11 +162,9 @@ public abstract class GCLogParser implements DataSourceParser, SharedPatterns {
         return summary;
     }
 
-    /**
-     * Extracts a MemoryPoolSummary from a line representing PermGen or Metaspace records.
-     * @param line the line to parse.
-     * @return the extracted MemoryPoolSummary.
-     */
+    /// Extracts a MemoryPoolSummary from a line representing PermGen or Metaspace records.
+    /// @param line the line to parse.
+    /// @return the extracted MemoryPoolSummary.
     MemoryPoolSummary extractPermOrMetaspaceRecord(String line) {
         GCLogTrace trace;
         MemoryPoolSummary metaDataPool = null;
@@ -225,37 +186,31 @@ public abstract class GCLogParser implements DataSourceParser, SharedPatterns {
                     break;
             }
         } else if ((trace = META_SPACE_RECORD.parse(line)) != null) {
-            int index = (trace.getGroup(1) == null) ? 1 : 3;
+            int index = trace.getGroup(1) == null ? 1 : 3;
             metaDataPool = new MetaspaceRecord(trace.toKBytes(index), trace.toKBytes(3), trace.toKBytes(5));
         }
         return metaDataPool;
     }
 
-    /**
-     * Extracts a PermGenSummary from a GCLogTrace.
-     * @param trace the GCLogTrace to extract from.
-     * @return the extracted PermGenSummary.
-     */
+    /// Extracts a PermGenSummary from a GCLogTrace.
+    /// @param trace the GCLogTrace to extract from.
+    /// @return the extracted PermGenSummary.
     MemoryPoolSummary extractPermGenRecord(GCLogTrace trace) {
-        int index = (trace.getGroup(2) == null) ? 2 : 4;
+        int index = trace.getGroup(2) == null ? 2 : 4;
         return new PermGenSummary(trace.getLongGroup(index), trace.getLongGroup(4), trace.getLongGroup(6));
     }
 
-    /**
-     * Extracts the GCID from a line.
-     * @param line the line to parse.
-     * @return the extracted GCID, or -1 if not found.
-     */
+    /// Extracts the GCID from a line.
+    /// @param line the line to parse.
+    /// @return the extracted GCID, or -1 if not found.
     int extractGCID(String line) {
         GCLogTrace trace = GCID_COUNTER.parse(line);
-        return (trace != null) ? trace.getIntegerGroup(1) : -1;
+        return trace != null ? trace.getIntegerGroup(1) : -1;
     }
 
-    /**
-     * Extracts a CPUSummary from a line.
-     * @param line the line to parse.
-     * @return the extracted CPUSummary, or null if not found.
-     */
+    /// Extracts a CPUSummary from a line.
+    /// @param line the line to parse.
+    /// @return the extracted CPUSummary, or null if not found.
     CPUSummary extractCPUSummary(String line) {
         GCLogTrace trace;
         if ((trace = CPU_BREAKDOWN.parse(line)) != null) {
@@ -264,19 +219,15 @@ public abstract class GCLogParser implements DataSourceParser, SharedPatterns {
         return null;
     }
 
-    /**
-     * Sets the JVMEventChannel to publish to.
-     * @param channel the channel to publish to.
-     */
+    /// Sets the JVMEventChannel to publish to.
+    /// @param channel the channel to publish to.
     @Override
     public void publishTo(JVMEventChannel channel) {
         this.consumer = channel;
     }
 
-    /**
-     * Gets the channel name.
-     * @return the channel name.
-     */
+    /// Gets the channel name.
+    /// @return the channel name.
     @Override
     public ChannelName channel() {
         return ChannelName.DATA_SOURCE;

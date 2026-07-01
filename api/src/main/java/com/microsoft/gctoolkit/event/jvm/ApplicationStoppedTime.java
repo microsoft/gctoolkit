@@ -13,7 +13,8 @@ public class ApplicationStoppedTime extends JVMEvent {
 
     public ApplicationStoppedTime(DateTimeStamp timeStamp, double duration,
                                   double timeToStopThreads, VMOperations safePointReason) {
-        this(timeStamp, duration, timeToStopThreads, safePointReason, safePointReason.isCollection());
+        var gcPause1 = safePointReason.isCollection();
+        this(timeStamp, duration, timeToStopThreads, safePointReason, gcPause1);
     }
 
     public ApplicationStoppedTime(DateTimeStamp timeStamp, double duration, boolean gcPause) {

@@ -2,17 +2,12 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.parser.unittests;
 
-import com.microsoft.gctoolkit.parser.GCLogTrace;
-import com.microsoft.gctoolkit.parser.GCParseRule;
 import com.microsoft.gctoolkit.parser.diary.TestLogFile;
-import com.microsoft.gctoolkit.time.DateTimeStamp;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.nio.file.Path;
 
-import static com.microsoft.gctoolkit.parser.CMSPatterns.*;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.fail;
 
 public class ICMSParNewParserTest extends ParserTest {
@@ -25,7 +20,7 @@ public class ICMSParNewParserTest extends ParserTest {
 
     @Test
     public void testForSimpleLogs() {
-        int i = 0;
+        var i = 0;
         for (String name : details) {
             try {
                 Path path = new TestLogFile("icms/details/" + name).getFile().toPath();
@@ -68,7 +63,7 @@ public class ICMSParNewParserTest extends ParserTest {
 
     @Test
     public void testForDetailsTenuring() {
-        int i = 0;
+        var i = 0;
         for (String name : detailsTenuring) {
             try {
                 Path path = new TestLogFile("icms/details/tenuring/" + name).getFile().toPath();
@@ -109,7 +104,7 @@ public class ICMSParNewParserTest extends ParserTest {
 
     @Test
     public void testForDetailsDebug() {
-        int i = 0;
+        var i = 0;
         for (String name : detailsDebug) {
             try {
                 Path path = new TestLogFile("icms/details/debug/" + name).getFile().toPath();

@@ -21,13 +21,13 @@ public class SingleGarbageCollectionLogFileTest {
 
     @Test
     public void unifiedLog() {
-        for (int index = 0; index < unifiedLogs.length; index++)
+        for (var index = 0; index < unifiedLogs.length; index++)
             logStreamingTest(unifiedLogs[index], logIsUnified[index], logIsZipped[index], logIsGZipped[index]);
     }
 
     private void logStreamingTest(String log, boolean unified, boolean zipped, boolean gzipped) {
         Path path = new TestLogFile(log).getFile().toPath();
-        SingleGCLogFile gcLogFile = new SingleGCLogFile(path);
+        var gcLogFile = new SingleGCLogFile(path);
         assertEquals(unified, gcLogFile.isUnified(), "Expected unified but failed");
         try {
             assertEquals(1, gcLogFile.getMetaData().getNumberOfFiles(), "Expected 1 but found " + gcLogFile.getMetaData().getNumberOfFiles());

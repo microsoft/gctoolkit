@@ -15,7 +15,7 @@ public class RotatingGCLogTest {
     void orderRotatingLogsTest() {
         Path path = new TestLogFile("G1-80-16gbps2.log").getFile().toPath();
         try {
-            RotatingGCLogFile file = new RotatingGCLogFile(path);
+            var file = new RotatingGCLogFile(path);
             assertEquals(2, file.getMetaData().getNumberOfFiles());
             assertEquals(2, file.getMetaData().logFiles().map(LogFileSegment::getPath).map(Path::toFile).map(File::getName).filter(s -> s.startsWith("G1-80-16gbps2")).count());
             file.getMetaData().logFiles().map(LogFileSegment::getEndTime).forEach(System.out::println);

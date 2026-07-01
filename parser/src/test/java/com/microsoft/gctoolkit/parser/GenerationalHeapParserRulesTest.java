@@ -16,10 +16,10 @@ public class GenerationalHeapParserRulesTest implements SimplePatterns, SerialPa
     @Test
     public void testGenerationalRules() {
         assertEquals(rules.length,lines.length);
-        for (int i = 0; i < rules.length; i++)
-            for (int j = 0; j < lines.length; j++) {
+        for (var i = 0; i < rules.length; i++)
+            for (var j = 0; j < lines.length; j++) {
                 assertTrue(lines[j].length > 0, "No lines to test for index " + j);
-                int captured = captureTest(rules[i], lines[j]);
+                var captured = captureTest(rules[i], lines[j]);
                 if (i == j) {
                     assertEquals(captured, lines[j].length, i + " failed to captured it's lines");
                 } else {
@@ -32,7 +32,7 @@ public class GenerationalHeapParserRulesTest implements SimplePatterns, SerialPa
 
     // @Test
     public void testDebugGenerationalRules() {
-        int index = 4;
+        var index = 4;
         GCParseRule rule = rules[index];
         //evaluate( rule, lines[index][0], debugging);
         evaluate(rule, lines[index][1], true);

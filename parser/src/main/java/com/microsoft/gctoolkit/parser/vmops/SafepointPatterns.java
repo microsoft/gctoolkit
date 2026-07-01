@@ -6,10 +6,8 @@ package com.microsoft.gctoolkit.parser.vmops;
 import com.microsoft.gctoolkit.parser.PreUnifiedTokens;
 import com.microsoft.gctoolkit.parser.SafepointParseRule;
 
-/**
- * General format is;
- * vmop                    [threads: total initially_running wait_to_block]    [time: spin block sync cleanup vmop] page_trap_count
- */
+/// General format is;
+/// vmop                    [threads: total initially_running wait_to_block]    [time: spin block sync cleanup vmop] page_trap_count
 public interface SafepointPatterns extends PreUnifiedTokens {
 
     String VMOP = "(Deoptimize|no vm operation|EnableBiasedLocking|GenCollectForAllocation|RevokeBias|BulkRevokeBias|ThreadDump|FindDeadlocks|Exit)";

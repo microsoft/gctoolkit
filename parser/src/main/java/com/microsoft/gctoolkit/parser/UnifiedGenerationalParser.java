@@ -35,6 +35,7 @@ import com.microsoft.gctoolkit.parser.unified.UnifiedGenerationalPatterns;
 
 import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.BiConsumer;
@@ -55,15 +56,13 @@ import static com.microsoft.gctoolkit.event.GarbageCollectionTypes.PSYoungGen;
 import static com.microsoft.gctoolkit.event.GarbageCollectionTypes.ParNew;
 import static com.microsoft.gctoolkit.event.GarbageCollectionTypes.Remark;
 
-/**
- * TODO No reports or views generated from this data yet.
- * <p>
- * Result on
- * - when GC started
- * - type of GC triggered
- * - from, to, configured
- * - pause time if it is reported or can be calculated
- */
+/// TODO No reports or views generated from this data yet.
+///
+/// Result on
+/// - when GC started
+/// - type of GC triggered
+/// - from, to, configured
+/// - pause time if it is reported or can be calculated
 public class UnifiedGenerationalParser extends UnifiedGCLogParser implements UnifiedGenerationalPatterns, TenuredPatterns {
 
     private static final Logger LOGGER = Logger.getLogger(UnifiedGenerationalParser.class.getName());
@@ -122,6 +121,7 @@ public class UnifiedGenerationalParser extends UnifiedGCLogParser implements Uni
         return Set.of(EventSource.GENERATIONAL);
     }
 
+    @Override
     public String getName() {
         return "UnifiedGenerationalParser";
     }
@@ -137,9 +137,8 @@ public class UnifiedGenerationalParser extends UnifiedGCLogParser implements Uni
                 .filter(tuple -> tuple.getValue() != null)
                 .findAny()
                 .ifPresentOrElse(
-                        tuple -> {
-                            applyRule(tuple.getKey(), tuple.getValue(), line);
-                        },
+                        tuple ->
+                            applyRule(tuple.getKey(), tuple.getValue(), line),
                         () -> LOGGER.log(Level.FINE, "Missed: {0}", line)
                 );
     }
@@ -153,10 +152,9 @@ public class UnifiedGenerationalParser extends UnifiedGCLogParser implements Uni
         }
     }
 
-    /*************
-     *
-     * Data Extraction methods
-     */
+    /// ***********
+    ///
+    /// Data Extraction methods
     private GenerationalForwardReference pauseEvent = null;
     private GenerationalForwardReference concurrentCyclePauseEvent = null;
     private GenerationalForwardReference concurrentEvent = null;
@@ -230,8 +228,8 @@ public class UnifiedGenerationalParser extends UnifiedGCLogParser implements Uni
     }
 
     private void youngDetails(GCLogTrace trace, String line) {
-    	boolean isNoDetailsEvent = false;
-    	int gcid = GCLogParser.GCID_COUNTER.parse(line).getIntegerGroup(1);
+    	var isNoDetailsEvent = false;
+    	var gcid = GCLogParser.GCID_COUNTER.parse(line).getIntegerGroup(1);
     	
     	if (pauseEvent == null && gcid > currentGcId) {
         	// #457 - Unified-Parallel file without details doesn't trigger youngHeader(). 
@@ -258,32 +256,26 @@ public class UnifiedGenerationalParser extends UnifiedGCLogParser implements Uni
         }
     }
 
-    /**
-     * Capture logged tenuring summary data
-     * @param trace
-     * @param line
-     */
+    /// Capture logged tenuring summary data
+    /// @param trace
+    /// @param line
     private void tenuringSummary(GCLogTrace trace, String line) {
         if ( pauseEvent != null)
             pauseEvent.survivorRecord(new SurvivorRecord(getClock(), trace.getLongGroup(1), trace.getIntegerGroup(2), trace.getIntegerGroup(3)));
     }
 
-    /**
-     * Capture logged age table data
-     * @param trace
-     * @param line
-     */
+    /// Capture logged age table data
+    /// @param trace
+    /// @param line
     private void tenuringAgeBreakout(GCLogTrace trace, String line) {
         if (pauseEvent != null)
             pauseEvent.addAgeBreakout(trace.getIntegerGroup(1), trace.getLongGroup(2));
     }
 
-    /**
-     * If the concurrentCyclePauseEvent has not been recorded, something has gone wrong and it's likely
-     * that it doesn't have a consistent state. The default action is to lose it.
-     * @param trace
-     * @param line
-     */
+    /// If the concurrentCyclePauseEvent has not been recorded, something has gone wrong and it's likely
+    /// that it doesn't have a consistent state. The default action is to lose it.
+    /// @param trace
+    /// @param line
     private void initialMark(GCLogTrace trace, String line) {
         if (concurrentCyclePauseEvent != null)
             LOGGER.warning("Pause event not completely recorded: " + pauseEvent.getGcID());
@@ -317,11 +309,9 @@ public class UnifiedGenerationalParser extends UnifiedGCLogParser implements Uni
         notYetImplemented(trace, line);
     }
 
-    /**
-     * If the forward reference has not been recorded, assume it's state is corrupted so over-write it.
-     * @param trace
-     * @param line
-     */
+    /// If the forward reference has not been recorded, assume it's state is corrupted so over-write it.
+    /// @param trace
+    /// @param line
     private void remark(GCLogTrace trace, String line) {
         if (concurrentCyclePauseEvent != null)
             LOGGER.warning("Pause event not recorded and is about to be lost: " + pauseEvent.getGcID());
@@ -373,8 +363,8 @@ public class UnifiedGenerationalParser extends UnifiedGCLogParser implements Uni
     }
 
     private void fullGCSummary(GCLogTrace trace, String line) {
-    	boolean isNoDetailsEvent = false;
-    	int gcid = GCLogParser.GCID_COUNTER.parse(line).getIntegerGroup(1);
+    	var isNoDetailsEvent = false;
+    	var gcid = GCLogParser.GCID_COUNTER.parse(line).getIntegerGroup(1);
     	
     	if (pauseEvent == null && gcid > currentGcId) {
         	// #457 - Unified-Parallel file doesn't trigger fullGC() to create pauseEvent. 
@@ -427,19 +417,16 @@ public class UnifiedGenerationalParser extends UnifiedGCLogParser implements Uni
         super.publish(ChannelName.GENERATIONAL_HEAP_PARSER_OUTBOX,  new JVMTermination(getClock(),diary.getTimeOfFirstEvent()));
     }
 
-    /**
-     *
-     * By convention, events are emitted iini the order that they started. For CMS, it's possible to have a ParNew
-     * intermixed with a concurrent cycle. To cover these cases, the young gen collection is cached, the concurrent
-     * event is completed and then the cached event is emitted.
-     */
-    private ArrayList<GenerationalGCPauseEvent> cache = new ArrayList<>();
+    /// By convention, events are emitted iini the order that they started. For CMS, it's possible to have a ParNew
+    /// intermixed with a concurrent cycle. To cover these cases, the young gen collection is cached, the concurrent
+    /// event is completed and then the cached event is emitted.
+    private List<GenerationalGCPauseEvent> cache = new ArrayList<>();
 
     private void cpuBreakout(GCLogTrace trace, String line) {
         GCLogTrace gcidTrace = GCID_COUNTER.parse(line);
         if (gcidTrace != null) {
-            CPUSummary cpuSummary = new CPUSummary(trace.getDoubleGroup(1), trace.getDoubleGroup(2), trace.getDoubleGroup(3));
-            int gcid = gcidTrace.getIntegerGroup(1);
+            var cpuSummary = new CPUSummary(trace.getDoubleGroup(1), trace.getDoubleGroup(2), trace.getDoubleGroup(3));
+            var gcid = gcidTrace.getIntegerGroup(1);
             // There are 3 cases to consider.
             // - pause event outside of a concurrent cycle
             // - pause event that is part of the concurrent cycle
@@ -451,7 +438,7 @@ public class UnifiedGenerationalParser extends UnifiedGCLogParser implements Uni
             if (pauseEvent != null && pauseEvent.getGcID() == gcid) {
                 pauseEvent.add(cpuSummary);
                 if (inConcurrentPhase) {
-                    cache.add(buildPauseEvent((pauseEvent)));
+                    cache.add(buildPauseEvent(pauseEvent));
                 } else {
                     publish(buildPauseEvent(pauseEvent));
                 }
@@ -481,10 +468,10 @@ public class UnifiedGenerationalParser extends UnifiedGCLogParser implements Uni
     }
 
     private void fillOutMemoryPoolData(GenerationalGCPauseEvent event, GenerationalForwardReference values) {
-        int map = 0;
-        map |= (values.getHeap() != null) ? 1 : 0;
-        map |= (values.getYoung() != null) ? 2 : 0;
-        map |= (values.getTenured() != null) ? 4 : 0;
+        var map = 0;
+        map |= values.getHeap() != null ? 1 : 0;
+        map |= values.getYoung() != null ? 2 : 0;
+        map |= values.getTenured() != null ? 4 : 0;
         switch (map) {
             default:
             case 0:  // none, error
@@ -536,14 +523,14 @@ public class UnifiedGenerationalParser extends UnifiedGCLogParser implements Uni
     }
 
     public InitialMark buildInitialMark(GenerationalForwardReference values) {
-        InitialMark collection = new InitialMark(values.getStartTime(), values.getGCCause(), values.getDuration());
+        var collection = new InitialMark(values.getStartTime(), values.getGCCause(), values.getDuration());
         collection.add(values.getHeap());
         collection.add(values.getCPUSummary());
         return collection;
     }
 
     private CMSRemark buildRemark(GenerationalForwardReference values) {
-        CMSRemark remark = new CMSRemark(values.getStartTime(), values.getGCCause(), values.getDuration());
+        var remark = new CMSRemark(values.getStartTime(), values.getGCCause(), values.getDuration());
         remark.add(values.getHeap());
         //add in all the other work
         remark.add(values.getCPUSummary());
@@ -562,14 +549,14 @@ public class UnifiedGenerationalParser extends UnifiedGCLogParser implements Uni
         FullGC gc;
         switch (forwardReference.getGarbageCollectionType()) {
             case PSFull:
-                if ( forwardReference.getGCCause().equals(GCCause.JAVA_LANG_SYSTEM))
+                if ( forwardReference.getGCCause() == GCCause.JAVA_LANG_SYSTEM)
                     gc = new SystemGC(forwardReference.getStartTime(), forwardReference.getGCCause(), forwardReference.getDuration());
                 else
                     gc = new PSFullGC(forwardReference.getStartTime(), forwardReference.getGCCause(), forwardReference.getDuration());
                 return fillOutFullGC(gc, forwardReference);
             case FullGC:
             case Full:
-                if ( forwardReference.getGCCause().equals(GCCause.JAVA_LANG_SYSTEM))
+                if ( forwardReference.getGCCause() == GCCause.JAVA_LANG_SYSTEM)
                     gc = new SystemGC(forwardReference.getStartTime(), forwardReference.getGCCause(), forwardReference.getDuration());
                 else
                     gc = new FullGC(forwardReference.getStartTime(), forwardReference.getGCCause(), forwardReference.getDuration());

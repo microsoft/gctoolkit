@@ -26,14 +26,14 @@ public class PreunifiedJavaVirtualMachineConfigurationTest {
     @Tag("modulePath")
     @Test
     public void testSingle() {
-        TestLogFile log = new TestLogFile(logFile);
+        var log = new TestLogFile(logFile);
         smokeTest(new SingleGCLogFile(log.getFile().toPath()), times);
     }
 
     private void smokeTest(GCLogFile log, int[] endStartTimes ) {
-        GCToolKit gcToolKit = new GCToolKit();
+        var gcToolKit = new GCToolKit();
         gcToolKit.loadAggregationsFromServiceLoader();
-        TestTimeAggregation aggregation = new TestTimeAggregation();
+        var aggregation = new TestTimeAggregation();
         gcToolKit.loadAggregation(aggregation);
         JavaVirtualMachine machine = null;
         try {
@@ -61,13 +61,11 @@ public class PreunifiedJavaVirtualMachineConfigurationTest {
     @Aggregates({EventSource.G1GC,EventSource.GENERATIONAL,EventSource.ZGC,EventSource.SHENANDOAH})
     public static class TestTimeAggregator extends Aggregator<TestTimeAggregation> {
 
-        /**
-         * Subclass only.
-         *
-         * @param aggregation The Aggregation that {@literal @}Collates this Aggregator
-         * @see Collates
-         * @see Aggregation
-         */
+        /// Subclass only.
+        ///
+        /// @param aggregation The Aggregation that `@`Collates this Aggregator
+        /// @see Collates
+        /// @see Aggregation
         public TestTimeAggregator(TestTimeAggregation aggregation) {
             super(aggregation);
         }

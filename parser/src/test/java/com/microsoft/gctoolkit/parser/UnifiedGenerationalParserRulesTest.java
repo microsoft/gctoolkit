@@ -17,9 +17,9 @@ public class UnifiedGenerationalParserRulesTest implements UnifiedGenerationalPa
 
     @Test
     public void testGenerationalParseRules() {
-        for (int i = 0; i < rules.length; i++)
-            for (int j = 0; j < lines.length; j++) {
-                int captured = captureTest(rules[i], lines[j]);
+        for (var i = 0; i < rules.length; i++)
+            for (var j = 0; j < lines.length; j++) {
+                var captured = captureTest(rules[i], lines[j]);
                 if (i == j) {
                     assertEquals(captured, lines[j].length, i + " failed to captured it's lines");
                 } else {
@@ -33,7 +33,7 @@ public class UnifiedGenerationalParserRulesTest implements UnifiedGenerationalPa
     @Test
     public void testUnifiedLoggingDecorators() {
         for (String decoratorLine : decoratorLines) {
-            Decorators decorators = new Decorators(decoratorLine);
+            var decorators = new Decorators(decoratorLine);
             assertTrue(decorators.getNumberOfDecorators() != 0);
         }
     }
@@ -41,7 +41,7 @@ public class UnifiedGenerationalParserRulesTest implements UnifiedGenerationalPa
     // Convenience test for debugging single rules
     // @Test
     public void testSingeRule() {
-        int index = 0;
+        var index = 0;
         assertEquals(4, captureTest(rules[index], lines[index]));
     }
 
@@ -52,7 +52,7 @@ public class UnifiedGenerationalParserRulesTest implements UnifiedGenerationalPa
       assertNotNull(trace);
         if (dump) {
             LOGGER.fine("matches groups " + trace.groupCount());
-            for (int i = 0; i <= trace.groupCount(); i++) {
+            for (var i = 0; i <= trace.groupCount(); i++) {
                 LOGGER.fine(i + ": " + trace.getGroup(i));
             }
         }

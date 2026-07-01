@@ -13,9 +13,7 @@ import com.microsoft.gctoolkit.time.DateTimeStamp;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- * G1 Event to capture parser errors
- */
+/// G1 Event to capture parser errors
 
 public class G1Trap extends G1GCPauseEvent {
 
@@ -24,7 +22,10 @@ public class G1Trap extends G1GCPauseEvent {
     private static final String message = "Internal EventSource Error @ ";
 
     public G1Trap() {
-        super(new DateTimeStamp(0.0d), GarbageCollectionTypes.G1Trap, GCCause.UNKNOWN_GCCAUSE, 0.0d);
+        DateTimeStamp timeStamp = new DateTimeStamp(0.0d);
+        GarbageCollectionTypes type = GarbageCollectionTypes.G1Trap;
+        GCCause cause1 = GCCause.UNKNOWN_GCCAUSE;
+        super(timeStamp, type, cause1, 0.0d);
     }
 
     private int errorCount = 0;

@@ -15,6 +15,7 @@ abstract class UnifiedGCLogParser extends GCLogParser {
 
     public UnifiedGCLogParser() {}
 
+    @Override
     void advanceClock(String record) {
         try {
             DateTimeStamp now = new Decorators(record).getDateTimeStamp();
@@ -28,11 +29,9 @@ abstract class UnifiedGCLogParser extends GCLogParser {
         trace.notYetImplemented();
     }
 
-    /**
-     * Some log entries require no actions
-     */
+    /// Some log entries require no actions
     void noop() {
         if (DEBUG)
-            System.out.println("noop");
+            IO.println("noop");
     }
 }

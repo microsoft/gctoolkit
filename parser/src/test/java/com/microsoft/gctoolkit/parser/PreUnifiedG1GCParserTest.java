@@ -3,8 +3,6 @@ package com.microsoft.gctoolkit.parser;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.List;
-
 import org.junit.jupiter.api.Test;
 
 import com.microsoft.gctoolkit.event.GCCause;
@@ -16,7 +14,6 @@ import com.microsoft.gctoolkit.event.g1gc.G1Mixed;
 import com.microsoft.gctoolkit.event.g1gc.G1Remark;
 import com.microsoft.gctoolkit.event.g1gc.G1Young;
 import com.microsoft.gctoolkit.event.g1gc.G1YoungInitialMark;
-import com.microsoft.gctoolkit.event.jvm.JVMEvent;
 import com.microsoft.gctoolkit.jvm.Diarizer;
 import com.microsoft.gctoolkit.parser.jvm.PreUnifiedDiarizer;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
@@ -25,20 +22,18 @@ public class PreUnifiedG1GCParserTest extends ParserTest {
 
 	protected long M = 1024;
 	protected long G = 1024*1024;
-	
+
+    @Override
     protected Diarizer diarizer() {
         return new PreUnifiedDiarizer();
-    };
+    }
 
+    @Override
     protected GCLogParser parser() {
         return new PreUnifiedG1GCParser();
-    };
-
-	/**
-	 * jlittle-ptc: Collection of different pre-unified events found in a log generated without -XX:+PrintGCDetails enabled.
-	 * 
-	 * Tests to ensure all events are parsed correctly.
-	 */
+    }/// jlittle-ptc: Collection of different pre-unified events found in a log generated without -XX:+PrintGCDetails enabled.
+///
+/// Tests to ensure all events are parsed correctly.
 	@Test
 	void testPreUnifiedG1GCLinesNoDetails() {
 		String[] lines = {
@@ -75,14 +70,14 @@ public class PreUnifiedG1GCParserTest extends ParserTest {
 
 		};
 		
-		int expectedEventCount = 8;
+		var expectedEventCount = 8;
 		
-    	List<JVMEvent> jvmEvents = feedParser(lines);
+    	var jvmEvents = feedParser(lines);
     	assertEquals(jvmEvents.size(), expectedEventCount);
     	
 		// 0 - G1Young
-    	assertTrue(jvmEvents.get(0) instanceof G1Young);
-    	G1Young evt0 = ((G1Young) jvmEvents.get(0));
+    	assertTrue(jvmEvents.getFirst() instanceof G1Young);
+    	var evt0 = (G1Young) jvmEvents.getFirst();
     	assertEquals(evt0.getDateTimeStamp(), new DateTimeStamp(1.303));
     	assertEquals(evt0.getGCCause(), GCCause.G1_EVACUATION_PAUSE);
     	assertMemoryPoolValues(evt0.getHeap(), 57260, 1024*M, 14150, 1024*M);
@@ -90,45 +85,45 @@ public class PreUnifiedG1GCParserTest extends ParserTest {
     	
 		// 1 - ConcurrentScanRootRegion - Duration/Timestamp only.
     	assertTrue(jvmEvents.get(1) instanceof ConcurrentScanRootRegion);
-    	ConcurrentScanRootRegion evt1 = ((ConcurrentScanRootRegion) jvmEvents.get(1));
+    	var evt1 = (ConcurrentScanRootRegion) jvmEvents.get(1);
     	assertEquals(evt1.getDateTimeStamp(), new DateTimeStamp(1.496));
     	assertDoubleEquals(evt1.getDuration(), 0.0033801);
     	
 		// 2 - G1ConcurrentMark - Duration/Timestamp only
     	assertTrue(jvmEvents.get(2) instanceof G1ConcurrentMark);
-    	G1ConcurrentMark evt2 = ((G1ConcurrentMark) jvmEvents.get(2));
+    	var evt2 = (G1ConcurrentMark) jvmEvents.get(2);
     	assertEquals(evt2.getDateTimeStamp(), new DateTimeStamp(1.499));
     	assertDoubleEquals(evt2.getDuration(), 0.0096200);
 
 		// 3 - G1Remark - Duration/Timestamp only
     	assertTrue(jvmEvents.get(3) instanceof G1Remark);
-    	G1Remark evt3 = ((G1Remark) jvmEvents.get(3));
+    	var evt3 = (G1Remark) jvmEvents.get(3);
     	assertEquals(evt3.getDateTimeStamp(), new DateTimeStamp(1.509));
     	assertDoubleEquals(evt3.getDuration(), 0.0045439);
     	
 		// 4 - G1Cleanup
     	assertTrue(jvmEvents.get(4) instanceof G1Cleanup);
-    	G1Cleanup evt4 = ((G1Cleanup) jvmEvents.get(4));
+    	var evt4 = (G1Cleanup) jvmEvents.get(4);
     	assertEquals(evt4.getDateTimeStamp(), new DateTimeStamp(1.513));    	
     	assertMemoryPoolValues(evt4.getHeap(), 15686, 1024*M, 13638, 1024*M);
     	assertDoubleEquals(evt4.getDuration(), 0.0014924);
     	
 		// 5 - G1ConcurrentCleanup - Duration/Timestamp only
     	assertTrue(jvmEvents.get(5) instanceof G1ConcurrentCleanup);
-    	G1ConcurrentCleanup evt5 = ((G1ConcurrentCleanup) jvmEvents.get(5));
+    	var evt5 = (G1ConcurrentCleanup) jvmEvents.get(5);
     	assertEquals(evt5.getDateTimeStamp(), new DateTimeStamp(1.515));    	
     	assertDoubleEquals(evt5.getDuration(), 0.0000053);
     	
 		// 6 - G1Mixed
     	assertTrue(jvmEvents.get(6) instanceof G1Mixed);
-    	G1Mixed evt6 = ((G1Mixed) jvmEvents.get(6));
+    	var evt6 = (G1Mixed) jvmEvents.get(6);
     	assertEquals(evt6.getDateTimeStamp(), new DateTimeStamp(24.383));
     	assertMemoryPoolValues(evt6.getHeap(), 269*M, 1149*M, 153*M, 1149*M);
     	assertDoubleEquals(evt6.getDuration(), 0.0457592);
     	
 		// 7 - G1Mixed
     	assertTrue(jvmEvents.get(7) instanceof G1Mixed);
-    	G1Mixed evt7 = ((G1Mixed) jvmEvents.get(7));
+    	var evt7 = (G1Mixed) jvmEvents.get(7);
     	assertEquals(evt7.getDateTimeStamp(), new DateTimeStamp(1566.108));
     	assertMemoryPoolValues(evt7.getHeap(), 7521, 13*M, 5701, 13*M);
     	assertDoubleEquals(evt7.getDuration(), 0.0030090);    	
@@ -172,14 +167,14 @@ public class PreUnifiedG1GCParserTest extends ParserTest {
 				" [Times: user=0.27 sys=0.01, real=0.05 secs] "
 		};
 		
-		int expectedEventCount = 1;
+		var expectedEventCount = 1;
 		
-    	List<JVMEvent> jvmEvents = feedParser(lines);
+    	var jvmEvents = feedParser(lines);
     	assertEquals(expectedEventCount, jvmEvents.size());
 
 		// 0 - G1Young
-    	assertTrue(jvmEvents.get(0) instanceof G1Young);
-    	G1Young evt0 = ((G1Young) jvmEvents.get(0));
+    	assertTrue(jvmEvents.getFirst() instanceof G1Young);
+    	var evt0 = (G1Young) jvmEvents.getFirst();
     	assertEquals(evt0.getDateTimeStamp(), new DateTimeStamp("2025-03-23T03:46:46.582+0000", 27.619));
     	assertEquals(evt0.getGCCause(), GCCause.G1_EVACUATION_PAUSE);    	
     	// Memory Pools
@@ -222,14 +217,14 @@ public class PreUnifiedG1GCParserTest extends ParserTest {
 				" [Times: user=0.07 sys=0.02, real=0.03 secs]"
 		};
 		
-		int expectedEventCount = 1;
+		var expectedEventCount = 1;
 		
-    	List<JVMEvent> jvmEvents = feedParser(lines);
+    	var jvmEvents = feedParser(lines);
     	assertEquals(expectedEventCount, jvmEvents.size());
 
 		// 0 - G1YoungInitialMark
-    	assertTrue(jvmEvents.get(0) instanceof G1YoungInitialMark);
-    	G1YoungInitialMark evt0 = ((G1YoungInitialMark) jvmEvents.get(0));
+    	assertTrue(jvmEvents.getFirst() instanceof G1YoungInitialMark);
+    	var evt0 = (G1YoungInitialMark) jvmEvents.getFirst();
     	assertEquals(evt0.getDateTimeStamp(), new DateTimeStamp("2025-03-23T03:46:27.139+0000", 8.176));    	
     	assertEquals(evt0.getGCCause(), GCCause.METADATA_GENERATION_THRESHOLD);
     	// Memory Pools    	
@@ -272,14 +267,14 @@ public class PreUnifiedG1GCParserTest extends ParserTest {
 				" [Times: user=0.03 sys=0.00, real=0.01 secs]" 	
 		};
 		
-		int expectedEventCount = 1;
+		var expectedEventCount = 1;
 		
-    	List<JVMEvent> jvmEvents = feedParser(lines);
+    	var jvmEvents = feedParser(lines);
     	assertEquals(expectedEventCount, jvmEvents.size());
 
 		// 0 - G1YoungInitialMark
-    	assertTrue(jvmEvents.get(0) instanceof G1YoungInitialMark);
-    	G1YoungInitialMark evt0 = ((G1YoungInitialMark) jvmEvents.get(0));
+    	assertTrue(jvmEvents.getFirst() instanceof G1YoungInitialMark);
+    	var evt0 = (G1YoungInitialMark) jvmEvents.getFirst();
     	assertEquals(evt0.getDateTimeStamp(), new DateTimeStamp("2025-04-18T20:35:53.067+0000", 2306974.104));
     	assertEquals(evt0.getGCCause(), GCCause.JAVA_LANG_SYSTEM);
     	// Memory Pools
@@ -322,14 +317,14 @@ public class PreUnifiedG1GCParserTest extends ParserTest {
 			" [Times: user=0.59 sys=0.05, real=0.13 secs] "
 		};
 		
-		int expectedEventCount = 1;
+		var expectedEventCount = 1;
 		
-    	List<JVMEvent> jvmEvents = feedParser(lines);
+    	var jvmEvents = feedParser(lines);
     	assertEquals(expectedEventCount, jvmEvents.size());
 
 		// 0 - G1YoungInitialMark
-    	assertTrue(jvmEvents.get(0) instanceof G1Young);
-    	G1Young evt0 = ((G1Young) jvmEvents.get(0));
+    	assertTrue(jvmEvents.getFirst() instanceof G1Young);
+    	var evt0 = (G1Young) jvmEvents.getFirst();
     	assertEquals(evt0.getDateTimeStamp(), new DateTimeStamp("2025-03-23T03:47:20.309+0000", 61.346));
     	assertEquals(evt0.getGCCause(), GCCause.GC_LOCKER);
     	// Memory Pools
@@ -372,14 +367,14 @@ public class PreUnifiedG1GCParserTest extends ParserTest {
 			" [Times: user=0.27 sys=0.00, real=0.03 secs]"
 		};
 		
-		int expectedEventCount = 1;
+		var expectedEventCount = 1;
 		
-    	List<JVMEvent> jvmEvents = feedParser(lines);
+    	var jvmEvents = feedParser(lines);
     	assertEquals(expectedEventCount, jvmEvents.size());
 
 		// 0 - G1Mixed
-    	assertTrue(jvmEvents.get(0) instanceof G1Mixed);
-    	G1Mixed evt0 = ((G1Mixed) jvmEvents.get(0));
+    	assertTrue(jvmEvents.getFirst() instanceof G1Mixed);
+    	var evt0 = (G1Mixed) jvmEvents.getFirst();
     	assertEquals(evt0.getDateTimeStamp(), new DateTimeStamp(879630.318));
     	assertEquals(evt0.getGCCause(), GCCause.G1_EVACUATION_PAUSE);
     	// Memory Pools

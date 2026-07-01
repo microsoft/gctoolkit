@@ -29,64 +29,62 @@ import static com.microsoft.gctoolkit.parser.CMSPatterns.FLS_HEADER;
 import static com.microsoft.gctoolkit.parser.SharedPatterns.MEMORY_SUMMARY_RULE;
 import static com.microsoft.gctoolkit.parser.SharedPatterns.META_SPACE_RECORD;
 
-/**
- * Class to answer 3 questions about the GC log;
- * - which collector combination is being used
- * - which JVM version
- * - which flags are being used
- * <p>
- * Collectors
- * - Unknown (no details)
- * - Serial
- * - ParNew/CMS
- * - iCMS
- * - PSYoungGen/PSFull
- * - G1GC
- * <p>
- * Version breaks
- * Can be known precisely if header is present in GC log.
- * prior to 1.7.0_45
- * 1.7.0_45 has the System.gc() regression
- * 1.8.0_05 anything after this version will include G1 Metaspace clause
- * 1.9.0 unknown how to determine this via deriveConfiguration.
- * <p>
- * Are these flags set
- * PrintGCDetails
- * PrintTenuringDistrubtion
- * PrintGCApplicationStoppedTime
- * PrintGCApplicationConcurrentTime
- * <p>
- * Log file characteristics
- * <p>
- * pre 7.0_45
- * - Permspace
- * - (System)
- * <p>
- * 7.0_45+
- * - (System.gc())
- * - Permspace
- * <p>
- * 8.0
- * - Metaspace
- * <p>
- * 8.0_20
- * - G1 prints Metaspace clause
- * <p>
- * Collector clues
- * iCMS
- * - CMS cycle starts early but once completed all further records will contain "icms_dc="
- * <p>
- * ParNew/CMS
- * - ParNew
- * - initial-mark
- * <p>
- * PSYoung/PSFull
- * - PSYoungGen
- * - PSFull
- * <p>
- * Serial
- * - DefNew
- */
+/// Class to answer 3 questions about the GC log;
+/// - which collector combination is being used
+/// - which JVM version
+/// - which flags are being used
+///
+/// Collectors
+/// - Unknown (no details)
+/// - Serial
+/// - ParNew/CMS
+/// - iCMS
+/// - PSYoungGen/PSFull
+/// - G1GC
+///
+/// Version breaks
+/// Can be known precisely if header is present in GC log.
+/// prior to 1.7.0_45
+/// 1.7.0_45 has the System.gc() regression
+/// 1.8.0_05 anything after this version will include G1 Metaspace clause
+/// 1.9.0 unknown how to determine this via deriveConfiguration.
+///
+/// Are these flags set
+/// PrintGCDetails
+/// PrintTenuringDistrubtion
+/// PrintGCApplicationStoppedTime
+/// PrintGCApplicationConcurrentTime
+///
+/// Log file characteristics
+///
+/// pre 7.0_45
+/// - Permspace
+/// - (System)
+///
+/// 7.0_45+
+/// - (System.gc())
+/// - Permspace
+///
+/// 8.0
+/// - Metaspace
+///
+/// 8.0_20
+/// - G1 prints Metaspace clause
+///
+/// Collector clues
+/// iCMS
+/// - CMS cycle starts early but once completed all further records will contain "icms_dc="
+///
+/// ParNew/CMS
+/// - ParNew
+/// - initial-mark
+///
+/// PSYoung/PSFull
+/// - PSYoungGen
+/// - PSFull
+///
+/// Serial
+/// - DefNew
 
 //SimplePatterns, CMSPatterns, ParallelPatterns, G1GCPatterns,
 public class PreUnifiedDiarizer implements Diarizer {
@@ -198,10 +196,8 @@ public class PreUnifiedDiarizer implements Diarizer {
         diary.setFalse(SupportedFlags.MAX_TENURING_THRESHOLD_VIOLATION, SupportedFlags.PRINT_PROMOTION_FAILURE, SupportedFlags.PRINT_FLS_STATISTICS);
     }
 
-    /**
-     * Attempt to diarize the GC Log line that's come.  That is, if we collect enough details about
-     * this log in oder to categorize it by collector and collector features then we return true
-     */
+    /// Attempt to diarize the GC Log line that's come.  That is, if we collect enough details about
+    /// this log in oder to categorize it by collector and collector features then we return true
     @Override
     public boolean diarize(String line) {
 
@@ -761,7 +757,7 @@ public class PreUnifiedDiarizer implements Diarizer {
     private void evaluateCommandLineFlags(String[] commandLineFlags) {
         for (String rawFlag : commandLineFlags) {
             String flag = processRawFlag(rawFlag);
-            boolean flagTurnedOn = isSetToTrue(rawFlag);
+            var flagTurnedOn = isSetToTrue(rawFlag);
             CommandLineFlag supportedFlag = CommandLineFlag.fromString(flag);
             if (supportedFlag != null) {
                 switch (supportedFlag) {
@@ -817,31 +813,31 @@ public class PreUnifiedDiarizer implements Diarizer {
                 if (gcFlag != null) {
                     switch (gcFlag) {
                         case UseSerialGC:
-                            setGCFlags |= (flagTurnedOn) ? 0x1 : 0x100;
+                            setGCFlags |= flagTurnedOn ? 0x1 : 0x100;
                             break;
 
                         case UseParallelGC:
-                            setGCFlags |= (flagTurnedOn) ? 0x2 : 0x200;
+                            setGCFlags |= flagTurnedOn ? 0x2 : 0x200;
                             break;
 
                         case UseParallelOldGC:
-                            setGCFlags |= (flagTurnedOn) ? 0x4 : 0x400;
+                            setGCFlags |= flagTurnedOn ? 0x4 : 0x400;
                             break;
 
                         case UseParNewGC:
-                            setGCFlags |= (flagTurnedOn) ? 0x8 : 0x800;
+                            setGCFlags |= flagTurnedOn ? 0x8 : 0x800;
                             break;
 
                         case UseConcMarkSweepGC:
-                            setGCFlags |= (flagTurnedOn) ? 0x10 : 0x1000;
+                            setGCFlags |= flagTurnedOn ? 0x10 : 0x1000;
                             break;
 
                         case CMSIncrementialMode:
-                            setGCFlags |= (flagTurnedOn) ? 0x20 : 0;
+                            setGCFlags |= flagTurnedOn ? 0x20 : 0;
                             break;
 
                         case UseG1GC:
-                            setGCFlags |= (flagTurnedOn) ? 0x40 : 0x4000;
+                            setGCFlags |= flagTurnedOn ? 0x40 : 0x4000;
                             break;
 
                         default:
@@ -859,13 +855,13 @@ public class PreUnifiedDiarizer implements Diarizer {
 
 
     private String processRawFlag(String rawFlag) {
-        String processedFlag = "";
+        var processedFlag = "";
         if (rawFlag.startsWith("-XX:")) {
             if (rawFlag.charAt(4) == '+' || rawFlag.charAt(4) == '-')
                 processedFlag = rawFlag.substring(5);
             else
                 processedFlag = rawFlag.substring(4);
-            int equalsPosition = processedFlag.indexOf("=");
+            var equalsPosition = processedFlag.indexOf("=");
             if (equalsPosition > 0)
                 processedFlag = processedFlag.substring(0, equalsPosition);
         }
@@ -874,7 +870,7 @@ public class PreUnifiedDiarizer implements Diarizer {
     }
 
     private boolean isSetToTrue(String flag) {
-        return (flag.startsWith("-XX:+"));
+        return flag.startsWith("-XX:+");
     }
 
     //"Java HotSpot(TM) 64-Bit Server VM (25.40-b25) for bsd-amd64 JRE (1.8.0_40-b25), built on Feb 10 2015 21:07:25 by \"java_re\" with gcc 4.2.1 (Based on Apple Inc. build 5658) (LLVM build 2336.11.00)",
@@ -890,12 +886,12 @@ public class PreUnifiedDiarizer implements Diarizer {
                     if (matcher.group(3) == null)
                         diary.setTrue(SupportedFlags.PRE_JDK70_40);
                     try {
-                        int minorVersion = Integer.parseInt(matcher.group(3).substring(1));
+                        var minorVersion = Integer.parseInt(matcher.group(3).substring(1));
                         if (minorVersion < 41)
                             diary.setTrue(SupportedFlags.PRE_JDK70_40);
                         else
                             diary.setFalse(SupportedFlags.PRE_JDK70_40);
-                    } catch (NumberFormatException nfe) {
+                    } catch (NumberFormatException _) {
                         diary.setTrue(SupportedFlags.PRE_JDK70_40);
                     }
                     break;

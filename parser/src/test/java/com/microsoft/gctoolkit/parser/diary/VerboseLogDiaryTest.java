@@ -8,7 +8,7 @@ public class VerboseLogDiaryTest extends LogDiaryTest {
 
     @Test
     public void testForVerbose() {
-        int i = 0;
+        var i = 0;
         for (String name : verbose) {
             testWith(new TestLogFile("verbose/" + name).getFile(), name, verboseDiary[i], verboseUnknown[i], verboseKnown[i++]);
         }
@@ -16,7 +16,7 @@ public class VerboseLogDiaryTest extends LogDiaryTest {
 
     @Test
     public void testForVerboseTenuring() {
-        int i = 0;
+        var i = 0;
         for (String name : verboseTenuring) {
             testWith(new TestLogFile("verbose/tenuring/" + name).getFile(), name, verboseTenuringDiary[i], verboseTenuringUnknown[i], verboseTenuringKnown[i++]);
         }

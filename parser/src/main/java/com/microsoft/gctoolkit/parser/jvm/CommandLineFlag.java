@@ -2,6 +2,8 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.parser.jvm;
 
+import org.jspecify.annotations.Nullable;
+
 public enum CommandLineFlag {
 
     PrintGCApplicationStoppedTime("PrintGCApplicationStoppedTime"),
@@ -20,15 +22,15 @@ public enum CommandLineFlag {
     PrintPromotionFailure("PrintPromotionFailure"),
     PrintFLSStatistics("PrintFLSStatistics");
 
-    public static CommandLineFlag getEnumFromString(String string) {
+    public static @Nullable CommandLineFlag getEnumFromString(String string) {
         try {
             return Enum.valueOf(CommandLineFlag.class, string.trim());
-        } catch (IllegalArgumentException ex) {
+        } catch (IllegalArgumentException _) {
         }
         return null;
     }
 
-    public static CommandLineFlag fromString(String name) {
+    public static @Nullable CommandLineFlag fromString(String name) {
         return getEnumFromString(name);
     }
 

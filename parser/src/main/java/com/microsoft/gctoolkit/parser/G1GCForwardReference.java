@@ -113,9 +113,7 @@ class G1GCForwardReference extends ForwardReference {
     }
 
 
-    /**
-     * memory pool statistics
-     */
+    /// memory pool statistics
     private static final int HEAP_OCCUPANCY_BEFORE_COLLECTION = 0;
     private static final int HEAP_OCCUPANCY_AFTER_COLLECTION = 1;
     private static final int HEAP_SIZE_BEFORE_COLLECTION = 2;
@@ -386,7 +384,7 @@ class G1GCForwardReference extends ForwardReference {
     }
 
     private ReferenceGCSummary generateReferenceGCSummary() {
-        ReferenceGCSummary summary = new ReferenceGCSummary();
+        var summary = new ReferenceGCSummary();
         summary.addSoftReferences(getStartTime(), referenceCounts[SOFT_REFERENCE], referenceProcessingDuarations[SOFT_REFERENCE]);
         summary.addWeakReferences(getStartTime(), referenceCounts[WEAK_REFERENCE], referenceProcessingDuarations[WEAK_REFERENCE]);
         summary.addPhantomReferences(getStartTime(), referenceCounts[PHANTOM_REFERENCE], referenceProcessingDuarations[PHANTOM_REFERENCE]);
@@ -532,7 +530,7 @@ class G1GCForwardReference extends ForwardReference {
         if (memoryPoolMeasurment[offset + OCCUPANCY_BEFORE_OFFSET] == -1L) //do we have recorded values
             return null;
         //do we know the size of the memory pool prior to the collection
-        long sizeBeforeCollection = (memoryPoolMeasurment[offset + SIZE_BEFORE_OFFSET] > -1L) ? memoryPoolMeasurment[offset + SIZE_BEFORE_OFFSET] : memoryPoolMeasurment[offset + SIZE_AFTER_OFFSET];
+        long sizeBeforeCollection = memoryPoolMeasurment[offset + SIZE_BEFORE_OFFSET] > -1L ? memoryPoolMeasurment[offset + SIZE_BEFORE_OFFSET] : memoryPoolMeasurment[offset + SIZE_AFTER_OFFSET];
         return new MemoryPoolSummary(memoryPoolMeasurment[offset + OCCUPANCY_BEFORE_OFFSET], sizeBeforeCollection, memoryPoolMeasurment[offset + OCCUPANCY_AFTER_OFFSET], memoryPoolMeasurment[offset + SIZE_AFTER_OFFSET]);
     }
 
@@ -570,7 +568,7 @@ class G1GCForwardReference extends ForwardReference {
         SURVIVOR,
         OLD,
         HUMONGOUS,
-        ARCHIVE;
+        ARCHIVE
     }
 
     private final RegionSummary[] regionSummaries = new RegionSummary[REGIONS.values().length];
@@ -636,7 +634,7 @@ class G1GCForwardReference extends ForwardReference {
     }
 
     private void fullInInternalPhases(G1FullGC collection) {
-        int index = 0;
+        var index = 0;
         String key;
         while ((key = fullGCInternalPhaseOrder.get(++index)) != null) {
             collection.addInternalPhase(key, fullGCInternalPhases.get(key));
@@ -733,10 +731,8 @@ class G1GCForwardReference extends ForwardReference {
         return new G1ConcurrentUndoCycle(getConcurrentCycleStartTime(), getDuration());
     }
 
-    /**
-     * gcType == null -> likely an incomplete record.
-     * @return
-     */
+    /// gcType == null -> likely an incomplete record.
+    /// @return
     G1GCPauseEvent buildEvent() throws MalformedEvent {
         if (gcType == null ) {
             throw new MalformedEvent("G1GC Event type is undefined (null): " + this.toString());
@@ -799,7 +795,7 @@ class G1GCForwardReference extends ForwardReference {
 
 
     private G1ConcurrentMark buildConcurrentMark() {
-        G1ConcurrentMark concurrentMark = new G1ConcurrentMark(getStartTime(), getDuration());
+        var concurrentMark = new G1ConcurrentMark(getStartTime(), getDuration());
         if (aborted)
             concurrentMark.abort();
         if (markFromRootsDuration > -1.0d) {
@@ -815,7 +811,7 @@ class G1GCForwardReference extends ForwardReference {
     }
 
     private G1Remark buildRemark() {
-        G1Remark remark = new G1Remark(pausePhaseDuringConcurrentCycleTime, 0.0d, pausePhaseDuringConcurrentCycleDuration);
+        var remark = new G1Remark(pausePhaseDuringConcurrentCycleTime, 0.0d, pausePhaseDuringConcurrentCycleDuration);
         if (hasReferenceGCSummary())
             remark.add(generateReferenceGCSummary());
         fillInMemoryPoolStats(remark);
@@ -824,7 +820,7 @@ class G1GCForwardReference extends ForwardReference {
     }
 
     private G1Cleanup buildCleanup() {
-        G1Cleanup cleanup = new G1Cleanup(pausePhaseDuringConcurrentCycleTime, pausePhaseDuringConcurrentCycleDuration);
+        var cleanup = new G1Cleanup(pausePhaseDuringConcurrentCycleTime, pausePhaseDuringConcurrentCycleDuration);
         fillInMemoryPoolStats(cleanup);
         cleanup.addCPUSummary(getCPUSummary());
         return cleanup;
@@ -870,13 +866,12 @@ class G1GCForwardReference extends ForwardReference {
         fullGCInternalPhases.put(fullGCInternalPhase, duration);
     }
 
-    /**
-     * Not that this value will be printed but having toString() defined is useful for debugging. The issue is
-     * null values for gctype and gcCause will cause IDE debuggers to NPE. Capture and set to null.
-     * @return String rep of this forward reference.
-     */
+    /// Not that this value will be printed but having toString() defined is useful for debugging. The issue is
+    /// null values for gctype and gcCause will cause IDE debuggers to NPE. Capture and set to null.
+    /// @return String rep of this forward reference.
+    @Override
     public String toString() {
-        return getStartTime().toString() + " : " + ((gcType == null) ? "null" : gcType.toString()) + " : " + ((getGCCause() == null) ? "null" : getGCCause().toString()) + " : " + getDuration();
+        return getStartTime().toString() + " : " + (gcType == null ? "null" : gcType.toString()) + " : " + (getGCCause() == null ? "null" : getGCCause().toString()) + " : " + getDuration();
     }
 
     boolean setArchiveOccupancyBeforeCollection(int value) {

@@ -12,9 +12,9 @@ public class CMSDefNewLogDiaryTest extends LogDiaryTest {
 
     @Test
     public void testForCMSDefNewDetails() {
-        int i = 0;
+        var i = 0;
         for (String name : cmsDefNewDetails) {
-            TestLogFile logFile = new TestLogFile(name);
+            var logFile = new TestLogFile(name);
             Diarizer diary = null;
             try {
                 diary = getJVMConfiguration(new SingleGCLogFile(logFile.getFile().toPath()));

@@ -17,13 +17,10 @@ import com.microsoft.gctoolkit.event.generational.InitialMark;
 import com.microsoft.gctoolkit.event.generational.PSFullGC;
 import com.microsoft.gctoolkit.event.generational.PSYoungGen;
 import com.microsoft.gctoolkit.event.generational.ParNew;
-import com.microsoft.gctoolkit.event.jvm.JVMEvent;
 import com.microsoft.gctoolkit.event.jvm.SurvivorRecord;
 import com.microsoft.gctoolkit.jvm.Diarizer;
 import com.microsoft.gctoolkit.parser.jvm.UnifiedDiarizer;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -55,10 +52,10 @@ public class UnifiedGenerationalEventsTest extends ParserTest {
                 "[10.026s][info ][gc           ] GC(0) Pause Young (Allocation Failure) 16M->4M(61M) 5.423ms",
                 "[10.026s][info ][gc,cpu       ] GC(0) User=0.02s Sys=0.01s Real=0.00s",
         };
-        List<JVMEvent> jvmEvents = feedParser(lines);
+        var jvmEvents = feedParser(lines);
         try {
             assertEquals(1, jvmEvents.size(), "Should be 1 event... ");
-            PSYoungGen youngGen = (PSYoungGen) jvmEvents.get(0);
+            var youngGen = (PSYoungGen) jvmEvents.getFirst();
             MemoryPoolSummary poolSummary = youngGen.getHeap();
             assertEquals(poolSummary.getOccupancyBeforeCollection(), 16 * 1024);
             assertEquals(poolSummary.getOccupancyAfterCollection(), 4 * 1024);
@@ -98,13 +95,13 @@ public class UnifiedGenerationalEventsTest extends ParserTest {
     			"[6529.878s][info][gc] GC(121) Pause Young (GCLocker Initiated GC) 9210M->7586M(12157M) 34.814ms"    			
     	};
     	
-    	List<JVMEvent> jvmEvents = feedParser(lines);
+    	var jvmEvents = feedParser(lines);
     	
     	assertEquals(5, jvmEvents.size());
     	
     	try {
         	// Event 0 - PSYoungGen
-        	PSYoungGen evt0 = (PSYoungGen) jvmEvents.get(0);
+        	var evt0 = (PSYoungGen) jvmEvents.getFirst();
         	assertEquals(GCCause.METADATA_GENERATION_THRESHOLD, evt0.getGCCause());
         	MemoryPoolSummary heapSummary = evt0.getHeap();
         	assertEquals(516*1024, heapSummary.getOccupancyBeforeCollection());
@@ -112,7 +109,7 @@ public class UnifiedGenerationalEventsTest extends ParserTest {
         	assertEquals(7065*1024, heapSummary.getSizeAfterCollection());
         	
         	// Event 1 - FullGC
-        	FullGC evt1 = (FullGC) jvmEvents.get(1);
+        	var evt1 = (FullGC) jvmEvents.get(1);
         	assertEquals(GCCause.METADATA_GENERATION_THRESHOLD, evt1.getGCCause());
         	heapSummary = evt1.getHeap();
         	assertEquals(42*1024, heapSummary.getOccupancyBeforeCollection());
@@ -120,7 +117,7 @@ public class UnifiedGenerationalEventsTest extends ParserTest {
         	assertEquals(7065*1024, heapSummary.getSizeAfterCollection());
     		
         	// Event 2 - PSYoungGen
-        	PSYoungGen evt2 = (PSYoungGen) jvmEvents.get(2);
+        	var evt2 = (PSYoungGen) jvmEvents.get(2);
         	assertEquals(GCCause.ALLOCATION_FAILURE, evt2.getGCCause());
         	heapSummary = evt2.getHeap();
         	assertEquals(1914*1024, heapSummary.getOccupancyBeforeCollection());
@@ -128,7 +125,7 @@ public class UnifiedGenerationalEventsTest extends ParserTest {
         	assertEquals(7065*1024, heapSummary.getSizeAfterCollection());
         	
         	// Event 3 - FullGC
-        	FullGC evt3 = (FullGC) jvmEvents.get(3);
+        	var evt3 = (FullGC) jvmEvents.get(3);
         	assertEquals(GCCause.ADAPTIVE_SIZE_POLICY, evt3.getGCCause());
         	heapSummary = evt3.getHeap();
         	assertEquals(5282*1024, heapSummary.getOccupancyBeforeCollection());
@@ -136,7 +133,7 @@ public class UnifiedGenerationalEventsTest extends ParserTest {
         	assertEquals(12150*1024, heapSummary.getSizeAfterCollection());
 
         	// Event 4 - PSYoungGen
-        	PSYoungGen evt4 = (PSYoungGen) jvmEvents.get(4);
+        	var evt4 = (PSYoungGen) jvmEvents.get(4);
         	assertEquals(GCCause.GC_LOCKER, evt4.getGCCause());
         	heapSummary = evt4.getHeap();
         	assertEquals(9210*1024, heapSummary.getOccupancyBeforeCollection());
@@ -178,10 +175,10 @@ public class UnifiedGenerationalEventsTest extends ParserTest {
                 "[10.130s][info ][gc             ] GC(25) Pause Full (Ergonomics) 55M->7M(42M) 14.092ms",
                 "[10.130s][info ][gc,cpu         ] GC(25) User=0.04s Sys=0.00s Real=0.02s"
         };
-        List<JVMEvent> jvmEvents = feedParser(lines);
+        var jvmEvents = feedParser(lines);
         try {
             assertEquals(1, jvmEvents.size(), "Should be 1 event... ");
-            PSFullGC full = (PSFullGC) jvmEvents.get(0);
+            var full = (PSFullGC) jvmEvents.getFirst();
             assertEquals(full.getHeap().getOccupancyBeforeCollection(), 55 * 1024);
             assertEquals(full.getHeap().getOccupancyAfterCollection(), 7 * 1024);
             assertEquals(full.getHeap().getSizeAfterCollection(), 42 * 1024);
@@ -206,10 +203,10 @@ public class UnifiedGenerationalEventsTest extends ParserTest {
                 "[31.193s][info ][gc,cpu       ] GC(17) User=0.01s Sys=0.00s Real=0.00s"
         };
 
-        List<JVMEvent> jvmEvents = feedParser(lines);
+        var jvmEvents = feedParser(lines);
         try {
             assertEquals(1, jvmEvents.size());
-            ParNew collection = (ParNew) jvmEvents.get(0);
+            var collection = (ParNew) jvmEvents.getFirst();
             assertEquals(31 * 1024, collection.getHeap().getOccupancyBeforeCollection());
             assertEquals(15 * 1024, collection.getHeap().getOccupancyAfterCollection());
             assertEquals(61 * 1024, collection.getHeap().getSizeAfterCollection());
@@ -270,31 +267,31 @@ public class UnifiedGenerationalEventsTest extends ParserTest {
                 "[31.276s][info ][gc           ] GC(29) Concurrent Reset 2.716ms",
                 "[31.276s][info ][gc,cpu       ] GC(29) User=0.01s Sys=0.00s Real=0.00s"
         };
-        List<JVMEvent> jvmEvents = feedParser(lines);
+        var jvmEvents = feedParser(lines);
         try {
             assertEquals(7, jvmEvents.size());
-            InitialMark initialMark = (InitialMark) jvmEvents.get(0);
+            var initialMark = (InitialMark) jvmEvents.getFirst();
             assertEquals(24 * 1024, initialMark.getHeap().getOccupancyBeforeCollection());
             assertEquals(24 * 1024, initialMark.getHeap().getOccupancyAfterCollection());
             assertEquals(61 * 1024, initialMark.getHeap().getSizeAfterCollection());
             assertEquals(240, Math.round(initialMark.getDuration() * 1000000.0d));
 
-            ConcurrentMark concurrentMark = (ConcurrentMark) jvmEvents.get(1);
+            var concurrentMark = (ConcurrentMark) jvmEvents.get(1);
             assertEquals(30285, Math.round(concurrentMark.getDuration() * 1000000.0d));
-            ConcurrentPreClean preClean = (ConcurrentPreClean) jvmEvents.get(2);
+            var preClean = (ConcurrentPreClean) jvmEvents.get(2);
             assertEquals(2368, Math.round(preClean.getDuration() * 1000000.0d));
-            AbortablePreClean abortablePreClean = (AbortablePreClean) jvmEvents.get(3);
+            var abortablePreClean = (AbortablePreClean) jvmEvents.get(3);
             assertEquals(2394, Math.round(abortablePreClean.getDuration() * 1000000.0d));
 
-            CMSRemark remark = (CMSRemark) jvmEvents.get(4);
+            var remark = (CMSRemark) jvmEvents.get(4);
             assertEquals(26 * 1024, remark.getHeap().getOccupancyBeforeCollection());
             assertEquals(26 * 1024, remark.getHeap().getOccupancyAfterCollection());
             assertEquals(61 * 1024, remark.getHeap().getSizeAfterCollection());
             assertEquals(2919, (int) (remark.getDuration() * 1000000.0d));
 
-            ConcurrentSweep sweep = (ConcurrentSweep) jvmEvents.get(5);
+            var sweep = (ConcurrentSweep) jvmEvents.get(5);
             assertEquals(4130, Math.round(sweep.getDuration() * 1000000.0d));
-            ConcurrentReset reset = (ConcurrentReset) jvmEvents.get(6);
+            var reset = (ConcurrentReset) jvmEvents.get(6);
             assertEquals(2716, Math.round(reset.getDuration() * 1000000.0d));
         } catch (ClassCastException cce) {
             fail(cce.getMessage());
@@ -312,10 +309,10 @@ public class UnifiedGenerationalEventsTest extends ParserTest {
                 "[11.910s][info ][gc           ] GC(0) Pause Young (Allocation Failure) 16M->3M(61M) 10.585ms",
                 "[11.910s][info ][gc,cpu       ] GC(0) User=0.01s Sys=0.00s Real=0.01s"
         };
-        List<JVMEvent> jvmEvents = feedParser(lines);
+        var jvmEvents = feedParser(lines);
         try {
             assertEquals(1, jvmEvents.size());
-            DefNew collection = (DefNew) jvmEvents.get(0);
+            var collection = (DefNew) jvmEvents.getFirst();
             assertEquals(16 * 1024, collection.getHeap().getOccupancyBeforeCollection());
             assertEquals(3 * 1024, collection.getHeap().getOccupancyAfterCollection());
             assertEquals(61 * 1024, collection.getHeap().getSizeAfterCollection());
@@ -368,10 +365,10 @@ public class UnifiedGenerationalEventsTest extends ParserTest {
                 "[12.199s][info ][gc             ] GC(112) Pause Young (Allocation Failure) 61M->6M(61M) 10.878ms",
                 "[12.199s][info ][gc,cpu         ] GC(112) User=0.02s Sys=0.00s Real=0.01s"
         };
-        List<JVMEvent> jvmEvents = feedParser(lines);
+        var jvmEvents = feedParser(lines);
         try {
             assertEquals(1, jvmEvents.size());
-            FullGC collection = (FullGC) jvmEvents.get(0);
+            var collection = (FullGC) jvmEvents.getFirst();
             assertEquals(61 * 1024, collection.getHeap().getOccupancyBeforeCollection());
             assertEquals(6 * 1024, collection.getHeap().getOccupancyAfterCollection());
             assertEquals(61 * 1024, collection.getHeap().getSizeAfterCollection());
@@ -391,10 +388,10 @@ public class UnifiedGenerationalEventsTest extends ParserTest {
                 "[0.694s][info][gc           ] GC(2) Pause Young (Allocation Failure) 116M->115M(171M) 131.613ms",
                 "[0.694s][info][gc,cpu       ] GC(2) User=0.33s Sys=0.02s Real=0.13s"
         };
-        List<JVMEvent> jvmEvents = feedParser(lines);
+        var jvmEvents = feedParser(lines);
         try {
             assertEquals(1, jvmEvents.size());
-            PSYoungGen collection = (PSYoungGen) jvmEvents.get(0);
+            var collection = (PSYoungGen) jvmEvents.getFirst();
             assertEquals(53228, collection.getYoung().getOccupancyBeforeCollection());
             assertEquals(7148, collection.getYoung().getOccupancyAfterCollection());
             assertEquals(53248, collection.getYoung().getSizeAfterCollection());
@@ -435,9 +432,9 @@ public class UnifiedGenerationalEventsTest extends ParserTest {
                 "[9.371s][info ][gc,cpu         ] GC(18) User=0.01s Sys=0.00s Real=0.00s"
         };
 
-        List<JVMEvent> jvmEvents = feedParser(lines);
+        var jvmEvents = feedParser(lines);
         assertEquals(1, jvmEvents.size());
-        PSYoungGen collection = (PSYoungGen) jvmEvents.get(0);
+        var collection = (PSYoungGen) jvmEvents.getFirst();
         assertEquals(9.371, collection.getDateTimeStamp().toSeconds());
         SurvivorRecord record = collection.getSurvivorRecord();
         assertNotNull(record);
@@ -464,9 +461,9 @@ public class UnifiedGenerationalEventsTest extends ParserTest {
                 "[8.727s][info ][gc,cpu         ] GC(9) User=0.00s Sys=0.00s Real=0.00s"
         };
 
-        List<JVMEvent> jvmEvents = feedParser(lines);
+        var jvmEvents = feedParser(lines);
         assertEquals(1, jvmEvents.size());
-        DefNew collection = (DefNew) jvmEvents.get(0);
+        var collection = (DefNew) jvmEvents.getFirst();
         assertEquals(8.726, collection.getDateTimeStamp().toSeconds());
         SurvivorRecord record = collection.getSurvivorRecord();
         assertNotNull(record);
@@ -475,7 +472,7 @@ public class UnifiedGenerationalEventsTest extends ParserTest {
         assertEquals(8945664, record.getDesiredOccupancyAfterCollection());
         assertEquals(16, record.getBytesAtEachAge().length);
         int[] bytesAtAge = {0, 400368, 0, 304, 0, 0, 0, 0, 32, 554176, 0, 0, 0, 0, 0, 0};
-        for (int i = 1; i < bytesAtAge.length; i++) {
+        for (var i = 1; i < bytesAtAge.length; i++) {
             assertEquals(bytesAtAge[i], record.getBytesAtAge(i));
         }
         assertThrows(IndexOutOfBoundsException.class, () -> record.getBytesAtAge(16));
@@ -496,9 +493,9 @@ public class UnifiedGenerationalEventsTest extends ParserTest {
                 "[11.634s][info ][gc             ] GC(12) Pause Young (Allocation Failure) 140M->3M(495M) 0.430ms",
                 "[11.634s][info ][gc,cpu         ] GC(12) User=0.00s Sys=0.00s Real=0.00s",
         };
-        List<JVMEvent> jvmEvents = feedParser(lines);
+        var jvmEvents = feedParser(lines);
         assertEquals(1, jvmEvents.size());
-        ParNew collection = (ParNew) jvmEvents.get(0);
+        var collection = (ParNew) jvmEvents.getFirst();
 
         assertEquals(11.633, collection.getDateTimeStamp().toSeconds());
         SurvivorRecord record = collection.getSurvivorRecord();
@@ -508,7 +505,7 @@ public class UnifiedGenerationalEventsTest extends ParserTest {
         assertEquals(8945664, record.getDesiredOccupancyAfterCollection());
         assertEquals(7, record.getBytesAtEachAge().length);
         int[] bytesAtAge = {0, 400208, 0, 0, 0, 0, 304};
-        for (int i = 1; i < bytesAtAge.length; i++) {
+        for (var i = 1; i < bytesAtAge.length; i++) {
             assertEquals(bytesAtAge[i], record.getBytesAtAge(i));
         }
         assertThrows(IndexOutOfBoundsException.class, () -> record.getBytesAtAge(7));

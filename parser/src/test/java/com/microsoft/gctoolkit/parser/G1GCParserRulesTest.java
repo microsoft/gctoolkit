@@ -14,9 +14,9 @@ public class G1GCParserRulesTest implements G1GCPatterns {
 
     @Test
     public void testG1GCParseRules() {
-        for (int i = 0; i < rules.length; i++)
-            for (int j = 0; j < lines.length; j++) {
-                int captured = CommonTestHelper.captureTest(rules[i], lines[j]);
+        for (var i = 0; i < rules.length; i++)
+            for (var j = 0; j < lines.length; j++) {
+                var captured = CommonTestHelper.captureTest(rules[i], lines[j]);
                 if (i == j) {
                     assertEquals(lines[j].length, captured, i + " failed to captured it's lines");
                 } else {
@@ -29,7 +29,7 @@ public class G1GCParserRulesTest implements G1GCPatterns {
 
     //  test for debugging only... @Test
     public void testSingeRule() {
-        int index = 35;
+        var index = 35;
         assertEquals(1, CommonTestHelper.captureTest(rules[index], lines[index]));
     }
 
@@ -40,7 +40,7 @@ public class G1GCParserRulesTest implements G1GCPatterns {
         assertNotNull(trace);
         if (dump) {
             LOGGER.fine("matches groups " + trace.groupCount());
-            for (int i = 0; i <= trace.groupCount(); i++) {
+            for (var i = 0; i <= trace.groupCount(); i++) {
                 LOGGER.fine(i + ": " + trace.getGroup(i));
             }
         }
