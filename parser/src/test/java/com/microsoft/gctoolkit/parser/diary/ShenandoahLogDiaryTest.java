@@ -9,7 +9,7 @@ public class ShenandoahLogDiaryTest extends LogDiaryTest {
 
     @Test
     public void testForShenandoahLogDiaryPickups() {
-        int i = 0;
+        var i = 0;
         for (String name : shenandoahLogs) {
             testWith(new TestLogFile("shenandoah/" + name).getFile(), name, shenandoahDiary[i], shenandoahUnknown[i], shenandoahKnown[i++]);
         }

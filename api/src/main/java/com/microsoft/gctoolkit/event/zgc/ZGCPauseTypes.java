@@ -20,6 +20,7 @@ public enum ZGCPauseTypes implements LabelledGCEventType {
         return LabelledGCEventType.fromLabel(ZGCPauseTypes.class, label);
     }
 
+    @Override
     public String getLabel() {
         return label;
     }

@@ -13,7 +13,7 @@ public class StartingGunTest {
 
   @Test
   public void testStartingGunNoInterruptions() throws InterruptedException {
-    StartingGun sg = new StartingGun();
+    var sg = new StartingGun();
     Thread[] threads = startWaitingThreads(sg);
 
     Thread.sleep(PAUSE);
@@ -27,7 +27,7 @@ public class StartingGunTest {
 
   private Thread[] startWaitingThreads(StartingGun sg) {
     Thread[] threads = new Thread[10];
-    for (int i = 0; i < threads.length; i++) {
+    for (var i = 0; i < threads.length; i++) {
       threads[i] = new Thread(sg::awaitUninterruptibly);
       threads[i].start();
     }
@@ -36,7 +36,7 @@ public class StartingGunTest {
 
   @Test
   public void testAwaitAfterReady() throws InterruptedException {
-    StartingGun sg = new StartingGun();
+    var sg = new StartingGun();
     sg.ready();
     Thread[] threads = startWaitingThreads(sg);
     allThreadsDead(threads);
@@ -44,9 +44,9 @@ public class StartingGunTest {
 
   @Test
   public void testInterruptedStatus() throws InterruptedException {
-    StartingGun sg = new StartingGun();
+    var sg = new StartingGun();
     Thread testingThread = Thread.currentThread();
-    Thread thread = new Thread(() ->
+    var thread = new Thread(() ->
     {
       while (testingThread.getState() != Thread.State.WAITING) {
         Thread.yield();
@@ -67,7 +67,7 @@ public class StartingGunTest {
 
   @Test
   public void testMultipleReadyCallsNoInterruptions() throws InterruptedException {
-    StartingGun sg = new StartingGun();
+    var sg = new StartingGun();
     Thread[] threads = startWaitingThreads(sg);
 
     Thread.sleep(PAUSE);
@@ -79,7 +79,7 @@ public class StartingGunTest {
     allThreadsDead(threads);
 
     threads = new Thread[10];
-    for (int i = 0; i < threads.length; i++) {
+    for (var i = 0; i < threads.length; i++) {
       threads[i] = new Thread(sg::awaitUninterruptibly);
       threads[i].start();
     }
@@ -89,7 +89,7 @@ public class StartingGunTest {
 
   @Test
   public void testStartingGunInterruptions() throws InterruptedException {
-    StartingGun sg = new StartingGun();
+    var sg = new StartingGun();
     Thread[] threads = startWaitingThreads(sg);
 
     Thread.sleep(PAUSE);

@@ -7,6 +7,7 @@
 module com.microsoft.gctoolkit.sample {
     requires com.microsoft.gctoolkit.api;
     requires java.logging;
+    requires transitive org.jspecify;
 
     exports com.microsoft.gctoolkit.sample;
 

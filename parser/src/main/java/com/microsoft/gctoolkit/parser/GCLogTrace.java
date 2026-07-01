@@ -12,15 +12,14 @@ import com.microsoft.gctoolkit.event.UnifiedStatisticalSummary;
 import com.microsoft.gctoolkit.event.jvm.MetaspaceRecord;
 import com.microsoft.gctoolkit.event.jvm.PermGenSummary;
 import com.microsoft.gctoolkit.event.zgc.ZGCPhase;
+import org.jspecify.annotations.Nullable;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 
-/**
- * Class that represents a chunk of GC log that we are attempting to match to a
- * known GC log pattern
- */
+/// Class that represents a chunk of GC log that we are attempting to match to a
+/// known GC log pattern
 public class GCLogTrace extends AbstractLogTrace {
 
     private static final Logger LOGGER = Logger.getLogger(GCLogTrace.class.getName());
@@ -31,18 +30,22 @@ public class GCLogTrace extends AbstractLogTrace {
         super(matcher);
     }
 
+    @Override
     public int groupCount() {
         return trace.groupCount();
     }
 
+    @Override
     public boolean groupNotNull(int index) {
         return getGroup(index) != null;
     }
 
+    @Override
     public long getLongGroup(int index) {
         return Long.parseLong(trace.group(index));
     }
 
+    @Override
     public int getIntegerGroup(int index) {
         return Integer.parseInt(trace.group(index));
     }
@@ -77,28 +80,22 @@ public class GCLogTrace extends AbstractLogTrace {
         return getDuration() / 1000.00d;
     }
 
-    /**
-     * Annoyingly we're assuming the field actually is ms instead of confirming
-     * @param index Index of the capture group.
-     * @return The capture group parsed to a double.
-     */
+    /// Annoyingly we're assuming the field actually is ms instead of confirming
+    /// @param index Index of the capture group.
+    /// @return The capture group parsed to a double.
     public double getMilliseconds(int index) {
         return getDoubleGroup(index);
     }
 
-    /**
-     * Annoyingly we're assuming the field actually is s instead of confirming
-     * @param index Index of the capture group.
-     * @return The capture group parsed to a double.
-     */
+    /// Annoyingly we're assuming the field actually is s instead of confirming
+    /// @param index Index of the capture group.
+    /// @return The capture group parsed to a double.
     public double getSeconds(int index) {
         return getDoubleGroup(index);
     }
 
-    /**
-     * Assumed to be the last capture group
-     * @return The last capture group parsed to a double.
-     */
+    /// Assumed to be the last capture group
+    /// @return The last capture group parsed to a double.
     public double getMilliseconds() {
         return getMilliseconds(groupCount());
     }
@@ -120,7 +117,7 @@ public class GCLogTrace extends AbstractLogTrace {
     }
 
     public boolean hasNext() {
-        return (trace.find());
+        return trace.find();
     }
 
     public int end() {
@@ -136,7 +133,7 @@ public class GCLogTrace extends AbstractLogTrace {
     }
 
     private double toKBytes(double value, String units) {
-        double returnValue = value;
+        var returnValue = value;
         switch (Character.toUpperCase(units.codePointAt(0))) {
             case 'G':
                 returnValue *= 1024.0D;
@@ -154,7 +151,7 @@ public class GCLogTrace extends AbstractLogTrace {
     }
 
     public long toKBytes(long value, String units) {
-        long returnValue = value;
+        var returnValue = value;
         switch (Character.toUpperCase(units.codePointAt(0))) {
             case 'G':
                 returnValue *= 1024L;
@@ -172,26 +169,26 @@ public class GCLogTrace extends AbstractLogTrace {
         return returnValue;
     }
 
-    public PermGenSummary getMetaspaceSummary(int offset) {
+    public @Nullable PermGenSummary getMetaspaceSummary(int offset) {
         try {
-            long before = toKBytes(offset);
-            long after = toKBytes(offset + 2);
-            long size = toKBytes(offset + 4);
+            var before = toKBytes(offset);
+            var after = toKBytes(offset + 2);
+            var size = toKBytes(offset + 4);
             return new PermGenSummary(before, after, size);
-        } catch (NumberFormatException numberFormatException) {
+        } catch (NumberFormatException _) {
             LOGGER.fine("Unable to calculate Metaspace summary.");
             notYetImplemented();
         }
         return null;
     }
 
-    public MemoryPoolSummary getOccupancyBeforeAfterWithMemoryPoolSizeSummary(int offset) {
+    public @Nullable MemoryPoolSummary getOccupancyBeforeAfterWithMemoryPoolSizeSummary(int offset) {
         try {
-            long before = toKBytes(offset);
-            long after = toKBytes(offset + 2);
-            long size = toKBytes(offset + 4);
+            var before = toKBytes(offset);
+            var after = toKBytes(offset + 2);
+            var size = toKBytes(offset + 4);
             return new MemoryPoolSummary(before, size, after, size);
-        } catch (NumberFormatException numberFormatException) {
+        } catch (NumberFormatException _) {
             LOGGER.warning("Unable to calculate generational memory pool summary.");
             notYetImplemented();
         }
@@ -199,13 +196,13 @@ public class GCLogTrace extends AbstractLogTrace {
         return null;
     }
 
-    public MemoryPoolSummary getOccupancyWithMemoryPoolSizeSummary(int offset) {
+    public @Nullable MemoryPoolSummary getOccupancyWithMemoryPoolSizeSummary(int offset) {
 
         try {
-            long occupancy = toKBytes(offset);
-            long size = toKBytes(offset + 2);
+            var occupancy = toKBytes(offset);
+            var size = toKBytes(offset + 2);
             return new MemoryPoolSummary(occupancy, size, occupancy, size);
-        } catch (NumberFormatException numberFormatException) {
+        } catch (NumberFormatException _) {
             LOGGER.fine("Unable to calculate generational memory pool occupancy summary.");
             notYetImplemented();
         }
@@ -213,13 +210,13 @@ public class GCLogTrace extends AbstractLogTrace {
         return null;
     }
 
-    public MemoryPoolSummary getOccupancyWithMemoryPoolSizeSummary() {
+    public @Nullable MemoryPoolSummary getOccupancyWithMemoryPoolSizeSummary() {
 
         try {
-            long occupancy = toKBytes(1);
-            long size = toKBytes(3);
+            var occupancy = toKBytes(1);
+            var size = toKBytes(3);
             return new MemoryPoolSummary(occupancy, size, occupancy, size);
-        } catch (NumberFormatException numberFormatException) {
+        } catch (NumberFormatException _) {
             LOGGER.fine("Unable to calculate generational memory pool occupancy summary.");
             notYetImplemented();
         }
@@ -227,40 +224,40 @@ public class GCLogTrace extends AbstractLogTrace {
         return null;
     }
 
-    public MetaspaceRecord getMetaSpaceRecord(int offset) {
+    public @Nullable MetaspaceRecord getMetaSpaceRecord(int offset) {
         try {
-            long before = toKBytes(offset);
-            long after = toKBytes(offset + 2);
-            long size = toKBytes(offset + 4);
+            var before = toKBytes(offset);
+            var after = toKBytes(offset + 2);
+            var size = toKBytes(offset + 4);
             return new MetaspaceRecord(before, after, size);
-        } catch (NumberFormatException numberFormatException) {
+        } catch (NumberFormatException _) {
             LOGGER.fine("Unable to calculate Metaspace summary.");
             notYetImplemented();
         }
         return null;
     }
 
-    public MetaspaceRecord getEnlargedMemoryPoolRecord(int offset) {
+    public @Nullable MetaspaceRecord getEnlargedMemoryPoolRecord(int offset) {
         try {
-            long before = toKBytes(offset);
-            long after = toKBytes(offset + 4);
-            long size = toKBytes(offset + 6);
+            var before = toKBytes(offset);
+            var after = toKBytes(offset + 4);
+            var size = toKBytes(offset + 6);
             return new MetaspaceRecord(before, after, size);
-        } catch (NumberFormatException numberFormatException) {
+        } catch (NumberFormatException _) {
             LOGGER.fine("Unable to calculate Metaspace summary.");
             notYetImplemented();
         }
         return null;
     }
 
-    public MetaspaceRecord getEnlargedMetaSpaceRecord(int offset) {
+    public @Nullable MetaspaceRecord getEnlargedMetaSpaceRecord(int offset) {
         try {
-            long before = toKBytes(offset);
-            long sizeBefore = toKBytes(offset + 2);
-            long after = toKBytes(offset + 4);
-            long size = toKBytes(offset + 6);
+            var before = toKBytes(offset);
+            var sizeBefore = toKBytes(offset + 2);
+            var after = toKBytes(offset + 4);
+            var size = toKBytes(offset + 6);
             return new MetaspaceRecord(before, sizeBefore, after, size);
-        } catch (NumberFormatException numberFormatException) {
+        } catch (NumberFormatException _) {
             LOGGER.fine("Unable to calculate Metaspace summary.");
             notYetImplemented();
         }
@@ -278,22 +275,22 @@ public class GCLogTrace extends AbstractLogTrace {
     public RegionSummary regionSummary() {
         return new RegionSummary(getIntegerGroup(2),
                 getIntegerGroup(3),
-                (trace.group(4) != null) ? getIntegerGroup(4) : getIntegerGroup(3));
+                trace.group(4) != null ? getIntegerGroup(4) : getIntegerGroup(3));
     }
 
     // Debugging support **PLEASE DO NOT REMOVE**
     public void notYetImplemented() {
         String threadName = Thread.currentThread().getName();
         LOGGER.log(Level.FINE, "{0}, not implemented: {1}", new Object[]{threadName, getGroup(0)});
-        for (int i = 1; i < groupCount() + 1; i++) {
+        for (var i = 1; i < groupCount() + 1; i++) {
             LOGGER.log(Level.FINE, "{0} : {1}", new Object[]{i, getGroup(i)});
         }
         LOGGER.fine("-----------------------------------------");
         //IntelliJ Eats this log output, so it's displayed to stdout
         GCToolKit.LOG_DEBUG_MESSAGE(() -> {
-            StringBuilder debugMessage = new StringBuilder();
+            var debugMessage = new StringBuilder();
             debugMessage.append(threadName).append(", not implemented: ").append(getGroup(0)).append(System.lineSeparator());
-            for (int i = 1; i < groupCount() + 1; i++) {
+            for (var i = 1; i < groupCount() + 1; i++) {
                 debugMessage.append(i).append(": ").append(getGroup(i)).append(System.lineSeparator());
             }
             debugMessage.append("-----------------------------------------");

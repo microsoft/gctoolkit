@@ -22,19 +22,19 @@ public class UnifiedJavaVirtualMachineConfigurationTest {
     @Tag("modulePath")
     @Test
     public void testRotating() {
-        TestLogFile log = new TestLogFile(logFile);
+        var log = new TestLogFile(logFile);
         test(new RotatingGCLogFile(log.getFile().toPath()), times[0]);
     }
 
     @Tag("modulePath")
     @Test
     public void testSingle() {
-        TestLogFile log = new TestLogFile(logFile);
+        var log = new TestLogFile(logFile);
         test(new SingleGCLogFile(log.getFile().toPath()), times[1]);
     }
 
     private void test(GCLogFile log, int[] endStartTimes ) {
-        GCToolKit gcToolKit = new GCToolKit();
+        var gcToolKit = new GCToolKit();
         gcToolKit.loadAggregationsFromServiceLoader();
         JavaVirtualMachine machine = null;
         try {

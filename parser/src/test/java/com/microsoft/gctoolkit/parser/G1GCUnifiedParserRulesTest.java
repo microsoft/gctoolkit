@@ -14,22 +14,20 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class G1GCUnifiedParserRulesTest implements UnifiedG1GCPatterns, TenuredPatterns {
 
-    /**
-     * The rules are;
-     * A pattern should capture the lines for which it is intended to capture
-     * A pattern should not capture any other lines.
-     *
-     * This testing is designed to run all patterns against all lines
-     */
+    /// The rules are;
+    /// A pattern should capture the lines for which it is intended to capture
+    /// A pattern should not capture any other lines.
+    ///
+    /// This testing is designed to run all patterns against all lines
 
     private static final Logger LOGGER = Logger.getLogger(G1GCUnifiedParserRulesTest.class.getName());
 
     @Test
     public void testG1GCParseRules() {
         assertEquals(lines.length,rules.length, "Rules and data dont't match");
-        for (int i = 0; i < rules.length; i++)
-            for (int j = 0; j < lines.length; j++) {
-                int captured = captureTest(rules[i], lines[j]);
+        for (var i = 0; i < rules.length; i++)
+            for (var j = 0; j < lines.length; j++) {
+                var captured = captureTest(rules[i], lines[j]);
                 if (i == j) {
                     assertEquals(lines[j].length, captured,rules[i].getName() + " failed to capture");
                 } else {
@@ -43,21 +41,21 @@ public class G1GCUnifiedParserRulesTest implements UnifiedG1GCPatterns, TenuredP
     @Test
     public void testUnifiedLoggingDecorators() {
         for (String decoratorLine : decoratorLines) {
-            Decorators decorators = new Decorators(decoratorLine);
+            var decorators = new Decorators(decoratorLine);
             assertTrue(decorators.getNumberOfDecorators() != 0);
         }
     }
 
     @Test @Disabled("used for debug testing")
     public void testSingeRuleCapture() {
-        int index = 6;
+        var index = 6;
         assertEquals(lines[index].length, captureTest(rules[index], lines[index]), "Miss for " + rules[index].getName());
     }
 
     // for debugging @Test
     public void testSingleRuleMisses() {
-        int index = 10;
-        for (int i = 0; i < rules.length; i++)
+        var index = 10;
+        for (var i = 0; i < rules.length; i++)
             if ( index != i)
                 assertEquals(0, captureTest(rules[index], lines[i]), rules[index].getName() + " hits on lines for " + rules[i].getName());
     }
@@ -75,7 +73,7 @@ public class G1GCUnifiedParserRulesTest implements UnifiedG1GCPatterns, TenuredP
         assertNotNull(trace);
         if (dump) {
             LOGGER.fine("matches groups " + trace.groupCount());
-            for (int i = 0; i <= trace.groupCount(); i++) {
+            for (var i = 0; i <= trace.groupCount(); i++) {
                 LOGGER.fine(i + ": " + trace.getGroup(i));
             }
         }

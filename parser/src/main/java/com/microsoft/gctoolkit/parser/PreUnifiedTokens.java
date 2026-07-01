@@ -2,11 +2,9 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.parser;
 
-/**
- * Interface that contains String and ParseRule representations of common
- * data types within GC Log data.These tokens are used in Regular Expressions
- * Pattern matching in the GC Log parser(s)
- */
+/// Interface that contains String and ParseRule representations of common
+/// data types within GC Log data.These tokens are used in Regular Expressions
+/// Pattern matching in the GC Log parser(s)
 public interface PreUnifiedTokens extends GenericTokens {
 
     // Time values

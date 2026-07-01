@@ -25,7 +25,7 @@ jobs:
       - name: Setup Java JDK
         uses: actions/setup-java@1bcf9fb12cf4aa7d266a90ae39939e61372fe520 # v5.4.0
         with:
-          java-version: '11'
+          java-version: '25'
           distribution: 'microsoft'
           server-id: ossrh
           server-username: MAVEN_USERNAME

@@ -4,20 +4,20 @@ package com.microsoft.gctoolkit.parser.jvm;
 
 import com.microsoft.gctoolkit.jvm.Diarizer;
 import com.microsoft.gctoolkit.jvm.Diary;
+import com.microsoft.gctoolkit.jvm.SupportedFlags;
 import com.microsoft.gctoolkit.parser.unified.UnifiedLoggingLevel;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
 
+import java.util.Set;
 import java.util.TreeSet;
 
-import static com.microsoft.gctoolkit.jvm.SupportedFlags.GC_CAUSE;
-import static com.microsoft.gctoolkit.jvm.SupportedFlags.*;
+import com.microsoft.gctoolkit.jvm.SupportedFlags;
 import static com.microsoft.gctoolkit.parser.unified.ShenandoahPatterns.SHENANDOAH_TAG;
 import static com.microsoft.gctoolkit.parser.unified.UnifiedG1GCPatterns.G1_COLLECTION;
 import static com.microsoft.gctoolkit.parser.unified.UnifiedG1GCPatterns.G1_TAG;
 import static com.microsoft.gctoolkit.parser.unified.UnifiedGenerationalPatterns.*;
 import static com.microsoft.gctoolkit.parser.unified.UnifiedPatterns.CPU_BREAKOUT;
 import static com.microsoft.gctoolkit.parser.unified.ZGCPatterns.CYCLE_START;
-import static com.microsoft.gctoolkit.parser.unified.ZGCPatterns.ZGC_TAG;
 
 //ShenandoahPatterns, ZGCPatterns, UnifiedG1GCPatterns, UnifiedGenerationalPatterns,
 public class UnifiedDiarizer implements Diarizer {
@@ -28,18 +28,19 @@ public class UnifiedDiarizer implements Diarizer {
     private int lineCount = MAXIMUM_LINES_TO_EXAMINE;
 
     private final Diary diary;
-    private final TreeSet<String> tagsAndLevels = new TreeSet<>();
+    private final Set<String> tagsAndLevels = new TreeSet<>();
     private int stopTheWorldEvents = 0;
 
     {
         diary = new Diary();
-        diary.setTrue(UNIFIED_LOGGING);
-        diary.setFalse(ICMS, PRE_JDK70_40, JDK70, PRE_JDK70_40, JDK80, MAX_TENURING_THRESHOLD_VIOLATION);
+        diary.setTrue(SupportedFlags.UNIFIED_LOGGING);
+        diary.setFalse(SupportedFlags.ICMS, SupportedFlags.PRE_JDK70_40, SupportedFlags.JDK70, SupportedFlags.PRE_JDK70_40, SupportedFlags.JDK80, SupportedFlags.MAX_TENURING_THRESHOLD_VIOLATION);
 
     }
 
     public UnifiedDiarizer() {}
 
+    @Override
     public Diary getDiary() {
         fillInKnowns();
         return diary;
@@ -70,7 +71,7 @@ public class UnifiedDiarizer implements Diarizer {
     }
 
     private void fillInKnowns() {
-        diary.setFalse(ADAPTIVE_SIZING);
+        diary.setFalse(SupportedFlags.ADAPTIVE_SIZING);
     }
 
     @Override
@@ -97,56 +98,54 @@ public class UnifiedDiarizer implements Diarizer {
         return this.completed();
     }
 
-    /**
-     * Extract decorators (from a GC log line tag) and set the corresponding diary flags accordingly
-     *
-     * @param line GC log line
-     */
+    /// Extract decorators (from a GC log line tag) and set the corresponding diary flags accordingly
+    ///
+    /// @param line GC log line
     private void extractDecorators(String line) {
-        Decorators decorators = new Decorators(line);
+        var decorators = new Decorators(line);
         timeOfFirstEvent(decorators);
         extractTagsAndLevels(decorators);
         // -Xlog:gc*,gc+ref=debug,gc+phases=debug,gc+age=trace,safepoint
         if (decorators.getLogLevel().isPresent()) {
             UnifiedLoggingLevel logLevel = decorators.getLogLevel().get();
             if (decorators.tagsContain("gc,age"))
-                diary.setTrue(TENURING_DISTRIBUTION);
+                diary.setTrue(SupportedFlags.TENURING_DISTRIBUTION);
             else if (decorators.tagsContain("ref") && logLevel.isGreaterThanOrEqualTo(UnifiedLoggingLevel.debug))
-                diary.setTrue(PRINT_REFERENCE_GC);
+                diary.setTrue(SupportedFlags.PRINT_REFERENCE_GC);
             else if (decorators.tagsContain("gc,phases") && logLevel.isGreaterThanOrEqualTo(UnifiedLoggingLevel.debug))
-                diary.setTrue(GC_DETAILS);
+                diary.setTrue(SupportedFlags.GC_DETAILS);
             else if ( decorators.tagsContain("gc,ergo"))
-                diary.setTrue(ADAPTIVE_SIZING);
+                diary.setTrue(SupportedFlags.ADAPTIVE_SIZING);
             else if (decorators.tagsContain("gc,cpu"))
-            	diary.setTrue(PRINT_CPU_TIMES);
+            	diary.setTrue(SupportedFlags.PRINT_CPU_TIMES);
             
             if (decorators.tagsContain("safepoint"))
-                diary.setTrue(APPLICATION_STOPPED_TIME, APPLICATION_CONCURRENT_TIME);
+                diary.setTrue(SupportedFlags.APPLICATION_STOPPED_TIME, SupportedFlags.APPLICATION_CONCURRENT_TIME);
 
             if (diary.isZGC()) {
                 if (decorators.tagsContain("task"))
-                    diary.setTrue(GC_DETAILS);
+                    diary.setTrue(SupportedFlags.GC_DETAILS);
                 else if (decorators.tagsContain("heap"))
-                    diary.setTrue(PRINT_HEAP_AT_GC);
+                    diary.setTrue(SupportedFlags.PRINT_HEAP_AT_GC);
                 else if (decorators.tagsContain("tlab"))
-                    diary.setTrue(TLAB_DATA);
+                    diary.setTrue(SupportedFlags.TLAB_DATA);
                 else if (decorators.tagsContain("gc,start") && line.contains("Garbage Collection ("))
-                    diary.setTrue(GC_CAUSE);
+                    diary.setTrue(SupportedFlags.GC_CAUSE);
                 else if (decorators.tagsContain("gc,heap")) {
                     if (line.contains("Heap before GC"))
-                        diary.setTrue(PRINT_HEAP_AT_GC);
-                    diary.setTrue(GC_DETAILS);
+                        diary.setTrue(SupportedFlags.PRINT_HEAP_AT_GC);
+                    diary.setTrue(SupportedFlags.GC_DETAILS);
                 } else if (decorators.tagsContain("gc,ref"))
-                    diary.setTrue(PRINT_REFERENCE_GC);
+                    diary.setTrue(SupportedFlags.PRINT_REFERENCE_GC);
                 else if (decorators.tagsContain("gc,heap") && decorators.getLogLevel().get() == UnifiedLoggingLevel.debug)
-                    diary.setTrue(PRINT_HEAP_AT_GC);
+                    diary.setTrue(SupportedFlags.PRINT_HEAP_AT_GC);
             } else if (diary.isShenandoah()) {
                 if (decorators.tagsContain("gc,task") || decorators.tagsContain("gc,start"))
-                    diary.setTrue(GC_DETAILS);
+                    diary.setTrue(SupportedFlags.GC_DETAILS);
                 else if (decorators.tagsContain("gc,ergo"))
-                    diary.setTrue(ADAPTIVE_SIZING);
+                    diary.setTrue(SupportedFlags.ADAPTIVE_SIZING);
                 else if (decorators.tagsContain("gc") && line.contains("Trigger"))
-                    diary.setTrue(GC_CAUSE);
+                    diary.setTrue(SupportedFlags.GC_CAUSE);
             }
         }
     }
@@ -175,72 +174,69 @@ public class UnifiedDiarizer implements Diarizer {
 
         if (CYCLE_START.parse(line) != null) {
             String cycleType = CYCLE_START.parse(line).getGroup(2);
-            diary.setTrue(ZGC);
-            if(cycleType.equals("Minor") || cycleType.equals("Major"))
-                diary.setTrue(GENERATIONAL_ZGC);
+            diary.setTrue(SupportedFlags.ZGC);
+            if("Minor".equals(cycleType) || "Major".equals(cycleType))
+                diary.setTrue(SupportedFlags.GENERATIONAL_ZGC);
             else
-                diary.setFalse(GENERATIONAL_ZGC);
-            diary.setFalse(DEFNEW, SERIAL, PARALLELGC, PARALLELOLDGC, PARNEW, CMS, ICMS, G1GC, RSET_STATS, SHENANDOAH, CMS_DEBUG_LEVEL_1, PRE_JDK70_40, JDK70, JDK80, TENURING_DISTRIBUTION, MAX_TENURING_THRESHOLD_VIOLATION, TLAB_DATA, PRINT_PROMOTION_FAILURE, PRINT_FLS_STATISTICS, ADAPTIVE_SIZING);
+                diary.setFalse(SupportedFlags.GENERATIONAL_ZGC);
+            diary.setFalse(SupportedFlags.DEFNEW, SupportedFlags.SERIAL, SupportedFlags.PARALLELGC, SupportedFlags.PARALLELOLDGC, SupportedFlags.PARNEW, SupportedFlags.CMS, SupportedFlags.ICMS, SupportedFlags.G1GC, SupportedFlags.RSET_STATS, SupportedFlags.SHENANDOAH, SupportedFlags.CMS_DEBUG_LEVEL_1, SupportedFlags.PRE_JDK70_40, SupportedFlags.JDK70, SupportedFlags.JDK80, SupportedFlags.TENURING_DISTRIBUTION, SupportedFlags.MAX_TENURING_THRESHOLD_VIOLATION, SupportedFlags.TLAB_DATA, SupportedFlags.PRINT_PROMOTION_FAILURE, SupportedFlags.PRINT_FLS_STATISTICS, SupportedFlags.ADAPTIVE_SIZING);
             return;
         }
 
         if ( SHENANDOAH_TAG.parse(line) != null) {
-            diary.setTrue(SHENANDOAH);
-            diary.setFalse(DEFNEW, SERIAL, PARALLELGC, PARALLELOLDGC, PARNEW, CMS, ICMS, G1GC, RSET_STATS, ZGC, CMS_DEBUG_LEVEL_1, PRE_JDK70_40, JDK70, JDK80, TENURING_DISTRIBUTION, MAX_TENURING_THRESHOLD_VIOLATION, TLAB_DATA, PRINT_PROMOTION_FAILURE, PRINT_FLS_STATISTICS, PRINT_HEAP_AT_GC, GENERATIONAL_ZGC);
+            diary.setTrue(SupportedFlags.SHENANDOAH);
+            diary.setFalse(SupportedFlags.DEFNEW, SupportedFlags.SERIAL, SupportedFlags.PARALLELGC, SupportedFlags.PARALLELOLDGC, SupportedFlags.PARNEW, SupportedFlags.CMS, SupportedFlags.ICMS, SupportedFlags.G1GC, SupportedFlags.RSET_STATS, SupportedFlags.ZGC, SupportedFlags.CMS_DEBUG_LEVEL_1, SupportedFlags.PRE_JDK70_40, SupportedFlags.JDK70, SupportedFlags.JDK80, SupportedFlags.TENURING_DISTRIBUTION, SupportedFlags.MAX_TENURING_THRESHOLD_VIOLATION, SupportedFlags.TLAB_DATA, SupportedFlags.PRINT_PROMOTION_FAILURE, SupportedFlags.PRINT_FLS_STATISTICS, SupportedFlags.PRINT_HEAP_AT_GC, SupportedFlags.GENERATIONAL_ZGC);
             return;
         }
 
         if (G1_TAG.parse(line) != null || line.contains("G1 Evacuation Pause") || (line.contains("Humongous regions: "))) {
-            diary.setTrue(G1GC);
-            diary.setFalse(DEFNEW, SERIAL, PARALLELGC, PARALLELOLDGC, PARNEW, CMS, ICMS, ZGC, SHENANDOAH, CMS_DEBUG_LEVEL_1, PRE_JDK70_40, JDK70, JDK80, TLAB_DATA, PRINT_PROMOTION_FAILURE, PRINT_FLS_STATISTICS, GENERATIONAL_ZGC);
+            diary.setTrue(SupportedFlags.G1GC);
+            diary.setFalse(SupportedFlags.DEFNEW, SupportedFlags.SERIAL, SupportedFlags.PARALLELGC, SupportedFlags.PARALLELOLDGC, SupportedFlags.PARNEW, SupportedFlags.CMS, SupportedFlags.ICMS, SupportedFlags.ZGC, SupportedFlags.SHENANDOAH, SupportedFlags.CMS_DEBUG_LEVEL_1, SupportedFlags.PRE_JDK70_40, SupportedFlags.JDK70, SupportedFlags.JDK80, SupportedFlags.TLAB_DATA, SupportedFlags.PRINT_PROMOTION_FAILURE, SupportedFlags.PRINT_FLS_STATISTICS, SupportedFlags.GENERATIONAL_ZGC);
             return;
         }
 
         if (CMS_TAG.parse(line) != null ||
                 PARNEW_TAG.parse(line) != null ||
                 line.contains("ParNew")) {
-            diary.setTrue(PARNEW, CMS);
-            diary.setFalse(DEFNEW, SERIAL, PARALLELGC, PARALLELOLDGC, ICMS, CMS_DEBUG_LEVEL_1, G1GC, ZGC, SHENANDOAH, PRE_JDK70_40, JDK70, JDK80, RSET_STATS, GENERATIONAL_ZGC);
+            diary.setTrue(SupportedFlags.PARNEW, SupportedFlags.CMS);
+            diary.setFalse(SupportedFlags.DEFNEW, SupportedFlags.SERIAL, SupportedFlags.PARALLELGC, SupportedFlags.PARALLELOLDGC, SupportedFlags.ICMS, SupportedFlags.CMS_DEBUG_LEVEL_1, SupportedFlags.G1GC, SupportedFlags.ZGC, SupportedFlags.SHENANDOAH, SupportedFlags.PRE_JDK70_40, SupportedFlags.JDK70, SupportedFlags.JDK80, SupportedFlags.RSET_STATS, SupportedFlags.GENERATIONAL_ZGC);
             return;
         }
 
         if (PARALLEL_TAG.parse(line) != null ||
                 line.contains("ParOldGen") ||
                 line.contains("PSYoungGen")) {
-            diary.setTrue(PARALLELGC, PARALLELOLDGC, GC_CAUSE);
-            diary.setFalse(DEFNEW, SERIAL, PARNEW, CMS, ICMS, CMS_DEBUG_LEVEL_1, G1GC, ZGC, SHENANDOAH, PRE_JDK70_40, JDK70, JDK80, RSET_STATS, GENERATIONAL_ZGC);
+            diary.setTrue(SupportedFlags.PARALLELGC, SupportedFlags.PARALLELOLDGC, SupportedFlags.GC_CAUSE);
+            diary.setFalse(SupportedFlags.DEFNEW, SupportedFlags.SERIAL, SupportedFlags.PARNEW, SupportedFlags.CMS, SupportedFlags.ICMS, SupportedFlags.CMS_DEBUG_LEVEL_1, SupportedFlags.G1GC, SupportedFlags.ZGC, SupportedFlags.SHENANDOAH, SupportedFlags.PRE_JDK70_40, SupportedFlags.JDK70, SupportedFlags.JDK80, SupportedFlags.RSET_STATS, SupportedFlags.GENERATIONAL_ZGC);
             return;
         }
 
         if (SERIAL_TAG.parse(line) != null || line.contains("DefNew")) {
-            diary.setTrue(DEFNEW, SERIAL, GC_CAUSE);
-            diary.setFalse(PARALLELGC, PARALLELOLDGC, PARNEW, CMS, ICMS, CMS_DEBUG_LEVEL_1, G1GC, ZGC, SHENANDOAH, PRE_JDK70_40, JDK70, JDK80, RSET_STATS, GENERATIONAL_ZGC);
+            diary.setTrue(SupportedFlags.DEFNEW, SupportedFlags.SERIAL, SupportedFlags.GC_CAUSE);
+            diary.setFalse(SupportedFlags.PARALLELGC, SupportedFlags.PARALLELOLDGC, SupportedFlags.PARNEW, SupportedFlags.CMS, SupportedFlags.ICMS, SupportedFlags.CMS_DEBUG_LEVEL_1, SupportedFlags.G1GC, SupportedFlags.ZGC, SupportedFlags.SHENANDOAH, SupportedFlags.PRE_JDK70_40, SupportedFlags.JDK70, SupportedFlags.JDK80, SupportedFlags.RSET_STATS, SupportedFlags.GENERATIONAL_ZGC);
             return;
         }
     }
 
-    /**
-     *
-     * @param line
-     */
+    /// @param line
     private void discoverDetails(String line) {
 
         //todo: RSET_STATS for G1 not looked for...
         if (G1_COLLECTION.parse(line) != null) {
-            diary.setTrue(GC_CAUSE);
+            diary.setTrue(SupportedFlags.GC_CAUSE);
         }
 
         else if (CYCLE_START.parse(line) != null) {
-            diary.setTrue(GC_CAUSE);
+            diary.setTrue(SupportedFlags.GC_CAUSE);
         }
 
         if (stopTheWorldEvents > CYCLES_TO_EXAMINE_BEFORE_GIVING_UP)
-            diary.setFalse(ADAPTIVE_SIZING, GC_CAUSE, TLAB_DATA, PRINT_REFERENCE_GC, PRINT_PROMOTION_FAILURE, PRINT_FLS_STATISTICS, RSET_STATS, PRINT_HEAP_AT_GC);
+            diary.setFalse(SupportedFlags.ADAPTIVE_SIZING, SupportedFlags.GC_CAUSE, SupportedFlags.TLAB_DATA, SupportedFlags.PRINT_REFERENCE_GC, SupportedFlags.PRINT_PROMOTION_FAILURE, SupportedFlags.PRINT_FLS_STATISTICS, SupportedFlags.RSET_STATS, SupportedFlags.PRINT_HEAP_AT_GC);
     }
 
     private void discoverJVMEvents(String line) {
         if (stopTheWorldEvents > CYCLES_TO_EXAMINE_FOR_SAFEPOINT) {
-            diary.setFalse(APPLICATION_STOPPED_TIME, APPLICATION_CONCURRENT_TIME);
+            diary.setFalse(SupportedFlags.APPLICATION_STOPPED_TIME, SupportedFlags.APPLICATION_CONCURRENT_TIME);
         }
     }
 

@@ -3,24 +3,24 @@
 package com.microsoft.gctoolkit.parser.jvm;
 
 public enum GarbageCollectorAlgorithm {
-    /** -XX:+UseConcMarkSweepGC */
+    /// -XX:+UseConcMarkSweepGC
     DEFNEW,                                     //  1
-    /** -XX:+UseConcMarkSweepGC -XX:+UseParNew */
+    /// -XX:+UseConcMarkSweepGC -XX:+UseParNew
     PARNEW,                                     //  2
-    /** -XX:+UseConcMarkSweepGC */
+    /// -XX:+UseConcMarkSweepGC
     CMS,                                        //  3
-    /** -XX:+UseConcMarkSweepGC -XX:+CMSIncrementalMode */
+    /// -XX:+UseConcMarkSweepGC -XX:+CMSIncrementalMode
     ICMS,                                       //  4
-    /** -XX:+UseParallelGC */
+    /// -XX:+UseParallelGC
     PARALLELGC,                                 //  5
-    /** -XX:+UseParallelGC -XX:+UseParallelOldGC <br>-XX:+UseParallelOldGC */
+    /// -XX:+UseParallelGC -XX:+UseParallelOldGC <br>-XX:+UseParallelOldGC
     PARALLELOLDGC,                              //  6
-    /** -XX:+UseSerialGC */
+    /// -XX:+UseSerialGC
     SERIAL,                                     //  7
-    /** -XX:+UseSerialGC */
+    /// -XX:+UseSerialGC
     G1GC,                                       //  8
-    /** -XX:+UseZGC */
+    /// -XX:+UseZGC
     ZGC,                                        //  9
-    /** -XX:+UseShenandoahGC */
+    /// -XX:+UseShenandoahGC
     SHENANDOAH                                  // 10
 }

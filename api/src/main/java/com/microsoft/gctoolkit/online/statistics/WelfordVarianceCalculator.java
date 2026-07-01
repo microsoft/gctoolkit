@@ -7,12 +7,12 @@ public class WelfordVarianceCalculator implements OnlineStatisticsCalculator {
 
     @Override
     public void update(double sampleValue) {
-        double oldMean = onlineMeanCalculator.getValue();
+        var oldMean = onlineMeanCalculator.getValue();
 
         onlineMeanCalculator.update(sampleValue);
         numSamples++;
 
-        double newMean = onlineMeanCalculator.getValue();
+        var newMean = onlineMeanCalculator.getValue();
 
         m2 += (sampleValue - oldMean) * (sampleValue - newMean);
     }

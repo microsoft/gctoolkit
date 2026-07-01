@@ -9,13 +9,11 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- * An implementation of JavaVirtualMachine that uses io.vertx verticles to feed
- * lines to the parser(s) and post events to the aggregators. This implementation
- * is here in the vertx module so that the api and parser modules can exist without
- * having to import io.vertx. In the api module, the class GCToolKit uses the classloader
- * to load required JavaVirtualMachine.
- */
+/// An implementation of JavaVirtualMachine that uses io.vertx verticles to feed
+/// lines to the parser(s) and post events to the aggregators. This implementation
+/// is here in the vertx module so that the api and parser modules can exist without
+/// having to import io.vertx. In the api module, the class GCToolKit uses the classloader
+/// to load required JavaVirtualMachine.
 public class PreUnifiedJavaVirtualMachine extends AbstractJavaVirtualMachine {
 
     private static final Logger LOGGER = Logger.getLogger(PreUnifiedJavaVirtualMachine.class.getName());
@@ -24,8 +22,8 @@ public class PreUnifiedJavaVirtualMachine extends AbstractJavaVirtualMachine {
     @Override
     public boolean accepts(DataSource logFile) {
         try {
-            if (logFile instanceof GCLogFile) {
-                if (!((GCLogFile) logFile).isUnified()) {
+            if (logFile instanceof GCLogFile file) {
+                if (!file.isUnified()) {
                     super.setDataSource(logFile);
                     return true;
                 }

@@ -34,16 +34,15 @@ public class JVMEventParser extends PreUnifiedGCLogParser implements JVMPatterns
         return Set.of(EventSource.JVM);
     }
 
+    @Override
     public String getName() {
         return "JVMEventParser";
     }
 
-    /**
-     * Application stopped time records prior to 7.0 are not timestamped.
-     * In those cases one can use Application Run time to reconstruct the timings
-     * If Application run time is missing, collect records and estimate run times
-     * based on a change in the value of getClock();
-     */
+    /// Application stopped time records prior to 7.0 are not timestamped.
+    /// In those cases one can use Application Run time to reconstruct the timings
+    /// If Application run time is missing, collect records and estimate run times
+    /// based on a change in the value of getClock();
     @Override
     protected void process(String line) {
 
@@ -54,7 +53,7 @@ public class JVMEventParser extends PreUnifiedGCLogParser implements JVMPatterns
             if ((trace = APPLICATION_STOP_TIME.parse(line)) != null) {
                 if (lastEventWasGC) {
                     // can estimate TTSP
-                    double duration = trace.getDoubleGroup(3);
+                    var duration = trace.getDoubleGroup(3);
                     publish(new ApplicationStoppedTime(trace.getDateTimeStamp(), duration, duration - gcPauseTime, lastEventWasGC));
                     lastEventWasGC = false;
                     gcPauseTime = GCPAUSE_TIME_NOT_SET;
@@ -81,7 +80,7 @@ public class JVMEventParser extends PreUnifiedGCLogParser implements JVMPatterns
                 extractTLAB(trace, 0);
             } else if ((trace = TLAB_TOTALS.parse(line)) != null) {
                 extractTLABSummary(trace);
-            } else if (line.equals(END_OF_DATA_SENTINEL)) {
+            } else if (END_OF_DATA_SENTINEL.equals(line)) {
                 // TODO: #154  else if (line.equals(END_OF_DATA_SENTINEL)|| (JVM_EXIT.parse(line) != null)) {
                 // if we see "^heap" then we're at the end of the log
                 // at issue is if logs have been concatenated then we're not at the end and we
@@ -93,7 +92,7 @@ public class JVMEventParser extends PreUnifiedGCLogParser implements JVMPatterns
                 timeStamp = getClock();
             }
 
-        } catch (Throwable t) {
+        } catch (Throwable _) {
             LOGGER.log(Level.FINE, "Missed: {0}", line);
         }
     }
@@ -105,23 +104,23 @@ public class JVMEventParser extends PreUnifiedGCLogParser implements JVMPatterns
     @SuppressWarnings("unused")
     private void extractTLAB(GCLogTrace trace, int offset) {
         String gcThreadId = trace.getGroup(1 + offset);
-        int id = trace.getIntegerGroup(2 + offset);
-        int desiredSize = trace.getIntegerGroup(3 + offset);
-        int slowAllocs = trace.getIntegerGroup(4 + offset);
-        int refillWaste = trace.getIntegerGroup(5 + offset);
-        double allocFraction = trace.getDoubleGroup(6 + offset);
-        int unknownKBField = trace.getIntegerGroup(7 + offset);
-        int refills = trace.getIntegerGroup(8 + offset);
-        double wastePercent = trace.getDoubleGroup(9 + offset);
-        int gcUknownField = trace.getIntegerGroup(10 + offset);
-        int slowUnknown = trace.getIntegerGroup(11 + offset);
-        int fastUnknown = trace.getIntegerGroup(12 + offset);
+        var id = trace.getIntegerGroup(2 + offset);
+        var desiredSize = trace.getIntegerGroup(3 + offset);
+        var slowAllocs = trace.getIntegerGroup(4 + offset);
+        var refillWaste = trace.getIntegerGroup(5 + offset);
+        var allocFraction = trace.getDoubleGroup(6 + offset);
+        var unknownKBField = trace.getIntegerGroup(7 + offset);
+        var refills = trace.getIntegerGroup(8 + offset);
+        var wastePercent = trace.getDoubleGroup(9 + offset);
+        var gcUknownField = trace.getIntegerGroup(10 + offset);
+        var slowUnknown = trace.getIntegerGroup(11 + offset);
+        var fastUnknown = trace.getIntegerGroup(12 + offset);
     }
 
     //todo: should actually use the timings in the log but this is ok for now.
     private void drainSafePoints() {
-        double interval = (getClock().getTimeStamp() - (timeStamp.getTimeStamp())) / (safePoints.size() + 1);
-        double timeValue = getClock().getTimeStamp() + interval;
+        var interval = (getClock().getTimeStamp() - (timeStamp.getTimeStamp())) / (safePoints.size() + 1);
+        var timeValue = getClock().getTimeStamp() + interval;
         for (SafePointData safePointData : safePoints) {
             publish(safePointData.complete(new DateTimeStamp(timeValue)));
             timeValue += interval;
@@ -145,6 +144,7 @@ public class JVMEventParser extends PreUnifiedGCLogParser implements JVMPatterns
             gcInduced = gc;
         }
 
+        @Override
         JVMEvent complete(DateTimeStamp dateTimeStamp) {
             return new ApplicationStoppedTime(dateTimeStamp, duration, gcInduced);
         }
@@ -156,6 +156,7 @@ public class JVMEventParser extends PreUnifiedGCLogParser implements JVMPatterns
             duration = timing;
         }
 
+        @Override
         JVMEvent complete(DateTimeStamp dateTimeStamp) {
             return new ApplicationConcurrentTime(dateTimeStamp, duration);
         }

@@ -3,17 +3,13 @@
 package com.microsoft.gctoolkit.parser;
 
 import com.microsoft.gctoolkit.event.GarbageCollectionTypes;
-import com.microsoft.gctoolkit.event.jvm.JVMEvent;
 import com.microsoft.gctoolkit.event.zgc.*;
 import com.microsoft.gctoolkit.jvm.Diarizer;
 import com.microsoft.gctoolkit.parser.jvm.UnifiedDiarizer;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -25,6 +21,7 @@ public class GenerationalZGCParserTest extends ParserTest {
         return new UnifiedDiarizer();
     }
 
+    @Override
     protected GCLogParser parser() {
         return new ZGCParser();
     }
@@ -123,11 +120,11 @@ public class GenerationalZGCParserTest extends ParserTest {
 
         };
 
-        List<JVMEvent> singleYoungSingleOld = feedParser(eventLogEntries);
+        var singleYoungSingleOld = feedParser(eventLogEntries);
         try {
             assertEquals(2, singleYoungSingleOld.size());
 
-            ZGCYoungCollection young = (ZGCYoungCollection) singleYoungSingleOld.get(0);
+            var young = (ZGCYoungCollection) singleYoungSingleOld.getFirst();
 
             assertEquals(young.getGcId(), 1L);
             assertEquals(toInt(0.075d, 1000), toInt(young.getDuration(),1000));
@@ -183,7 +180,7 @@ public class GenerationalZGCParserTest extends ParserTest {
             assertTrue(checkPageSummary(young.getLargePageSummary(), 1,0,0,8,0,0));
 
             assertEquals(2, young.getAgeTableSummary().size());
-            assertTrue(checkPageAgeSummary(young.getAgeTableSummary().get(0), "Eden", 8, 0, 223, 1, 100, 78, 1, 0, 0,0));
+            assertTrue(checkPageAgeSummary(young.getAgeTableSummary().getFirst(), "Eden", 8, 0, 223, 1, 100, 78, 1, 0, 0,0));
             assertTrue(checkPageAgeSummary(young.getAgeTableSummary().get(1), "Survivor 1", 16, 0 , 47, 0, 12, 7, 1, 0, 1, 0));
 
             assertEquals(3 * 1024, young.getForwardingUsage());
@@ -204,7 +201,7 @@ public class GenerationalZGCParserTest extends ParserTest {
             /*
              * Old Phase Checks
              */
-            ZGCOldCollection old = (ZGCOldCollection) singleYoungSingleOld.get(1);
+            var old = (ZGCOldCollection) singleYoungSingleOld.get(1);
 
             assertEquals(old.getGcId(), 1L);
             assertEquals(toInt(0.029d, 1000), toInt(old.getDuration(),1000));
@@ -335,10 +332,10 @@ public class GenerationalZGCParserTest extends ParserTest {
 
         };
 
-        List<JVMEvent> singleCycle = feedParser(eventLogEntries);
+        var singleCycle = feedParser(eventLogEntries);
         try {
             assertEquals(1, singleCycle.size());
-            ZGCYoungCollection young = (ZGCYoungCollection) singleCycle.get(0);
+            var young = (ZGCYoungCollection) singleCycle.getFirst();
 
             assertEquals(young.getGcId(), 7L);
 
@@ -394,7 +391,7 @@ public class GenerationalZGCParserTest extends ParserTest {
             assertEquals(36 * 1024, young.getForwardingUsage());
 
             assertEquals(3, young.getAgeTableSummary().size());
-            assertTrue(checkPageAgeSummary(young.getAgeTableSummary().get(0), "Eden", 79, 0 , 13800, 37, 6940, 5622, 0, 0, 0, 0));
+            assertTrue(checkPageAgeSummary(young.getAgeTableSummary().getFirst(), "Eden", 79, 0 , 13800, 37, 6940, 5622, 0, 0, 0, 0));
             assertTrue(checkPageAgeSummary(young.getAgeTableSummary().get(1), "Survivor 1", 25, 0, 132, 0, 79, 61, 0, 0, 0, 0));
             assertTrue(checkPageAgeSummary(young.getAgeTableSummary().get(2), "Survivor 2", 15, 0, 78, 0, 47, 37, 0, 0, 0, 0));
 
@@ -612,23 +609,23 @@ public class GenerationalZGCParserTest extends ParserTest {
                 "[2024-11-19T09:48:57.431-0600][info ][gc,phases   ] GC(3) O: Old Generation 13310M(81%)->15900M(97%) 9.540s",
                 "[2024-11-19T09:48:57.431-0600][info ][gc          ] GC(3) Major Collection (Warmup) 8960M(55%)->13184M(80%) 14.923s",
         };
-        List<JVMEvent> events = feedParser(eventLogEntries);
+        var events = feedParser(eventLogEntries);
 
         assertEquals(4, events.size());
 
-        ZGCYoungCollection majorYoung = (ZGCYoungCollection) events.get(0);
+        var majorYoung = (ZGCYoungCollection) events.getFirst();
         assertEquals(3L, majorYoung.getGcId());
         assertEquals(GarbageCollectionTypes.ZGCMajorYoung, majorYoung.getGarbageCollectionType());
 
-        ZGCYoungCollection minorYoungA = (ZGCYoungCollection) events.get(1);
+        var minorYoungA = (ZGCYoungCollection) events.get(1);
         assertEquals(4L, minorYoungA.getGcId());
         assertEquals(GarbageCollectionTypes.ZGCMinorYoung, minorYoungA.getGarbageCollectionType());
 
-        ZGCYoungCollection minorYoungB = (ZGCYoungCollection) events.get(2);
+        var minorYoungB = (ZGCYoungCollection) events.get(2);
         assertEquals(5L, minorYoungB.getGcId());
         assertEquals(GarbageCollectionTypes.ZGCMinorYoung, minorYoungB.getGarbageCollectionType());
 
-        ZGCOldCollection majorOld = (ZGCOldCollection) events.get(3);
+        var majorOld = (ZGCOldCollection) events.get(3);
         assertEquals(3L, majorOld.getGcId());
         assertEquals(GarbageCollectionTypes.ZGCMajorOld, majorOld.getGarbageCollectionType());
 

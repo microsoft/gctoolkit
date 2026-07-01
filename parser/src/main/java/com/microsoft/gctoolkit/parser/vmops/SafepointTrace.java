@@ -16,7 +16,7 @@ public class SafepointTrace extends AbstractLogTrace {
     }
 
     public Safepoint toSafepoint() {
-        Safepoint safepoint = new Safepoint(getVMOP(), getDateTimeStamp(), getDuration());
+        var safepoint = new Safepoint(getVMOP(), getDateTimeStamp(), getDuration());
         safepoint.recordThreadCounts(totalThreads(), initiallyRunningThreads(), waitingToBlockThreads());
         safepoint.recordDurations(spinTime(), blockTime(), syncTime(), cleanupTime(), vmopTime());
         safepoint.recordPageTrapCount(getTrapCount());
@@ -27,6 +27,7 @@ public class SafepointTrace extends AbstractLogTrace {
         return super.getGroup(VMOP);
     }
 
+    @Override
     public DateTimeStamp getDateTimeStamp() {
         return new DateTimeStamp(getTimeStampGroup());
     }

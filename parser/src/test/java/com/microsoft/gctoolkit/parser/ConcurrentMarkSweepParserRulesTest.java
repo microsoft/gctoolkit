@@ -5,23 +5,19 @@ package com.microsoft.gctoolkit.parser;
 import com.microsoft.gctoolkit.GCToolKit;
 import org.junit.jupiter.api.Test;
 
-import java.util.StringJoiner;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ConcurrentMarkSweepParserRulesTest implements CMSPatterns {
 
-    /**
-     * Run all rules over all log entries looking for both misses and greedy rules.
-     */
+    /// Run all rules over all log entries looking for both misses and greedy rules.
     @Test
     public void testCMSParseRules() {
         assertEquals(rules.length, lines.length, "Number of rules differs from the numbers of log entries");
-        for (int i = 0; i < rules.length; i++) {
-            for (int j = 0; j < lines.length; j++) {
-                int captured = CommonTestHelper.captureTest(rules[i], lines[j]);
+        for (var i = 0; i < rules.length; i++) {
+            for (var j = 0; j < lines.length; j++) {
+                var captured = CommonTestHelper.captureTest(rules[i], lines[j]);
                 if (i == j) {
                     assertEquals(captured, lines[j].length, i + " failed to captured it's lines");
                 } else {
@@ -37,7 +33,7 @@ public class ConcurrentMarkSweepParserRulesTest implements CMSPatterns {
     //@Test
     //@Ignore("Not a real test, only for debugging")
     public void testDebugCMSParseRule() {
-        int index = rules.length-1; // awesome fix from David.. thanks :-)
+        var index = rules.length-1; // awesome fix from David.. thanks :-)
         index = 43;
         GCParseRule rule = rules[index];
         evaluate(rule, lines[index][0]);
@@ -49,9 +45,9 @@ public class ConcurrentMarkSweepParserRulesTest implements CMSPatterns {
         assertNotNull(trace);
         // Enable debugging by setting gctoolkit.debug to true
         GCToolKit.LOG_DEBUG_MESSAGE(() -> {
-            StringBuilder sb = new StringBuilder("matches groups " + trace.groupCount());
-            for (int i = 0; i <= trace.groupCount(); i++) {
-                sb.append(String.format("%n%d : %s", i, trace.getGroup(i))) ;
+            var sb = new StringBuilder("matches groups " + trace.groupCount());
+            for (var i = 0; i <= trace.groupCount(); i++) {
+                sb.append("%n%d : %s".formatted(i, trace.getGroup(i))) ;
             }
             return sb.toString();
         });

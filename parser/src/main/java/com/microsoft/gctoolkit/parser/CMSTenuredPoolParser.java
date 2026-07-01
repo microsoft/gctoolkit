@@ -36,6 +36,7 @@ public class CMSTenuredPoolParser extends PreUnifiedGCLogParser implements Simpl
         return Set.of(EventSource.CMS_PREUNIFIED);
     }
 
+    @Override
     public String getName() {
         return ChannelName.CMS_TENURED_POOL_PARSER_OUTBOX.toString();
     }
@@ -67,13 +68,11 @@ public class CMSTenuredPoolParser extends PreUnifiedGCLogParser implements Simpl
         }
     }
 
-    /**
-     * 12.986: [GC[1 CMS-initial-mark: 33532K(62656K)] 49652K(81280K), 0.0014191 secs]
-     * null,12.986,null,null,null,null,33532,K,62656,K,null,null,null,49652,K,81280,K,0.0014191
-     * first 6 is the date.
-     */
+    /// 12.986: [GC[1 CMS-initial-mark: 33532K(62656K)] 49652K(81280K), 0.0014191 secs]
+    /// null,12.986,null,null,null,null,33532,K,62656,K,null,null,null,49652,K,81280,K,0.0014191
+    /// first 6 is the date.
     private void initialMark(GCLogTrace trace) {
-        InitialMark initialMark = new InitialMark(trace.getDateTimeStamp(), GCCause.UNKNOWN_GCCAUSE, trace.getDoubleGroup(trace.groupCount()));
+        var initialMark = new InitialMark(trace.getDateTimeStamp(), GCCause.UNKNOWN_GCCAUSE, trace.getDoubleGroup(trace.groupCount()));
         MemoryPoolSummary tenured = trace.getOccupancyWithMemoryPoolSizeSummary(7);
         MemoryPoolSummary heap = trace.getOccupancyWithMemoryPoolSizeSummary(11);
         initialMark.add(heap.minus(tenured), tenured, heap);
@@ -93,16 +92,16 @@ public class CMSTenuredPoolParser extends PreUnifiedGCLogParser implements Simpl
     private void endConcurrentPrecleanWithReferenceProcessing(GCLogTrace trace) {
         try {
             publish(new ConcurrentPreClean(startOfPhase, trace.getDoubleGroup(14) - startOfPhase.getTimeStamp(), trace.getDoubleGroup(16), trace.getDoubleGroup(17)));
-        } catch (Throwable t) {
+        } catch (Throwable _) {
             LOG.warning("concurrent phase choked on " + trace.toString());
         }
     }
 
     private void endOfConcurrentPhase(GCLogTrace trace, DateTimeStamp timeStamp) {
         String phase = trace.getGroup(6);
-        double cpuTime = trace.getDoubleGroup(7);
-        double wallTime = trace.getDoubleGroup(8);
-        double duration = timeStamp.getTimeStamp() - startOfPhase.getTimeStamp();
+        var cpuTime = trace.getDoubleGroup(7);
+        var wallTime = trace.getDoubleGroup(8);
+        var duration = timeStamp.getTimeStamp() - startOfPhase.getTimeStamp();
         if ("mark".equals(phase))
             publish(new ConcurrentMark(startOfPhase, duration, cpuTime, wallTime));
         else if ("preclean".equals(phase))
@@ -119,10 +118,10 @@ public class CMSTenuredPoolParser extends PreUnifiedGCLogParser implements Simpl
 
     private void abortPrecleanDueToTime(GCLogTrace trace) {
         try {
-            double cpuTime = trace.getDoubleGroup(7);
-            double wallClock = trace.getDoubleGroup(8);
+            var cpuTime = trace.getDoubleGroup(7);
+            var wallClock = trace.getDoubleGroup(8);
             publish(new AbortablePreClean(startOfPhase, trace.getDateTimeStamp().getTimeStamp() - startOfPhase.getTimeStamp(), cpuTime, wallClock, true));
-        } catch (Exception e) {
+        } catch (Exception _) {
             LOG.warning("concurrent phase end choked on " + trace);
         }
     }
@@ -148,7 +147,7 @@ public class CMSTenuredPoolParser extends PreUnifiedGCLogParser implements Simpl
                 gcCause = GCCause.CMS_FINAL_REMARK;
         }
 
-        CMSRemark remark = new CMSRemark(startOfPhase, gcCause, trace.getDoubleGroup(trace.groupCount()));
+        var remark = new CMSRemark(startOfPhase, gcCause, trace.getDoubleGroup(trace.groupCount()));
 
         try {
             MemoryPoolSummary tenured = trace.getOccupancyWithMemoryPoolSizeSummary(1);
@@ -156,7 +155,7 @@ public class CMSTenuredPoolParser extends PreUnifiedGCLogParser implements Simpl
             remark.add(heap.minus(tenured), tenured, heap);
             recordRescanStepTimes(remark, line);
             remark.add(extractPrintReferenceGC(line));
-        } catch (Exception e) {
+        } catch (Exception _) {
             LOG.warning("Unable to properly extract data from " + trace);
         }
         return remark;

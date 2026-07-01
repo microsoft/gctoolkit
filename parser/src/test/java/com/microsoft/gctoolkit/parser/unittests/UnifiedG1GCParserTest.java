@@ -14,7 +14,7 @@ public class UnifiedG1GCParserTest extends ParserTest {
 
     @Test
     public void testForDetailsLogs() {
-        int i = 0;
+        var i = 0;
         for (String name : details) {
             try {
                 Path path = new TestLogFile("g1gc/" + name).getFile().toPath();

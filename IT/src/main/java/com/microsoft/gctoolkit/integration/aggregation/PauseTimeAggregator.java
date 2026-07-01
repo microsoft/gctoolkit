@@ -6,9 +6,7 @@ import com.microsoft.gctoolkit.aggregator.EventSource;
 import com.microsoft.gctoolkit.event.g1gc.G1RealPause;
 import com.microsoft.gctoolkit.event.generational.GenerationalGCPauseEvent;
 
-/**
- * An Aggregator that extracts pause time.
- */
+/// An Aggregator that extracts pause time.
 @Aggregates({EventSource.G1GC, EventSource.GENERATIONAL})
 public class PauseTimeAggregator extends Aggregator<PauseTimeAggregation> {
 

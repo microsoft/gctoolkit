@@ -11,30 +11,23 @@ import io.vertx.core.eventbus.DeliveryOptions;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
-/**
- * A class that represents a Vert.x JVM event channel.
- * It extends VertxChannel and implements JVMEventChannel.
- */
+/// A class that represents a Vert.x JVM event channel.
+/// It extends VertxChannel and implements JVMEventChannel.
 public class VertxJVMEventChannel extends VertxChannel implements JVMEventChannel {
 
     // Delivery options for the event bus, using the JVMEventCodec.
     final private DeliveryOptions options = new DeliveryOptions().setCodecName(JVMEventCodec.NAME);
 
-    /**
-     * Default constructor.
-     */
+    /// Default constructor.
     public VertxJVMEventChannel() {}
 
-    /**
-     * Registers a listener for the JVM event channel.
-     * @param listener the JVMEventChannelListener to register.
-     */
+    /// Registers a listener for the JVM event channel.
+    /// @param listener the JVMEventChannelListener to register.
     @Override
     public void registerListener(JVMEventChannelListener listener) {
-        final JVMEventVerticle processor = new JVMEventVerticle(vertx(), listener.channel().getName(), listener);
-        CountDownLatch latch = new CountDownLatch(1);
+        final var processor = new JVMEventVerticle(vertx(), listener.channel().getName(), listener);
+        var latch = new CountDownLatch(1);
         vertx().deployVerticle(processor)
             .onComplete(ar -> {
                 processor.setID(ar.succeeded() ? ar.result() : "");
@@ -49,11 +42,9 @@ public class VertxJVMEventChannel extends VertxChannel implements JVMEventChanne
         }
     }
 
-    /**
-     * Publishes a JVM event message to a specified channel.
-     * @param channel the channel to publish to.
-     * @param message the JVMEvent message to publish.
-     */
+    /// Publishes a JVM event message to a specified channel.
+    /// @param channel the channel to publish to.
+    /// @param message the JVMEvent message to publish.
     @Override
     public void publish(ChannelName channel, JVMEvent message) {
         try {
@@ -63,9 +54,7 @@ public class VertxJVMEventChannel extends VertxChannel implements JVMEventChanne
         }
     }
 
-    /**
-     * Closes the VertxChannel.
-     */
+    /// Closes the VertxChannel.
     @Override
     public void close() {
         super.close();

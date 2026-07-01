@@ -7,6 +7,7 @@
 module com.microsoft.gctoolkit.parser {
     requires com.microsoft.gctoolkit.api;
     requires java.logging;
+    requires transitive org.jspecify;
 
     exports com.microsoft.gctoolkit.parser to
             com.microsoft.gctoolkit.api;

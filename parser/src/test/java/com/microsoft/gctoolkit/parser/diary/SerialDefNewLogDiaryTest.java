@@ -8,7 +8,7 @@ public class SerialDefNewLogDiaryTest extends LogDiaryTest {
 
     @Test
     public void testForSerialDefNewDetails() {
-        int i = 0;
+        var i = 0;
         for (String name : serialDefNewDetails) {
             testWith(new TestLogFile(name).getFile(), name, serialDefNewDetailsDiary[i], serialDefNewDetailsUnknown[i], serialDefNewDetailsKnown[i++]);
         }
@@ -16,7 +16,7 @@ public class SerialDefNewLogDiaryTest extends LogDiaryTest {
 
     @Test
     public void testForSerialDefNewDetailsTenuring() {
-        int i = 0;
+        var i = 0;
         for (String name : serialDefNewDetailsTenuring) {
             testWith(new TestLogFile(name).getFile(), name, serialDefNewDetailsTenuringDiary[i], serialDefNewDetailsTenuringUnknown[i], serialDefNewDetailsTenuringKnown[i++]);
         }
@@ -24,7 +24,7 @@ public class SerialDefNewLogDiaryTest extends LogDiaryTest {
 
     @Test
     public void testForSerialDefNewDetailsTenuring180() {
-        int i = 0;
+        var i = 0;
         for (String name : serialDefNewDetailsTenuring180) {
             testWith(new TestLogFile(name).getFile(), name, serialDefNewDetailsTenuring180Diary[i], serialDefNewDetailsTenuring180Unknown[i], serialDefNewDetailsTenuring180Known[i++]);
         }

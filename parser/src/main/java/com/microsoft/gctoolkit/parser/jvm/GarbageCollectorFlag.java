@@ -2,6 +2,8 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.parser.jvm;
 
+import org.jspecify.annotations.Nullable;
+
 
 public enum GarbageCollectorFlag {
 
@@ -13,15 +15,15 @@ public enum GarbageCollectorFlag {
     UseSerialGC("UseSerialGC"),
     CMSIncrementialMode("CMSIncrementalMode");
 
-    public static GarbageCollectorFlag getEnumFromString(String string) {
+    public static @Nullable GarbageCollectorFlag getEnumFromString(String string) {
         try {
             return Enum.valueOf(GarbageCollectorFlag.class, string.trim());
-        } catch (IllegalArgumentException ex) {
+        } catch (IllegalArgumentException _) {
         }
         return null;
     }
 
-    public static GarbageCollectorFlag fromString(String name) {
+    public static @Nullable GarbageCollectorFlag fromString(String name) {
         return getEnumFromString(name);
     }
 

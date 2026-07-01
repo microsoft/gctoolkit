@@ -74,18 +74,18 @@ public class GCCausePatternTest implements GenericTokens {
 
     @Test
     public void matchesAllGCCauses() {
-        String local = "\\([G1,A-Z,a-z, ,-,.gc\\(\\)]+\\)";
+        var local = "\\([G1,A-Z,a-z, ,-,.gc\\(\\)]+\\)";
         //\([G1,A-Z,a-z, ,-]+\)
         //GCParseRule cause = new GCParseRule("GC_CAUSE", local);
-        GCParseRule cause = new GCParseRule("GC_CAUSE", GC_CAUSE);
-        for (int i = 0; i < gcCauses.length; i++) {
+        var cause = new GCParseRule("GC_CAUSE", GC_CAUSE);
+        for (var i = 0; i < gcCauses.length; i++) {
             assertNotNull(cause.parse(gcCauses[i]));
         }
     }
 
     @Test
     public void onlyMatchCause() {
-        GCParseRule cause = new GCParseRule("GC_CAUSE", GC_CAUSE);
+        var cause = new GCParseRule("GC_CAUSE", GC_CAUSE);
         for (String s : extraText) {
             GCLogTrace trace = cause.parse(s);
             assertNotNull(trace);

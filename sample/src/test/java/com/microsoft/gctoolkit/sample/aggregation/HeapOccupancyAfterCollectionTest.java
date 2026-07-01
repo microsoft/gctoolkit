@@ -16,9 +16,9 @@ class HeapOccupancyAfterCollectionTest {
 
     @Test
     void ignoresGenerationalEventsWithoutHeapSummary() {
-        HeapOccupancyAfterCollectionSummary summary = new HeapOccupancyAfterCollectionSummary();
-        HeapOccupancyAfterCollection aggregator = new HeapOccupancyAfterCollection(summary);
-        DefNew event = new DefNew(new DateTimeStamp(1.0d), GCCause.ALLOCATION_FAILURE, 1.0d);
+        var summary = new HeapOccupancyAfterCollectionSummary();
+        var aggregator = new HeapOccupancyAfterCollection(summary);
+        var event = new DefNew(new DateTimeStamp(1.0d), GCCause.ALLOCATION_FAILURE, 1.0d);
 
         assertDoesNotThrow(() -> aggregator.receive(event));
 
@@ -27,9 +27,9 @@ class HeapOccupancyAfterCollectionTest {
 
     @Test
     void ignoresZgcEventsWithoutMemorySummary() {
-        HeapOccupancyAfterCollectionSummary summary = new HeapOccupancyAfterCollectionSummary();
-        HeapOccupancyAfterCollection aggregator = new HeapOccupancyAfterCollection(summary);
-        ZGCYoungCollection event = new ZGCYoungCollection(
+        var summary = new HeapOccupancyAfterCollectionSummary();
+        var aggregator = new HeapOccupancyAfterCollection(summary);
+        var event = new ZGCYoungCollection(
                 new DateTimeStamp(1.0d),
                 GarbageCollectionTypes.ZGCMinorYoung,
                 GCCause.ALLOCATION_FAILURE,

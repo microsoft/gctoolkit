@@ -17,9 +17,7 @@ import java.util.zip.ZipFile;
 
 import static java.util.stream.Collectors.toList;
 
-/**
- * Meta-data about a {@link FileDataSource}.
- */
+/// Meta-data about a [FileDataSource].
 public class RotatingLogFileMetadata extends LogFileMetadata {
 
     private static final Logger LOG = Logger.getLogger(RotatingLogFileMetadata.class.getName());
@@ -30,6 +28,7 @@ public class RotatingLogFileMetadata extends LogFileMetadata {
         super(path);
     }
 
+    @Override
     public Stream<LogFileSegment> logFiles() {
         if ( segments == null) {
             if ( isPlainText() || isDirectory())
@@ -57,11 +56,10 @@ public class RotatingLogFileMetadata extends LogFileMetadata {
         orderSegments();
     }
 
-    /**
-     * Return the number of files. Useful if the file is a compressed file which may
-     * contain multiple entries.
-     * @return The number of files in the file.
-     */
+    /// Return the number of files. Useful if the file is a compressed file which may
+    /// contain multiple entries.
+    /// @return The number of files in the file.
+    @Override
     public int getNumberOfFiles() {
         if ( this.segments == null)
             if ( isZip())
@@ -71,21 +69,19 @@ public class RotatingLogFileMetadata extends LogFileMetadata {
             return this.segments.size();
     }
 
-    /**
-     * Root for the pattern for the file currently being written to... has
-     * a .<number> suffix for unified
-     * a .current suffix for pre-unified.
-     *
-     * The possible parameters here along with the actions
-     * 1) directory
-     * 2) the file currently being written to
-     * 3) a file not currently being written to.
-     *
-     * In all cases we want to find the file currently being written to and
-     * use that to reverse engineer the root.
-     *
-     * @return String representing the pattern for the root of the rotating log name
-     */
+    /// Root for the pattern for the file currently being written to... has
+    /// a .<number> suffix for unified
+    /// a .current suffix for pre-unified.
+    ///
+    /// The possible parameters here along with the actions
+    /// 1) directory
+    /// 2) the file currently being written to
+    /// 3) a file not currently being written to.
+    ///
+    /// In all cases we want to find the file currently being written to and
+    /// use that to reverse engineer the root.
+    ///
+    /// @return String representing the pattern for the root of the rotating log name
     private String getRootPattern() {
 
         // at this point we only have the path, not a segment... it maybe that we have to save the chosen segment
@@ -99,12 +95,12 @@ public class RotatingLogFileMetadata extends LogFileMetadata {
                     .get()
                     .getSegmentName().split("\\.");
         } else if ( isZip()) {
-            bits = segments.get(0).getSegmentName().split("\\.");
+            bits = segments.getFirst().getSegmentName().split("\\.");
         } else {
             bits = getPath().getFileName().toString().split("\\.");
         }
 
-        int baseLength = 0;
+        var baseLength = 0;
         if ( "current".equals(bits[bits.length - 1]))
             baseLength = bits.length - 2;
         else if ( bits[bits.length - 1].matches("\\d+$"))
@@ -112,8 +108,8 @@ public class RotatingLogFileMetadata extends LogFileMetadata {
         else
             baseLength = bits.length;
 
-        StringBuilder base = new StringBuilder(bits[0]);
-        for ( int i = 1; i < baseLength; i++)
+        var base = new StringBuilder(bits[0]);
+        for ( var i = 1; i < baseLength; i++)
             base.append(".").append(bits[i]);
         return base.toString();
     }
@@ -127,7 +123,7 @@ public class RotatingLogFileMetadata extends LogFileMetadata {
             else {
                 Files.list(getPath().getParent())
                         .filter(file -> file.getFileName().toString().startsWith(getRootPattern()))
-                        .map(p -> new GCLogFileSegment(p)).forEach(segments::add);
+                        .map(GCLogFileSegment::new).forEach(segments::add);
             }
         } catch (IOException ioe) {
             LOG.log(Level.WARNING,"Unable to find log segments.", ioe);
@@ -139,7 +135,7 @@ public class RotatingLogFileMetadata extends LogFileMetadata {
 
         if (segments.size() < 2) return;
 
-        LinkedList<LogFileSegment> orderedList = new LinkedList<>();
+        var orderedList = new LinkedList<LogFileSegment>();
         List<LogFileSegment> workingList = new ArrayList<>();
         workingList.addAll(segments);
 

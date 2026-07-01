@@ -14,9 +14,9 @@ public class CMSLogDiaryTest extends LogDiaryTest {
 
     @Test
     public void testForCMS() {
-        int i = 0;
+        var i = 0;
         for (String name : cms) {
-            TestLogFile logFile = new TestLogFile("cms/" + name);
+            var logFile = new TestLogFile("cms/" + name);
             Diarizer diary = null;
             try {
                 diary = getJVMConfiguration(new SingleGCLogFile(logFile.getFile().toPath()));

@@ -6,9 +6,7 @@ import com.microsoft.gctoolkit.event.GCCause;
 import com.microsoft.gctoolkit.event.GarbageCollectionTypes;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
 
-/**
- * 2015-10-17T21:10:23.673-0400: 3993.137: [GC concurrent-string-deduplication, 79.3K-&gt;792.0B(78.6K), avg 96.2%, 0.0024351 secs]
- */
+/// 2015-10-17T21:10:23.673-0400: 3993.137: [GC concurrent-string-deduplication, 79.3K->792.0B(78.6K), avg 96.2%, 0.0024351 secs]
 
 public class G1ConcurrentStringDeduplication extends G1GCConcurrentEvent {
 

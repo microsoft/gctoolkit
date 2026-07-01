@@ -2,6 +2,8 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.parser.collection;
 
+import org.jspecify.annotations.Nullable;
+
 import java.util.AbstractMap;
 import java.util.Collection;
 import java.util.HashMap;
@@ -31,15 +33,16 @@ public class RuleSet<K, V> implements Map<K, V>, Iterable<K> {
     // the list in O(1) time, instead of O(n) time.
     private Node<K,V> head;
 
-    private final HashMap<K, Node<K,V>> entries;
+    private final Map<K, Node<K,V>> entries;
 
     public RuleSet() {
         entries = new HashMap<>();
     }
 
-    public V get(Object key) {
+    @Override
+    public @Nullable V get(Object key) {
         if (key != null) {
-            Node<K,V> node = entries.get(key);
+            var node = entries.<K,V>get(key);
             return node.getValue();
         }
         return null;
@@ -67,7 +70,7 @@ public class RuleSet<K, V> implements Map<K, V>, Iterable<K> {
 
     @Override
     public V put(K key, V value) {
-        Node<K,V> node = new Node<>(key, value);
+        var node = new Node<K,V>(key, value);
         if (head == null) {
             head = node;
         } else {
@@ -80,7 +83,7 @@ public class RuleSet<K, V> implements Map<K, V>, Iterable<K> {
     }
 
     @Override
-    public V remove(Object key) {
+    public @Nullable V remove(Object key) {
         return null;
     }
 
@@ -101,7 +104,7 @@ public class RuleSet<K, V> implements Map<K, V>, Iterable<K> {
 
     @Override
     public Collection<V> values() {
-        Collection<V> values = new LinkedList<>();
+        var values = new LinkedList<V>();
         for (Node<K,V> node = head; node != null; node = node.next) {
             values.add(node.getValue());
         }
@@ -110,7 +113,7 @@ public class RuleSet<K, V> implements Map<K, V>, Iterable<K> {
 
     @Override
     public Set<Entry<K, V>> entrySet() {
-        Set<Entry<K,V>> entrySet = new HashSet<>();
+        var entrySet = new HashSet<Entry<K,V>>();
         for (Node<K,V> node = head; node != null; node = node.next) {
             entrySet.add(node);
         }

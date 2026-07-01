@@ -14,7 +14,7 @@ public class CMSParNewParserTest extends ParserTest {
 
     @Test
     public void testForSimpleLogs() {
-        int i = 0;
+        var i = 0;
         for (String name : simple) {
             try {
                 Path path = new TestLogFile("cms/" + name).getFile().toPath();
@@ -44,7 +44,7 @@ public class CMSParNewParserTest extends ParserTest {
 
     @Test
     public void testForDetails() {
-        int i = 0;
+        var i = 0;
         for (String name : details) {
             try {
                 Path path = new TestLogFile("cms/parnew/details/" + name).getFile().toPath();
@@ -100,7 +100,7 @@ public class CMSParNewParserTest extends ParserTest {
     @Test
     public void testForDetailsGCCause170() {
 
-        int i = 0;
+        var i = 0;
         for (String name : detailsGCCause170) {
             try {
                 Path path = new TestLogFile("cms/parnew/details/gccause/170/" + name).getFile().toPath();
@@ -131,7 +131,7 @@ public class CMSParNewParserTest extends ParserTest {
 
     @Test
     public void testForDetailsTenuring() {
-        int i = 0;
+        var i = 0;
         for (String name : detailsTenuring) {
             try {
                 Path path = new TestLogFile("cms/parnew/details/tenuring/" + name).getFile().toPath();
@@ -213,7 +213,7 @@ public class CMSParNewParserTest extends ParserTest {
     @Test
     public void testForDefNewDetails() {
 
-        int i = 0;
+        var i = 0;
         for (String name : defNewDetailsLog) {
             try {
                 Path path = new TestLogFile("cms/defnew/details/" + name).getFile().toPath();
@@ -241,7 +241,7 @@ public class CMSParNewParserTest extends ParserTest {
 
     @Test
     public void testForParNewDetailsTenuringReference80() {
-        int i = 0;
+        var i = 0;
         for (String name : parNewDetailsTenuringReference180) {
             try {
                 Path path = new TestLogFile("cms/parnew/details/tenuring/180/" + name).getFile().toPath();
@@ -270,7 +270,7 @@ public class CMSParNewParserTest extends ParserTest {
 
     @Test
     public void testForBrokenGCLockerWithTLAB() {
-        int i = 0;
+        var i = 0;
         for (String name : parNewDetailsTenuringTLAB) {
             try {
                 Path path = new TestLogFile("cms/parnew/details/tenuring/tlab/" + name).getFile().toPath();

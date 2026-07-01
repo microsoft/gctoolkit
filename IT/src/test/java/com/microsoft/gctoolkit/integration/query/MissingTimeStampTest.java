@@ -30,7 +30,7 @@ public class MissingTimeStampTest {
          * The log files can be either in text, zip, or gzip format.
          */
         GCLogFile logFile = new SingleGCLogFile(Path.of(gcLogFile));
-        GCToolKit gcToolKit = new GCToolKit();
+        var gcToolKit = new GCToolKit();
 
         /*
          * This call will load all implementations of Aggregator that have been declared in module-info.java.
@@ -57,7 +57,7 @@ public class MissingTimeStampTest {
             fail("getPercentPaused failed", t);
         }
 
-        double pauseTimePercentage = 0.0d;
+        var pauseTimePercentage = 0.0d;
 
         try {
             pauseTimePercentage = machine.getAggregation(PauseTimeSummary.class).get().getPercentPaused();

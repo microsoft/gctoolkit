@@ -9,7 +9,7 @@ public class CMSParNewLogDiaryTest extends LogDiaryTest {
 
     @Test
     public void testForCMSParNewDetails() {
-        int i = 0;
+        var i = 0;
         for (String name : cmsParNewDetails) {
             testWith(new TestLogFile("cms/parnew/details/" + name).getFile(), name, cmsParNewDetailsDiary[i], cmsParNewDetailsUnknown[i], cmsParNewDetailsKnown[i++]);
         }
@@ -17,7 +17,7 @@ public class CMSParNewLogDiaryTest extends LogDiaryTest {
 
     @Test
     public void testForCMSParNewDetailsTenuring() {
-        int i = 0;
+        var i = 0;
         for (String name : cmsParNewDetailsTenuring) {
             testWith(new TestLogFile("cms/parnew/details/tenuring/" + name).getFile(), name, cmsParNewDetailsTenuringDiary[i], cmsParNewDetailsTenuringUnknown[i], cmsParNewDetailsTenuringKnown[i++]);
         }
@@ -25,7 +25,7 @@ public class CMSParNewLogDiaryTest extends LogDiaryTest {
 
     @Test
     public void testForCMS() {
-        int i = 0;
+        var i = 0;
         for (String name : cms) {
             testWith(new TestLogFile("cms/" + name).getFile(), name, cmsDiary[i], cmsUnknown[i], cmsKnown[i++]);
         }
@@ -33,7 +33,7 @@ public class CMSParNewLogDiaryTest extends LogDiaryTest {
 
     @Test
     public void testForCMSParNewDetailsGCCause170() {
-        int i = 0;
+        var i = 0;
         for (String name : cmsParNewDetailsGCCause170) {
             testWith(new TestLogFile("cms/parnew/details/gccause/170/" + name).getFile(), name, cmsParNewDetailsGCCause170Diary[i], cmsParNewDetailsGCCause170Unknown[i], cmsParNewDetailsGCCause170Known[i++]);
         }

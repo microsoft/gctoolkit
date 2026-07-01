@@ -19,16 +19,16 @@ public class G1GCPatternsTest implements G1GCPatterns {
 
     @Test
     public void testParallelParseRules() {
-        for (int i = 0; i < rules.length; i++)
-            for (int j = 0; j < lines.length; j++) {
-                int captured = captureTest(rules[i], lines[j]);
+        for (var i = 0; i < rules.length; i++)
+            for (var j = 0; j < lines.length; j++) {
+                var captured = captureTest(rules[i], lines[j]);
                 if (i == j) {
                     assertEquals( lines[j].length, captured, rules[i].getName() + " failed to captured it's lines");
                 } else {
                     if ( captured != 0)
-                        for( int k = 0; k < lines[j].length; k++) {
+                        for( var k = 0; k < lines[j].length; k++) {
                             rules[i].parse(lines[j][k]).notYetImplemented();
-                            System.out.println(lines[j][k]);
+                            IO.println(lines[j][k]);
                         }
                     assertEquals(0, captured, rules[i].getName() + " captured data from group " + j);
                 }

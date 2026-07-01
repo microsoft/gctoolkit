@@ -34,10 +34,8 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 public abstract class ParserTest {
 
-    /**
-     * A mapping of GC event types to an index. This supports the counting of events. The tests will compare the
-     * expected counts against the counts that are captured here.
-     */
+    /// A mapping of GC event types to an index. This supports the counting of events. The tests will compare the
+    /// expected counts against the counts that are captured here.
     private final Map<GarbageCollectionTypes, Integer> collectorNameMapping = Map.ofEntries(
             Map.entry(GarbageCollectionTypes.Young, 0),
             Map.entry(GarbageCollectionTypes.DefNew, 1),
@@ -89,7 +87,7 @@ public abstract class ParserTest {
 
     public void analyzeResults(String gcLogName, TestResults testResults, int numberOfDifferentPhases, int[] invocationCounts) {
         assertEquals(numberOfDifferentPhases, testResults.numberOfDifferentPhases());
-        for (int i = 0; i < invocationCounts.length; i++) {
+        for (var i = 0; i < invocationCounts.length; i++) {
             assertEquals(invocationCounts[i], testResults.getCount(i), "Phase Count Differs @ " + i + " for " + findGarbageCollector(i) + " in " + gcLogName);
         }
     }
@@ -125,8 +123,8 @@ public abstract class ParserTest {
     TestResults testGenerationalRotatingLogFile(Path path) throws IOException {
         GCLogFile logfile = loadLogFile(path, true);
         Diarizer jvmConfiguration = getJVMConfiguration(logfile);
-        GenerationalHeapParser generationalHeapParser = new GenerationalHeapParser();
-        TestResults testResults = new TestResults();
+        var generationalHeapParser = new GenerationalHeapParser();
+        var testResults = new TestResults();
         generationalHeapParser.publishTo(testResults);
         generationalHeapParser.diary(jvmConfiguration.getDiary());
         logfile.stream().map(String::trim).forEach(generationalHeapParser::receive);
@@ -136,8 +134,8 @@ public abstract class ParserTest {
     TestResults testGenerationalSingleLogFile(Path path) throws IOException {
         GCLogFile logfile = loadLogFile(path, false);
         Diarizer jvmConfiguration = getJVMConfiguration(logfile);
-        GCLogParser generationalHeapParser = (jvmConfiguration.getDiary().isUnifiedLogging()) ? new UnifiedGenerationalParser() : new GenerationalHeapParser();
-        TestResults testResults = new TestResults();
+        GCLogParser generationalHeapParser = jvmConfiguration.getDiary().isUnifiedLogging() ? new UnifiedGenerationalParser() : new GenerationalHeapParser();
+        var testResults = new TestResults();
         generationalHeapParser.publishTo(testResults);
         generationalHeapParser.diary(jvmConfiguration.getDiary());
         logfile.stream().map(String::trim).forEach(generationalHeapParser::receive);
@@ -145,10 +143,10 @@ public abstract class ParserTest {
     }
 
     TestResults testUnifiedG1GCSingleFile(Path path) throws IOException {
-        SingleGCLogFile logfile = new SingleGCLogFile(path);
+        var logfile = new SingleGCLogFile(path);
         Diarizer jvmConfiguration = getJVMConfiguration(logfile);
-        UnifiedG1GCParser parser = new UnifiedG1GCParser();
-        TestResults testResults = new TestResults();
+        var parser = new UnifiedG1GCParser();
+        var testResults = new TestResults();
         parser.publishTo(testResults);
         parser.diary(jvmConfiguration.getDiary());
         logfile.stream().map(String::trim).forEach(parser::receive);
@@ -159,8 +157,8 @@ public abstract class ParserTest {
         GCLogFile logfile = loadLogFile(path, true);
         Diarizer jvmConfiguration = getJVMConfiguration(logfile);
         logfile.stream().map(String::trim).forEach(jvmConfiguration::diarize);
-        PreUnifiedG1GCParser parser = new PreUnifiedG1GCParser();
-        TestResults testResults = new TestResults();
+        var parser = new PreUnifiedG1GCParser();
+        var testResults = new TestResults();
         parser.publishTo(testResults);
         parser.diary(jvmConfiguration.getDiary());
         logfile.stream().map(String::trim).forEach(parser::receive);
@@ -170,17 +168,15 @@ public abstract class ParserTest {
     TestResults testRegionalSingleLogFile(Path path) throws IOException {
         GCLogFile logfile = loadLogFile(path, false);
         Diarizer jvmConfiguration = getJVMConfiguration(logfile);
-        PreUnifiedG1GCParser parser = new PreUnifiedG1GCParser();
-        TestResults testResults = new TestResults();
+        var parser = new PreUnifiedG1GCParser();
+        var testResults = new TestResults();
         parser.publishTo(testResults);
         parser.diary(jvmConfiguration.getDiary());
         logfile.stream().map(String::trim).forEach(parser::receive);
         return testResults;
     }
 
-    /**
-     * Setups an array of counts that is indexed by the type of GC event.
-     */
+    /// Setups an array of counts that is indexed by the type of GC event.
     class TestResults implements JVMEventChannel {
 
         private final int[] counts = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 , 0, 0, 0, 0, 0};
@@ -191,7 +187,7 @@ public abstract class ParserTest {
         }
 
         public int numberOfDifferentPhases() {
-            int count = 0;
+            var count = 0;
             for (int j : counts)
                 if (j > 0)
                     count++;
@@ -207,18 +203,16 @@ public abstract class ParserTest {
             throw new IllegalStateException("Listener not used for testing");
         }
 
-        /**
-         * Counts by the type of the incoming event.
-         * @param event
-         */
+        /// Counts by the type of the incoming event.
+        /// @param event
         @Override
         public void publish(ChannelName channel, JVMEvent event) {
             if (!(event instanceof JVMTermination)) {
-                GCEvent gcEvent = (GCEvent) event;
-                int index = collectorNameMapping.get(gcEvent.getGarbageCollectionType());
+                var gcEvent = (GCEvent) event;
+                var index = collectorNameMapping.get(gcEvent.getGarbageCollectionType());
                 counts[index] = counts[index] + 1;
-                if (event instanceof G1GCPauseEvent) {
-                    if (((G1GCPauseEvent) event).getPermOrMetaspace() != null)
+                if (event instanceof G1GCPauseEvent pauseEvent) {
+                    if (pauseEvent.getPermOrMetaspace() != null)
                         metaSpaceRecordCount++;
                 }
             }

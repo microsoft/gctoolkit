@@ -88,8 +88,8 @@ public class GarbageCollectionEventSourceTest {
 
     private void assertExpectedLineCountInLog(int expectedNumberOfLines, GCLogFile logFile) {
         disableCaching();
-        GCLogConsumer consumer = new GCLogConsumer();
-        VertxDataSourceChannel channel = new VertxDataSourceChannel();
+        var consumer = new GCLogConsumer();
+        var channel = new VertxDataSourceChannel();
         channel.registerListener(consumer);
         long[] observedNumberOfLines = {0L};
         try {

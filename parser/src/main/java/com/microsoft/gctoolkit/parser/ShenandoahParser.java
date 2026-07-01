@@ -19,17 +19,15 @@ import java.util.function.BiConsumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- * Time of GC
- * GCType
- * Collect total heap values
- * Heap before collection
- * Heap after collection
- * Heap configured size
- * total pause time
- * CMS failures
- * System.gc() calls
- */
+/// Time of GC
+/// GCType
+/// Collect total heap values
+/// Heap before collection
+/// Heap after collection
+/// Heap configured size
+/// total pause time
+/// CMS failures
+/// System.gc() calls
 
 public class ShenandoahParser extends UnifiedGCLogParser implements ShenandoahPatterns {
 

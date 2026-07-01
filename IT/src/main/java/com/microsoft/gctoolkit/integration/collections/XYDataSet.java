@@ -32,25 +32,21 @@ public class XYDataSet {
         return dataSeries.isEmpty();
     }
 
-    /**
-     * Returns an immutable List of the items in this DataSet.
-     */
+    /// Returns an immutable List of the items in this DataSet.
     public List<com.microsoft.gctoolkit.integration.collections.XYDataSet.Point> getItems() {
         return List.copyOf(dataSeries);
     }
 
     public com.microsoft.gctoolkit.integration.collections.XYDataSet scaleSeries(double scaleFactor) {
-        com.microsoft.gctoolkit.integration.collections.XYDataSet scaled = new com.microsoft.gctoolkit.integration.collections.XYDataSet();
+        var scaled = new com.microsoft.gctoolkit.integration.collections.XYDataSet();
         for (com.microsoft.gctoolkit.integration.collections.XYDataSet.Point item : dataSeries) {
             scaled.add(item.getX(), item.getY().doubleValue() * scaleFactor);
         }
         return scaled;
     }
 
-    /**
-     * Returns the largest Y value in the XYDataSet as an OptionalDouble,
-     * with an empty optional if the dataset is empty.
-     */
+    /// Returns the largest Y value in the XYDataSet as an OptionalDouble,
+    /// with an empty optional if the dataset is empty.
     public OptionalDouble maxOfY() {
         return dataSeries.stream()
                 .map(com.microsoft.gctoolkit.integration.collections.XYDataSet.Point::getY)
@@ -59,9 +55,9 @@ public class XYDataSet {
     }
 
     public com.microsoft.gctoolkit.integration.collections.XYDataSet scaleAndTranslateXAxis(double scale, double offset) {
-        com.microsoft.gctoolkit.integration.collections.XYDataSet translatedSeries = new com.microsoft.gctoolkit.integration.collections.XYDataSet();
+        var translatedSeries = new com.microsoft.gctoolkit.integration.collections.XYDataSet();
         for (com.microsoft.gctoolkit.integration.collections.XYDataSet.Point dataPoint : dataSeries) {
-            double scaledXCoordinate = (scale * dataPoint.getX().doubleValue()) + offset;
+            var scaledXCoordinate = (scale * dataPoint.getX().doubleValue()) + offset;
             translatedSeries.add(scaledXCoordinate, dataPoint.getY());
         }
         return translatedSeries;

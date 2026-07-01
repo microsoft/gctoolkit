@@ -35,28 +35,22 @@ public abstract class ParserTest {
         parser.publishTo(channel);
     }
 
-    /**
-     * The test provides an instance of a Diarizer appropriate to the gc log or lines being parsed.
-     * @return A Diarizer appropriate to the gc log or lines being parsed
-     */
+    /// The test provides an instance of a Diarizer appropriate to the gc log or lines being parsed.
+    /// @return A Diarizer appropriate to the gc log or lines being parsed
     protected abstract Diarizer diarizer();
 
-    /**
-     * The test provides an instance of a GCLogParser appropriate to the gc log or lines being parsed.
-     * @return A GCLogParser appropriate to the gc log or lines being parsed
-     */
+    /// The test provides an instance of a GCLogParser appropriate to the gc log or lines being parsed.
+    /// @return A GCLogParser appropriate to the gc log or lines being parsed
     protected abstract GCLogParser parser();
 
     GCLogParser getParser() {
         return this.parser;
     }
 
-    /**
-     * Parser runs in its own thread so start one for it and then feed it the lines to be parsed
-     *
-     * @param lines The GC log lines to be fed to the parser.
-     * @return The list of JVMEvents from the parsed lines.
-     */
+    /// Parser runs in its own thread so start one for it and then feed it the lines to be parsed
+    ///
+    /// @param lines The GC log lines to be fed to the parser.
+    /// @return The list of JVMEvents from the parsed lines.
     protected List<JVMEvent> feedParser(String[] lines) {
         Arrays.stream(lines).forEach(diarizer::diarize);
         parser.diary(diarizer.getDiary());
@@ -64,15 +58,13 @@ public abstract class ParserTest {
         return channel.events();
     }
 
-    /**
-     * Common check for all GC events that report on memory.
-     *
-     * @param summary
-     * @param occupancyAtStartOfCollection
-     * @param sizeAtStartOfCollection
-     * @param occupancyAfterCollection
-     * @param sizeAfterCollection
-     */
+    /// Common check for all GC events that report on memory.
+    ///
+    /// @param summary
+    /// @param occupancyAtStartOfCollection
+    /// @param sizeAtStartOfCollection
+    /// @param occupancyAfterCollection
+    /// @param sizeAfterCollection
     protected void assertMemoryPoolValues(MemoryPoolSummary summary, long occupancyAtStartOfCollection, long sizeAtStartOfCollection, long occupancyAfterCollection, long sizeAfterCollection) {
         assertEquals(summary.getOccupancyBeforeCollection(), occupancyAtStartOfCollection);
         assertEquals(summary.getSizeBeforeCollection(), sizeAtStartOfCollection);
@@ -80,28 +72,24 @@ public abstract class ParserTest {
         assertEquals(summary.getSizeAfterCollection(), sizeAfterCollection);
     }
 
-    /**
-     * Common check for GC events that report on Survivor memory.
-     *
-     * @param summary
-     * @param occupancyAtStartOfCollection
-     * @param sizeAtStartOfCollection
-     * @param occupancyAfterCollection
-     * @param sizeAfterCollection
-     */
+    /// Common check for GC events that report on Survivor memory.
+    ///
+    /// @param summary
+    /// @param occupancyAtStartOfCollection
+    /// @param sizeAtStartOfCollection
+    /// @param occupancyAfterCollection
+    /// @param sizeAfterCollection
     protected void assertSurvivorMemoryPoolValues(SurvivorMemoryPoolSummary summary, long occupancyAtStartOfCollection, long occupancyAfterCollection) {
         assertEquals(summary.getOccupancyBeforeCollection(), occupancyAtStartOfCollection);
         assertEquals(summary.getOccupancyAfterCollection(), occupancyAfterCollection);
     }
         
-    /**
-     * Common check for GC events that report on CPU usage
-     * 
-     * @param summary
-     * @param user
-     * @param sys  (kernel)
-     * @param real (wallClock)
-     */
+    /// Common check for GC events that report on CPU usage
+    ///
+    /// @param summary
+    /// @param user
+    /// @param sys  (kernel)
+    /// @param real (wallClock)
     protected void assertCPUSummaryValues(CPUSummary summary, double user, double sys, double real) {
     	assertNotNull(summary);
     	assertDoubleEquals(summary.getUser(), user);
@@ -109,25 +97,21 @@ public abstract class ParserTest {
     	assertDoubleEquals(summary.getWallClock(), real);
     }
     
-    /**
-     * Compare doubles using a default epsilon value of 0.0000001, which should be
-     * sufficient for most duration representations.
-     * 
-     * @param d1
-     * @param d2
-     */
+    /// Compare doubles using a default epsilon value of 0.0000001, which should be
+    /// sufficient for most duration representations.
+    ///
+    /// @param d1
+    /// @param d2
     protected void assertDoubleEquals(double d1, double d2) {
-    	double defaultEpsilon = 0.0000001d;
+    	var defaultEpsilon = 0.0000001d;
     	assertDoubleEquals(d1, d2, defaultEpsilon);
     }
     
-    /**
-     * Compare doubles without worrying about binary representation discrepancies
-     *  
-     * @param d1
-     * @param d2
-     * @param epsilon
-     */
+    /// Compare doubles without worrying about binary representation discrepancies
+    ///
+    /// @param d1
+    /// @param d2
+    /// @param epsilon
     protected void assertDoubleEquals(double d1, double d2, double epsilon) {
     	assertTrue(Math.abs(d1-d2) < epsilon);
     }
@@ -147,9 +131,7 @@ public abstract class ParserTest {
             events.add(message);
         }
 
-        /**
-         * Unfortunately needs to be implemented but doesn't need to do anything
-         */
+        /// Unfortunately needs to be implemented but doesn't need to do anything
         @Override
         public void close() {
 

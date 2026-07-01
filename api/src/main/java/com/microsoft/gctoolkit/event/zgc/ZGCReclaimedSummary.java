@@ -2,6 +2,8 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.event.zgc;
 
+import org.jspecify.annotations.Nullable;
+
 public class ZGCReclaimedSummary {
 
     private final long relocateStart;
@@ -20,7 +22,7 @@ public class ZGCReclaimedSummary {
         return relocateEnd;
     }
 
-    public ZGCReclaimedSummary sum(ZGCReclaimedSummary other) {
+    public ZGCReclaimedSummary sum(@Nullable ZGCReclaimedSummary other) {
         if (other == null) {
             return this;
         }

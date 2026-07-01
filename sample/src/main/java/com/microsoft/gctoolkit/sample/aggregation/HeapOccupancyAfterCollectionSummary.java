@@ -13,8 +13,9 @@ public class HeapOccupancyAfterCollectionSummary extends HeapOccupancyAfterColle
 
     public HeapOccupancyAfterCollectionSummary() {}
 
+    @Override
     public void addDataPoint(GarbageCollectionTypes gcType, DateTimeStamp timeStamp, long heapOccupancy) {
-        aggregations.computeIfAbsent(gcType, key -> new XYDataSet()).add(timeStamp.getTimeStamp(),heapOccupancy);
+        aggregations.computeIfAbsent(gcType, _ -> new XYDataSet()).add(timeStamp.getTimeStamp(),heapOccupancy);
     }
 
     public Map<GarbageCollectionTypes, XYDataSet> get() {

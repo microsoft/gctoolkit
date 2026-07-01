@@ -18,13 +18,11 @@ import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-/**
- * A {@link RotatingGCLogFile} is made up of {@code GarbageCollectionLogFileSegment}s. Creating
- * a {@code GarbageCollectionLogFileSegment} is not necessary when the
- * {@link RotatingGCLogFile#RotatingGCLogFile(Path)} constructor is used.
- * The {@link RotatingGCLogFile#RotatingGCLogFile(Path)} constructor allows the user to
- * provide a list of discrete {@code GarbageCollectionLogFileSegement}s for a {@code RotatingGCLogFile}.
- */
+/// A [RotatingGCLogFile] is made up of `GarbageCollectionLogFileSegment`s. Creating
+/// a `GarbageCollectionLogFileSegment` is not necessary when the
+/// [RotatingGCLogFile#RotatingGCLogFile(Path)] constructor is used.
+/// The [RotatingGCLogFile#RotatingGCLogFile(Path)] constructor allows the user to
+/// provide a list of discrete `GarbageCollectionLogFileSegement`s for a `RotatingGCLogFile`.
 public class GCLogFileZipSegment implements LogFileSegment {
 
     private final Path path;
@@ -32,24 +30,22 @@ public class GCLogFileZipSegment implements LogFileSegment {
     private DateTimeStamp endTime = null;
     private DateTimeStamp startTime = null;
 
-    /**
-     * The constructor attempts to extract the segment index from the file name.
-     * @param path The path to the file.
-     * @param segmentName name of first segment in zip file
-     */
+    /// The constructor attempts to extract the segment index from the file name.
+    /// @param path The path to the file.
+    /// @param segmentName name of first segment in zip file
     public GCLogFileZipSegment(Path path, String segmentName) {
         this.path = path;
         this.segmentName = segmentName;
     }
 
-    /**
-     * Return the path to the file.
-     * @return The path to the file.
-     */
+    /// Return the path to the file.
+    /// @return The path to the file.
+    @Override
     public Path getPath() {
         return path;
     }
 
+    @Override
     public String getSegmentName() {
         return this.segmentName;
     }
@@ -67,7 +63,7 @@ public class GCLogFileZipSegment implements LogFileSegment {
 
     private DateTimeStamp ageOfJVMAtLogEnd()  {
         if (endTime == null) {
-            List<String> tail = stream().
+            var tail = stream().
                     collect(tail(100));
             endTime = tail.stream()
                     .filter(line -> ! line.contains("Saved as"))
@@ -102,7 +98,7 @@ public class GCLogFileZipSegment implements LogFileSegment {
                 return startTime.toEpochInMillis();
             else
                 return Double.MAX_VALUE;
-        } catch (NullPointerException ex) {
+        } catch (NullPointerException _) {
             return Double.MIN_VALUE;
         }
     }
@@ -117,18 +113,17 @@ public class GCLogFileZipSegment implements LogFileSegment {
                 return endTime.toEpochInMillis();
             else
                 return Double.MAX_VALUE;
-        } catch (NullPointerException ex) {
+        } catch (NullPointerException _) {
             return Double.MIN_VALUE;
         }
     }
 
-    /**
-     * Stream the file, one line at a time.
-     * @return A stream of lines from the file.
-     */
+    /// Stream the file, one line at a time.
+    /// @return A stream of lines from the file.
+    @Override
     public Stream<String> stream() {
         try {
-            ZipFile file = new ZipFile(path.toFile());
+            var file = new ZipFile(path.toFile());
             ZipEntry entry = file.getEntry(this.segmentName);
             return new BufferedReader(new InputStreamReader(file.getInputStream(entry))).lines();
         } catch (IOException e) {
@@ -137,10 +132,8 @@ public class GCLogFileZipSegment implements LogFileSegment {
         return new ArrayList<String>().stream();
     }
 
-    /**
-     * {@inheritDoc}
-     * @return Returns {@code this.getPath().toString(); }
-     */
+    /// {@inheritDoc}
+    /// @return Returns `this.getPath().toString(); `
     @Override
     public String toString() {
         return getSegmentName();

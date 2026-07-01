@@ -51,11 +51,11 @@ public class RotatingGarbageCollectionLogFileTest {
     public void getOrderedGarbageCollectionLogFiles() {
         for(String[] data : expected) {
             try {
-                TestLogFile logFile = new TestLogFile(data[0]);
-                RotatingGCLogFile garbageCollectionLogFile = new RotatingGCLogFile(logFile.getFile().toPath());
+                var logFile = new TestLogFile(data[0]);
+                var garbageCollectionLogFile = new RotatingGCLogFile(logFile.getFile().toPath());
                 List<LogFileSegment> segments = garbageCollectionLogFile.getOrderedGarbageCollectionLogFiles();
                 assertEquals(data.length - 1, segments.size());
-                for (int n = 1; n < data.length; n++) {
+                for (var n = 1; n < data.length; n++) {
                     assertEquals(data[n], segments.get(n - 1).getPath().getFileName().toString());
                 }
             } catch (Throwable e) {
@@ -66,15 +66,15 @@ public class RotatingGarbageCollectionLogFileTest {
 
     private void runRollingLogOrderingTest(Path path, List<String> expectedOrdering, long lineCount) {
         try {
-            RotatingGCLogFile rotatingGCLogFile = new RotatingGCLogFile(path);
-            List<String> actual =
+            var rotatingGCLogFile = new RotatingGCLogFile(path);
+            var actual =
                     rotatingGCLogFile
                             .getOrderedGarbageCollectionLogFiles()
                             .stream()
-                            .map(segment -> segment.getSegmentName())
+                            .map(LogFileSegment::getSegmentName)
                             .collect(Collectors.toList());
             assertEquals(expectedOrdering, actual);
-            long count = rotatingGCLogFile.stream().count();
+            var count = rotatingGCLogFile.stream().count();
             assertEquals(246733,count,"Unequal line counts");
         } catch (Exception badTestData) {
             fail(badTestData);
@@ -84,7 +84,7 @@ public class RotatingGarbageCollectionLogFileTest {
     @Test
     public void testRollingLogOrderUsage() {
         Path path = new TestLogFile("rolling/jdk14/rollinglogs/rollover.log").getFile().toPath();
-        List<String> expected = Arrays.asList(
+        var expected = Arrays.asList(
                 "rollover.log.3", "rollover.log.4", "rollover.log.0", "rollover.log.1", "rollover.log.2", "rollover.log"
         );
         runRollingLogOrderingTest(path, expected, 246732);
@@ -93,7 +93,7 @@ public class RotatingGarbageCollectionLogFileTest {
     @Test
     public void testRollingInZip() {
         Path path = new TestLogFile("rolling/jdk14/rollinglogs/zip/rollover.zip").getFile().toPath();
-        List<String> expected = Arrays.asList(
+        var expected = Arrays.asList(
                 "rollover.log.3", "rollover.log.4", "rollover.log.0", "rollover.log.1", "rollover.log.2", "rollover.log"
         );
         runRollingLogOrderingTest(path,expected, 246733);
@@ -102,7 +102,7 @@ public class RotatingGarbageCollectionLogFileTest {
     @Test
     public void testRollingInDirInZip() {
         Path path = new TestLogFile("rolling/jdk14/rollinglogs/zip/rolloverdir.zip").getFile().toPath();
-        List<String> expected = Arrays.asList(
+        var expected = Arrays.asList(
                 "rollover/rollover.log.3", "rollover/rollover.log.4", "rollover/rollover.log.0", "rollover/rollover.log.1", "rollover/rollover.log.2", "rollover/rollover.log"
         );
         runRollingLogOrderingTest(path,expected, 246733);

@@ -14,7 +14,7 @@ public class UnifiedGenerationalParserTest extends ParserTest {
 
     @Test
     public void testForDetailsLogs() {
-        int i = 0;
+        var i = 0;
         for (String name : details) {
             try {
                 Path path = new TestLogFile("parallel/" + name).getFile().toPath();
@@ -41,7 +41,7 @@ public class UnifiedGenerationalParserTest extends ParserTest {
 
     @Test
     public void testCMSLogsMissingTimeStamps() {
-        int i = 0;
+        var i = 0;
         for (String name : cms) {
             try {
                 Path path = new TestLogFile("cms/" + name).getFile().toPath();
@@ -69,7 +69,7 @@ public class UnifiedGenerationalParserTest extends ParserTest {
     //Serial
     @Test
     public void testSerialLogs() {
-        int i = 0;
+        var i = 0;
         for (String name : serial) {
             try {
                 Path path = new TestLogFile("serial/" + name).getFile().toPath();

@@ -3,6 +3,7 @@
 package com.microsoft.gctoolkit.parser;
 
 import com.microsoft.gctoolkit.parser.vmops.SafepointTrace;
+import org.jspecify.annotations.Nullable;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -10,10 +11,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- * Class that tracks whether a log entry was parsed successfully (hit), or not
- * (miss) and captures the origin of that hit or miss.
- */
+/// Class that tracks whether a log entry was parsed successfully (hit), or not
+/// (miss) and captures the origin of that hit or miss.
 public class SafepointParseRule {
 
     private static final ConcurrentMap<SafepointParseRule, AtomicInteger> hits = new ConcurrentHashMap<>();
@@ -24,19 +23,17 @@ public class SafepointParseRule {
 
     public SafepointParseRule(String pattern) {
         this.pattern = Pattern.compile(pattern);
-        Throwable throwable = new Throwable();
+        var throwable = new Throwable();
         throwable = throwable.fillInStackTrace();
         origin.put(this, throwable);
     }
 
-    /**
-     * TODO #155 This painful pattern of returning a null which gets checked by
-     * the caller could be replaced by use of Optional
-     *
-     * @param trace The trace to match against the pattern
-     * @return A trace with a valid matcher or null
-     */
-    public SafepointTrace parse(String trace) {
+    /// TODO #155 This painful pattern of returning a null which gets checked by
+    /// the caller could be replaced by use of Optional
+    ///
+    /// @param trace The trace to match against the pattern
+    /// @return A trace with a valid matcher or null
+    public @Nullable SafepointTrace parse(String trace) {
         Matcher matcher = pattern.matcher(trace);
         if (matcher.find()) {
             hits();

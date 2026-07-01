@@ -2,9 +2,7 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.event;
 
-/**
- * Representation of GC Collection Events
- */
+/// Representation of GC Collection Events
 public enum GarbageCollectionTypes implements LabelledGCEventType {
 
     GC("GC"),
@@ -71,6 +69,7 @@ public enum GarbageCollectionTypes implements LabelledGCEventType {
         return LabelledGCEventType.fromLabel(GarbageCollectionTypes.class, label);
     }
 
+    @Override
     public String getLabel() {
         return label;
     }

@@ -29,7 +29,7 @@ public enum ZGCCycleType {
         } else if (phase == ZGCPhase.MINOR_YOUNG){
             return ZGCCycleType.MINOR;
         } else {
-            throw new IllegalArgumentException(String.format("Unknown ZGCPhase: %s", phase));
+            throw new IllegalArgumentException("Unknown ZGCPhase: %s".formatted(phase));
         }
     }
 }

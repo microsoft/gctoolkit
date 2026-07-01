@@ -50,13 +50,13 @@ public class MemoryPoolSummary {
     }
 
     public long kBytesRecovered() {
-        long kBytesRecovered = kByteDelta();
-        return (kBytesRecovered > 0) ? kBytesRecovered : 0L;
+        var kBytesRecovered = kByteDelta();
+        return kBytesRecovered > 0 ? kBytesRecovered : 0L;
     }
 
     public long kBytesAllocated(MemoryPoolSummary previousHeapState) {
-        long kBytesAllocated = occupancyBeforeCollection - previousHeapState.getOccupancyAfterCollection();
-        return (kBytesAllocated > 0) ? kBytesAllocated : 0L;
+        var kBytesAllocated = occupancyBeforeCollection - previousHeapState.getOccupancyAfterCollection();
+        return kBytesAllocated > 0 ? kBytesAllocated : 0L;
     }
 
     // Will be positive if data is copied into the pool and negative if the pool has been GC'ed
@@ -68,6 +68,7 @@ public class MemoryPoolSummary {
         return sizeAfterCollection != -1;
     }
 
+    @Override
     public String toString() {
         return occupancyBeforeCollection + "K(" + sizeBeforeCollection + "K)->" + occupancyAfterCollection + "K(" + sizeAfterCollection + "K)";
     }

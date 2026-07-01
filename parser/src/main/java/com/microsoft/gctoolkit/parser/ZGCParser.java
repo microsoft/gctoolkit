@@ -42,6 +42,7 @@ import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.HashMap;
@@ -49,17 +50,15 @@ import java.util.function.BiConsumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- * Time of GC
- * GCType
- * Collect total heap values
- * Heap before collection
- * Heap after collection
- * Heap configured size
- * total pause time
- * CMS failures
- * System.gc() calls
- */
+/// Time of GC
+/// GCType
+/// Collect total heap values
+/// Heap before collection
+/// Heap after collection
+/// Heap configured size
+/// total pause time
+/// CMS failures
+/// System.gc() calls
 public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
 
     private static final Logger LOGGER = Logger.getLogger(ZGCParser.class.getName());
@@ -68,7 +67,7 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
     private final boolean develop = Boolean.getBoolean("microsoft.develop");
 
     private final ZGCForwardReference[] forwardReferences = new ZGCForwardReference[3];
-    private final HashMap<Long, GCCause> gcCauseMap = new HashMap<>(2);
+    private final Map<Long, GCCause> gcCauseMap = new HashMap<>(2);
 
     private final long[] heapCapacity = new long[3];
 
@@ -115,10 +114,8 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
         return Set.of(EventSource.ZGC);
     }
 
-    /**
-     * This marks the phase we're in for memory stats. Generation ZGC will provide heap capacity
-     * as well as old and young gen capacities. This enables the Young gen phase
-     */
+    /// This marks the phase we're in for memory stats. Generation ZGC will provide heap capacity
+    /// as well as old and young gen capacities. This enables the Young gen phase
     private void markGenHeapStats(GCLogTrace gcLogTrace, String s) {
         this.genHeapStats = true;
     }
@@ -199,11 +196,11 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
         	// cycleStart ends up being called for ZGC logging with no details, but did not handle this situation.  
         	// It is not clear if there is any differentiation between Young/Old Phases in no-details logging, so I've made
         	// an assumption here that we're strictly dealing with Young collections until we have sample logging otherwise.
-        	if (ZGCCycleType.MAJOR.equals(type)) {
+        	if (ZGCCycleType.MAJOR == type) {
         		setForwardRefForPhase(
         				ZGCPhase.MAJOR_YOUNG, 
         				new ZGCForwardReference(getClock(), trace.getLongGroup(1), trace.gcCause(3,0), type, ZGCPhase.MAJOR_YOUNG));
-        	} else if (ZGCCycleType.MINOR.equals(type)) {
+        	} else if (ZGCCycleType.MINOR == type) {
         		setForwardRefForPhase(
         				ZGCPhase.MINOR_YOUNG, 
         				new ZGCForwardReference(getClock(), trace.getLongGroup(1), trace.gcCause(3,0), type, ZGCPhase.MINOR_YOUNG));        		
@@ -229,9 +226,9 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
             return;
         }
         ZGCPhase phase = ZGCPhase.get(trace.getGroup(2));
-        long gcId = trace.getLongGroup(1);
+        var gcId = trace.getLongGroup(1);
         GCCause gcCause = gcCauseMap.getOrDefault(gcId, GCCause.UNKNOWN_GCCAUSE);
-        ZGCForwardReference forwardReference = new ZGCForwardReference(getClock(), gcId, gcCause, ZGCCycleType.fromPhase(phase), phase);
+        var forwardReference = new ZGCForwardReference(getClock(), gcId, gcCause, ZGCCycleType.fromPhase(phase), phase);
         setForwardRefForPhase(
                 phase,
                 forwardReference
@@ -311,7 +308,7 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
     private void pageSummary(GCLogTrace trace, String s) {
         ZGCForwardReference ref = getForwardRefForPhase(trace.getZCollectionPhase());
 
-        ZGCPageSummary summary = new ZGCPageSummary(
+        var summary = new ZGCPageSummary(
                 trace.getLongGroup(3),
                 trace.getLongGroup(4),
                 trace.getLongGroup(5),
@@ -336,7 +333,7 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
     private void ageTable(GCLogTrace trace, String s) {
         ZGCForwardReference ref = getForwardRefForPhase(trace.getZCollectionPhase());
 
-        ZGCPageAgeSummary summary = new ZGCPageAgeSummary(
+        var summary = new ZGCPageAgeSummary(
                 trace.getGroup(2),
                 trace.toKBytes(3),
                 trace.getIntegerGroup(5),
@@ -402,7 +399,7 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
     private void nMethods(GCLogTrace trace, String s) {
         ZGCForwardReference ref = getForwardRefForPhase(trace.getZCollectionPhase());
 
-        ZGCNMethodSummary summary = new ZGCNMethodSummary(
+        var summary = new ZGCNMethodSummary(
                 trace.getLongGroup(2),
                 trace.getLongGroup(3));
         ref.setNMethodSummary(summary);
@@ -411,7 +408,7 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
     private void metaspace(GCLogTrace trace, String s) {
         ZGCForwardReference ref = getForwardRefForPhase(trace.getZCollectionPhase());
 
-        ZGCMetaspaceSummary summary = new ZGCMetaspaceSummary(
+        var summary = new ZGCMetaspaceSummary(
                 trace.toKBytes(2),
                 trace.toKBytes(4),
                 trace.toKBytes(6));
@@ -425,7 +422,7 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
     private void referenceProcessingGen(GCLogTrace trace, String s) {
         ZGCForwardReference ref = getForwardRefForPhase(trace.getZCollectionPhase());
 
-        ZGCReferenceSummary summary = new ZGCReferenceSummary(trace.getLongGroup(3), trace.getLongGroup(4), trace.getLongGroup(5));
+        var summary = new ZGCReferenceSummary(trace.getLongGroup(3), trace.getLongGroup(4), trace.getLongGroup(5));
         if ("Soft".equals(trace.getGroup(2))){
             ref.setSoftRefSummary(summary);
         } else if ("Weak".equals(trace.getGroup(2))) {
@@ -463,7 +460,7 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
 
         if (genHeapStats) {
             if ("Used".equals(trace.getGroup(2))){
-                ZGCUsedSummary summary = new ZGCUsedSummary(
+                var summary = new ZGCUsedSummary(
                         trace.toKBytes(3),
                         trace.toKBytes(6),
                         trace.toKBytes(9),
@@ -566,7 +563,7 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
 
     private void memorySummary(GCLogTrace trace, String s) {
         if (diary.isGenerationalZGC()) {
-            long gcId = trace.getLongGroup(1);
+            var gcId = trace.getLongGroup(1);
             
             if (gcCauseMap.containsKey(gcId)) {
             	gcCauseMap.remove(gcId);
@@ -604,7 +601,7 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
         // We use the lack of a MemorySummary in the forwardReference as a sign
     	// that we need to publish a Generational no-details event.
    		ZGCCycleType cycleType = ZGCCycleType.get(trace.getGroup(2));
-    	ZGCForwardReference forwardReference = ZGCCycleType.MAJOR.equals(cycleType) ? 
+    	ZGCForwardReference forwardReference = ZGCCycleType.MAJOR == cycleType ? 
     			getForwardRefForPhase(ZGCPhase.MAJOR_YOUNG) :
     			getForwardRefForPhase(ZGCPhase.MINOR_YOUNG);
     	
@@ -758,7 +755,7 @@ public class ZGCParser extends UnifiedGCLogParser implements ZGCPatterns {
 
         public GCEvent getGCEVent(DateTimeStamp endTime) {
             ZGCCollection cycle;
-            double duration = (gcDuration != null) ? gcDuration : endTime.minus(startTimeStamp);
+            double duration = gcDuration != null ? gcDuration : endTime.minus(startTimeStamp);
 
             switch (phase) {
                 case FULL:

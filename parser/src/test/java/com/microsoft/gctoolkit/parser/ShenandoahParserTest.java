@@ -2,13 +2,10 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.parser;
 
-import com.microsoft.gctoolkit.event.jvm.JVMEvent;
 import com.microsoft.gctoolkit.event.shenandoah.ShenandoahCycle;
 import com.microsoft.gctoolkit.jvm.Diarizer;
 import com.microsoft.gctoolkit.parser.jvm.UnifiedDiarizer;
 import org.junit.jupiter.api.Assertions;
-
-import java.util.List;
 
 public class ShenandoahParserTest extends ParserTest {
 
@@ -75,10 +72,10 @@ public class ShenandoahParserTest extends ParserTest {
                 "[0.896s][info][gc,ergo       ] Pacer for Idle. Initial: 163M, Alloc Tax Rate: 1.0x"
         };
 
-        List<JVMEvent> singleCycle = feedParser(eventLogEntries);
+        var singleCycle = feedParser(eventLogEntries);
         try {
             Assertions.assertTrue(singleCycle.size() == 1);
-            ShenandoahCycle sc = (ShenandoahCycle) singleCycle.get(0);
+            var sc = (ShenandoahCycle) singleCycle.getFirst();
             // todo: Put in checks for values
             //Memory
 

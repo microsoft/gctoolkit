@@ -54,13 +54,11 @@ import static com.microsoft.gctoolkit.jvm.SupportedFlags.*;
     GENERATIONAL_ZGC                            // 29
  */
 
-/**
- * Records discovered GC log feature states while a log is being diarized.
- *
- * <p>Each {@link SupportedFlags} entry is tracked as true, false, or unknown so
- * parser selection and event-source discovery can defer decisions until enough
- * log evidence has been observed.</p>
- */
+/// Records discovered GC log feature states while a log is being diarized.
+///
+/// Each [SupportedFlags] entry is tracked as true, false, or unknown so
+/// parser selection and event-source discovery can defer decisions until enough
+/// log evidence has been observed.
 public class Diary {
 
     private final TripleState[] states;
@@ -68,7 +66,7 @@ public class Diary {
 
     public Diary() {
         states = new TripleState[SupportedFlags.values().length];
-        for (int i = 0; i < states.length; i++) states[i] = TripleState.UNKNOWN;
+        for (var i = 0; i < states.length; i++) states[i] = TripleState.UNKNOWN;
     }
 
     public void setTrue(SupportedFlags flag) {
@@ -96,7 +94,7 @@ public class Diary {
     }
 
     public boolean isStateKnown(SupportedFlags... flags) {
-        boolean value = true;
+        var value = true;
         for (SupportedFlags flag : flags) {
             value &= states[flag.ordinal()].isTrue();
         }
@@ -104,7 +102,7 @@ public class Diary {
     }
 
     public void setState(SupportedFlags flag, boolean flagTurnedOn) {
-        if ((flagTurnedOn)) {
+        if (flagTurnedOn) {
             setTrue(flag);
         } else {
             setFalse(flag);
@@ -117,8 +115,8 @@ public class Diary {
 
     @Override
     public String toString() {
-        StringBuilder buffer = new StringBuilder("LoggingDiary{");
-        boolean first = true;
+        var buffer = new StringBuilder("LoggingDiary{");
+        var first = true;
         for(SupportedFlags flag : SupportedFlags.values()) {
             if (!first || (first = false)) {
                 buffer.append(", ");
@@ -423,7 +421,7 @@ public class Diary {
             events.add(eventSource);
     }
     public Set<EventSource> generatesEvents() {
-        Set<EventSource> generatedEvents = new TreeSet<>();
+        var generatedEvents = new TreeSet<EventSource>();
         evaluate(generatedEvents, APPLICATION_STOPPED_TIME, SAFEPOINT);
         evaluate(generatedEvents, APPLICATION_CONCURRENT_TIME, SAFEPOINT);
         evaluate(generatedEvents, DEFNEW, EventSource.GENERATIONAL);

@@ -9,7 +9,7 @@ public class ZGCLogDiaryTest extends LogDiaryTest {
 
     @Test
     public void testForZGCLogDiaryPickups() {
-        int i = 0;
+        var i = 0;
         for (String name : zgcLogs) {
             testWith(new TestLogFile("zgc/" + name).getFile(), name, zgcDiary[i], zgcUnknown[i], zgcKnown[i++]);
         }

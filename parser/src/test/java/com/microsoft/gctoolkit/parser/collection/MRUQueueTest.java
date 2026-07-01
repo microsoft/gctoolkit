@@ -16,13 +16,13 @@ public class MRUQueueTest {
         String[] afterA = {"A", "B", "C"};
         String[] afterC = {"C", "A", "B"};
 
-        MRUQueue<String, String> queue = new MRUQueue<>();
+        var queue = new MRUQueue<String, String>();
         queue.put("B", "E");
         queue.put("A", "D");
         queue.put("C", "F");
 
         assertEquals(3, queue.size());
-        int i = 0;
+        var i = 0;
         for (String key : queue.keys()) {
             assertEquals(key, original[i++]);
         }

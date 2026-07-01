@@ -8,9 +8,7 @@ import java.util.List;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 
-/**
- * Meta-data about a {@link FileDataSource}.
- */
+/// Meta-data about a [FileDataSource].
 public class SingleLogFileMetadata extends LogFileMetadata {
 
     private static final Logger LOG = Logger.getLogger(SingleLogFileMetadata.class.getName());
@@ -22,12 +20,14 @@ public class SingleLogFileMetadata extends LogFileMetadata {
         this.logFile = new GCLogFileSegment(path);
     }
 
+    @Override
     public Stream<LogFileSegment> logFiles() {
         return List.of(logFile).stream();
     }
 
+    @Override
     public int getNumberOfFiles() {
-        return ( logFile != null) ? 1 : 0;
+        return logFile != null ? 1 : 0;
     }
 
 }

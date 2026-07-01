@@ -24,17 +24,16 @@ public class SurvivorMemoryPoolParser extends PreUnifiedGCLogParser implements T
         return Set.of(EventSource.SURVIVOR);
     }
 
+    @Override
     public String getName() {
         return "SurvivorMemoryPoolParser";
     }
 
-    /**
-     * 61.572: [GC 61.572: [ParNew
-     * Desired survivor size 1343488 bytes, new threshold 4 (max 4)
-     * - age   1:      25176 bytes,      25176 total
-     *
-     * @param entry : GC log entry to deriveConfiguration
-     */
+    /// 61.572: [GC 61.572: [ParNew
+    /// Desired survivor size 1343488 bytes, new threshold 4 (max 4)
+    /// - age   1:      25176 bytes,      25176 total
+    ///
+    /// @param entry : GC log entry to deriveConfiguration
     @Override
     protected void process(String entry) {
         GCLogTrace trace;
@@ -43,7 +42,7 @@ public class SurvivorMemoryPoolParser extends PreUnifiedGCLogParser implements T
             forwardReference = new SurvivorRecord(getClock(), trace.getLongGroup(1), trace.getIntegerGroup(2), trace.getIntegerGroup(3));
         } else if ((trace = TENURING_AGE_BREAKDOWN.parse(entry)) != null) {
             forwardReference.add(trace.getIntegerGroup(1), trace.getLongGroup(2));
-        } else if (entry.equals(END_OF_DATA_SENTINEL) || (JVM_EXIT.parse(entry) != null)) {
+        } else if (END_OF_DATA_SENTINEL.equals(entry) || (JVM_EXIT.parse(entry) != null)) {
             if (forwardReference != null)
                 super.publish(ChannelName.SURVIVOR_MEMORY_POOL_PARSER_OUTBOX, forwardReference);
             super.publish(ChannelName.SURVIVOR_MEMORY_POOL_PARSER_OUTBOX, new JVMTermination(getClock(),diary.getTimeOfFirstEvent()));

@@ -2,14 +2,12 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.parser;
 
-/**
- * Patterns for the incremental Concurrent Mark and Sweep (iCMS) collector
- */
+/// Patterns for the incremental Concurrent Mark and Sweep (iCMS) collector
 public interface ICMSPatterns extends CMSPatterns {
 
     String ICMS_DC = " icms_dc=(\\d+) ";
 
-    /***** iCMS records ******/
+    /// *** iCMS records *****
     //Greedy: 263204.684: [GC263204.684: [ParNew (promotion failed): 153342K->153343K(153344K), 0.0910130 secs]263204.776: [CMS: 1752518K->1636004K(1926784K), 8.9443330 secs] 1889511K->1636004K(2080128K), [CMS Perm : 137004K->135442K(233916K)] icms_dc=75 , 9.0355990 secs]
     //Greedy: 410971.012: [GC 410971.012: [ParNew (promotion failed): 153068K->153068K(153344K), 0.1683040 secs]410971.180: [CMS: 1414041K->1301153K(1926784K), 7.3235580 secs] 1543745K->1301153K(2080128K), [CMS Perm : 137698K->135751K(235644K)] icms_dc=19 , 7.4921120 secs]
     //Missed: 357305.590: [GC 357305.590: [ParNew (promotion failed): 10973K->3147K(153344K), 0.0295730 secs] 1763339K->1763817K(2080128K) icms_dc=32 , 0.0297680 secs]

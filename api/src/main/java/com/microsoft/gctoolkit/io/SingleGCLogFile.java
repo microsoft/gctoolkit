@@ -15,18 +15,14 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-/**
- * A single GC log file. If the file is a zip or gzip file,
- * then the first entry is the file of interest.
- */
+/// A single GC log file. If the file is a zip or gzip file,
+/// then the first entry is the file of interest.
 public class SingleGCLogFile extends GCLogFile {
 
     private static final Logger LOGGER = Logger.getLogger(SingleGCLogFile.class.getName());
 
-    /**
-     * Constructor for a single, GC log file.
-     * @param path The path to the log file.
-     */
+    /// Constructor for a single, GC log file.
+    /// @param path The path to the log file.
 
     private SingleLogFileMetadata metadata = null;
 
@@ -68,7 +64,7 @@ public class SingleGCLogFile extends GCLogFile {
     }
 
     private static Stream<String> streamZipFile(Path path) throws IOException {
-        ZipInputStream zipStream = new ZipInputStream(Files.newInputStream(path));
+        var zipStream = new ZipInputStream(Files.newInputStream(path));
         ZipEntry entry;
         do {
             entry = zipStream.getNextEntry();
@@ -77,7 +73,7 @@ public class SingleGCLogFile extends GCLogFile {
     }
 
     private static Stream<String> streamGZipFile(Path path) throws IOException {
-        GZIPInputStream gzipStream = new GZIPInputStream(Files.newInputStream(path));
+        var gzipStream = new GZIPInputStream(Files.newInputStream(path));
         return new BufferedReader(new InputStreamReader(new BufferedInputStream(gzipStream))).lines();
     }
 

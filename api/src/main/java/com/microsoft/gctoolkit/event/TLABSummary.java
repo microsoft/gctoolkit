@@ -2,12 +2,11 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.event;
 
-
-import java.util.ArrayList;
+import java.util.List;
 
 public class TLABSummary {
 
-    private ArrayList<String> tlabRecords;
+    private List<String> tlabRecords;
 
     public TLABSummary() {
     }

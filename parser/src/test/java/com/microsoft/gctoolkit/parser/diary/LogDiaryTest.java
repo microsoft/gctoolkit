@@ -35,14 +35,12 @@ abstract class LogDiaryTest {
         return jvmConfiguration;
     }
 
-    /**
-     * Convenience method to avoid changing test that rely on the other form of this method signature.
-     *
-     * @param name test log file name
-     * @param expectedDiaryResults expected diary results
-     * @param expectedDetailsUnKnown expected unknown details
-     * @param expectedDetailsKnown expected known details
-     */
+    /// Convenience method to avoid changing test that rely on the other form of this method signature.
+    ///
+    /// @param name test log file name
+    /// @param expectedDiaryResults expected diary results
+    /// @param expectedDetailsUnKnown expected unknown details
+    /// @param expectedDetailsKnown expected known details
     void testWith(String name, boolean[] expectedDiaryResults, int[] expectedDetailsUnKnown, int[] expectedDetailsKnown) {
         testWith(new TestLogFile(name).getFile(), name, expectedDiaryResults, expectedDetailsUnKnown, expectedDetailsKnown);
     }
@@ -64,10 +62,8 @@ abstract class LogDiaryTest {
         org.junit.jupiter.api.Assertions.assertTrue(calculated == expected, name + ", calculated: " + calculated + ", expected: " + expected);
     }
 
-    /**
-     * What the deriveConfiguration should look like. Unknown == false so there is a separate test to determine
-     * if something is truly false when it should be false
-     */
+    /// What the deriveConfiguration should look like. Unknown == false so there is a separate test to determine
+    /// if something is truly false when it should be false
     void interrogateDiary(Diarizer jvmConfiguration, String name, boolean[] expected) {
         Diary diary = jvmConfiguration.getDiary();
         performCheck(name, diary.isApplicationStoppedTime(), expected[SupportedFlags.APPLICATION_STOPPED_TIME.ordinal()]);
@@ -97,9 +93,7 @@ abstract class LogDiaryTest {
         performCheck(name, diary.isMaxTenuringThresholdViolation(), expected[SupportedFlags.MAX_TENURING_THRESHOLD_VIOLATION.ordinal()]);
     }
 
-    /**
-     * Things we shouldn't know
-     */
+    /// Things we shouldn't know
     void lookForUnknowns(Diarizer jvmConfiguration, String name, int[] unknowns) {
         Diary diary = jvmConfiguration.getDiary();
         for (int unknown : unknowns) {
@@ -193,11 +187,9 @@ abstract class LogDiaryTest {
         }
     }
 
-    /**
-     * Things we should know. Since unknown == false this is primarily to test for things that should be false.
-     * IOWs, if the primary test passes, this is a secondary to cover cases where the value should be false and
-     * not unknown.
-     */
+    /// Things we should know. Since unknown == false this is primarily to test for things that should be false.
+    /// IOWs, if the primary test passes, this is a secondary to cover cases where the value should be false and
+    /// not unknown.
     void lookForKnowns(Diarizer jvmConfiguration, String name, int[] knowns) {
         Diary diary = jvmConfiguration.getDiary();
         for (int known : knowns) {

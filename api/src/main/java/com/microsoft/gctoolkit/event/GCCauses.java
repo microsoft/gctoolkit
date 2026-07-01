@@ -2,6 +2,8 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.event;
 
+import org.jspecify.annotations.Nullable;
+
 import java.util.Arrays;
 import java.util.Map;
 import java.util.function.Function;
@@ -16,7 +18,7 @@ public class GCCauses {
         GC_CAUSES.put("System", GCCause.JAVA_LANG_SYSTEM);
     }
 
-    public static GCCause get(String gcCauseName) {
+    public static GCCause get(@Nullable String gcCauseName) {
         GCCause cause;
         if (gcCauseName == null) {
             cause = GCCause.GCCAUSE_NOT_SET;

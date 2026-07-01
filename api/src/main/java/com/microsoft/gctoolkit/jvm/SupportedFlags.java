@@ -2,10 +2,8 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.jvm;
 
-/**
- * Flags that describe JVM, collector, and log-detail features discovered while
- * diarizing a GC log.
- */
+/// Flags that describe JVM, collector, and log-detail features discovered while
+/// diarizing a GC log.
 public enum SupportedFlags {
     APPLICATION_STOPPED_TIME,                   //  0
     APPLICATION_CONCURRENT_TIME,                //  1

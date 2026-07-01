@@ -15,7 +15,7 @@ import java.util.Optional;
 
 public class Main {
 
-    public static void main(String[] args) throws IOException {
+    void main(String[] args) throws IOException {
         String userInput = args.length > 0 ? args[0] : "";
         String gcLogFile = System.getProperty("gcLogFile", userInput);
 
@@ -24,10 +24,10 @@ public class Main {
         }
 
         if (Files.notExists(Path.of(gcLogFile))) {
-            throw new IllegalArgumentException(String.format("File %s not found.", gcLogFile));
+            throw new IllegalArgumentException("File %s not found.".formatted(gcLogFile));
         }
        
-        Main main = new Main();
+        var main = new Main();
         main.analyze(gcLogFile);
     }
 
@@ -38,7 +38,7 @@ public class Main {
          * The log files can be either in text, zip, or gzip format.
          */
         GCLogFile logFile = new SingleGCLogFile(Path.of(gcLogFile));
-        GCToolKit gcToolKit = new GCToolKit();
+        var gcToolKit = new GCToolKit();
 
         /**
          * This call will load all implementations of Aggregator that have been declared in module-info.java.
@@ -53,10 +53,10 @@ public class Main {
         JavaVirtualMachine machine = gcToolKit.analyze(logFile);
 
         // Retrieves the Aggregation for HeapOccupancyAfterCollectionSummary. This is a time-series aggregation.
-        String message = "The XYDataSet for %s contains %s items.\n";
+        var message = "The XYDataSet for %s contains %s items.\n";
         machine.getAggregation(HeapOccupancyAfterCollectionSummary.class)
                 .map(HeapOccupancyAfterCollectionSummary::get)
-                .ifPresent(summary -> {
+                .ifPresent(summary ->
                     summary.forEach((gcType, dataSet) -> {
                         System.out.printf(message, gcType, dataSet.size());
                         switch (gcType) {
@@ -70,13 +70,12 @@ public class Main {
                                 remarkCount = dataSet.size();
                                 break;
                             default:
-                                System.out.println(gcType + " not managed");
+                                IO.println(gcType + " not managed");
                                 break;
                         }
-                    });
-                });
+                    }));
 
-        Optional<CollectionCycleCountsSummary> summary = machine.getAggregation(CollectionCycleCountsSummary.class);
+        var summary = machine.getAggregation(CollectionCycleCountsSummary.class);
         summary.ifPresent(s -> s.printOn(System.out));
         // Retrieves the Aggregation for PauseTimeSummary. This is a com.microsoft.gctoolkit.sample.aggregation.RuntimeAggregation.
         machine.getAggregation(PauseTimeSummary.class).ifPresent(pauseTimeSummary -> {

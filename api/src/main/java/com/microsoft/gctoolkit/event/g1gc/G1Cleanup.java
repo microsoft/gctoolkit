@@ -6,15 +6,11 @@ import com.microsoft.gctoolkit.event.GCCause;
 import com.microsoft.gctoolkit.event.GarbageCollectionTypes;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
 
-/**
- * Pause phase
- */
+/// Pause phase
 public class G1Cleanup extends G1RealPause {
 
-    /**
-     * @param timeStamp time of the event
-     * @param duration duration of the event
-     */
+    /// @param timeStamp time of the event
+    /// @param duration duration of the event
     public G1Cleanup(DateTimeStamp timeStamp, double duration) {
         super(timeStamp, GarbageCollectionTypes.G1GCCleanup, GCCause.GCCAUSE_NOT_SET, duration);
     }

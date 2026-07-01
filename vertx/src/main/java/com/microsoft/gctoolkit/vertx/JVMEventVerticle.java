@@ -3,7 +3,6 @@
 package com.microsoft.gctoolkit.vertx;
 
 import com.microsoft.gctoolkit.event.jvm.JVMEvent;
-import com.microsoft.gctoolkit.event.jvm.JVMTermination;
 import com.microsoft.gctoolkit.message.JVMEventChannelListener;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Promise;
@@ -12,9 +11,7 @@ import io.vertx.core.Vertx;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- * A Vert.x verticle for dispatching JVMEvent.
- */
+/// A Vert.x verticle for dispatching JVMEvent.
 public class JVMEventVerticle extends AbstractVerticle {
 
     // Logger for the JVMEventVerticle class.
@@ -28,30 +25,24 @@ public class JVMEventVerticle extends AbstractVerticle {
     // ID of the verticle.
     private String id;
 
-    /**
-     * Constructor for JVMEventVerticle.
-     * @param vertx the Vert.x instance.
-     * @param channelName the name of the channel.
-     * @param listener the listener for processing JVM events.
-     */
+    /// Constructor for JVMEventVerticle.
+    /// @param vertx the Vert.x instance.
+    /// @param channelName the name of the channel.
+    /// @param listener the listener for processing JVM events.
     public JVMEventVerticle(Vertx vertx, String channelName, JVMEventChannelListener listener) {
         this.vertx = vertx;
         this.inbox = channelName;
         this.processor = listener;
     }
 
-    /**
-     * Sets the ID of the verticle.
-     * @param id the ID to set.
-     */
+    /// Sets the ID of the verticle.
+    /// @param id the ID to set.
     public void setID(String id) {
         this.id = id;
     }
 
-    /**
-     * Starts the verticle and sets up the event bus consumer for JVM events.
-     * @param promise the promise to complete when the verticle is started.
-     */
+    /// Starts the verticle and sets up the event bus consumer for JVM events.
+    /// @param promise the promise to complete when the verticle is started.
     @Override
     public void start(Promise<Void> promise) {
         vertx.eventBus().<JVMEvent>consumer(inbox, message -> {
@@ -63,7 +54,7 @@ public class JVMEventVerticle extends AbstractVerticle {
             }
             // Removed vertx.undeploy(id) to avoid double-undeploy
         }).completion()
-          .onComplete(ar -> promise.complete());
+          .onComplete(_ -> promise.complete());
     }
 
     @Override

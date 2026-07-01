@@ -136,9 +136,9 @@ public abstract class G1GCPauseEvent extends G1GCEvent {
             return getHeap().minus(getEden());
         } else {
             final RegionSummary summary = getArchiveRegionSummary();
-            final long archiveRegionByteBefore = summary.getBefore() * heapRegionSize * 1024L;
-            final long archiveRegionByteAfter = summary.getAfter() * heapRegionSize * 1024L;
-            final long archiveRegionByteAssigned = summary.getAssigned() * heapRegionSize * 1024L;
+            final var archiveRegionByteBefore = summary.getBefore() * heapRegionSize * 1024L;
+            final var archiveRegionByteAfter = summary.getAfter() * heapRegionSize * 1024L;
+            final var archiveRegionByteAssigned = summary.getAssigned() * heapRegionSize * 1024L;
 
             return new MemoryPoolSummary(getHeap().getOccupancyBeforeCollection() - this.getEden().getOccupancyBeforeCollection() - getSurvivor().getOccupancyBeforeCollection() - archiveRegionByteAssigned,
                     getHeap().getSizeBeforeCollection() - getEden().getSizeBeforeCollection() - getSurvivor().getOccupancyBeforeCollection() - archiveRegionByteBefore,
