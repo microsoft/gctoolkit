@@ -185,8 +185,7 @@
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>${maven.compiler-plugin.version}</version>
                     <configuration>
-                        <source>{maven.compiler.release}</source>
-                        <target>{maven.compiler.release}</target>
+                        <release>${maven.compiler.release}</release>
                         <compilerArgs>
                             <arg>--module-version=${project.version}</arg>
                             <arg>-Xlint:unchecked</arg>
