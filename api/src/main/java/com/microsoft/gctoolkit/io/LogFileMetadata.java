@@ -24,11 +24,22 @@ public abstract class LogFileMetadata {
     private FileFormat fileFormat = FileFormat.UNKNOWN;
     private final Path path;
 
+    /**
+     * Creates metadata for the file system entry at the supplied path and detects its format.
+     *
+     * @param path path to a log file, archive, or directory
+     * @throws IOException if the path cannot be inspected
+     */
     public LogFileMetadata(Path path) throws IOException {
         this.path = path;
         magic();
     }
 
+    /**
+     * Returns the path described by this metadata.
+     *
+     * @return path to the log file, archive, or directory
+     */
     public Path getPath() {
         return path;
     }
@@ -44,6 +55,11 @@ public abstract class LogFileMetadata {
         return false;
     }
 
+    /**
+     * Streams the log segments discovered at this metadata path.
+     *
+     * @return a stream of discovered log segments
+     */
     public abstract Stream<LogFileSegment> logFiles();
 
     private void magic() {
