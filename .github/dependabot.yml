@@ -8,6 +8,8 @@ updates:
       monthly-batch:
         patterns:
           - "*"
+    cooldown:
+      default-days: 7
 
   - package-ecosystem: "maven"
     directory: "/"
