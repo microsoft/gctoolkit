@@ -5,12 +5,16 @@ package com.microsoft.gctoolkit.io;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
 
 import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.nio.file.Files;
+import java.io.UncheckedIOException;
 import java.nio.file.Path;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Deque;
+import java.util.List;
+import java.util.Objects;
 import java.util.regex.Matcher;
+import java.util.stream.Collector;
 import java.util.stream.Stream;
 
 /**
@@ -23,6 +27,7 @@ import java.util.stream.Stream;
 public class GCLogFileSegment implements LogFileSegment {
 
     private final Path path;
+    private final LogFileReadLimits readLimits;
     private final int segmentIndex;
     private final boolean current;
     private DateTimeStamp endTime = null;
@@ -33,7 +38,18 @@ public class GCLogFileSegment implements LogFileSegment {
      * @param path The path to the file.
      */
     public GCLogFileSegment(Path path) {
+        this(path, LogFileReadLimits.defaults());
+    }
+
+    /**
+     * Creates a log segment with explicit resource limits.
+     *
+     * @param path the path to the file
+     * @param readLimits resource limits applied while streaming the segment
+     */
+    public GCLogFileSegment(Path path, LogFileReadLimits readLimits) {
         this.path = path;
+        this.readLimits = Objects.requireNonNull(readLimits, "readLimits");
 
         String filename = path.getFileName().toString();
         Matcher matcher = ROTATING_LOG_PATTERN.matcher(filename);
@@ -70,8 +86,12 @@ public class GCLogFileSegment implements LogFileSegment {
      */
     @Override
     public double getStartTime() {
+        return getStartTime(new LogFileReadBudget(readLimits.getMaxExpandedBytes()));
+    }
+
+    double getStartTime(LogFileReadBudget readBudget) {
         try {
-            ageOfJVMAtLogStart();
+            ageOfJVMAtLogStart(readBudget);
             return startTime.getTimeStamp();
         } catch (NullPointerException ex) {
             return Double.MAX_VALUE;
@@ -89,10 +109,14 @@ public class GCLogFileSegment implements LogFileSegment {
      */
     @Override
     public double getEndTime() {
+        return getEndTime(new LogFileReadBudget(readLimits.getMaxExpandedBytes()));
+    }
+
+    double getEndTime(LogFileReadBudget readBudget) {
         try {
-            ageOfJVMAtLogEnd();
+            ageOfJVMAtLogEnd(readBudget);
             return endTime.getTimeStamp();
-        } catch (NullPointerException|IOException ex) {
+        } catch (NullPointerException ex) {
             return Double.MIN_VALUE;
         }
     }
@@ -111,12 +135,18 @@ public class GCLogFileSegment implements LogFileSegment {
      * @return A stream of lines from the file.
      */
     public Stream<String> stream() {
+        return stream(new LogFileReadBudget(readLimits.getMaxExpandedBytes()));
+    }
+
+    Stream<String> stream(LogFileReadBudget readBudget) {
         try {
-            return Files.lines(path);
+            return LogFileStreams.plainText(
+                    path,
+                    readLimits,
+                    readBudget);
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new UncheckedIOException(e);
         }
-        return null;
     }
 
     /**
@@ -127,20 +157,22 @@ public class GCLogFileSegment implements LogFileSegment {
         return current;
     }
 
-    private DateTimeStamp ageOfJVMAtLogStart() {
+    private DateTimeStamp ageOfJVMAtLogStart(LogFileReadBudget readBudget) {
         if (startTime == null) {
-            startTime = stream()
-                    .map(DateTimeStamp::fromGCLogLine)
-                    .filter(dateTimeStamp -> dateTimeStamp.hasTimeStamp() || dateTimeStamp.hasDateStamp())
-                    .findFirst()
-                    .orElse(new DateTimeStamp(-1.0d));
+            try (Stream<String> lines = stream(readBudget)) {
+                startTime = lines
+                        .map(DateTimeStamp::fromGCLogLine)
+                        .filter(dateTimeStamp -> dateTimeStamp.hasTimeStamp() || dateTimeStamp.hasDateStamp())
+                        .findFirst()
+                        .orElse(new DateTimeStamp(-1.0d));
+            }
         }
         return startTime;
     }
 
-    private DateTimeStamp ageOfJVMAtLogEnd() throws IOException {
+    private DateTimeStamp ageOfJVMAtLogEnd(LogFileReadBudget readBudget) {
         if (endTime == null) {
-            endTime = tail(100).stream()
+            endTime = tail(100, readBudget).stream()
                     .map(DateTimeStamp::fromGCLogLine)
                     .filter(dateTimeStamp -> dateTimeStamp.hasTimeStamp() || dateTimeStamp.hasDateStamp())
                     .max(Comparator.comparing(dateTimeStamp -> dateTimeStamp != null ? dateTimeStamp.getTimeStamp() : 0))
@@ -158,54 +190,23 @@ public class GCLogFileSegment implements LogFileSegment {
         return getSegmentName();
     }
 
-
-     // todo: implementation may be a bit ugly...
-     // https://codereview.stackexchange.com/questions/79039/get-the-tail-of-a-file-the-last-10-lines
-     // Tail is not a class, it's a method so the solution in stackoverflow isn't correct but the core
-     // could be used here as it's cleaner
-    private ArrayList<String> tail(int numberOfLines) throws IOException {
-
-        char LF = '\n';
-        char CR = '\r';
-        boolean foundEOL = false;
-        char eol = 0;
-        RandomAccessFile randomAccessFile = new RandomAccessFile(path.toFile(), "r");
-        long currentPosition = randomAccessFile.length() - 1;
-        int linesFound = 0;
-
-        while (currentPosition > 0 && !foundEOL) {
-            randomAccessFile.seek(currentPosition);
-            char character = (char) randomAccessFile.readByte();
-            if (character == LF) {
-                eol = LF;
-                randomAccessFile.seek(currentPosition - 1);
-                character = (char) randomAccessFile.readByte();
-                if (character == CR)
-                    eol = CR;
-                foundEOL = true;
-            } else if (character == CR && !foundEOL) {
-                eol = CR;
-                foundEOL = true;
-            } else
-                currentPosition--;
+    private List<String> tail(int numberOfLines, LogFileReadBudget readBudget) {
+        try (Stream<String> lines = stream(readBudget)) {
+            return lines.collect(tailCollector(numberOfLines));
         }
+    }
 
-        currentPosition = randomAccessFile.length() - 1;
-
-        while (currentPosition > 0 && linesFound < numberOfLines) {
-            randomAccessFile.seek(--currentPosition);
-            char character = (char) randomAccessFile.readByte();
-            if (eol == character)
-                linesFound++;
-        }
-
-        ArrayList<String> lines = new ArrayList<>();
-        if (linesFound > 0) {
-            String line;
-            while ((line = randomAccessFile.readLine()) != null) {
-                lines.add(line);
+    private static <T> Collector<T, ?, List<T>> tailCollector(int count) {
+        return Collector.<T, Deque<T>, List<T>>of(ArrayDeque::new, (buffer, line) -> {
+            if (buffer.size() == count) {
+                buffer.pollFirst();
             }
-        }
-        return lines;
+            buffer.add(line);
+        }, (buffer, list) -> {
+            while (list.size() < count && !buffer.isEmpty()) {
+                list.addFirst(buffer.pollLast());
+            }
+            return list;
+        }, ArrayList::new);
     }
 }
