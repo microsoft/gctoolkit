@@ -28,8 +28,7 @@ public class GCLogFileZipSegment implements LogFileSegment {
     private final Path path;
     private final String segmentName;
     private final LogFileReadLimits readLimits;
-    private final ZipArchivePreflight.Index archiveIndex;
-    private final ZipArchivePreflight.Entry archiveEntry;
+    private final LogFileStreams.ZipEntryReference archiveEntry;
     private DateTimeStamp endTime = null;
     private DateTimeStamp startTime = null;
 
@@ -50,19 +49,17 @@ public class GCLogFileZipSegment implements LogFileSegment {
      * @param readLimits resource limits applied while streaming the segment
      */
     public GCLogFileZipSegment(Path path, String segmentName, LogFileReadLimits readLimits) {
-        this(path, segmentName, readLimits, null, null);
+        this(path, segmentName, readLimits, null);
     }
 
     GCLogFileZipSegment(
             Path path,
             String segmentName,
             LogFileReadLimits readLimits,
-            ZipArchivePreflight.Index archiveIndex,
-            ZipArchivePreflight.Entry archiveEntry) {
+            LogFileStreams.ZipEntryReference archiveEntry) {
         this.path = path;
         this.segmentName = segmentName;
         this.readLimits = Objects.requireNonNull(readLimits, "readLimits");
-        this.archiveIndex = archiveIndex;
         this.archiveEntry = archiveEntry;
     }
 
@@ -168,10 +165,9 @@ public class GCLogFileZipSegment implements LogFileSegment {
 
     Stream<String> stream(LogFileReadBudget readBudget) {
         try {
-            if (archiveIndex != null && archiveEntry != null) {
+            if (archiveEntry != null) {
                 return LogFileStreams.zipEntry(
                         path,
-                        archiveIndex,
                         archiveEntry,
                         readLimits,
                         readBudget);

@@ -31,6 +31,7 @@ import java.util.zip.ZipOutputStream;
 
 import static com.microsoft.gctoolkit.io.GCLogFile.END_OF_DATA_SENTINEL;
 import static com.microsoft.gctoolkit.io.LogFileReadLimitExceededException.LimitType.ARCHIVE_ENTRIES;
+import static com.microsoft.gctoolkit.io.LogFileReadLimitExceededException.LimitType.ARCHIVE_METADATA_BYTES;
 import static com.microsoft.gctoolkit.io.LogFileReadLimitExceededException.LimitType.COMPRESSED_BYTES;
 import static com.microsoft.gctoolkit.io.LogFileReadLimitExceededException.LimitType.COMPRESSED_MEMBERS;
 import static com.microsoft.gctoolkit.io.LogFileReadLimitExceededException.LimitType.COMPRESSION_RATIO;
@@ -413,11 +414,7 @@ class SingleGCLogFileReadLimitsTest {
         Files.write(log, archive);
         LogFileReadLimits limits = new LogFileReadLimits(16 * 1024, 16 * 1024, 10_000.0d, 1024, 16);
 
-        assertThrows(UncheckedIOException.class, () -> {
-            try (Stream<String> stream = new SingleGCLogFile(log, limits).stream()) {
-                stream.count();
-            }
-        });
+        assertThrows(IOException.class, () -> new SingleGCLogFile(log, limits).stream());
     }
 
     @Test
@@ -450,6 +447,23 @@ class SingleGCLogFileReadLimitsTest {
                 new LogFileReadLimits(64 * 1024, 64 * 1024, 1024, 100.0d, 1024, 2, 1024);
 
         assertLimit(ARCHIVE_ENTRIES, () -> new SingleGCLogFile(log, limits).stream());
+    }
+
+    @Test
+    void rejectsOversizedZipCentralDirectoryBeforeIndexing() throws IOException {
+        Path log = temporaryDirectory.resolve("central-directory.zip");
+        writeZip(log, Map.of("gc.log", "line\n"));
+        LogFileReadLimits limits = new LogFileReadLimits(
+                64 * 1024,
+                64 * 1024,
+                1024,
+                100.0d,
+                1024,
+                16,
+                32,
+                1024);
+
+        assertLimit(ARCHIVE_METADATA_BYTES, () -> new SingleGCLogFile(log, limits).stream());
     }
 
     @Test
@@ -551,6 +565,8 @@ class SingleGCLogFileReadLimitsTest {
                 () -> new LogFileReadLimits(0, 1, 1, 1.0d, 1, 1, 1));
         assertThrows(IllegalArgumentException.class,
                 () -> new LogFileReadLimits(1, 1, 1, 1.0d, 1, 1, 0));
+        assertThrows(IllegalArgumentException.class,
+                () -> new LogFileReadLimits(1, 1, 1, 1.0d, 1, 1, 0, 1));
     }
 
     @Test
@@ -563,6 +579,7 @@ class SingleGCLogFileReadLimitsTest {
         assertTrue(Double.isFinite(defaults.getMaxCompressionRatio()));
         assertTrue(defaults.getCompressionRatioGraceBytes() > 0);
         assertTrue(defaults.getMaxArchiveEntries() > 0);
+        assertTrue(defaults.getMaxArchiveMetadataBytes() > 0);
         assertTrue(defaults.getMaxGzipHeaderBytes() > 0);
     }
 

@@ -72,19 +72,18 @@ public class RotatingLogFileMetadata extends LogFileMetadata {
     }
 
     private void findZIPSegments(LogFileReadBudget inspectionBudget) {
-        ZipArchivePreflight.Index index;
+        List<LogFileStreams.ZipEntryReference> entries;
         try {
-            index = ZipArchivePreflight.validate(getPath(), readLimits);
+            entries = LogFileStreams.zipEntries(getPath(), readLimits);
         } catch (IOException ioe) {
             throw new UncheckedIOException(ioe);
         }
-        segments = index.getEntries().stream()
+        segments = entries.stream()
                 .filter(entry -> !entry.isDirectory())
                 .map(entry -> new GCLogFileZipSegment(
                         getPath(),
                         entry.getName(),
                         readLimits,
-                        index,
                         entry))
                 .collect(toList());
         orderSegments(inspectionBudget);

@@ -21,6 +21,7 @@ public final class LogFileReadLimitExceededException extends RuntimeException {
         LINE_CHARACTERS,
         COMPRESSION_RATIO,
         ARCHIVE_ENTRIES,
+        ARCHIVE_METADATA_BYTES,
         COMPRESSED_MEMBERS,
         HEADER_BYTES
     }

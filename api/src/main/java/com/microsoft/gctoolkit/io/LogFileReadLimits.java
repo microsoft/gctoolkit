@@ -30,6 +30,9 @@ public final class LogFileReadLimits {
     /** Default maximum number of file entries in a rotating ZIP log. */
     public static final int DEFAULT_MAX_ARCHIVE_ENTRIES = 1024;
 
+    /** Default maximum number of bytes in a ZIP central directory. */
+    public static final long DEFAULT_MAX_ARCHIVE_METADATA_BYTES = 16L * 1024L * 1024L;
+
     /** Default maximum number of bytes in one GZIP member header. */
     public static final int DEFAULT_MAX_GZIP_HEADER_BYTES = 64 * 1024;
 
@@ -40,6 +43,7 @@ public final class LogFileReadLimits {
             DEFAULT_MAX_COMPRESSION_RATIO,
             DEFAULT_COMPRESSION_RATIO_GRACE_BYTES,
             DEFAULT_MAX_ARCHIVE_ENTRIES,
+            DEFAULT_MAX_ARCHIVE_METADATA_BYTES,
             DEFAULT_MAX_GZIP_HEADER_BYTES);
 
     private final long maxCompressedBytes;
@@ -48,6 +52,7 @@ public final class LogFileReadLimits {
     private final double maxCompressionRatio;
     private final long compressionRatioGraceBytes;
     private final int maxArchiveEntries;
+    private final long maxArchiveMetadataBytes;
     private final int maxGzipHeaderBytes;
 
     /**
@@ -72,6 +77,7 @@ public final class LogFileReadLimits {
                 maxCompressionRatio,
                 compressionRatioGraceBytes,
                 maxArchiveEntries,
+                DEFAULT_MAX_ARCHIVE_METADATA_BYTES,
                 DEFAULT_MAX_GZIP_HEADER_BYTES);
     }
 
@@ -94,6 +100,38 @@ public final class LogFileReadLimits {
             long compressionRatioGraceBytes,
             int maxArchiveEntries,
             int maxGzipHeaderBytes) {
+        this(
+                maxCompressedBytes,
+                maxExpandedBytes,
+                maxLineCharacters,
+                maxCompressionRatio,
+                compressionRatioGraceBytes,
+                maxArchiveEntries,
+                DEFAULT_MAX_ARCHIVE_METADATA_BYTES,
+                maxGzipHeaderBytes);
+    }
+
+    /**
+     * Creates a set of finite log-file read limits, including archive metadata limits.
+     *
+     * @param maxCompressedBytes maximum bytes read from one compressed input
+     * @param maxExpandedBytes maximum plaintext or expanded bytes per top-level stream operation
+     * @param maxLineCharacters maximum decoded characters in one line
+     * @param maxCompressionRatio maximum expanded-to-compressed byte ratio
+     * @param compressionRatioGraceBytes expanded bytes allowed before ratio enforcement begins
+     * @param maxArchiveEntries maximum ZIP entries, GZIP members, or rotating log segments
+     * @param maxArchiveMetadataBytes maximum bytes in a ZIP central directory
+     * @param maxGzipHeaderBytes maximum bytes in one GZIP member header
+     */
+    public LogFileReadLimits(
+            long maxCompressedBytes,
+            long maxExpandedBytes,
+            int maxLineCharacters,
+            double maxCompressionRatio,
+            long compressionRatioGraceBytes,
+            int maxArchiveEntries,
+            long maxArchiveMetadataBytes,
+            int maxGzipHeaderBytes) {
         if (maxCompressedBytes <= 0) {
             throw new IllegalArgumentException("maxCompressedBytes must be positive");
         }
@@ -112,6 +150,9 @@ public final class LogFileReadLimits {
         if (maxArchiveEntries <= 0) {
             throw new IllegalArgumentException("maxArchiveEntries must be positive");
         }
+        if (maxArchiveMetadataBytes <= 0) {
+            throw new IllegalArgumentException("maxArchiveMetadataBytes must be positive");
+        }
         if (maxGzipHeaderBytes <= 0) {
             throw new IllegalArgumentException("maxGzipHeaderBytes must be positive");
         }
@@ -121,6 +162,7 @@ public final class LogFileReadLimits {
         this.maxCompressionRatio = maxCompressionRatio;
         this.compressionRatioGraceBytes = compressionRatioGraceBytes;
         this.maxArchiveEntries = maxArchiveEntries;
+        this.maxArchiveMetadataBytes = maxArchiveMetadataBytes;
         this.maxGzipHeaderBytes = maxGzipHeaderBytes;
     }
 
@@ -188,6 +230,15 @@ public final class LogFileReadLimits {
     }
 
     /**
+     * Returns the maximum number of bytes accepted in a ZIP central directory.
+     *
+     * @return maximum ZIP central-directory bytes
+     */
+    public long getMaxArchiveMetadataBytes() {
+        return maxArchiveMetadataBytes;
+    }
+
+    /**
      * Returns the maximum number of bytes accepted in one GZIP member header.
      *
      * @return maximum GZIP header bytes
@@ -211,6 +262,7 @@ public final class LogFileReadLimits {
                 && Double.compare(maxCompressionRatio, that.maxCompressionRatio) == 0
                 && compressionRatioGraceBytes == that.compressionRatioGraceBytes
                 && maxArchiveEntries == that.maxArchiveEntries
+                && maxArchiveMetadataBytes == that.maxArchiveMetadataBytes
                 && maxGzipHeaderBytes == that.maxGzipHeaderBytes;
     }
 
@@ -223,6 +275,7 @@ public final class LogFileReadLimits {
                 maxCompressionRatio,
                 compressionRatioGraceBytes,
                 maxArchiveEntries,
+                maxArchiveMetadataBytes,
                 maxGzipHeaderBytes);
     }
 
@@ -235,6 +288,7 @@ public final class LogFileReadLimits {
                 + ", maxCompressionRatio=" + maxCompressionRatio
                 + ", compressionRatioGraceBytes=" + compressionRatioGraceBytes
                 + ", maxArchiveEntries=" + maxArchiveEntries
+                + ", maxArchiveMetadataBytes=" + maxArchiveMetadataBytes
                 + ", maxGzipHeaderBytes=" + maxGzipHeaderBytes
                 + '}';
     }
