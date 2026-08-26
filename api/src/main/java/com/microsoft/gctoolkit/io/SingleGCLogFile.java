@@ -2,18 +2,10 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.io;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Objects;
-import java.util.logging.Logger;
 import java.util.stream.Stream;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
 /**
  * A single GC log file. If the file is a zip or gzip file,
@@ -21,23 +13,30 @@ import java.util.zip.ZipInputStream;
  */
 public class SingleGCLogFile extends GCLogFile {
 
-    private static final Logger LOGGER = Logger.getLogger(SingleGCLogFile.class.getName());
+    private SingleLogFileMetadata metadata = null;
 
     /**
      * Constructor for a single, GC log file.
      * @param path The path to the log file.
      */
-
-    private SingleLogFileMetadata metadata = null;
-
     public SingleGCLogFile(Path path) {
-        super(path);
+        this(path, LogFileReadLimits.defaults());
+    }
+
+    /**
+     * Constructor for a single GC log file with explicit resource limits.
+     *
+     * @param path the path to the log file
+     * @param readLimits resource limits applied while streaming the log
+     */
+    public SingleGCLogFile(Path path, LogFileReadLimits readLimits) {
+        super(path, readLimits);
     }
 
     @Override
     public LogFileMetadata getMetaData() throws IOException {
         if (metadata == null) {
-            metadata = new SingleLogFileMetadata(path);
+            metadata = new SingleLogFileMetadata(path, getReadLimits());
         }
         return metadata;
     }
@@ -48,16 +47,17 @@ public class SingleGCLogFile extends GCLogFile {
     }
 
     private Stream<String> stream(LogFileMetadata metadata) throws IOException {
-        Stream<String> stream = null;
+        LogFileReadBudget budget = new LogFileReadBudget(getReadLimits().getMaxExpandedBytes());
+        Stream<String> stream;
         if (metadata.isPlainText()) {
-            stream = Files.lines(metadata.getPath());
+            stream = LogFileStreams.plainText(metadata.getPath(), getReadLimits(), budget);
         } else if (metadata.isZip()) {
-            stream = streamZipFile(metadata.getPath());
+            stream = LogFileStreams.firstZipEntry(metadata.getPath(), getReadLimits(), budget);
         } else if (metadata.isGZip()) {
-            stream = streamGZipFile(metadata.getPath());
+            stream = LogFileStreams.gzip(metadata.getPath(), getReadLimits(), budget);
+        } else {
+            throw new IOException("Unable to read " + path);
         }
-        if ( stream == null)
-            throw new IOException("Unable to read " + path.toString());
         return Stream.concat(stream
                 .filter(Objects::nonNull)
                 .filter(line -> ! line.isBlank())
@@ -66,19 +66,4 @@ public class SingleGCLogFile extends GCLogFile {
                 ,Stream.of(endOfData()));
 
     }
-
-    private static Stream<String> streamZipFile(Path path) throws IOException {
-        ZipInputStream zipStream = new ZipInputStream(Files.newInputStream(path));
-        ZipEntry entry;
-        do {
-            entry = zipStream.getNextEntry();
-        } while (entry != null && entry.isDirectory());
-        return new BufferedReader(new InputStreamReader(new BufferedInputStream(zipStream))).lines();
-    }
-
-    private static Stream<String> streamGZipFile(Path path) throws IOException {
-        GZIPInputStream gzipStream = new GZIPInputStream(Files.newInputStream(path));
-        return new BufferedReader(new InputStreamReader(new BufferedInputStream(gzipStream))).lines();
-    }
-
 }
