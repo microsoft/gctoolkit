@@ -2,6 +2,9 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.event;
 
+/**
+ * Occupancy of the survivor space before and after a collection. Size is {@code -1} when the log omitted it.
+ */
 public class SurvivorMemoryPoolSummary {
 
     private final long occupancyBeforeCollection;

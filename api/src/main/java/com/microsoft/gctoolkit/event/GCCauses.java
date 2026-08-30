@@ -8,6 +8,9 @@ import java.util.function.Function;
 
 import static java.util.stream.Collectors.toMap;
 
+/**
+ * Maps the parenthesized cause token in a GC log line to a {@link GCCause}.
+ */
 public class GCCauses {
     private static final Map<String, GCCause> GC_CAUSES = Arrays.stream(GCCause.values()).collect(toMap(GCCause::getLabel, Function.identity()));
 

@@ -2,6 +2,9 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.event;
 
+/**
+ * Min, average, max, range, and sum for a numeric statistic in a GC log.
+ */
 public class StatisticalSummary {
 
     public static final double UNDEFINED = -1.0d;

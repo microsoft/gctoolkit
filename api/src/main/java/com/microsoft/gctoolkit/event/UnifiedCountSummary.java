@@ -2,6 +2,9 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.event;
 
+/**
+ * Count statistic from unified logging: min, average, max, range, sum, and worker threads.
+ */
 public class UnifiedCountSummary {
 
     //example: Min: 1, Avg: 17.4, Max: 34, Diff: 33, Sum: 139, Workers: 8

@@ -2,6 +2,9 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.event;
 
+/**
+ * {@link StatisticalSummary} plus the worker thread count from unified logging.
+ */
 public class UnifiedStatisticalSummary extends StatisticalSummary {
 
     private final int threads;

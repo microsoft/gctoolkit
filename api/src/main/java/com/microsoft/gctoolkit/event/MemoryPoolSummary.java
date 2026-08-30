@@ -2,6 +2,9 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.event;
 
+/**
+ * Occupancy and committed size of a heap memory pool before and after a collection, in kilobytes.
+ */
 public class MemoryPoolSummary {
 
     private final long occupancyBeforeCollection;

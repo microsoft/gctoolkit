@@ -2,6 +2,9 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.event;
 
+/**
+ * Count of G1 regions in a pool before and after a collection, plus regions assigned to the pool.
+ */
 public class RegionSummary {
 
     private final int before;

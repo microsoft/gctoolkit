@@ -5,6 +5,9 @@ package com.microsoft.gctoolkit.event;
 
 import java.util.ArrayList;
 
+/**
+ * Thread-local allocation buffer records captured from a GC log.
+ */
 public class TLABSummary {
 
     private ArrayList<String> tlabRecords;
