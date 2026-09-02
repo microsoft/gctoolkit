@@ -13,13 +13,13 @@ import java.util.Objects;
 public final class LogFileReadLimits {
 
     /** Default maximum number of bytes read from plaintext or emitted by decompression. */
-    public static final long DEFAULT_MAX_EXPANDED_BYTES = 1024L * 1024L * 1024L;
+    public static final long DEFAULT_MAX_EXPANDED_BYTES = 2L * 1024L * 1024L * 1024L;
 
     /** Default maximum number of bytes read from one compressed input. */
     public static final long DEFAULT_MAX_COMPRESSED_BYTES = 1024L * 1024L * 1024L;
 
     /** Default maximum number of decoded characters in one line. */
-    public static final int DEFAULT_MAX_LINE_CHARACTERS = 1024 * 1024;
+    public static final int DEFAULT_MAX_LINE_CHARACTERS = 2 * 1024 * 1024;
 
     /** Default maximum ratio of expanded bytes to compressed bytes. */
     public static final double DEFAULT_MAX_COMPRESSION_RATIO = 100.0d;

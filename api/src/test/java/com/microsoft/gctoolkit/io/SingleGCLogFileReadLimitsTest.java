@@ -46,7 +46,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class SingleGCLogFileReadLimitsTest {
 
-    private static final int DEFAULT_MAX_LINE_CHARACTERS = 1024 * 1024;
+    private static final int DEFAULT_MAX_LINE_CHARACTERS =
+            LogFileReadLimits.DEFAULT_MAX_LINE_CHARACTERS;
     private static final int HIGHLY_COMPRESSIBLE_LINE_COUNT = 2048;
     private static final String HIGHLY_COMPRESSIBLE_LINE = "a".repeat(1024);
     private static final LogFileReadLimits SMALL_LIMITS =
