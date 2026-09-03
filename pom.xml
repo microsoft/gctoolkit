@@ -72,16 +72,16 @@
         <maven.resources-plugin.version>3.5.0</maven.resources-plugin.version>
         <maven.site-plugin.version>4.0.0-M16</maven.site-plugin.version>
         <maven.source-plugin.version>3.4.0</maven.source-plugin.version>
-        <maven.spotbugs-plugin.version>4.10.3.0</maven.spotbugs-plugin.version>
+        <maven.spotbugs-plugin.version>4.10.4.0</maven.spotbugs-plugin.version>
         <maven.surefire-plugin.version>3.5.6</maven.surefire-plugin.version>
         <maven.version>3.9.11</maven.version>
         <maven.versions-plugin.version>2.21.0</maven.versions-plugin.version>
         <mutability.detector.version>0.9.3</mutability.detector.version>
-        <pmd.version>7.26.0</pmd.version>
+        <pmd.version>7.27.0</pmd.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.github.repository>microsoft/gctoolkit</project.github.repository>
         <repository.url>git@github.com:${project.github.repository}.git</repository.url>
-        <spotbugs.version>4.10.3</spotbugs.version>
+        <spotbugs.version>4.10.4</spotbugs.version>
     </properties>
 
     <modules>
