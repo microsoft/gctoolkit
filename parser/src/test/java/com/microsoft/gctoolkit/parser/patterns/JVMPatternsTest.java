@@ -32,8 +32,8 @@ public class JVMPatternsTest implements JVMPatterns {
         string = "Total time for which application threads were stopped: 0.0006115 seconds, Stopping threads took: 0.0003832 seconds";
         assertNotNull(UNIFIED_LOGGING_APPLICATION_STOP_TIME_WITH_STOPPING_TIME.parse(string));
 
-        string = "Safepoint \"G1CollectForAllocation\", Time since last: 295590960 ns, Reaching safepoint: 238882 ns, At safepoint: 23888872 ns, Total: 24127754 ns)";
-        assertNotNull(UNIFIED_LOGGING_G1_SAFEPOINT.parse(string));
+        string = "Safepoint \"G1CollectForAllocation\", Time since last: 295590960 ns, Reaching safepoint: 238882 ns, At safepoint: 23888872 ns, Total: 24127754 ns";
+        assertNotNull(UNIFIED_LOGGING_SAFEPOINT.parse(string));
 
     }
 }
