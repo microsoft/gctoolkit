@@ -24,8 +24,12 @@ public class SingleLogFileMetadata extends LogFileMetadata {
      * @throws IOException if the path cannot be inspected
      */
     public SingleLogFileMetadata(Path path) throws IOException {
+        this(path, LogFileReadLimits.defaults());
+    }
+
+    SingleLogFileMetadata(Path path, LogFileReadLimits readLimits) throws IOException {
         super(path);
-        this.logFile = new GCLogFileSegment(path);
+        this.logFile = new GCLogFileSegment(path, readLimits);
     }
 
     /**
