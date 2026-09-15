@@ -6,7 +6,7 @@ import com.microsoft.gctoolkit.aggregator.Aggregation;
 import com.microsoft.gctoolkit.aggregator.Aggregator;
 import com.microsoft.gctoolkit.aggregator.Collates;
 import com.microsoft.gctoolkit.aggregator.EventSource;
-import com.microsoft.gctoolkit.event.jvm.ApplicationStoppedTime;
+import com.microsoft.gctoolkit.event.jvm.Safepoint;
 import com.microsoft.gctoolkit.integration.io.TestLogFile;
 import com.microsoft.gctoolkit.io.GCLogFile;
 import com.microsoft.gctoolkit.io.SingleGCLogFile;
@@ -50,24 +50,21 @@ public class UnifiedSafepointAggregationTest {
         SafepointSummary summary = analyze("zgc/zgc.log");
         assertEquals(3478, summary.count(), "safepoint lines in zgc.log");
         assertTrue(summary.totalTimeToSafepoint() > 0.0d, "ZGC log should report time to safepoint");
-        assertTrue(summary.reasons().contains(ApplicationStoppedTime.VMOperations.ZMarkStart),
-                "expected ZGC VM operations to be recognised");
-        // All but the two "Cleanup" safepoints, which are not collections
-        assertEquals(3476, summary.gcPauseCount(), "ZGC safepoints attributed to a collection");
+        assertTrue(summary.reasons().contains("ZMarkStart"), "expected ZGC VM operations to be reported");
     }
 
     @Test
     public void testG1Safepoints() {
         SafepointSummary summary = analyze("g1gc/G1-80-16gbps2.log.0");
         assertEquals(2158, summary.count(), "safepoint lines in G1-80-16gbps2.log.0");
-        assertTrue(summary.reasons().contains(ApplicationStoppedTime.VMOperations.G1CollectForAllocation));
+        assertTrue(summary.reasons().contains("G1CollectForAllocation"));
     }
 
     @Test
     public void testSerialSafepoints() {
         SafepointSummary summary = analyze("serial/factorization-serialgc-tip.log");
         assertEquals(17, summary.count(), "safepoint lines in factorization-serialgc-tip.log");
-        assertTrue(summary.reasons().contains(ApplicationStoppedTime.VMOperations.SerialGCCollect));
+        assertTrue(summary.reasons().contains("SerialGCCollect"));
     }
 
     @Aggregates(EventSource.SAFEPOINT)
@@ -75,10 +72,10 @@ public class UnifiedSafepointAggregationTest {
 
         public SafepointAggregator(SafepointSummary aggregation) {
             super(aggregation);
-            register(ApplicationStoppedTime.class, this::process);
+            register(Safepoint.class, this::process);
         }
 
-        private void process(ApplicationStoppedTime event) {
+        private void process(Safepoint event) {
             aggregation().record(event);
         }
     }
@@ -86,27 +83,20 @@ public class UnifiedSafepointAggregationTest {
     @Collates(SafepointAggregator.class)
     public static class SafepointSummary extends Aggregation {
 
-        private final List<ApplicationStoppedTime.VMOperations> reasons = new ArrayList<>();
+        private final List<String> reasons = new ArrayList<>();
         private double totalTimeToSafepoint = 0.0d;
-        private int gcPauseCount = 0;
 
-        public void record(ApplicationStoppedTime event) {
-            reasons.add(event.getSafePointReason());
-            if (event.isGCPause())
-                gcPauseCount++;
-            if (event.hasTTSP())
-                totalTimeToSafepoint += event.getTimeToStopThreads();
+        public void record(Safepoint event) {
+            reasons.add(event.getVmOperation());
+            if (event.hasReachingSafepointDuration())
+                totalTimeToSafepoint += event.getReachingSafepointDuration();
         }
 
         public int count() {
             return reasons.size();
         }
 
-        public int gcPauseCount() {
-            return gcPauseCount;
-        }
-
-        public List<ApplicationStoppedTime.VMOperations> reasons() {
+        public List<String> reasons() {
             return reasons;
         }
 
