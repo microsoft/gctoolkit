@@ -228,9 +228,8 @@ public class PreUnifiedDiarizer implements Diarizer {
 
     @Override
     public DateTimeStamp getTimeOfFirstEvent() {
-        if (timeOfFirstEvent == null)
-            timeOfFirstEvent = new DateTimeStamp(0.0d);
-        return timeOfFirstEvent;
+        // Keep the fallback transient so a timestamp found on a later line can still be recorded.
+        return timeOfFirstEvent == null ? new DateTimeStamp(0.0d) : timeOfFirstEvent;
     }
 
     private void timeOfFirstEvent(String line) {
@@ -1048,3 +1047,4 @@ public class PreUnifiedDiarizer implements Diarizer {
         }
     }
 }
+
