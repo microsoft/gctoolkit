@@ -53,6 +53,10 @@ public abstract class GCLogParser implements DataSourceParser, SharedPatterns {
     public void diary(Diary diary) {
         this.diary = diary;
         this.clock = diary.getTimeOfFirstEvent();
+        if (this.clock == null) {
+            LOGGER.log(Level.SEVERE, "Time of first event is null, are there any events presented in the log file?");
+            throw new IllegalStateException("Missing log events");
+        }
     }
 
     /**
