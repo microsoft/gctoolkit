@@ -251,7 +251,9 @@ public class GCToolKit {
                     "com.microsoft.gctoolkit.parser.UnifiedGenerationalParser",
                     "com.microsoft.gctoolkit.parser.UnifiedJVMEventParser",
                     "com.microsoft.gctoolkit.parser.UnifiedSurvivorMemoryPoolParser",
-                    "com.microsoft.gctoolkit.parser.ZGCParser"
+                    "com.microsoft.gctoolkit.parser.ZGCParser",
+                    "com.microsoft.gctoolkit.parser.vmops.SafepointParser",
+                    "com.microsoft.gctoolkit.parser.vmops.UnifiedSafepointParser"
             };
             dataSourceParsers = Arrays.stream(parsers)
                     .map(parserName -> {

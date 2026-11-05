@@ -31,6 +31,7 @@ module com.microsoft.gctoolkit.parser {
             com.microsoft.gctoolkit.parser.JVMEventParser,
             com.microsoft.gctoolkit.parser.UnifiedJVMEventParser,
             com.microsoft.gctoolkit.parser.vmops.SafepointParser,
+            com.microsoft.gctoolkit.parser.vmops.UnifiedSafepointParser,
             com.microsoft.gctoolkit.parser.SurvivorMemoryPoolParser,
             com.microsoft.gctoolkit.parser.UnifiedSurvivorMemoryPoolParser,
             com.microsoft.gctoolkit.parser.CMSTenuredPoolParser,
