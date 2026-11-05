@@ -3,17 +3,16 @@
 package com.microsoft.gctoolkit.io;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.logging.Level;
+import java.util.Objects;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 
 import static java.util.stream.Collectors.toList;
 
@@ -25,6 +24,7 @@ public class RotatingLogFileMetadata extends LogFileMetadata {
     private static final Logger LOG = Logger.getLogger(RotatingLogFileMetadata.class.getName());
 
     private List<LogFileSegment> segments;
+    private final LogFileReadLimits readLimits;
 
     /**
      * Creates metadata for a rotating garbage collection log source.
@@ -33,7 +33,19 @@ public class RotatingLogFileMetadata extends LogFileMetadata {
      * @throws IOException if the path cannot be inspected
      */
     public RotatingLogFileMetadata(Path path) throws IOException {
+        this(path, LogFileReadLimits.defaults());
+    }
+
+    /**
+     * Creates metadata for a rotating garbage collection log source with explicit resource limits.
+     *
+     * @param path path to a rotating log file, archive, or directory
+     * @param readLimits resource limits applied while inspecting log segments
+     * @throws IOException if the path cannot be inspected
+     */
+    public RotatingLogFileMetadata(Path path, LogFileReadLimits readLimits) throws IOException {
         super(path);
+        this.readLimits = Objects.requireNonNull(readLimits, "readLimits");
     }
 
     /**
@@ -42,11 +54,15 @@ public class RotatingLogFileMetadata extends LogFileMetadata {
      * @return a stream of ordered log segments
      */
     public Stream<LogFileSegment> logFiles() {
+        return logFiles(new LogFileReadBudget(readLimits.getMaxExpandedBytes()));
+    }
+
+    Stream<LogFileSegment> logFiles(LogFileReadBudget inspectionBudget) {
         if ( segments == null) {
             if ( isPlainText() || isDirectory())
-                findSegments();
+                findSegments(inspectionBudget);
             else if ( isZip())
-                findZIPSegments();
+                findZIPSegments(inspectionBudget);
             else {
                 LOG.warning("unknown log file format");
                 segments = new ArrayList<>();
@@ -55,17 +71,22 @@ public class RotatingLogFileMetadata extends LogFileMetadata {
         return segments.stream();
     }
 
-    private void findZIPSegments() {
-        try (var zipfile = new ZipFile(getPath().toFile())) {
-            segments = zipfile.stream()
-                    .filter(zipEntry -> !zipEntry.isDirectory())
-                    .map(ZipEntry::getName)
-                    .map(name -> new GCLogFileZipSegment(getPath(),name))
-                    .collect(toList());
+    private void findZIPSegments(LogFileReadBudget inspectionBudget) {
+        List<LogFileStreams.ZipEntryReference> entries;
+        try {
+            entries = LogFileStreams.zipEntries(getPath(), readLimits);
         } catch (IOException ioe) {
-            LOG.warning(ioe.getMessage());
+            throw new UncheckedIOException(ioe);
         }
-        orderSegments();
+        segments = entries.stream()
+                .filter(entry -> !entry.isDirectory())
+                .map(entry -> new GCLogFileZipSegment(
+                        getPath(),
+                        entry.getName(),
+                        readLimits,
+                        entry))
+                .collect(toList());
+        orderSegments(inspectionBudget);
     }
 
     /**
@@ -76,9 +97,9 @@ public class RotatingLogFileMetadata extends LogFileMetadata {
     public int getNumberOfFiles() {
         if ( this.segments == null)
             if ( isZip())
-                findZIPSegments();
+                findZIPSegments(new LogFileReadBudget(readLimits.getMaxExpandedBytes()));
             else
-                findSegments();
+                findSegments(new LogFileReadBudget(readLimits.getMaxExpandedBytes()));
             return this.segments.size();
     }
 
@@ -129,52 +150,77 @@ public class RotatingLogFileMetadata extends LogFileMetadata {
         return base.toString();
     }
 
-    private void findSegments() {
-        segments = new ArrayList<>();
-        try {
+    private void findSegments(LogFileReadBudget inspectionBudget) {
+        try (Stream<Path> paths = Files.list(isDirectory() ? getPath() : getPath().getParent())) {
+            Stream<Path> matchingPaths = paths;
             if (isDirectory()) {
-                Files.list(getPath()).map(GCLogFileSegment::new).forEach(segments::add);
+                matchingPaths = paths;
+            } else {
+                matchingPaths = paths.filter(
+                        file -> file.getFileName().toString().startsWith(getRootPattern()));
             }
-            else {
-                Files.list(getPath().getParent())
-                        .filter(file -> file.getFileName().toString().startsWith(getRootPattern()))
-                        .map(p -> new GCLogFileSegment(p)).forEach(segments::add);
+            List<Path> segmentPaths = matchingPaths
+                    .limit((long) readLimits.getMaxArchiveEntries() + 1L)
+                    .collect(toList());
+            if (segmentPaths.size() > readLimits.getMaxArchiveEntries()) {
+                throw new LogFileReadLimitExceededException(
+                        LogFileReadLimitExceededException.LimitType.ARCHIVE_ENTRIES,
+                        getPath(),
+                        null,
+                        Integer.toString(readLimits.getMaxArchiveEntries()),
+                        Integer.toString(segmentPaths.size()));
             }
+            segments = segmentPaths.stream()
+                    .map(path -> new GCLogFileSegment(path, readLimits))
+                    .collect(toList());
         } catch (IOException ioe) {
-            LOG.log(Level.WARNING,"Unable to find log segments.", ioe);
+            throw new UncheckedIOException(ioe);
         }
-        orderSegments();
+        orderSegments(inspectionBudget);
     }
 
-    private void orderSegments() {
+    private void orderSegments(LogFileReadBudget inspectionBudget) {
 
         if (segments.size() < 2) return;
 
-        LinkedList<LogFileSegment> orderedList = new LinkedList<>();
-        List<LogFileSegment> workingList = new ArrayList<>();
-        workingList.addAll(segments);
-
-        // Find current
         String basePattern = getRootPattern();
-        LogFileSegment current = workingList.stream()
+        LogFileSegment current = segments.stream()
                 .filter( segment -> segment.getSegmentName().endsWith(basePattern) || segment.getSegmentName().endsWith(".current"))
                 .findFirst().get();
 
+        LinkedList<LogFileSegment> orderedList = new LinkedList<>();
         orderedList.addLast(current);
-        workingList = removeIneligibleSegments (workingList, current);
-        while ( ! workingList.isEmpty()) {
-            current = workingList.stream()
-                    .max(Comparator.comparing(LogFileSegment::getEndTime))
-                    .get();
-            orderedList.addFirst(current);
-            workingList = removeIneligibleSegments (workingList, current);
+        double nextStartTime = getStartTime(current, inspectionBudget);
+        List<LogFileSegment> candidates = segments.stream()
+                .filter(segment -> segment != current)
+                .sorted(Comparator.comparing(
+                        (LogFileSegment segment) -> getEndTime(segment, inspectionBudget))
+                        .reversed())
+                .collect(toList());
+        for (LogFileSegment candidate : candidates) {
+            if (getEndTime(candidate, inspectionBudget) <= nextStartTime) {
+                orderedList.addFirst(candidate);
+                nextStartTime = getStartTime(candidate, inspectionBudget);
+            }
         }
         segments = orderedList;
     }
 
-    private List<LogFileSegment> removeIneligibleSegments(final List<LogFileSegment> logFileSegments, final LogFileSegment current) {
-        return logFileSegments.stream()
-                .filter( segment -> segment.getEndTime() <= current.getStartTime())
-                .collect(toList());
+    private static double getStartTime(
+            LogFileSegment segment,
+            LogFileReadBudget inspectionBudget) {
+        if (segment instanceof GCLogFileZipSegment) {
+            return ((GCLogFileZipSegment) segment).getStartTime(inspectionBudget);
+        }
+        return ((GCLogFileSegment) segment).getStartTime(inspectionBudget);
+    }
+
+    private static double getEndTime(
+            LogFileSegment segment,
+            LogFileReadBudget inspectionBudget) {
+        if (segment instanceof GCLogFileZipSegment) {
+            return ((GCLogFileZipSegment) segment).getEndTime(inspectionBudget);
+        }
+        return ((GCLogFileSegment) segment).getEndTime(inspectionBudget);
     }
 }

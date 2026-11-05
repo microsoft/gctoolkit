@@ -46,6 +46,7 @@
     <properties>
         <revision>3.0.3-SNAPSHOT</revision>
         <checkstyle.version>13.10.0</checkstyle.version>
+        <commons-compress.version>1.28.0</commons-compress.version>
         <jreleaser.plugin.version>1.25.0</jreleaser.plugin.version>
         <junit5.version>5.13.4</junit5.version>
         <maven.antrun-plugin.version>3.2.0</maven.antrun-plugin.version>
@@ -123,6 +124,11 @@
                 <groupId>com.microsoft.gctoolkit</groupId>
                 <artifactId>gctoolkit-gclogs</artifactId>
                 <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-compress</artifactId>
+                <version>${commons-compress.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.junit.jupiter</groupId>

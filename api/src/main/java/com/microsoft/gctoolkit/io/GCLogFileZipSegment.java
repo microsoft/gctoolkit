@@ -4,19 +4,17 @@ package com.microsoft.gctoolkit.io;
 
 import com.microsoft.gctoolkit.time.DateTimeStamp;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.UncheckedIOException;
 import java.nio.file.Path;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Deque;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collector;
 import java.util.stream.Stream;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 
 /**
  * A {@link RotatingGCLogFile} is made up of {@code GarbageCollectionLogFileSegment}s. Creating
@@ -29,6 +27,8 @@ public class GCLogFileZipSegment implements LogFileSegment {
 
     private final Path path;
     private final String segmentName;
+    private final LogFileReadLimits readLimits;
+    private final LogFileStreams.ZipEntryReference archiveEntry;
     private DateTimeStamp endTime = null;
     private DateTimeStamp startTime = null;
 
@@ -38,8 +38,29 @@ public class GCLogFileZipSegment implements LogFileSegment {
      * @param segmentName name of first segment in zip file
      */
     public GCLogFileZipSegment(Path path, String segmentName) {
+        this(path, segmentName, LogFileReadLimits.defaults());
+    }
+
+    /**
+     * Creates an archived log segment with explicit resource limits.
+     *
+     * @param path path to the ZIP file
+     * @param segmentName name of the entry in the ZIP file
+     * @param readLimits resource limits applied while streaming the segment
+     */
+    public GCLogFileZipSegment(Path path, String segmentName, LogFileReadLimits readLimits) {
+        this(path, segmentName, readLimits, null);
+    }
+
+    GCLogFileZipSegment(
+            Path path,
+            String segmentName,
+            LogFileReadLimits readLimits,
+            LogFileStreams.ZipEntryReference archiveEntry) {
         this.path = path;
         this.segmentName = segmentName;
+        this.readLimits = Objects.requireNonNull(readLimits, "readLimits");
+        this.archiveEntry = archiveEntry;
     }
 
     /**
@@ -54,21 +75,25 @@ public class GCLogFileZipSegment implements LogFileSegment {
         return this.segmentName;
     }
 
-    private void ageOfJVMAtLogStart() {
+    private void ageOfJVMAtLogStart(LogFileReadBudget readBudget) {
         if (startTime == null) {
-            startTime = stream()
-                    .filter(s -> ! s.contains(" file created "))
-                    .map(DateTimeStamp::fromGCLogLine)
-                    .filter(dateTimeStamp -> dateTimeStamp.hasTimeStamp() || dateTimeStamp.hasDateStamp())
-                    .findFirst()
-                    .orElse(new DateTimeStamp(-1.0d));
+            try (Stream<String> lines = stream(readBudget)) {
+                startTime = lines
+                        .filter(s -> ! s.contains(" file created "))
+                        .map(DateTimeStamp::fromGCLogLine)
+                        .filter(dateTimeStamp -> dateTimeStamp.hasTimeStamp() || dateTimeStamp.hasDateStamp())
+                        .findFirst()
+                        .orElse(new DateTimeStamp(-1.0d));
+            }
         }
     }
 
-    private DateTimeStamp ageOfJVMAtLogEnd()  {
+    private DateTimeStamp ageOfJVMAtLogEnd(LogFileReadBudget readBudget)  {
         if (endTime == null) {
-            List<String> tail = stream().
-                    collect(tail(100));
+            List<String> tail;
+            try (Stream<String> lines = stream(readBudget)) {
+                tail = lines.collect(tail(100));
+            }
             endTime = tail.stream()
                     .filter(line -> ! line.contains("Saved as"))
                     .map(DateTimeStamp::fromGCLogLine)
@@ -94,8 +119,12 @@ public class GCLogFileZipSegment implements LogFileSegment {
 
     @Override
     public double getStartTime() {
+        return getStartTime(new LogFileReadBudget(readLimits.getMaxExpandedBytes()));
+    }
+
+    double getStartTime(LogFileReadBudget readBudget) {
         try {
-            ageOfJVMAtLogStart();
+            ageOfJVMAtLogStart(readBudget);
             if ( startTime.hasTimeStamp())
                 return startTime.getTimeStamp();
             else if ( startTime.hasDateStamp())
@@ -109,8 +138,12 @@ public class GCLogFileZipSegment implements LogFileSegment {
 
     @Override
     public double getEndTime() {
+        return getEndTime(new LogFileReadBudget(readLimits.getMaxExpandedBytes()));
+    }
+
+    double getEndTime(LogFileReadBudget readBudget) {
         try {
-            ageOfJVMAtLogEnd();
+            ageOfJVMAtLogEnd(readBudget);
             if ( endTime.hasTimeStamp())
                 return endTime.getTimeStamp();
             else if ( endTime.hasDateStamp())
@@ -127,14 +160,26 @@ public class GCLogFileZipSegment implements LogFileSegment {
      * @return A stream of lines from the file.
      */
     public Stream<String> stream() {
+        return stream(new LogFileReadBudget(readLimits.getMaxExpandedBytes()));
+    }
+
+    Stream<String> stream(LogFileReadBudget readBudget) {
         try {
-            ZipFile file = new ZipFile(path.toFile());
-            ZipEntry entry = file.getEntry(this.segmentName);
-            return new BufferedReader(new InputStreamReader(file.getInputStream(entry))).lines();
+            if (archiveEntry != null) {
+                return LogFileStreams.zipEntry(
+                        path,
+                        archiveEntry,
+                        readLimits,
+                        readBudget);
+            }
+            return LogFileStreams.zipEntry(
+                    path,
+                    segmentName,
+                    readLimits,
+                    readBudget);
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new UncheckedIOException(e);
         }
-        return new ArrayList<String>().stream();
     }
 
     /**
