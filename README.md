@@ -24,9 +24,9 @@ In order to use this library you'll need to add its dependencies to your project
 
 ### Maven Coordinates
 
-[![Maven Central](https://img.shields.io/maven-central/v/com.microsoft.gctoolkit/gctoolkit-parser.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22com.microsoft.gctoolkit%22%20AND%20a:%22gctoolkit-api%22)
+[![Maven Central](https://img.shields.io/maven-central/v/com.microsoft.gctoolkit/gctoolkit-parser.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22com.microsoft.gctoolkit%22%20AND%20a:%22gctoolkit-parser%22)
 
-The GCToolKit artifacts are in [Maven Central](https://search.maven.org/search?q=g:com.microsoft.gctoolkit). You'll then need to add the `api`, `parser` and `vertx` modules to your project in the `dependencyManagement` and/or `dependencies` section as you see fit.
+The GCToolKit artifacts are in [Maven Central](https://search.maven.org/search?q=g:com.microsoft.gctoolkit). You'll then need to add the `gctoolkit-api`, `gctoolkit-parser` and `gctoolkit-vertx` dependencies to your project in the `dependencyManagement` and/or `dependencies` section as you see fit.
 
 ```xml
 <dependencies>
@@ -34,19 +34,19 @@ The GCToolKit artifacts are in [Maven Central](https://search.maven.org/search?q
     
     <dependency>
         <groupId>com.microsoft.gctoolkit</groupId>
-        <artifactId>api</artifactId>
+        <artifactId>gctoolkit-api</artifactId>
         <version>3.0.4</version>
     </dependency>
     
     <dependency>
         <groupId>com.microsoft.gctoolkit</groupId>
-        <artifactId>parser</artifactId>
+        <artifactId>gctoolkit-parser</artifactId>
         <version>3.0.4</version>
     </dependency>
     
     <dependency>
         <groupId>com.microsoft.gctoolkit</groupId>
-        <artifactId>vertx</artifactId>
+        <artifactId>gctoolkit-vertx</artifactId>
         <version>3.0.4</version>
     </dependency>
 
