@@ -82,7 +82,7 @@ public abstract class AbstractJavaVirtualMachine implements JavaVirtualMachine {
 
     @Override
     public String getCommandLine() {
-        return ""; //todo: extract from diary... jvmConfigurationFromParser.getCommandLine();
+        return diary == null ? "" : diary.getCommandLine();
     }
 
     public DateTimeStamp getTimeOfFirstEvent() {

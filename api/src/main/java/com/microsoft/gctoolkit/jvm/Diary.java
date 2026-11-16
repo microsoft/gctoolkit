@@ -65,6 +65,15 @@ public class Diary {
 
     private final TripleState[] states;
     private DateTimeStamp timeOfFirstEvent;
+    private String commandLine = "";
+
+    public String getCommandLine() {
+        return commandLine;
+    }
+
+    public void setCommandLine(String commandLine) {
+        this.commandLine = commandLine;
+    }
 
     public Diary() {
         states = new TripleState[SupportedFlags.values().length];

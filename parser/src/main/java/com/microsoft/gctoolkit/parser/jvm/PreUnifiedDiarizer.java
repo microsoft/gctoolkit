@@ -135,8 +135,7 @@ public class PreUnifiedDiarizer implements Diarizer {
 
     @Override
     public String getCommandLine() {
-        // TODO #149 Extract command line from PreUnifiedJVMConfiguration log file
-        return "";
+        return diary.getCommandLine();
     }
 
     @Override
@@ -211,6 +210,9 @@ public class PreUnifiedDiarizer implements Diarizer {
         if (line.startsWith("Java HotSpot(TM)") || line.startsWith("OpenJDK")) {
             parseJVMVersion(line);
         } else if (line.startsWith("CommandLine ")) {
+            if (line.startsWith("CommandLine flags:")) {
+                diary.setCommandLine(line.substring("CommandLine flags:".length()).strip());
+            }
             evaluateCommandLineFlags(line.split(" "));
             /*
              * We're almost done, all we need is a time stamp which should be on the next line.
