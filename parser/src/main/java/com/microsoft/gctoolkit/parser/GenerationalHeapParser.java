@@ -1956,8 +1956,9 @@ public class GenerationalHeapParser extends PreUnifiedGCLogParser implements Sim
         if ( remarkBlock == null) {
             LOGGER.warning("Internal error, unable to parse CMS information from " + line);
         } else {
-            MemoryPoolSummary tenured = remarkBlock.getOccupancyWithMemoryPoolSizeSummary();
-            MemoryPoolSummary heap = remarkBlock.getOccupancyWithMemoryPoolSizeSummary();
+            // [1 CMS-remark: <tenured occupancy>K(<tenured size>K)] <heap occupancy>K(<heap size>K), ...
+            MemoryPoolSummary tenured = remarkBlock.getOccupancyWithMemoryPoolSizeSummary(1);
+            MemoryPoolSummary heap = remarkBlock.getOccupancyWithMemoryPoolSizeSummary(5);
             collection.add(heap.minus(tenured), tenured, heap);
             recordRescanStepTimes(collection, line);
             collection.add(extractCPUSummary(line));
