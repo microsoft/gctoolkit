@@ -8,26 +8,27 @@ We use the Maven wrapper (`mvnw`) so you don't have to change your system wide M
 
 ### From Maven
 
-Install the sample to your local maven repository with `mvnw install`, then use `mvnw exec:exec` to run the sample.
+Build and install the reactor from the repository root. Then run the sample from the `sample` directory so its default relative log path resolves correctly.
 
 ```shell
-mvnw clean install
-mvnw exec:exec
+./mvnw clean install
+cd sample
+../mvnw exec:exec
 ```
 
-By default, the sample analyzes `../gclogs/preunified/cms/defnew/details/defnew.log`. Set the parameter `gcLogPath` to analyze a different GC log file.
+By default, the sample analyzes `../gclogs/preunified/cms/defnew/details/defnew.log`. Set the property `gcLogFile` to analyze a different GC log file.
 
 ```shell
-mvnw exec:exec -DgcLogFile=../gclogs/unified/parallel/parallelgc.log
+../mvnw exec:exec -DgcLogFile=/path/to/gc.log
 ```
 
 ### From the command line
 
-The sample can also be run from the command line with Java 11 or higher. Compile the sample with `mvnw compile dependency:copy-dependencies`,
+The sample can also be run from the command line with Java 11 or higher. From the `sample` directory, after installing the reactor as shown above, compile the sample with `../mvnw compile dependency:copy-dependencies`,
 then run `java` with `--module-path` and give it the path to a GC log file as an argument.
 
 ```shell
-mvnw clean compile dependency:copy-dependencies
+../mvnw clean compile dependency:copy-dependencies
 java --module-path target/classes:target/lib --module com.microsoft.gctoolkit.sample/com.microsoft.gctoolkit.sample.Main ../gclogs/preunified/cms/defnew/details/defnew.log
 ```
 
@@ -45,5 +46,5 @@ This has something to do with the [Exec Maven Plugin](https://www.mojohaus.org/e
 
 There are two possible issues here.
 
-1. There is no `gclogs` directory in the _top-level_ directory. The sample uses `unit-test` data from building GCToolKit. Either run `mvnw test` from the _top-level_ directory, or use `-DgcLogFile=<path-to-gc-log-file>` argument to specify a log file.
-1. The sample is not being run from the `sample` directory. Please ensure you are in the sample directory before executing `mvnw exec:exec`.
+1. The default log file is missing. Run `./mvnw test` from the repository root to download the test data, or pass `-DgcLogFile=<path-to-gc-log-file>` to use your own log.
+1. The sample is not being run from the `sample` directory. Please ensure you are in the sample directory before executing `../mvnw exec:exec`.
