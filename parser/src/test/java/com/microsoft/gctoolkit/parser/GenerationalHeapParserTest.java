@@ -134,6 +134,48 @@ public class GenerationalHeapParserTest extends ParserTest {
         assertTrue(true);
     }
 
+    /**
+     * The CMS Final Remark line reports the old generation as "[1 CMS-remark: 264253K(265024K)]" and the whole heap
+     * as "290653K(343680K)". The remark event must keep these two summaries apart (young = heap - tenured).
+     */
+    @Test
+    public void testCMSRemarkHeapAndTenuredSummaries() {
+        String[] lines = new String[]{
+                "2024-01-31T14:51:29.583+0800: 0.166: [GC (CMS Initial Mark) [1 CMS-initial-mark: 124639K(174784K)] 133425K(253440K), 0.0005158 secs] [Times: user=0.00 sys=0.00, real=0.00 secs]",
+                "2024-01-31T14:51:29.583+0800: 0.166: [CMS-concurrent-mark-start]",
+                "2024-01-31T14:51:29.585+0800: 0.168: [CMS-concurrent-mark: 0.001/0.001 secs] [Times: user=0.00 sys=0.00, real=0.00 secs]",
+                "2024-01-31T14:51:29.606+0800: 0.189: [CMS-concurrent-preclean-start]",
+                "2024-01-31T14:51:29.607+0800: 0.190: [CMS-concurrent-preclean: 0.001/0.001 secs] [Times: user=0.00 sys=0.00, real=0.00 secs]",
+                "2024-01-31T14:51:29.607+0800: 0.190: [CMS-concurrent-abortable-preclean-start]",
+                "2024-01-31T14:51:29.622+0800: 0.205: [CMS-concurrent-abortable-preclean: 0.001/0.015 secs] [Times: user=0.02 sys=0.02, real=0.02 secs]",
+                "2024-01-31T14:51:29.622+0800: 0.205: [GC (CMS Final Remark) [YG occupancy: 26399 K (78656 K)]2024-01-31T14:51:29.622+0800: 0.206: [Rescan (parallel) , 0.0009973 secs]2024-01-31T14:51:29.624+0800: 0.207: [weak refs processing, 0.0000331 secs]2024-01-31T14:51:29.624+0800: 0.207: [class unloading, 0.0015893 secs]2024-01-31T14:51:29.625+0800: 0.208: [scrub symbol table, 0.0005356 secs]2024-01-31T14:51:29.626+0800: 0.209: [scrub string table, 0.0001132 secs][1 CMS-remark: 264253K(265024K)] 290653K(343680K), 0.0033981 secs] [Times: user=0.00 sys=0.00, real=0.00 secs]",
+                "2024-01-31T14:51:29.626+0800: 0.209: [CMS-concurrent-sweep-start]",
+                "2024-01-31T14:51:29.628+0800: 0.211: [CMS-concurrent-sweep: 0.002/0.002 secs] [Times: user=0.00 sys=0.00, real=0.00 secs]",
+                "2024-01-31T14:51:29.629+0800: 0.212: [CMS-concurrent-reset-start]",
+                "2024-01-31T14:51:29.702+0800: 0.285: [CMS-concurrent-reset: 0.009/0.073 secs] [Times: user=0.11 sys=0.08, real=0.08 secs]"
+        };
+
+        List<JVMEvent> jvmEvents = feedParser(lines);
+
+        CMSRemark remark = jvmEvents.stream()
+                .filter(CMSRemark.class::isInstance)
+                .map(CMSRemark.class::cast)
+                .findFirst()
+                .orElseGet(() -> fail("No CMSRemark event was published"));
+
+        assertEquals(0.0033981d, remark.getDuration());
+
+        // whole heap: 290653K(343680K)
+        assertEquals(290653, remark.getHeap().getOccupancyAfterCollection());
+        assertEquals(343680, remark.getHeap().getSizeAfterCollection());
+        // old generation: 264253K(265024K)
+        assertEquals(264253, remark.getTenured().getOccupancyAfterCollection());
+        assertEquals(265024, remark.getTenured().getSizeAfterCollection());
+        // young generation = heap - old generation
+        assertEquals(26400, remark.getYoung().getOccupancyAfterCollection());
+        assertEquals(78656, remark.getYoung().getSizeAfterCollection());
+    }
+
     @Test
     public void testThat2CMFDoNotHappen() {
         String[][] lines = new String[][]{
