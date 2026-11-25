@@ -2,15 +2,42 @@
 // Licensed under the MIT License.
 package com.microsoft.gctoolkit.parser.diary;
 
+import com.microsoft.gctoolkit.io.SingleGCLogFile;
 import com.microsoft.gctoolkit.jvm.Diarizer;
+import com.microsoft.gctoolkit.jvm.PreUnifiedJavaVirtualMachine;
 import com.microsoft.gctoolkit.jvm.Diary;
 import com.microsoft.gctoolkit.parser.jvm.PreUnifiedDiarizer;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class CommandLineFlagsLogDiaryTest {
+
+    @Test
+    void exposesLoggedCommandLineThroughJvm(@TempDir Path directory) throws IOException {
+        String flags = "-XX:+UseParallelGC  -XX:+PrintGCDetails";
+        Path log = directory.resolve("gc.log");
+        Files.write(log, List.of(gcLogFileHeader[1][0], "CommandLine flags: " + flags,
+                "1.250: [GC (Allocation Failure) 100K->50K(200K), 0.001 secs]"));
+
+        PreUnifiedJavaVirtualMachine jvm = new PreUnifiedJavaVirtualMachine();
+        assertEquals("", jvm.getCommandLine());
+        assertTrue(jvm.accepts(new SingleGCLogFile(log)));
+        assertEquals(flags, jvm.getCommandLine());
+
+        Diarizer diarizer = new PreUnifiedDiarizer();
+        assertEquals("", diarizer.getCommandLine());
+        diarizer.diarize("CommandLine flags: " + flags);
+        assertEquals(flags, diarizer.getCommandLine());
+    }
 
     private static final String[][] gcLogFileHeader = {
             {
