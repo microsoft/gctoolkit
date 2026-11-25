@@ -8,7 +8,7 @@ import com.microsoft.gctoolkit.time.DateTimeStamp;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-abstract class UnifiedGCLogParser extends GCLogParser {
+public abstract class UnifiedGCLogParser extends GCLogParser {
 
     private static final Logger LOGGER = Logger.getLogger(UnifiedGCLogParser.class.getName());
     private static final boolean DEBUG = Boolean.getBoolean("microsoft.debug");
