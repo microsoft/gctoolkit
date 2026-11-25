@@ -7,6 +7,7 @@ import com.microsoft.gctoolkit.aggregator.Aggregator;
 import com.microsoft.gctoolkit.aggregator.EventSource;
 import com.microsoft.gctoolkit.io.DataSource;
 import com.microsoft.gctoolkit.io.GCLogFile;
+import com.microsoft.gctoolkit.io.LogFileReadLimitExceededException;
 import com.microsoft.gctoolkit.io.RotatingGCLogFile;
 import com.microsoft.gctoolkit.io.SingleGCLogFile;
 import com.microsoft.gctoolkit.jvm.Diary;
@@ -16,6 +17,7 @@ import com.microsoft.gctoolkit.message.DataSourceParser;
 import com.microsoft.gctoolkit.message.JVMEventChannel;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Parameter;
@@ -312,6 +314,10 @@ public class GCToolKit {
             long start = System.currentTimeMillis();
             javaVirtualMachine.analyze(filteredAggregators, jvmEventChannel, dataSourceChannel);
             LOGGER.log(Level.FINE,() -> "Analysis completed in " + (System.currentTimeMillis() - start) + "ms");
+        } catch (LogFileReadLimitExceededException limitExceeded) {
+            throw limitExceeded;
+        } catch (UncheckedIOException uncheckedIOException) {
+            throw uncheckedIOException.getCause();
         } catch(Throwable t) {
             LOGGER.log(Level.SEVERE, "Internal Error: Cannot invoke analyze method", t);
         }

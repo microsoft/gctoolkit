@@ -25,6 +25,8 @@ public interface DataSource<T> {
      * @return A stream of the data.
      * @throws IOException Thrown if the data cannot be streamed,
      * or an IOException is raised while streaming.
+     * @throws LogFileReadLimitExceededException if a log-file resource limit is exceeded during a
+     * lazy terminal operation
      */
     Stream<T> stream() throws IOException;
 

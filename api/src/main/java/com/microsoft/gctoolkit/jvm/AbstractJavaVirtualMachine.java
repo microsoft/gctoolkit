@@ -15,6 +15,7 @@ import com.microsoft.gctoolkit.message.JVMEventChannelAggregator;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -23,6 +24,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Phaser;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Stream;
 
 /**
  * The base implementation of JavaVirtualMachine that uses the message API to feed
@@ -178,7 +180,9 @@ public abstract class AbstractJavaVirtualMachine implements JavaVirtualMachine {
 
         try {
             if (finishLine.getRegisteredParties() > 0) {
-                dataSource.stream().forEach(message -> dataSourceBus.publish(ChannelName.DATA_SOURCE, message));
+                try (Stream<String> lines = dataSource.stream()) {
+                    lines.forEach(message -> dataSourceBus.publish(ChannelName.DATA_SOURCE, message));
+                }
                 finishLine.awaitAdvance(0);
             } else {
                 LOGGER.log(Level.INFO, "No Aggregations have been registered, DataSource will not be analysed.");
@@ -194,7 +198,7 @@ public abstract class AbstractJavaVirtualMachine implements JavaVirtualMachine {
                 setEstimatedJVMStartTime(terminationRecord.estimatedStartTime());
             });
         } catch (IOException ioe) {
-            LOGGER.log(Level.SEVERE, ioe.getMessage(), ioe);
+            throw new UncheckedIOException(ioe);
         } finally {
             dataSourceBus.close();
             eventBus.close();

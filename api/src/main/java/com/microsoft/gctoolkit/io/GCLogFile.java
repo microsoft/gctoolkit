@@ -40,13 +40,33 @@ public abstract class GCLogFile extends FileDataSource<String> {
     private Diary diary;
     private TripleState unifiedFormat = TripleState.UNKNOWN;
     private JavaVirtualMachine jvm = null;
+    private final LogFileReadLimits readLimits;
 
     /**
      * Subclass only.
      * @param path The path to the GCLogFile or, in the case of rotating log files, the parent directory.
      */
     protected GCLogFile(Path path) {
+        this(path, LogFileReadLimits.defaults());
+    }
+
+    /**
+     * Subclass only.
+     * @param path The path to the GCLogFile or, in the case of rotating log files, the parent directory.
+     * @param readLimits resource limits applied while streaming the log
+     */
+    protected GCLogFile(Path path, LogFileReadLimits readLimits) {
         super(path);
+        this.readLimits = Objects.requireNonNull(readLimits, "readLimits");
+    }
+
+    /**
+     * Returns the resource limits applied while streaming this log.
+     *
+     * @return immutable read limits
+     */
+    public final LogFileReadLimits getReadLimits() {
+        return readLimits;
     }
 
     /**
@@ -96,13 +116,14 @@ public abstract class GCLogFile extends FileDataSource<String> {
     public Diary diary() throws IOException {
         if ( diary == null) {
             Diarizer diarizer = diarizer();
-            stream()
-                    .filter(Objects::nonNull)
-                    .map(String::trim)
-                    .filter(s -> s.length() > 0)
-                    .map(diarizer::diarize)
-                    .filter(completed -> completed)
-                    .findFirst();
+            try (Stream<String> lines = stream()) {
+                lines.filter(Objects::nonNull)
+                        .map(String::trim)
+                        .filter(s -> s.length() > 0)
+                        .map(diarizer::diarize)
+                        .filter(completed -> completed)
+                        .findFirst();
+            }
             this.diary = diarizer.getDiary();
         }
         return diary;
