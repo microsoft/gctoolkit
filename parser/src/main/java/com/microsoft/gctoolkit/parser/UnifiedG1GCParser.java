@@ -4,11 +4,7 @@ package com.microsoft.gctoolkit.parser;
 
 import com.microsoft.gctoolkit.GCToolKit;
 import com.microsoft.gctoolkit.aggregator.EventSource;
-import com.microsoft.gctoolkit.event.CPUSummary;
-import com.microsoft.gctoolkit.event.GarbageCollectionTypes;
-import com.microsoft.gctoolkit.event.MalformedEvent;
-import com.microsoft.gctoolkit.event.MemoryPoolSummary;
-import com.microsoft.gctoolkit.event.RegionSummary;
+import com.microsoft.gctoolkit.event.*;
 import com.microsoft.gctoolkit.event.g1gc.G1ConcurrentUndoCycle;
 import com.microsoft.gctoolkit.event.g1gc.G1GCConcurrentEvent;
 import com.microsoft.gctoolkit.event.g1gc.G1GCEvent;
@@ -24,7 +20,6 @@ import com.microsoft.gctoolkit.parser.jvm.Decorators;
 import com.microsoft.gctoolkit.parser.unified.UnifiedG1GCPatterns;
 import com.microsoft.gctoolkit.time.DateTimeStamp;
 
-import java.util.AbstractMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
@@ -33,8 +28,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static com.microsoft.gctoolkit.event.GarbageCollectionTypes.fromLabel;
 
@@ -177,36 +170,38 @@ public class UnifiedG1GCParser extends UnifiedGCLogParser implements UnifiedG1GC
             parse(line);
     }
 
-    private static final Pattern gcIdPattern = GCLogParser.GCID_COUNTER.pattern();
-
     private void parse(String line) {
 
         // Minor optimization. The parse rule only applies to what comes after the GC ID.
         final int end;
         final int gcid;
-        final Matcher gcIdMatcher = gcIdPattern.matcher(line);
-        if (gcIdMatcher.find()) {
-            gcid = Integer.parseInt(gcIdMatcher.group(1));
-            end = gcIdMatcher.end();
+        long packedGcCycleIdAndEnd = extractGCCycleIdAndTextualLength(line);
+        if (packedGcCycleIdAndEnd != -1) {
+            gcid = extractGCCycleId(packedGcCycleIdAndEnd);
+            end = extractGCCycleIdTextualLength(packedGcCycleIdAndEnd);
         } else {
             gcid = -1;
             end = 0;
         }
 
         final String lineAfterGcId = line.substring(end);
-        parseRules.stream()
-                .map(Map.Entry::getKey)
-                .map(rule -> new AbstractMap.SimpleEntry<>(rule, rule.parse(lineAfterGcId)))
-                .filter(tuple -> tuple.getValue() != null)
-                .findAny()
-                .ifPresentOrElse(
-                        tuple -> {
-                            // Typically, "end" will be greater than zero, but not always.
-                            setForwardReference(gcid, end > 0 ? line.substring(0, end) : line);
-                            applyRule(tuple.getKey(), tuple.getValue(), line);
-                        },
-                        () -> log(line)
-                );
+        GCParseRule matchedParseRule = null;
+        GCLogTrace parsed = null;
+        for (Map.Entry<GCParseRule, BiConsumer<GCLogTrace, String>> entry : parseRules.entrySet()) {
+            GCParseRule rule = entry.getKey();
+            parsed = rule.parse(lineAfterGcId);
+            if (parsed != null) {
+                matchedParseRule = rule;
+                break;
+            }
+        }
+        if (parsed != null) {
+            // Typically, "end" will be greater than zero, but not always.
+            setForwardReference(gcid, end > 0 ? line.substring(0, end) : line);
+            applyRule(matchedParseRule, parsed, line);
+        } else {
+            log(line);
+        }
     }
 
 
